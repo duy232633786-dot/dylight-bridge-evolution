@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-005",
+  "type": "design_heuristic",
+  "title": "Ràng buộc chi phối là kéo thớ dưới SD-III — đừng tối ưu theo võng",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["SERV-001", "SERV-002"],
+    "variables": []
+  },
+  "guidance": "Trong họ Super-T nhịp 38.3 m, kéo thớ dưới ở tổ hợp Sử dụng III (SERV-001) là ràng buộc chi phối quyết định khả thi của phương án. Võng do hoạt tải luôn dư rất lớn: khoảng 9–19 mm so với giới hạn 47.9 mm (L/800), tức SERV-002 gần như không bao giờ active. Do đó đừng tiêu ngân sách tìm kiếm để cải thiện võng — hãy tập trung vào ứng suất kéo thớ dưới.",
+  "evidence": "Thống kê run_b600_s42: mọi phương án qua được hình học đều có võng hoạt tải 9–19 mm, không cá thể nào vi phạm SERV-002; SERV-001 chiếm đa số vi phạm HARD còn lại.",
+  "source": { "kind": "experiment", "ref": "experiments/results/run_b600_s42" },
+  "status": "DRAFT",
+  "version": 1
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research_handoff.schema.json",
+  "title": "BridgeLabResearchHandoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "task_id", "agent_id", "role", "summary", "claim_level",
+    "gates_completed", "artifacts", "assumptions", "unresolved_risks", "next_action"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "task_id": {"type": "string", "pattern": "^(BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})$"},
+    "agent_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$"},
+    "role": {
+      "enum": [
+        "orchestrator", "form_inventor", "structural_analyst", "materials_researcher",
+        "constructability_lcca", "aesthetics_context", "independent_reproducer",
+        "evidence_safety_auditor", "bim_fem_integrator"
+      ]
+    },
+    "summary": {"type": "string", "minLength": 10},
+    "claim_level": {
+      "enum": [
+        "IDEA", "SCREENED", "NUMERICALLY_VERIFIED", "LAB_VALIDATED",
+        "PILOT_VALIDATED", "ENGINEERING_CANDIDATE"
+      ]
+    },
+    "gates_completed": {
+      "type": "array", "uniqueItems": true,
+      "items": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"]}
+    },
+    "artifacts": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "sha256", "kind"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "kind": {"enum": ["input", "model", "solver_output", "raw_measurement", "report", "code", "test"]}
+        }
+      }
+    },
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "unresolved_risks": {"type": "array", "items": {"type": "string"}},
+    "next_action": {"type": "string", "minLength": 5}
+  }
+}

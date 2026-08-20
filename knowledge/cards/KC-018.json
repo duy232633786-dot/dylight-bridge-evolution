@@ -1,0 +1,18 @@
+{
+  "card_id": "KC-018",
+  "type": "design_heuristic",
+  "title": "Mô phỏng mạng dầm 3D (Grillage Analysis): Phân tích phân bố ngang hoạt tải so với dầm đơn L1",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["STR-001", "STR-002", "SERV-001", "SERV-002"],
+    "variables": ["girder_count", "girder_spacing_mm", "diaphragm_layout_id"]
+  },
+  "guidance": "Mô hình dầm đơn L1 sử dụng hệ số phân bố ngang AASHTO/TCVN Type-k cho kết quả an toàn nhưng thường bảo thủ từ 10% đến 25% so với phân tích mạng dầm 3D (Grillage Model). Trong các phương án cận biên Pareto hoặc dầm biên chịu tải lệch tâm lớn, việc kích hoạt solver L2 tự động (qua OpenSees / ospgrillage) giúp định lượng chính xác hiệu ứng phân phối tải qua các hàng dầm ngang (DG-3, DG-5) và độ xoắn cục bộ của dầm máng Super-T.",
+  "evidence": "Nghiên cứu của Monash University (Ngan & Caprani, 2022) về mô hình mạng dầm cầu Super-T và dầm I bê tông dự ứng lực chỉ ra rằng việc mô hình hóa dầm ngang và bản trực hướng 3D làm giảm ứng suất uốn cực đại trên dầm giữa so với công thức hệ số phân bố tiêu chuẩn, mở ra không gian tiết kiệm lượng cáp DƯL.",
+  "source": {
+    "kind": "textbook",
+    "ref": "Ngan, J.W. and Caprani, C.C. (2022), ospgrillage: A bridge deck grillage analysis preprocessor for OpenSeesPy, JOSS 7(77), 4404"
+  },
+  "status": "DRAFT",
+  "version": 1
+}

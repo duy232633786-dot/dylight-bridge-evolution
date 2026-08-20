@@ -1,0 +1,28 @@
+{
+  "grammar_id": "super_t_simple_v1",
+  "grammar_version": "1.0.0",
+  "description": "Design grammar cho cầu Super-T nhịp giản đơn — miền biến rời rạc, RL/EA chỉ được chọn trong miền này (action mask).",
+  "project_inputs": {
+    "span_length_m": 38.3,
+    "deck_width_m": 12.0,
+    "alignment_type": "STRAIGHT",
+    "skew_deg": 0
+  },
+  "fixed": {
+    "load_profile_id": "LOAD-PROFILE-01",
+    "rule_profile_id": "BRIDGE-RULESET-V1",
+    "prestressing_steel_id": "PS-15.2-1860",
+    "fidelity": "L1_LINE_GIRDER",
+    "solver": "BUILTIN_L1"
+  },
+  "design_variables": {
+    "girder_catalog_id": { "type": "catalog", "domain": ["ST-1650", "ST-1750", "ST-1850"] },
+    "girder_count": { "type": "int", "domain": [5, 6, 7, 8] },
+    "girder_spacing_mm": { "type": "grid", "min": 2150, "max": 2900, "step": 50 },
+    "deck_slab_thickness_mm": { "type": "grid", "min": 175, "max": 250, "step": 5 },
+    "girder_concrete_id": { "type": "catalog", "domain": ["C40", "C45", "C50"] },
+    "deck_concrete_id": { "type": "catalog", "domain": ["C30", "C35"] },
+    "diaphragm_layout_id": { "type": "catalog", "domain": ["DG-END-ONLY", "DG-3", "DG-5"] },
+    "prestress_layout_id": { "type": "catalog", "domain": ["PT-34", "PT-38", "PT-42", "PT-46", "PT-50", "PT-54"] }
+  }
+}

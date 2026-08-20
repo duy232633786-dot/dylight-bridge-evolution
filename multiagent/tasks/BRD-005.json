@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-005",
+  "title": "Evidence matrix cho vật liệu rẻ, bền và ít carbon",
+  "research_question": "Vật liệu/hệ vật liệu nào có thể giảm lifecycle cost và carbon cho exposure cụ thể mà không vượt miền hiệu lực tiêu chuẩn?",
+  "workstream": "materials",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0",
+    "G6"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/materials/",
+    "contracts/material_evidence.schema.json",
+    "tests/test_material_evidence.py",
+    "knowledge/cards/experimental/"
+  ],
+  "acceptance_criteria": [
+    "Mỗi claim truy được tới source gốc, batch/process và miền exposure",
+    "Tách mean khỏi characteristic values và ghi uncertainty",
+    "Có creep, shrinkage, fatigue, fracture, fire, chemical/corrosion, repair và recyclability",
+    "Cost dùng supplier quote/range; carbon ghi EPD boundary; không dùng chữ trường tồn"
+  ],
+  "required_artifacts": [
+    "contracts/material_evidence.schema.json",
+    "research/materials/evidence_matrix.json",
+    "research/materials/test_plan_template.json"
+  ],
+  "safety_notes": [
+    "Không thêm vật liệu mới vào catalogs/catalogs.json",
+    "NotebookLM summary không phải nguồn bằng chứng",
+    "Không suy extrapolation tuổi thọ nếu chưa có degradation model được kiểm chứng"
+  ],
+  "review_notes": [
+    "Phe duyet Material Evidence Matrix va Test Plan Template"
+  ]
+}

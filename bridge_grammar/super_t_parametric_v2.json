@@ -1,0 +1,43 @@
+{
+  "grammar_id": "super_t_parametric_v2",
+  "grammar_version": "2.0.0",
+  "description": "Design grammar cấp 2 cho cầu Super-T nhịp giản đơn — AI TỰ THIẾT KẾ hình dạng mặt cắt thay vì chọn tiết diện định hình. girder_catalog_id bị khóa ở marker ST-PARAM: đặc trưng tiết diện (A, I, y_b) được TÍNH từ 6 biến hình dạng qua bridge_evolution.section.section_from_params. Đổi lại tự do đó, rule profile BRIDGE-RULESET-V2 bật nhóm FAB-001…FAB-007 (chế tạo/vận chuyển/cẩu lắp/bố trí cáp) ở L0 dưới dạng HARD constraint. Grammar v1 giữ nguyên làm arm đối chứng (docs/03_shape_evolution.md §1).",
+  "project_inputs": {
+    "span_length_m": 38.3,
+    "deck_width_m": 12.0,
+    "alignment_type": "STRAIGHT",
+    "skew_deg": 0
+  },
+  "fixed": {
+    "load_profile_id": "LOAD-PROFILE-01",
+    "rule_profile_id": "BRIDGE-RULESET-V2",
+    "prestressing_steel_id": "PS-15.2-1860",
+    "fidelity": "L1_LINE_GIRDER",
+    "solver": "BUILTIN_L1"
+  },
+  "design_variables": {
+    "girder_catalog_id": { "type": "catalog", "domain": ["ST-PARAM"] },
+    "girder_count": { "type": "int", "domain": [5, 6] },
+    "girder_spacing_mm": { "type": "grid", "min": 2150, "max": 2900, "step": 50 },
+    "deck_slab_thickness_mm": { "type": "grid", "min": 175, "max": 250, "step": 5 },
+    "girder_concrete_id": { "type": "catalog", "domain": ["C40", "C45", "C50", "C55", "C60"] },
+    "deck_concrete_id": { "type": "catalog", "domain": ["C30", "C35"] },
+    "diaphragm_layout_id": { "type": "catalog", "domain": ["DG-3", "DG-5"] },
+    "prestress_layout_id": { "type": "catalog", "domain": ["PT-34", "PT-38", "PT-42", "PT-46", "PT-50", "PT-54"] },
+
+    "girder_depth_mm": { "type": "grid", "min": 1500, "max": 2100, "step": 50 },
+    "top_flange_width_mm": { "type": "grid", "min": 1900, "max": 2300, "step": 50 },
+    "top_flange_thickness_mm": { "type": "grid", "min": 90, "max": 170, "step": 10 },
+    "web_thickness_mm": { "type": "grid", "min": 90, "max": 160, "step": 10 },
+    "bottom_bulb_width_mm": { "type": "grid", "min": 250, "max": 450, "step": 25 },
+    "bottom_bulb_height_mm": { "type": "grid", "min": 150, "max": 350, "step": 25 }
+  },
+  "shape_notes": {
+    "model": "Mặt cắt máng hở đối xứng dựng từ 6 biến hình dạng; quy ước dựng biên đầy đủ ở docstring bridge_evolution/section.py. bb là bề rộng MỖI bầu (hai bầu), không phải bề rộng đáy dầm.",
+    "flange_overhang_mm": 300,
+    "coupling": "Miền 6 biến là hình HỘP nên KHÔNG phải mọi tổ hợp đều dựng được biên. Điều kiện hợp lệ: tf < H; hb < H - tf; bf/2 - 300 > tw; bb >= tw; và 2·bb < bf/2 - 300 + tw (mép trong hai bầu không chồng qua tim). Tổ hợp vi phạm bị loại ở L0 bằng violation HARD FAB-000 — KHÔNG raise, KHÔNG tốn ngân sách solver.",
+    "bulb_width_domain_rationale": "Miền bottom_bulb_width_mm là 250–450 (KHÔNG phải 500–1100 như bản nháp đặc tả). Lý do bắt buộc: với bf ≤ 2300 và tw ≤ 160 thì chặn trên của bb là (bf/2 - 300 + tw)/2 ≤ 505 mm; miền 500–1100 chỉ có duy nhất 1 tổ hợp (bf,tw,bb) = (2300,160,500) hợp lệ trên 936 tổ hợp, tức ~99.9% không gian tìm kiếm rơi vào FAB-000 và mọi ngân sách solver bị đốt vô ích. Miền 250–450 hợp lệ trên gần toàn bộ hộp, phần góc không hợp lệ vẫn còn để FAB-000 làm việc.",
+    "example_valid": "H=1750, bf=2050, tf=120, tw=110, bb=350, hb=350 — dựng được biên, sạch FAB, và đủ chỗ cho PT-42 (sức chứa 50 tao).",
+    "budget": "Cả 6 biến chỉ ảnh hưởng L0 (section_from_params + fabrication_violations đều rẻ cấp L0); ngân sách solver vẫn đếm theo BudgetedEvaluator như v1."
+  }
+}

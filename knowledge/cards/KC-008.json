@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-008",
+  "type": "construction_method",
+  "title": "Ít dầm hơn = phiến nặng hơn: kiểm năng lực cẩu/xe lao trước khi chốt 5 dầm",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": [],
+    "variables": ["girder_count"]
+  },
+  "guidance": "Phương án ít dầm giảm số lần lao lắp nhưng mỗi phiến dầm nặng hơn đáng kể — phải kiểm tra năng lực cẩu/xe lao phiến thực tế của nhà thầu trước khi chốt phương án 5 dầm. Chuẩn hóa cùng một tiết diện dầm cho toàn cầu giúp ván khuôn quay vòng nhiều lần, giảm chi phí chế tạo. Đây là ràng buộc thi công nằm ngoài mô hình L1 — verifier hiện chưa kiểm, kỹ sư phải tự đối chiếu với thiết bị hiện có.",
+  "evidence": "Kinh nghiệm lao lắp dầm Super-T tại Việt Nam: phiến nhịp ~38–40 m nặng 60–80 tấn, nhiều dự án phải đổi phương án vì thiết bị lao không đủ sức nâng.",
+  "source": { "kind": "expert", "ref": "kinh nghiệm thi công Super-T VN" },
+  "status": "DRAFT",
+  "version": 1
+}

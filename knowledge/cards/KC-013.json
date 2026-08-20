@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-013",
+  "type": "construction_method",
+  "title": "Sườn phải nghiêng tối thiểu để rút ván khuôn — tối ưu toán học luôn cho sườn thẳng đứng",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": ["FAB-006"],
+    "variables": ["web_thickness_mm", "bottom_bulb_width_mm"]
+  },
+  "guidance": "Dầm Super-T đúc trong ván khuôn thép có lõi rút, nên thành sườn phải giữ một độ nghiêng (draft) tối thiểu thì mới tháo khuôn được mà không sứt vỡ bê tông. Bài toán tối ưu thuần khối lượng không có động cơ nào tạo ra độ nghiêng đó: nó luôn đẩy tiết diện về sườn thẳng đứng mỏng nhất, tức là về một hình dạng không đúc được. Đây chính là lý do FAB-006 phải nằm trong vòng lặp ở cấp L0 như một ràng buộc chế tạo, chứ không phải một khoản phạt mềm cộng vào hàm mục tiêu.",
+  "evidence": "Yêu cầu độ nghiêng để rút ván khuôn là KINH NGHIỆM chế tạo (ván khuôn thép, lõi rút) CHƯA được hiệu chỉnh bằng số liệu đo; góc nghiêng tối thiểu phải lấy theo hệ ván khuôn thực tế của nhà máy đúc. Nhận định 'tối ưu toán học cho sườn thẳng đứng' là SUY LUẬN từ dạng hàm mục tiêu (giảm diện tích bê tông ở mọi cao độ), chưa được xác nhận bằng một run tối ưu nào trên grammar v2.",
+  "source": { "kind": "expert", "ref": "kinh nghiệm ván khuôn đúc dầm Super-T (chưa hiệu chỉnh bằng số liệu đo)" },
+  "status": "DRAFT",
+  "version": 1
+}

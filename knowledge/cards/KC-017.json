@@ -1,0 +1,18 @@
+{
+  "card_id": "KC-017",
+  "type": "design_heuristic",
+  "title": "Hình học tiết diện tự do: Phân tích 2D FEA (sectionproperties) để xác định chính xác đặc trưng mặt cắt",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": ["GEOM-001", "GEOM-002", "STR-001", "STR-002"],
+    "variables": ["top_flange_width_mm", "web_thickness_mm", "bottom_thickness_mm"]
+  },
+  "guidance": "Khi thoát khỏi catalog rời rạc để AI Agent tự do tối ưu hóa các kích thước mặt cắt dầm, không được dùng các công thức diện tích và mômen quán tính gần đúng thô sơ. Phải sử dụng tích phân giải tích đa giác (Green's Theorem) hoặc lưới phần tử hữu hạn 2D (sectionproperties) để tính chính xác diện tích A, trọng tâm y_bottom, mômen quán tính chính Ixx, Iyy, hằng số xoắn J và mômen kháng uốn W. Cần kết hợp bộ đệm (lru_cache) để bảo đảm tốc độ đánh giá hàng ngàn phương án trong thời gian thực.",
+  "evidence": "Đối chiếu giữa tích phân giải tích chính xác và FEA 2D trên các tiết diện Super-T tiêu chuẩn (ST-1650, ST-1750, ST-1850) cho sai số diện tích và trục trung hòa dưới 0.1%, trong khi mô hình gần đúng chữ T đơn giản có thể gây sai lệch vị trí trục trung hòa tới 5-8%, dẫn tới tính sai ứng suất thớ kéo đáy trong SERV-001.",
+  "source": {
+    "kind": "textbook",
+    "ref": "Robbie van Leeuwen (2024), sectionproperties: A Python package for the analysis of arbitrary cross-sections using the Finite Element Method"
+  },
+  "status": "DRAFT",
+  "version": 1
+}

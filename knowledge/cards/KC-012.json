@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-012",
+  "type": "construction_method",
+  "title": "Khối lượng phiến và tĩnh không vận chuyển cắt trước lời giải trên giấy",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": ["FAB-004", "FAB-005"],
+    "variables": ["girder_depth_mm", "girder_count"]
+  },
+  "guidance": "Tăng chiều cao dầm và giảm số dầm đều là hướng tối ưu rất mạnh trên giấy, nhưng cả hai cùng đẩy phương án về phía phiến NẶNG hơn và CAO hơn. Hai ràng buộc thực tế cắt trước kết quả tính toán: năng lực cẩu/xe lao phiến (FAB-004) và tĩnh không cùng kích thước cho phép trên tuyến vận chuyển tới công trường (FAB-005). Phương án vượt hai ngưỡng này là vô nghĩa dù mọi kiểm tra kết cấu đều đạt, nên cả hai rule phải chạy ở L0 trước khi tiêu ngân sách solver.",
+  "evidence": "Mở rộng KC-008 sang grammar tham số: phiến Super-T nhịp ~38–40 m thường nặng 60–80 tấn theo KINH NGHIỆM lao lắp tại Việt Nam, chưa đo cho các tiết diện do agent tự sinh. Ngưỡng cẩu và tĩnh không là số liệu THEO TỪNG DỰ ÁN — phải lấy từ thiết bị và tuyến vận chuyển thực tế; giá trị mặc định trong rule profile không được coi là phổ quát.",
+  "source": { "kind": "expert", "ref": "kinh nghiệm lao lắp và vận chuyển dầm Super-T VN (chưa hiệu chỉnh)" },
+  "status": "DRAFT",
+  "version": 1
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-007",
+  "title": "Prototype, thí nghiệm cấu kiện và pipeline cảm biến",
+  "research_question": "Thiết kế test nào phân biệt được các failure mode và hiệu chỉnh mô hình số cho hình dạng/vật liệu được đề cử?",
+  "workstream": "experiments",
+  "priority": "P1",
+  "status": "BACKLOG",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": ["BRD-003", "BRD-004", "BRD-005"],
+  "required_gates": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"],
+  "claim_ceiling": "LAB_VALIDATED",
+  "write_scope": ["research/physical_tests/", "contracts/test_plan.schema.json", "bridge_evolution/measurements/", "tests/test_measurement_ingest.py"],
+  "acceptance_criteria": [
+    "Test plan và tolerance được pre-register trước khi nhìn kết quả",
+    "Sensor/calibration/batch IDs và raw data là bất biến",
+    "Có repeatability, uncertainty và blind model prediction",
+    "Kết quả âm được giữ và cập nhật Brain 2 dưới trạng thái VERIFIED-FAIL"
+  ],
+  "required_artifacts": ["contracts/test_plan.schema.json", "research/physical_tests/pre_registration.json", "tests/test_measurement_ingest.py"],
+  "safety_notes": [
+    "AI không được tuyên bố đã thử nếu không có raw measurement",
+    "Thử phá hủy và tải trọng thực do lab operator có thẩm quyền thực hiện"
+  ],
+  "review_notes": []
+}

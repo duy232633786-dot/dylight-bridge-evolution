@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-006",
+  "title": "Thẩm mỹ theo bối cảnh và constructability objective",
+  "research_question": "Làm sao đo nhịp điệu, tỷ lệ, silhouette, view corridor và khả năng thi công mà không biến cảm nhận AI thành sự thật kỹ thuật?",
+  "workstream": "aesthetics",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0",
+    "G1"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/aesthetics/",
+    "contracts/aesthetic_review.schema.json",
+    "tests/test_aesthetic_review.py"
+  ],
+  "acceptance_criteria": [
+    "Viewpoint, site context, weather/light và scale được khóa trước review",
+    "Human panel score tách khỏi AI score và có inter-rater uncertainty",
+    "Constructability/inspection access là hard gate độc lập với aesthetics",
+    "Không dùng aesthetics để bù safety violation"
+  ],
+  "required_artifacts": [
+    "contracts/aesthetic_review.schema.json",
+    "research/aesthetics/review_protocol.json"
+  ],
+  "safety_notes": [
+    "Ảnh AI không chứng minh hình học có thể xây",
+    "Không tối ưu một điểm nhìn duy nhất rồi tuyên bố đẹp toàn cảnh"
+  ],
+  "review_notes": [
+    "Phe duyet Aesthetic Review va Constructability Protocol"
+  ]
+}

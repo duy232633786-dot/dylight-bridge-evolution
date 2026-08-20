@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evaluation_result.schema.json",
+  "title": "EvaluationResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["case_id", "status", "feasible", "solver", "violations", "provenance"],
+  "properties": {
+    "case_id": { "type": "string", "pattern": "^BT-[0-9a-f]{16}$" },
+    "status": { "enum": ["SUCCESS", "SCHEMA_INVALID", "GEOMETRY_INVALID", "SOLVER_FAILED"] },
+    "feasible": { "type": "boolean" },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["CONVERGED", "NOT_CONVERGED", "NOT_RUN"] },
+        "name": { "type": "string" },
+        "runtime_ms": { "type": "number", "minimum": 0 }
+      }
+    },
+    "responses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Mu_strength1_kNm": { "type": "number" },
+        "phiMn_kNm": { "type": "number" },
+        "Vu_strength1_kN": { "type": "number" },
+        "phiVn_kN": { "type": "number" },
+        "bottom_stress_service3_MPa": { "type": "number" },
+        "tension_limit_MPa": { "type": "number" },
+        "max_ll_deflection_mm": { "type": "number" },
+        "deflection_limit_mm": { "type": "number" },
+        "first_frequency_Hz": { "type": "number" },
+        "max_utilization": { "type": "number" },
+        "distribution_factor_moment": { "type": "number" },
+        "distribution_factor_shear": { "type": "number" }
+      }
+    },
+    "objectives": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "relative_cost": { "type": "number" },
+        "material_mass_t": { "type": "number" },
+        "embodied_carbon_kgCO2e": { "type": "number" }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "severity", "message", "margin"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "severity": { "enum": ["HARD", "SOFT"] },
+          "message": { "type": "string" },
+          "margin": { "type": "number", "description": "Mức vi phạm chuẩn hóa: (demand-capacity)/capacity, > 0 nghĩa là FAIL" }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_state", "verification_report"],
+      "properties": {
+        "design_state": { "type": "string" },
+        "analysis_result": { "type": "string" },
+        "verification_report": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_hash", "ruleset_version", "solver_version", "catalogs_version"],
+      "properties": {
+        "input_hash": { "type": "string" },
+        "ruleset_version": { "type": "string" },
+        "solver_version": { "type": "string" },
+        "catalogs_version": { "type": "string" },
+        "grammar_version": { "type": "string" },
+        "random_seed": { "type": ["integer", "null"] },
+        "timestamp_utc": { "type": "string" }
+      }
+    }
+  }
+}

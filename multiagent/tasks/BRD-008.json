@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-008",
+  "title": "Pilot, SHM và model updating trong môi trường thật",
+  "research_question": "Làm sao đối chiếu dự báo với tải và môi trường thật, cập nhật mô hình nhưng vẫn giữ dữ liệu gốc và alarm governance?",
+  "workstream": "durability",
+  "priority": "P2",
+  "status": "BACKLOG",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": ["BRD-007"],
+  "required_gates": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"],
+  "claim_ceiling": "PILOT_VALIDATED",
+  "write_scope": ["research/field_validation/", "contracts/field_monitoring.schema.json", "bridge_evolution/measurements/field/", "tests/test_field_monitoring.py"],
+  "acceptance_criteria": [
+    "Proof/static/dynamic test tuân theo authority và kế hoạch an toàn",
+    "SHM baseline gắn load/environment metadata và calibration",
+    "Model update giữ nguyên raw data, prior model và audit trail",
+    "Có alarm threshold, inspection response và maintenance plan"
+  ],
+  "required_artifacts": ["contracts/field_monitoring.schema.json", "research/field_validation/monitoring_plan.json", "tests/test_field_monitoring.py"],
+  "safety_notes": [
+    "Không điều khiển tải/công trình thật nếu thiếu người có thẩm quyền",
+    "PILOT_VALIDATED không đồng nghĩa build-ready hoặc phê duyệt đại trà"
+  ],
+  "review_notes": []
+}

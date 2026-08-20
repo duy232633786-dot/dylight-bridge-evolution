@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "site_hazard_profile.schema.json",
+  "title": "SiteHazardProfile",
+  "description": "Hồ sơ rủi ro và điều kiện môi trường tự nhiên tại vị trí cầu.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "site_id",
+    "geographic_location",
+    "seismic_hazard",
+    "wind_hazard",
+    "hydrology_scour",
+    "geotechnical_category"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "site_id": { "type": "string", "minLength": 1 },
+    "geographic_location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["latitude", "longitude", "terrain_category"],
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90.0, "maximum": 90.0 },
+        "longitude": { "type": "number", "minimum": -180.0, "maximum": 180.0 },
+        "terrain_category": { "enum": ["A_OPEN_SEA", "B_SUBURBAN", "C_URBAN", "D_DENSE_CITY"] }
+      }
+    },
+    "seismic_hazard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pga_g", "site_class", "seismic_performance_zone"],
+      "properties": {
+        "pga_g": { "type": "number", "minimum": 0.0, "maximum": 2.0 },
+        "site_class": { "enum": ["A_HARD_ROCK", "B_ROCK", "C_VERY_DENSE_SOIL", "D_STIFF_SOIL", "E_SOFT_SOIL", "F_LIQUEFIABLE"] },
+        "seismic_performance_zone": { "type": "integer", "minimum": 1, "maximum": 4 }
+      }
+    },
+    "wind_hazard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["basic_wind_speed_m_s", "gust_effect_factor", "aerodynamic_risk_level"],
+      "properties": {
+        "basic_wind_speed_m_s": { "type": "number", "minimum": 10.0, "maximum": 90.0 },
+        "gust_effect_factor": { "type": "number", "minimum": 0.8, "maximum": 2.0 },
+        "aerodynamic_risk_level": { "enum": ["LOW", "MODERATE", "HIGH_AEROELASTIC"] }
+      }
+    },
+    "hydrology_scour": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_flood_frequency_years", "estimated_scour_depth_m", "tidal_range_m"],
+      "properties": {
+        "design_flood_frequency_years": { "type": "integer", "minimum": 10 },
+        "estimated_scour_depth_m": { "type": "number", "minimum": 0.0 },
+        "tidal_range_m": { "type": "number", "minimum": 0.0 }
+      }
+    },
+    "geotechnical_category": {
+      "enum": ["SHALLOW_BEDROCK", "DEEP_ALLUVIAL", "SOFT_CLAY_DELTA", "KARST_CAVERN", "VARIABLE"]
+    }
+  }
+}

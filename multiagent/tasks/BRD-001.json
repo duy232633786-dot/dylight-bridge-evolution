@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-001",
+  "title": "Khóa baseline, provenance và sửa lệch contract–runtime",
+  "research_question": "Runtime thực sự hỗ trợ những grammar, rule và knowledge card nào và làm sao khóa một baseline không mâu thuẫn?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "README.md",
+    "docs/",
+    "bridge_grammar/",
+    "contracts/",
+    "knowledge/audits/",
+    ".gitignore"
+  ],
+  "acceptance_criteria": [
+    "Docs không còn tuyên bố grammar v2 hoặc FAB rules đã chạy khi runtime chưa có",
+    "Knowledge audit bao phủ đúng toàn bộ card được runtime nạp",
+    "Có baseline version-control plan và provenance không còn mơ hồ"
+  ],
+  "required_artifacts": [
+    "docs/runtime_capability_matrix.md",
+    "knowledge/audits/current.json"
+  ],
+  "safety_notes": [
+    "Không xóa grammar/card để làm số liệu khớp giả tạo",
+    "Không nâng trạng thái card nếu thiếu kỹ sư duyệt"
+  ],
+  "review_notes": [
+    "Phe duyet baseline capability matrix va nhat quan provenance"
+  ]
+}

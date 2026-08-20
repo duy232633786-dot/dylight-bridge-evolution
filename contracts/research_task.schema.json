@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research_task.schema.json",
+  "title": "BridgeLabResearchTask",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "task_id", "title", "research_question", "workstream",
+    "priority", "status", "owner", "reviewer", "dependencies", "required_gates",
+    "claim_ceiling", "write_scope", "acceptance_criteria", "required_artifacts", "safety_notes"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "task_id": {
+      "type": "string",
+      "pattern": "^(BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})$"
+    },
+    "title": {"type": "string", "minLength": 5},
+    "research_question": {"type": "string", "minLength": 10},
+    "workstream": {
+      "enum": [
+        "design_basis", "geometry", "structural_physics", "materials",
+        "durability", "constructability", "aesthetics", "experiments",
+        "knowledge", "integration"
+      ]
+    },
+    "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+    "status": {
+      "enum": ["BACKLOG", "READY", "ACTIVE", "REVIEW", "BLOCKED", "ACCEPTED", "REJECTED"]
+    },
+    "owner": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9_-]{1,31}$"},
+    "reviewer": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9_-]{1,31}$"},
+    "dependencies": {
+      "type": "array", "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})$"
+      }
+    },
+    "required_gates": {
+      "type": "array", "uniqueItems": true,
+      "items": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"]}
+    },
+    "claim_ceiling": {
+      "enum": [
+        "IDEA", "SCREENED", "NUMERICALLY_VERIFIED", "LAB_VALIDATED",
+        "PILOT_VALIDATED", "ENGINEERING_CANDIDATE"
+      ]
+    },
+    "write_scope": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "acceptance_criteria": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "string", "minLength": 5}
+    },
+    "required_artifacts": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 3}
+    },
+    "safety_notes": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "string", "minLength": 5}
+    },
+    "review_notes": {"type": "array", "items": {"type": "string"}},
+    "source_brief_id": {
+      "type": "string",
+      "pattern": "^RND-[0-9]{8}-[a-f0-9]{8}$"
+    },
+    "preferred_provider": {
+      "enum": ["codex", "claude", "opencode", "antigravity"]
+    },
+    "preferred_role": {
+      "enum": [
+        "orchestrator", "form_inventor", "structural_analyst", "materials_researcher",
+        "constructability_lcca", "aesthetics_context", "independent_reproducer",
+        "evidence_safety_auditor", "bim_fem_integrator"
+      ]
+    },
+    "review_provider": {
+      "enum": ["codex", "claude", "opencode", "antigravity"]
+    },
+    "test_commands": {
+      "type": "array",
+      "items": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+    },
+    "human_gate": {"type": "boolean"}
+  }
+}

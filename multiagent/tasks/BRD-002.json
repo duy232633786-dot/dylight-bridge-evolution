@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-002",
+  "title": "Design basis và site–hazard profile máy đọc được",
+  "research_question": "Cần khóa những dữ liệu vị trí, tải trọng, tiêu chuẩn và tuổi thọ nào trước khi agent được phép tối ưu một cầu thực?",
+  "workstream": "design_basis",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "contracts/design_basis.schema.json",
+    "contracts/site_hazard_profile.schema.json",
+    "docs/design_basis/",
+    "tests/test_design_basis.py"
+  ],
+  "acceptance_criteria": [
+    "Schema phân biệt dữ liệu bắt buộc, chưa biết và NOT_APPLICABLE có lý do",
+    "Khóa units, coordinate system, code/version, load profile, design life và exposure",
+    "Test chặn tối ưu khi input G0 còn thiếu"
+  ],
+  "required_artifacts": [
+    "contracts/design_basis.schema.json",
+    "contracts/site_hazard_profile.schema.json",
+    "tests/test_design_basis.py"
+  ],
+  "safety_notes": [
+    "Không tự bịa site, địa chất, thủy văn, gió hoặc động đất",
+    "Không trộn phiên bản tiêu chuẩn trong cùng design basis"
+  ],
+  "review_notes": [
+    "Phe duyet Design Basis va Site-Hazard Profile may doc duoc"
+  ]
+}

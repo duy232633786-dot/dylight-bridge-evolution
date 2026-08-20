@@ -1,0 +1,19 @@
+{
+  "test_plan_id": "TP-MAT-TEMPLATE-01",
+  "title": "Kế hoạch thử nghiệm nén, kéo, từ biến và khuếch tán ion clo mẫu bê tông dầm cầu",
+  "specimens": {
+    "geometry": "Cylinder 150x300mm",
+    "batch_count": 6,
+    "curing_days": [3, 7, 28, 56, 90]
+  },
+  "required_tests": [
+    "ASTM C39 / TCVN 3118 (Compressive Strength)",
+    "ASTM C469 (Static Modulus of Elasticity & Poisson's Ratio)",
+    "ASTM C512 (Creep in Compression)",
+    "ASTM C1202 / NT BUILD 492 (Chloride Migration)"
+  ],
+  "falsification_thresholds": {
+    "min_characteristic_strength_MPa": 50.0,
+    "max_chloride_diffusion_coeff": 5.0e-12
+  }
+}

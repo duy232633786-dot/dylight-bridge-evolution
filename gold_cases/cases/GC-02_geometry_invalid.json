@@ -1,0 +1,13 @@
+{
+  "family": "super_t_simple_v1",
+  "status": "CANDIDATE",
+  "project_inputs": { "span_length_m": 38.3, "deck_width_m": 12.0, "alignment_type": "STRAIGHT", "skew_deg": 0 },
+  "design_variables": {
+    "girder_catalog_id": "ST-1750", "girder_count": 6, "girder_spacing_mm": 2400,
+    "deck_slab_thickness_mm": 200, "diaphragm_layout_id": "DG-5", "prestress_layout_id": "PT-46"
+  },
+  "materials": { "girder_concrete_id": "C45", "deck_concrete_id": "C35", "prestressing_steel_id": "PS-15.2-1860" },
+  "analysis": { "fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1", "load_profile_id": "LOAD-PROFILE-01" },
+  "constraints": { "rule_profile_id": "BRIDGE-RULESET-V1" },
+  "provenance": { "random_seed": 42, "parent_candidate_id": null, "generation_action": "GOLD_CASE" }
+}

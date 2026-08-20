@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-009",
+  "type": "design_heuristic",
+  "title": "Nâng grade bê tông dầm là đòn bẩy kém hiệu quả cho kéo thớ dưới",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["SERV-001"],
+    "variables": ["girder_concrete_id"]
+  },
+  "guidance": "Nâng grade bê tông dầm (C40 → C45 → C50) làm chi phí và phát thải carbon tăng gần như tuyến tính, nhưng giới hạn ứng suất kéo cho phép chỉ tăng theo căn bậc hai của f'c. Vì vậy đây là đòn bẩy kém hiệu quả để xử lý vi phạm SERV-001 — ưu tiên tăng số tao cáp DƯL trước (xem KC-001). Chỉ nâng grade khi các đòn bẩy khác đã kịch trần hoặc khi cần cường độ lúc truyền lực căng.",
+  "evidence": "So sánh trong run_b600_s42: cùng một mức giảm vi phạm SERV-001, +1 mức PT rẻ hơn rõ rệt so với +1 grade bê tông cả về chi phí lẫn carbon.",
+  "source": { "kind": "experiment", "ref": "experiments/results/run_b600_s42" },
+  "status": "DRAFT",
+  "version": 1
+}

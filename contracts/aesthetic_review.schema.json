@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aesthetic_review.schema.json",
+  "title": "AestheticAndConstructabilityReview",
+  "description": "Đánh giá thẩm mỹ theo ngữ cảnh và khả năng thi công độc lập với ràng buộc an toàn kết cấu.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "review_id",
+    "viewpoints",
+    "context_fit_criteria",
+    "human_panel_evaluation",
+    "constructability_gate"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "review_id": { "type": "string", "minLength": 1 },
+    "viewpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["viewpoint_id", "location_type", "distance_m", "elevation_angle_deg"],
+        "properties": {
+          "viewpoint_id": { "type": "string" },
+          "location_type": { "enum": ["RIVERBANK_PEDESTRIAN", "APPROACH_DRIVER", "AERIAL_BIRD_EYE", "WATERWAY_VESSEL"] },
+          "distance_m": { "type": "number", "minimum": 10.0 },
+          "elevation_angle_deg": { "type": "number", "minimum": -90.0, "maximum": 90.0 }
+        }
+      },
+      "minItems": 2
+    },
+    "context_fit_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slenderness_ratio_span_to_depth", "silhouette_transparency", "visual_rhythm_repetition"],
+      "properties": {
+        "slenderness_ratio_span_to_depth": { "type": "number", "minimum": 5.0, "maximum": 50.0 },
+        "silhouette_transparency": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "visual_rhythm_repetition": { "type": "string" }
+      }
+    },
+    "human_panel_evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["panel_size", "mean_score_out_of_10", "std_deviation", "inter_rater_agreement"],
+      "properties": {
+        "panel_size": { "type": "integer", "minimum": 3 },
+        "mean_score_out_of_10": { "type": "number", "minimum": 0.0, "maximum": 10.0 },
+        "std_deviation": { "type": "number", "minimum": 0.0 },
+        "inter_rater_agreement": { "enum": ["HIGH", "MODERATE", "LOW_DIVERGENT"] }
+      }
+    },
+    "constructability_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["crane_capacity_check", "transport_route_clearance_check", "inspection_access_pass"],
+      "properties": {
+        "crane_capacity_check": { "type": "boolean" },
+        "transport_route_clearance_check": { "type": "boolean" },
+        "inspection_access_pass": { "type": "boolean" }
+      }
+    }
+  }
+}

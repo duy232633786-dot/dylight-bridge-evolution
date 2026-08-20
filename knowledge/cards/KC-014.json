@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-014",
+  "type": "design_heuristic",
+  "title": "Cao hơn và mỏng hơn: I tăng bậc ba theo chiều cao, khối lượng chỉ bậc một",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": [],
+    "variables": ["girder_depth_mm", "top_flange_thickness_mm"]
+  },
+  "guidance": "Với tiết diện tham số hóa, hướng 'nhẹ hơn mà khỏe hơn' có đòn bẩy giải tích lớn nhất là TĂNG chiều cao dầm đồng thời GIẢM bề dày bụng/cánh xuống tới ngưỡng chế tạo: mô men quán tính tăng xấp xỉ theo bậc ba của chiều cao, trong khi khối lượng chỉ tăng theo bậc một. Hãy coi đây là hướng DÒ TÌM ưu tiên, không phải kết luận: chiều cao bị chặn trên bởi tĩnh không vận chuyển và khối lượng phiến (KC-012), còn bề dày bị chặn dưới bởi FAB-001/FAB-006 (KC-010, KC-013). Phương án tốt nằm ở giao của các ràng buộc đó, không ở cực trị của công thức.",
+  "evidence": "Quan hệ I ~ h³ và A ~ h là kết quả GIẢI TÍCH cho tiết diện chữ I/T, không phải kết quả đo của repo; chưa có run tối ưu nào trên grammar v2 xác nhận hướng này thắng trong không gian biến có ràng buộc FAB. Ngoài ra dầm cao–thành mỏng làm ổn định thành mỏng và xoắn trở nên đáng kể, mà solver L1 hiện tại KHÔNG kiểm — phương án đi xa theo hướng này bắt buộc phải kiểm chứng ở cấp L2.",
+  "source": { "kind": "textbook", "ref": "Sức bền vật liệu — quan hệ mô men quán tính và chiều cao tiết diện chữ I/T" },
+  "status": "DRAFT",
+  "version": 1
+}

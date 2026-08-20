@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-010",
+  "type": "construction_method",
+  "title": "Sườn dầm: tối ưu phải dừng ở ngưỡng CHẾ TẠO, không ở ngưỡng chịu lực",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": ["FAB-001"],
+    "variables": ["web_thickness_mm"]
+  },
+  "guidance": "Khi agent được tự thiết kế tiết diện, giảm bề dày sườn là đòn bẩy tiết kiệm bê tông trực tiếp nhất — nhưng dưới khoảng 100 mm thì sườn không còn đổ và đầm được: cốt liệu và đầm dùi không lọt qua lồng thép, mặt bê tông rỗ, và phần còn lại không đủ cho lớp bảo vệ cốt thép ở cả hai mặt. Vì vậy vòng tối ưu phải dừng ở NGƯỠNG CHẾ TẠO (FAB-001), không ở ngưỡng chịu lực mà STR-002 hay ổn định thành mỏng quyết định; hai ngưỡng này khác nhau và ngưỡng chế tạo thường lớn hơn. Con số ngưỡng cụ thể phải đọc lại từ rule profile đang dùng và đối chiếu Dmax cốt liệu + yêu cầu lớp bảo vệ của dự án trước khi tin.",
+  "evidence": "Ngưỡng ~100 mm là KINH NGHIỆM chế tạo dầm Super-T tại Việt Nam (đầm dùi, cốt liệu Dmax ~20 mm, lớp bảo vệ hai mặt), CHƯA được hiệu chỉnh bằng số liệu đo trong phạm vi thẻ này. Solver L1 hiện tại không mô hình chất lượng đổ bê tông lẫn ổn định thành mỏng, nên nó không thể tự phát hiện chế độ hỏng này — đó là lý do FAB-001 phải là ràng buộc L0 riêng chứ không để suy ra từ kết quả phân tích.",
+  "source": { "kind": "expert", "ref": "kinh nghiệm chế tạo dầm Super-T VN (chưa hiệu chỉnh bằng số liệu đo)" },
+  "status": "DRAFT",
+  "version": 1
+}

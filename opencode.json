@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "multiagent/PROTOCOL.md",
+    "multiagent/PHYSICS_GATES.md"
+  ],
+  "agent": {
+    "dylight-worker": {
+      "description": "Bounded worker; canonical orchestrator owns tests and task transitions",
+      "permission": {
+        "*": "deny", "read": "allow", "glob": "allow", "grep": "allow",
+        "list": "allow", "lsp": "allow", "edit": "allow", "bash": "deny"
+      }
+    },
+    "dylight-reviewer": {
+      "description": "Independent read-only physics/evidence reviewer",
+      "permission": {
+        "*": "deny", "read": "allow", "glob": "allow", "grep": "allow",
+        "list": "allow", "lsp": "allow", "edit": "deny", "bash": "deny"
+      }
+    }
+  }
+}

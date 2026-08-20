@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-006",
+  "type": "repair_rule",
+  "title": "Cắt STR-002 có thể vi phạm thật khi 5 dầm khoảng cách lớn: tăng số dầm hoặc giảm S kèm kiểm tra lại",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["STR-002"],
+    "variables": ["girder_count", "girder_spacing_mm"]
+  },
+  "guidance": "Với 5 dầm và khoảng cách lớn, hệ số sử dụng cắt dao động 0.89–1.05 tùy tiết diện, chiều dày bản và grade — STR-002 CÓ THỂ vi phạm thật chứ không chỉ 'sát 1', và cả S < 2650 mm với bản dày vẫn có thể chạm 1.0. Cách sửa: tăng số dầm lên 6 nếu cửa sổ hình học còn cho phép, hoặc giảm S nhưng PHẢI chạy kiểm tra lại vì giảm S đơn thuần không bảo đảm hết vi phạm. Mô hình cắt ở mức L1 (line girder) chỉ là gần đúng — phương án sát biên cắt cần kiểm chứng lại ở mức L2 (grillage/Midas) trước khi duyệt.",
+  "evidence": "Quét 1296 cấu hình hợp lệ hình học bằng solver L1: nhóm 5 dầm S ≥ 2650 có hệ số sử dụng cắt 0.893–1.049 (có vi phạm thật, ví dụ ST-1650/S=2800/ts=195/C40 → 1.025); nhóm 5 dầm S < 2650 với bản dày vẫn lên tới 1.007. Nhóm 6 dầm cùng cấu hình còn dư đáng kể.",
+  "source": { "kind": "experiment", "ref": "experiments/results/run_b600_s42" },
+  "status": "DRAFT",
+  "version": 1
+}

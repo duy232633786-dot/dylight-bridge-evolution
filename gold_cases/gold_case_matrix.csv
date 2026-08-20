@@ -1,0 +1,8 @@
+case_file,description,expected_status,expected_feasible,expected_rules_contain,engineer_approved
+GC-01_standard_pass.json,Phuong an chuan dat toan bo rang buoc,SUCCESS,true,,PENDING
+GC-02_geometry_invalid.json,Sai hinh hoc: 6 dam x 2400 -> canh hang = 0,GEOMETRY_INVALID,false,GEOM-001,PENDING
+GC-03_capacity_fail.json,Khong du kha nang: ST-1650 + PT-34 tren 5 dam,SUCCESS,false,SERV-001,PENDING
+GC-04_slab_too_thin.json,Ban 175mm mong hon yeu cau 193mm khi S=2800,GEOMETRY_INVALID,false,GEOM-003,PENDING
+GC-05_solver_failure.json,Tiet dien test I=0 -> solver ky di (NOT_CONVERGED),SOLVER_FAILED,false,SOLVER-001,PENDING
+GC-06_cheap_but_fails.json,Re nhat (5 dam PT-38) nhung truot Su dung III,SUCCESS,false,SERV-001,PENDING
+GC-07_pass_but_expensive.json,Dat nhung qua du: ST-1850 C50 PT-54 ban 250,SUCCESS,true,,PENDING

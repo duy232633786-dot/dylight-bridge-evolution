@@ -1,0 +1,1225 @@
+{
+  "snapshot_schema_version": 1,
+  "captured_date": "2026-08-20",
+  "scope": "bridge-design-and-bridge-bim",
+  "selection_rule": "Notebook title/card matches bridge, cầu, dầm, formtraveler or I-Beam; unrelated personal notebooks excluded.",
+  "provenance": "Read-only inventory from the user's signed-in NotebookLM UI. Summaries are NotebookLM-generated and unverified.",
+  "notebooks": [
+    {
+      "notebook_id": "10048ac9-71c9-4dbf-b78e-e41c6e261652",
+      "url": "https://notebook.google.com/notebook/10048ac9-71c9-4dbf-b78e-e41c6e261652",
+      "title": "TCVN 11823-5:2017 Highway Bridge Design: Concrete Structures",
+      "updated": "24 thg 7, 2026",
+      "declared_source_count": 15,
+      "observed_source_items": 14,
+      "non_item_source_count": 1,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "TCVN 11823_Phan 13_Lan-can (1).pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part01.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part02.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part03.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part04.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part05.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part06.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part07.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part08.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part09.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part10.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part11.pdf",
+          "count": 1
+        },
+        {
+          "name": "Tieu_chuan_Quoc_gia_TCVN_11823_2017_ve_thiet_ke_cau_duong_bo_part12.pdf",
+          "count": 1
+        },
+        {
+          "name": "tcvn11823-5.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu này cung cấp hướng dẫn kỹ thuật và quy định tiêu chuẩn để thiết kế, mô hình hóa các bộ phận cấu tạo của cầu đường bộ tại Việt Nam. Nội dung trọng tâm bao gồm một prompt chi tiết hướng dẫn xây dựng phần mềm hỗ trợ tự động hóa việc bố trí các lớp phủ mặt cầu, vạch sơn và bê tông lót dựa trên nền tảng BIM. Song song với đó, văn bản trích dẫn chi tiết Tiêu chuẩn Quốc gia TCVN 11823-13:2017, quy định cụ thể về kích thước hình học, vật liệu và khả năng chịu lực an toàn cho hệ thống lan can cầu. Ngoài ra, nguồn tin còn hướng dẫn các kỹ thuật xử lý lỗi giao cắt đường breakline và phương pháp tạo bề mặt địa hình trong phần mềm Autodesk Civil 3D. Tổng thể, các nguồn này phục vụ như một bộ cẩm nang kết hợp giữa quy chuẩn pháp lý và giải pháp công nghệ dành cho kỹ sư công trình."
+    },
+    {
+      "notebook_id": "179b61da-f421-46be-985f-5bf10eae8a29",
+      "url": "https://notebook.google.com/notebook/179b61da-f421-46be-985f-5bf10eae8a29",
+      "title": "cầu btct tổng",
+      "updated": "24 thg 6, 2026",
+      "declared_source_count": 26,
+      "observed_source_items": 26,
+      "non_item_source_count": 0,
+      "public": true,
+      "source_inventory": [
+        {
+          "name": "5 - Chapter VI - Deck slab calculation 193 to 212.pdf",
+          "count": 1
+        },
+        {
+          "name": "6 điểm cần biết khi Triển khai bản vẽ kỹ thuật với Revit | Revit4detailing",
+          "count": 1
+        },
+        {
+          "name": "7 - Chapter VIII - Pier calculation 273 to 308.pdf",
+          "count": 1
+        },
+        {
+          "name": "BẢO VỆ ĐỒ ÁN ONLINE TRƯỜNG BÁCH KHOA ĐÀ NẴNG KHOA CẦU ĐƯỜNG",
+          "count": 1
+        },
+        {
+          "name": "BẢO VỆ ĐỒ ÁN TỐT NGHIỆP ĐẠI HỌC BÁCH KHOA ĐÀ NẴNG KHOA CẦU ĐƯỜNG",
+          "count": 1
+        },
+        {
+          "name": "Bảo vệ (online) đồ án Cầu BTCT 60 A Thầy Hùng 26/08/2021",
+          "count": 1
+        },
+        {
+          "name": "Bảo vệ đồ án (online) Cầu BTCT nhóm 60 Thầy Nguyễn Duy Thảo 26/08/2021",
+          "count": 1
+        },
+        {
+          "name": "Bảo vệ đồ án thi công nền đường 2021/08/31",
+          "count": 1
+        },
+        {
+          "name": "Chuyên đề cầu - CẦU DÂY VĂNG | (20/09/2021)",
+          "count": 1
+        },
+        {
+          "name": "Chuyên đề cầu - ĐIỀU CHỈNH NỘI LỰC CẦU DÂY VĂNG | (27/09/2021)",
+          "count": 1
+        },
+        {
+          "name": "HƯỚNG DẪN BẢO VỆ ĐỒ ÁN TỐT NGHIỆP CẦU UTC [Nhận làm ĐATN Cầu Đường - 0983376556]",
+          "count": 1
+        },
+        {
+          "name": "Hướng dẫn đồ án cầu - CẦU BÊ TÔNG CỐT THÉP ỨNG SUẤT TRƯỚC | Phần 1",
+          "count": 1
+        },
+        {
+          "name": "Hướng dẫn đồ án cầu - CẦU BÊ TÔNG CỐT THÉP ỨNG SUẤT TRƯỚC | Phần 2",
+          "count": 1
+        },
+        {
+          "name": "Hướng dẫn đồ án cầu - KIỂM TOÁN DẦM CẦU BTCT ỨNG SUẤT TRƯỚC THEO TTGH CƯỜNG ĐỘ 1",
+          "count": 1
+        },
+        {
+          "name": "Hướng dẫn đồ án cầu - MẤT MÁT ỨNG SUẤT TRONG CẦU DẦM BTCT ỨNG SUẤT TRƯỚC",
+          "count": 1
+        },
+        {
+          "name": "Hướng dẫn đồ án cầu - THIẾT KẾ DẦM CHỦ VÀ BẢN MẶT CẦU",
+          "count": 1
+        },
+        {
+          "name": "Preliminary Design I II III.pdf",
+          "count": 1
+        },
+        {
+          "name": "TRIỂN KHAI BẢN VẼ KỸ THUẬT CÙNG REVIT - GIỚI THIỆU",
+          "count": 1
+        },
+        {
+          "name": "Thuyet_Minh_HOAN_CHINH_Bridge DYLIGHT (1).docx",
+          "count": 1
+        },
+        {
+          "name": "Tính hệ số phân phối ngang và nội lực dầm chủ ( Cầu dầm BTCT )",
+          "count": 1
+        },
+        {
+          "name": "[HỌC REVIT TRIỂN KHAI] - Thiết lập bảng Revit Object Style cho View Bản vẽ Triển khai",
+          "count": 1
+        },
+        {
+          "name": "[Webinar / 08.08.2024] Phân Tích Phần Tử Hữu Hạn Kết Cấu Bê Tông Cốt Thép Với phần mềm MIDAS FEA NX",
+          "count": 1
+        },
+        {
+          "name": "[Webinar / 22.04.2024] GIỚI THIỆU MÔ HÌNH BIM MỚI CHO HẠ TẦNG GIAO THÔNG VỚI MIDAS CIM",
+          "count": 1
+        },
+        {
+          "name": "[Webinar / 23.09.23] Phân Tích và Thiết Kế Cầu Dây Văng bằng MIDAS CIVIL",
+          "count": 1
+        },
+        {
+          "name": "[Webinar / 25.01.2024] PHÂN TÍCH DAO ĐỘNG CẦU ĐI BỘ THEO AASHTO VÀ EUROCODE BẰNG MIDAS CIVIL",
+          "count": 1
+        },
+        {
+          "name": "Đồ Án Cầu đây nha ae !!",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu này trình bày chi tiết về đồ án tốt nghiệp chuyên ngành kỹ thuật cầu đường, tập trung vào việc thiết kế một cầu dầm hộp bê tông cốt thép dự ứng lực liên tục ba nhịp. Nội dung bao gồm các thông số kỹ thuật cơ bản như chiều dài nhịp, quy mô mặt cắt ngang, các đặc tính địa chất và tải trọng thiết kế theo tiêu chuẩn HL-93. Nguồn tin cung cấp các phương thức tính toán kết cấu phức tạp, từ việc phân chia đốt dầm để thi công đúc hẫng đến việc xác định các đặc trưng hình học bằng phần mềm chuyên dụng. Ngoài ra, văn bản còn đi sâu vào phân tích khả năng chịu lực tại các vị trí quan trọng như mặt cắt trụ và giữa nhịp để đảm bảo an toàn dưới tác động của tĩnh tải và hoạt tải. Hệ thống cốt thép dự ứng lực và cấu tạo mố trụ cũng được mô tả chi tiết nhằm đáp ứng tuổi thọ công trình trên 100 năm. Cuối cùng, một đoạn trích từ video cho thấy đồ án này đã được thực hiện và bảo vệ trong một buổi thuyết trình trực tuyến dưới sự hướng dẫn chuyên môn."
+    },
+    {
+      "notebook_id": "55bf58fc-89a6-4338-b675-14c1bdc95f13",
+      "url": "https://notebook.google.com/notebook/55bf58fc-89a6-4338-b675-14c1bdc95f13",
+      "title": "Bridge Pier Foundation Design and Geological Analysis Report",
+      "updated": "3 thg 3, 2026",
+      "declared_source_count": 6,
+      "observed_source_items": 5,
+      "non_item_source_count": 1,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Bản vẽ cọc-đa.pdf",
+          "count": 1
+        },
+        {
+          "name": "Bệ móng.pdf",
+          "count": 1
+        },
+        {
+          "name": "Bố Trí Chung đa.pdf",
+          "count": 1
+        },
+        {
+          "name": "De bai Do an Nen mong 2024 (15.9).pdf",
+          "count": 1
+        },
+        {
+          "name": "Đồ án Nền móng (3).pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu này cung cấp cái nhìn toàn diện về quy trình thiết kế và kỹ thuật xây dựng hạ tầng giao thông, tập trung chủ yếu vào kết cấu cầu và đường hầm. Nội dung bao gồm các bản vẽ kỹ thuật chi tiết về cốt thép cho cọc khoan nhồi và bệ móng, cùng với các số liệu địa chất quan trọng như kết quả thí nghiệm xuyên tiêu chuẩn (SPT). Bên cạnh đó, nguồn tin còn tổng hợp các câu hỏi lý thuyết trọng tâm về cơ học kết cấu, phương pháp thi công bê tông dự ứng lực và nguyên tắc thiết kế hầm xuyên núi. Những hồ sơ này đóng vai trò là tài liệu học tập và hướng dẫn đồ án cho sinh viên chuyên ngành kỹ thuật công trình. Toàn bộ thông tin giúp người đọc nắm vững cả kiến thức nền tảng lẫn kỹ năng thực hành trong việc tính toán và triển khai bản vẽ kỹ thuật."
+    },
+    {
+      "notebook_id": "f3cefbdd-e2dd-4f16-a20a-b70c73f6813b",
+      "url": "https://notebook.google.com/notebook/f3cefbdd-e2dd-4f16-a20a-b70c73f6813b",
+      "title": "cầu bê tông 2",
+      "updated": "19 thg 5, 2026",
+      "declared_source_count": 51,
+      "observed_source_items": 50,
+      "non_item_source_count": 1,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "0_ Muc luc -OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "1_ Trang 1 - 5 -OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_ Trang 6-46 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_0 Bia va muc luc.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_1 Trang 1-21.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_2 Trang 22-39.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_3 Trang 40-53.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_4 Trang 54 - 77.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_5 Trang 78 -94.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_6 Trang 95 - 114.pdf",
+          "count": 1
+        },
+        {
+          "name": "2_7 Tai lieu tham khao.pdf",
+          "count": 1
+        },
+        {
+          "name": "3_ Trang 47-66 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "4_ Trang 67-76 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "5_ Trang 77 - 87 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "6_1_ Trang 88-95 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "6_2_ Trang 96 - 103 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "7_ Trang 104 - 116 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "8_ Trang 117 - 124 _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "9_ Tai lieu tham khao _OK.pdf",
+          "count": 1
+        },
+        {
+          "name": "Bao cao cuoi ky - Do an cau Cao Lanh.pdf",
+          "count": 1
+        },
+        {
+          "name": "Bien phap thi cong dam hop.pdf",
+          "count": 1
+        },
+        {
+          "name": "BÁO CÁO TỌA ĐÀM CÔNG NGHỆ HIỆN ĐẠI ĐÁNH GIÁ SỨC KHỎE CÔNG TRÌNH CẦU.pdf",
+          "count": 1
+        },
+        {
+          "name": "C1-Co so thiet ke-Unicode.pdf",
+          "count": 1
+        },
+        {
+          "name": "C2_Thietke SoBo-Unicode.pdf",
+          "count": 1
+        },
+        {
+          "name": "C3_ViDu SAP-Unicode.pdf",
+          "count": 1
+        },
+        {
+          "name": "C4_Bai toan dong hoc-unicode.pdf",
+          "count": 1
+        },
+        {
+          "name": "C5_phan tich danh gia hu hon-Unicode.pdf",
+          "count": 1
+        },
+        {
+          "name": "Cable supported bridges Concept and Design - 3rd ed 2012 Niels.pdf",
+          "count": 1
+        },
+        {
+          "name": "Cable-Stayed Bridges_ 40 Years of Experience Worldwide ( PDFDrive )-đã mở khóa.pdf",
+          "count": 1
+        },
+        {
+          "name": "De cuong Cau be tong.pdf",
+          "count": 1
+        },
+        {
+          "name": "GS Ng-viet-Trung-MiDAS-Phan tich Cau day vang.pdf",
+          "count": 1
+        },
+        {
+          "name": "HDTKTNDucHang-ChuVietBinh.pdf",
+          "count": 2
+        },
+        {
+          "name": "KỶ YẾU HỘI THẢO QT CẦU TREO DÂY VÕNG - TỪ THIẾT KẾ ĐẾN THI CÔNG.pdf",
+          "count": 1
+        },
+        {
+          "name": "Nghien-cuu-thiet-ke-va-cong-nghe-thi-cong-cau-day-vang-o-viet-nam.pdf",
+          "count": 1
+        },
+        {
+          "name": "Nghien-cuu-ung-dung-he-giam-chan-chat-long-trong-kiem-soat-dao-dong-cho-cau-day-vang-tai-viet-nam-luan-van-tien-si.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 10 - Nen mong.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 11 - Mo, tru va tuong chan.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 12 - Ket cau vui va ao ham.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 13 - Lan can.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 3 - Tai trong va he so tai trong.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 4 - Phan tich va danh gia ket cau.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 5 - Ket cau be tong.pdf",
+          "count": 1
+        },
+        {
+          "name": "Phan 6 - Ket cau thep.pdf",
+          "count": 1
+        },
+        {
+          "name": "TCVN4054_2005_OntapChaussees.docx",
+          "count": 1
+        },
+        {
+          "name": "Thiet ke cau treo day vong.pdf",
+          "count": 1
+        },
+        {
+          "name": "decuongCBT nang cao.pdf",
+          "count": 1
+        },
+        {
+          "name": "giamsatdambtctdul_5985.pdf",
+          "count": 1
+        },
+        {
+          "name": "quy_trinh_thi_cong_duc_hang_tan_thuan.pdf",
+          "count": 1
+        },
+        {
+          "name": "xay_dung_cau_be_tong_cot_thep_bang_cong_nghe_da_giao_di_dong_2_6048.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu này cung cấp cái nhìn toàn diện về quy trình thiết kế và xây dựng cầu Bãi Cháy, một công trình cầu dây văng bê tông dự ứng lực một mặt phẳng dây mang tính biểu tượng tại Việt Nam. Nội dung tập trung vào việc so sánh các phương án kỹ thuật trong giai đoạn nghiên cứu khả thi để lựa chọn thiết kế tối ưu với nhịp chính dài 435m, lập kỷ lục thế giới tại thời điểm đó. Văn bản giải thích chi tiết các tiêu chuẩn kỹ thuật áp dụng, từ thông số mặt cắt ngang, tải trọng thiết kế cho đến các phân tích về khí động học và tác động của động đất. Ngoài ra, nguồn tin còn giới thiệu sơ lược về lịch sử phát triển của hệ thống cầu dây văng trên thế giới và tại Việt Nam, nêu bật ưu điểm của kết cấu bê tông và thép. Các khía cạnh về thẩm mỹ kiến trúc và chiếu sáng cũng được đề cập nhằm đảm bảo công trình hài hòa với cảnh quan di sản Vịnh Hạ Long. Tổng thể, bộ tài liệu đóng vai trò như một hướng dẫn kỹ thuật chuyên sâu phản ánh sự hợp tác giữa các kỹ sư Nhật Bản và Việt Nam trong lĩnh vực hạ tầng giao thông."
+    },
+    {
+      "notebook_id": "66e5ce47-d362-41ce-b61e-be7682d53be4",
+      "url": "https://notebook.google.com/notebook/66e5ce47-d362-41ce-b61e-be7682d53be4",
+      "title": "Cầu",
+      "updated": "30 thg 6, 2026",
+      "declared_source_count": 13,
+      "observed_source_items": 13,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Cong_nghe_thi_cong_hien_dai_Cau_BTCT.pdf",
+          "count": 1
+        },
+        {
+          "name": "Công nghệ đúc hẫng cầu bê tông cốt thép.pdf",
+          "count": 1
+        },
+        {
+          "name": "HSTK Cau Km43-km61.pdf",
+          "count": 1
+        },
+        {
+          "name": "Nghien-cuu-thiet-ke-va-cong-nghe-thi-cong-cau-day-vang-o-viet-nam.pdf",
+          "count": 1
+        },
+        {
+          "name": "QUYỂN 3.1.2 HỒ SƠ THIẾT KẾ CẦU SỐ 2.pdf",
+          "count": 1
+        },
+        {
+          "name": "Quyen 3.1.2. Ho so BVTC Cau so 02_12.03.26.pdf",
+          "count": 1
+        },
+        {
+          "name": "Thiet ke cau treo day vong.pdf",
+          "count": 1
+        },
+        {
+          "name": "ap_dung_cong_nghe_duc_day_trong_xay_dung_cau_be_tong_cot_thep_du_ung_luc_1_4704.pdf",
+          "count": 1
+        },
+        {
+          "name": "ap_dung_cong_nghe_duc_day_trong_xay_dung_cau_be_tong_cot_thep_du_ung_luc_2_57.pdf",
+          "count": 1
+        },
+        {
+          "name": "dapancsctcau.docx",
+          "count": 1
+        },
+        {
+          "name": "xay_dung_cau_be_tong_cot_thep_bang_cong_nghe_da_giao_di_dong_1_9683.pdf",
+          "count": 1
+        },
+        {
+          "name": "ĐỀ CƯƠNG CƠ SỞ CÔNG TRÌNH CẦU.docx",
+          "count": 2
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": ""
+    },
+    {
+      "notebook_id": "13f39a14-5df4-41f7-b603-de1fff91f56a",
+      "url": "https://notebook.google.com/notebook/13f39a14-5df4-41f7-b603-de1fff91f56a",
+      "title": "Steel-Concrete Composite I-Beam Bridge Design Specifications",
+      "updated": "3 thg 7, 2026",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "BẢN VẼ DỒ ÁN 2.pdf",
+          "count": 1
+        },
+        {
+          "name": "thuyetminh.pdf",
+          "count": 1
+        },
+        {
+          "name": "ĐỒ ÁN BẢN VẼ 1.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này bao gồm bản vẽ kỹ thuật và thuyết minh tính toán cho một đồ án thiết kế cầu dầm thép chữ I liên hợp bản bê tông cốt thép. Nội dung tập trung vào việc xác định kích thước mặt cắt, tính toán các đặc trưng hình học và thiết lập sơ đồ phân bố nội lực dựa trên tiêu chuẩn TCVN 11823-2017. Nguồn tin cung cấp chi tiết về vật liệu xây dựng như thép M270, bê tông f'c = 28 MPa và các loại bu lông cường độ cao. Các bảng thống kê khối lượng và bản vẽ cấu tạo giúp làm rõ phương pháp thiết kế dầm tổ hợp hàn cùng hệ thống mối nối công trường. Ngoài ra, tài liệu còn hướng dẫn cách tính toán tải trọng từ xe thiết kế HL-93 để kiểm tra các trạng thái giới hạn về cường độ, sử dụng và mỏi của công trình."
+    },
+    {
+      "notebook_id": "a9799ef8-af21-4191-9c0a-dd36cb08ff73",
+      "url": "https://notebook.google.com/notebook/a9799ef8-af21-4191-9c0a-dd36cb08ff73",
+      "title": "Định Hướng Thiết Kế Kết Cấu Phần Cầu",
+      "updated": "26 thg 11, 2025",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Ho so Dinh huong thiet ke phan cau HNCL (ver2) - 240508.pdf",
+          "count": 3
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Bộ tài liệu này trình bày các định hướng thiết kế kỹ thuật cho hạng mục công trình cầu thuộc dự án đường cao tốc cửa khẩu Hữu Nghị - Chi Lăng được đầu tư theo hình thức BOT. Nội dung tập trung xác định các tiêu chuẩn kỹ thuật áp dụng, thông số tải trọng, tác động tự nhiên và yêu cầu về vật liệu xây dựng như bê tông và thép dự ứng lực. Nguồn tài liệu cũng quy định chi tiết về cấu tạo các bộ phận từ kết cấu phần trên, thân trụ cho đến hệ thống gối cầu và khe co giãn. Bên cạnh các chỉ dẫn lý thuyết, hồ sơ còn bao gồm các bản vẽ minh họa điển hình cho cọc khoan nhồi, bản quá độ và các giải pháp thoát nước, chiếu sáng. Đây là cơ sở pháp lý và kỹ thuật quan trọng để các đơn vị liên quan triển khai tính toán và thi công chi tiết cho từng nhịp cầu cụ thể trên tuyến. Toàn bộ hồ sơ được thực hiện và kiểm soát bởi Công ty Cổ phần Tư vấn Thiết kế Xây dựng Đại Phong vào năm 2023."
+    },
+    {
+      "notebook_id": "f5f5a909-5492-4692-8d6e-f8d5bde09f27",
+      "url": "https://notebook.google.com/notebook/f5f5a909-5492-4692-8d6e-f8d5bde09f27",
+      "title": "Tính Đặc Trưng Hình Học Dầm Thép Liên Hợp",
+      "updated": "27 thg 10, 2025",
+      "declared_source_count": 2,
+      "observed_source_items": 2,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Trí Tuệ Nhân Tạo (AI) là gì? Học AI Trong 3 Phút | Làm Bạn Với AI",
+          "count": 1
+        },
+        {
+          "name": "ĐỒ ÁN KẾT CẤU THÉP UTC (dầm liên hợp - Nhận Làm Đồ Án 0983376556) - tính đặc trưng hình học (BÀI 1)",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu được cung cấp tập trung giới thiệu và hướng dẫn về hai lĩnh vực kỹ thuật chuyên biệt là trí tuệ nhân tạo (AI) và kết cấu thép trong xây dựng. Nguồn tin thứ nhất giải thích các khái niệm nền tảng của AI như máy học (Machine Learning), AI tạo sinh và cách công nghệ này mô phỏng khả năng của con người để hỗ trợ đời sống. Trong khi đó, nguồn thứ hai đi sâu vào khía cạnh thực hành kỹ thuật, cụ thể là cách tính toán đặc trưng hình học cho đồ án dầm thép liên hợp bản bê tông. Người học sẽ nắm bắt được từ thuật ngữ công nghệ hiện đại đến các công thức toán học về mô-men quán tính và hệ số quy đổi vật liệu. Tổng thể, các nguồn này đóng vai trò như tài liệu giáo dục giúp đơn giản hóa các lý thuyết phức tạp thông qua ví dụ thực tế và hướng dẫn chi tiết. Sự kết hợp giữa khoa học máy tính và kỹ thuật xây dựng cung cấp một cái nhìn đa dạng về cách ứng dụng kiến thức chuyên môn vào thực tiễn."
+    },
+    {
+      "notebook_id": "f43231a6-bc9e-4dc0-afd6-127fdc02f57b",
+      "url": "https://notebook.google.com/notebook/f43231a6-bc9e-4dc0-afd6-127fdc02f57b",
+      "title": "Thiết Kế và Kiểm Toán Dầm Thép Liên Hợp",
+      "updated": "2 thg 11, 2025",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "thuyetminh.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này là hồ sơ thuyết minh kỹ thuật chi tiết về thiết kế dầm cầu thép chữ I liên hợp với bản mặt cầu bê tông cốt thép cho một nhịp đơn dài 24 mét. Nội dung tập trung vào quy trình lựa chọn kích thước hình học và tính toán các đặc trưng kỹ thuật dựa trên tiêu chuẩn thiết kế cầu đường bộ hiện hành. Các bước kiểm toán cấu kiện được thực hiện nghiêm ngặt qua nhiều trạng thái giới hạn, bao gồm trạng thái cường độ, trạng thái sử dụng và trạng thái mỏi để đảm bảo an toàn kết cấu. Nguồn tài liệu cũng trình bày chi tiết phương pháp xác định nội lực thông qua đường ảnh hưởng và tính toán các bộ phận phụ trợ như neo chống cắt hay sườn tăng cường. Cuối cùng, văn bản hướng dẫn cách thiết kế mối nối công trường bằng bu lông cường độ cao, đảm bảo tính liên tục và khả năng chịu lực của toàn hệ thống dầm."
+    },
+    {
+      "notebook_id": "8ed6d432-615e-4f65-a085-26fdcd252bbf",
+      "url": "https://notebook.google.com/notebook/8ed6d432-615e-4f65-a085-26fdcd252bbf",
+      "title": "Thiết Kế và Kiểm Toán Dầm Thép Liên Hợp",
+      "updated": "11 thg 11, 2025",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": true,
+      "source_inventory": [
+        {
+          "name": "1.pdf",
+          "count": 1
+        },
+        {
+          "name": "2.pdf",
+          "count": 1
+        },
+        {
+          "name": "thuyetminh.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu được cung cấp là hồ sơ thiết kế kỹ thuật chi tiết cho một dầm thép chữ I liên hợp với bản mặt cầu bằng bê tông cốt thép. Nội dung bao gồm các bản vẽ kỹ thuật với thông số kích thước cụ thể, sơ đồ bố trí cốt thép, hệ thống neo chống cắt và chi tiết các mối nối công trường sử dụng bu lông cường độ cao. Phần thuyết minh trình bày quy trình tính toán kết cấu theo tiêu chuẩn TCVN 11823-2017, tập trung kiểm chứng khả năng chịu lực tại các trạng thái giới hạn cường độ, sử dụng và mỏi. Nguồn tin cũng liệt kê chi tiết các đặc tính vật liệu thép M270 và bê tông, đồng thời thiết lập các biểu đồ bao nội lực phục vụ kiểm tra độ võng và độ vồng ngược của dầm. Tổng thể, đây là hướng dẫn kỹ thuật hoàn chỉnh để thiết kế và thi công dầm cầu thép nhịp đơn trên đường ô tô."
+    },
+    {
+      "notebook_id": "f305062e-950e-4058-ae15-2f16d8cb66ce",
+      "url": "https://notebook.google.com/notebook/f305062e-950e-4058-ae15-2f16d8cb66ce",
+      "title": "Balanced Cantilever Bridge Construction Technology and Applications",
+      "updated": "18 thg 1, 2026",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Công nghệ thi công đúc hẫng cân bằng.docx",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu cung cấp cái nhìn toàn diện về công nghệ đúc hẫng cân bằng, một giải pháp kỹ thuật tiên tiến được sử dụng rộng rãi trong xây dựng các công trình cầu dây văng và cầu dầm liên tục nhịp lớn tại Việt Nam. Nội dung giải thích chi tiết quy trình thi công từ việc đúc khối K0 đến việc sử dụng xe đúc di động (form traveler) để mở rộng các đốt dầm đối xứng qua đỉnh trụ. Nguồn tin cũng nhấn mạnh các ưu điểm vượt trội như tiết kiệm chi phí giàn giáo, không gây cản trở giao thông thủy và rút ngắn tiến độ thực hiện dự án. Nhiều công trình tiêu biểu như cầu Mỹ Thuận, Cửa Hội và Đại Ngãi được dẫn chứng để minh chứng cho năng lực làm chủ công nghệ của các nhà thầu nội địa như Tập đoàn Đèo Cả. Bên cạnh đó, văn bản còn đề cập đến các yêu cầu khắt khe về an toàn lao động, hậu cần thiết bị và các thủ tục pháp lý liên quan đến máy móc nhập khẩu. Tổng thể, đây là tài liệu kỹ thuật quan trọng khẳng định vị thế của phương pháp đúc hẫng trong việc phát triển hạ tầng giao thông hiện đại."
+    },
+    {
+      "notebook_id": "3bfd28b8-1d34-459e-887f-b12c623578ba",
+      "url": "https://notebook.google.com/notebook/3bfd28b8-1d34-459e-887f-b12c623578ba",
+      "title": "Cao Tốc Đồng Đăng – Trà Lĩnh: Kết Cấu Cầu KM26+910",
+      "updated": "24 thg 11, 2025",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Quyen 2.3.6.1- HO SO BVTC MO TRU Cau Km26+910-(02-04).pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này là hồ sơ Thiết kế bản vẽ thi công cho hạng mục cầu tại Km26+910, thuộc gói thầu EC01 của dự án đầu tư xây dựng cao tốc Đồng Đăng – Trà Lĩnh (Giai đoạn 1). Nội dung tập trung chi tiết vào kết cấu phần dưới, bao gồm các thông số kỹ thuật và bản vẽ thiết kế cho hai mố (A1, A2) và bốn trụ (P1 đến P4). Nguồn tin cung cấp đầy đủ các căn cứ pháp lý, điều kiện địa chất, thủy văn tại khu vực Lạng Sơn và Cao Bằng cùng giải pháp kỹ thuật sử dụng cọc khoan nhồi đường kính 1,2m. Ngoài ra, hồ sơ còn thuyết minh về các điều chỉnh chiều dài cọc tại mố A2 và trụ P4 nhằm phù hợp với khảo sát thực tế so với thiết kế kỹ thuật ban đầu. Công trình được thiết kế theo tiêu chuẩn vĩnh cửu với dầm Super T và tải trọng HL-93, đảm bảo kết nối đồng bộ với quy mô toàn tuyến cao tốc."
+    },
+    {
+      "notebook_id": "94290e83-630f-41c7-87e0-8f68a23eebae",
+      "url": "https://notebook.google.com/notebook/94290e83-630f-41c7-87e0-8f68a23eebae",
+      "title": "Balanced Cantilever Bridge Construction Technology and Applications",
+      "updated": "18 thg 1, 2026",
+      "declared_source_count": 2,
+      "observed_source_items": 2,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Văn bản được dán",
+          "count": 2
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu cung cấp cái nhìn toàn diện về công nghệ đúc hẫng cân bằng, một giải pháp kỹ thuật tiên tiến được sử dụng rộng rãi trong xây dựng các công trình cầu nhịp lớn tại Việt Nam. Phương pháp này vận hành bằng cách đúc hoặc lắp đặt các đốt dầm đối xứng qua đỉnh trụ mà không cần hệ thống giàn giáo hỗ trợ phía dưới, giúp tối ưu hóa chi phí và đảm bảo lưu thông đường thủy. Nội dung các nguồn tập trung phân tích quy trình thi công chi tiết, từ việc xử lý khối K0 đến vận hành xe đúc di động, cùng các yêu cầu nghiêm ngặt về thiết bị chuyên dụng và an toàn lao động. Ngoài ra, văn bản còn nhấn mạnh hiệu quả kinh tế và vai trò chủ chốt của các nhà thầu nội địa như Tập đoàn Đèo Cả trong việc làm chủ công nghệ tại các dự án trọng điểm như cầu Mỹ Thuận 2 và Đại Ngãi. Các nguồn cũng hướng dẫn cụ thể về thủ tục pháp lý, công tác logistics vận chuyển máy móc quốc tế và các biện pháp kỹ thuật để nâng cao năng suất trên công trường. Tổng thể, các nguồn tài liệu khẳng định đây là công nghệ cốt lõi giúp hiện đại hóa hạ tầng giao thông và nâng cao năng lực ngành xây dựng cầu đường trong nước."
+    },
+    {
+      "notebook_id": "ed1a121f-1f72-4902-a383-147c1bd7a278",
+      "url": "https://notebook.google.com/notebook/ed1a121f-1f72-4902-a383-147c1bd7a278",
+      "title": "Balanced Cantilever Bridge Construction: Technology and Implementation Guide",
+      "updated": "26 thg 2, 2026",
+      "declared_source_count": 2,
+      "observed_source_items": 2,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Văn bản được dán",
+          "count": 2
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các nguồn tài liệu cung cấp cái nhìn toàn diện về công nghệ thi công cầu đúc hẫng cân bằng, một phương pháp hiện đại cho phép xây dựng các nhịp cầu lớn mà không cần hệ thống giàn giáo đỡ từ dưới đất. Văn bản đi sâu vào quy trình kỹ thuật chi tiết, từ việc sử dụng xe đúc chuyên dụng để đổ bê tông đối xứng qua các trụ cầu đến kỹ thuật căng cáp dự ứng lực nhằm đảm bảo ổn định kết cấu. Bên cạnh các yếu tố kỹ thuật, tài liệu còn phân tích ưu nhược điểm của công nghệ, các tiêu chuẩn an toàn lao động nghiêm ngặt và yêu cầu về quản lý logistics phức tạp tại công trường. Ngoài ra, các nội dung cũng đề cập đến khía cạnh kinh tế và pháp lý, bao gồm thủ tục nhập khẩu thiết bị, chi phí đầu tư và tiềm năng phát triển nội địa hóa công nghệ này tại Việt Nam. Thông qua các ví dụ thực tế như cầu Phú Lương hay Rạch Miễu, nguồn tin khẳng định đây là giải pháp tối ưu cho các địa hình khó khăn như sông rộng hoặc hẻm núi sâu. Cuối cùng, các nguồn dẫn hướng tới tương lai của ngành xây dựng cầu đường với việc ứng dụng tự động hóa và vật liệu mới để nâng cao năng suất và độ chính xác."
+    },
+    {
+      "notebook_id": "9c943263-156d-4a67-b200-84a038e33398",
+      "url": "https://notebook.google.com/notebook/9c943263-156d-4a67-b200-84a038e33398",
+      "title": "Engineering Guide for I-Beam Strength and Deflection Analysis",
+      "updated": "21 thg 4, 2026",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "%C4%90e%CC%82%CC%80%20ba%CC%80i.pdf",
+          "count": 1
+        },
+        {
+          "name": "Giao%20ba%CC%80i%20ta%CC%A3%CC%82p%20lo%CC%9B%CC%81n%20lo%CC%9B%CC%81p%20N01-to%CC%82%CC%81i%20T2.pdf",
+          "count": 1
+        },
+        {
+          "name": "hu%CC%9Bo%CC%9B%CC%81ng%20da%CC%82%CC%83n.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này cung cấp hướng dẫn chi tiết cho sinh viên thực hiện bài tập lớn về tính toán dầm thép chữ I theo tiêu chuẩn TCVN 655-75. Nội dung tập trung vào quy trình kiểm tra độ bền thông qua việc vẽ biểu đồ nội lực, tính toán ứng suất và xác định số hiệu mặt cắt phù hợp. Bên cạnh đó, nguồn tin còn yêu cầu kiểm định độ cứng của cấu kiện bằng cách thiết lập phương trình độ võng và góc xoay. Danh sách đính kèm phân loại cụ thể sơ đồ dầm và số liệu tải trọng riêng biệt cho từng sinh viên trong lớp. Cuối cùng, các văn bản trình bày một bài mẫu cụ thể để minh họa phương pháp phân tích dầm tĩnh định nhiều nhịp và cách trình bày bản vẽ kỹ thuật đúng quy định."
+    },
+    {
+      "notebook_id": "618ca9b1-acde-4bb5-bc0b-e706e3b49a73",
+      "url": "https://notebook.google.com/notebook/618ca9b1-acde-4bb5-bc0b-e706e3b49a73",
+      "title": "Professional Qualifications for Formtraveler Bridge Construction",
+      "updated": "29 thg 3, 2026",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Văn bản được dán",
+          "count": 3
+        }
+      ],
+      "conversation_prompts": [
+        "Hãy LỌC và TỔNG HỢP toàn bộ kiến thức cốt lõi từ TẤT CẢ các nguồn trong notebook này thành một Tài liệu tham khảo kỹ thuật chuyên sâu cho kỹ sư Cầu đường / BIM, viết bằng tiếng Việt (giữ nguyên thuật ngữ kỹ thuật tiếng Anh), theo đúng cấu trúc 7 mục sau:",
+        "Yêu cầu: số liệu kỹ thuật LUÔN kèm đơn vị; công thức viết dạng LaTeX; nếu một mục không có thông tin trong nguồn thì ghi rõ \"(nguồn không đề cập)\"; không bịa thông tin ngoài nguồn."
+      ],
+      "summary": "Các nguồn tài liệu cung cấp cái nhìn toàn diện về công nghệ thi công cầu bằng xe đúc hẫng, bao gồm các yêu cầu khắt khe về nhân sự và chứng chỉ pháp lý. Hệ thống văn bản làm rõ các tiêu chuẩn chuyên môn từ cấp công nhân kỹ thuật đến kỹ sư trưởng nhằm đảm bảo an toàn tuyệt đối cho công trình. Bên cạnh đó, nội dung còn phân tích chi tiết giá trị đầu tư thiết bị với các mức giá khác nhau tùy thuộc vào nguồn gốc xuất xứ và cấu tạo cơ khí. Những phân tích về chi phí vận hành hàng ngày giúp nhà thầu nắm bắt được định mức kinh tế từ nhân công đến khấu hao máy móc. Cuối cùng, các tài liệu nhấn mạnh tầm quan trọng của việc kiểm soát kỹ thuật và dự toán ngân sách chính xác trong suốt quá trình triển khai dự án."
+    },
+    {
+      "notebook_id": "44c15112-e23d-4423-b6e4-91bb631d9dca",
+      "url": "https://notebook.google.com/notebook/44c15112-e23d-4423-b6e4-91bb631d9dca",
+      "title": "Bridging the Future: Digital Innovation in Infrastructure Management",
+      "updated": "17 thg 4, 2026",
+      "declared_source_count": 15,
+      "observed_source_items": 15,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "AI &amp;amp; BIM: Tương lai của ngành xây dựng.",
+          "count": 1
+        },
+        {
+          "name": "AI trong tự động hóa quy trình xây dựng: Định hình công trường thông minh và năng suất bứt phá - Minh Triệu",
+          "count": 1
+        },
+        {
+          "name": "Accelerating Bridge Design: How AI, BIM, and BrIM Transform Workflows",
+          "count": 1
+        },
+        {
+          "name": "AutoGen-based AI assistant for improving the interactions between BIM and project teams for design coordination",
+          "count": 1
+        },
+        {
+          "name": "Automated BIM-based structural design and cost optimization model for reinforced concrete buildings | Scientific Reports",
+          "count": 1
+        },
+        {
+          "name": "BIMCAD Vietnam - AI & ML TRONG BIM: TỰ ĐỘNG HÓA VÀ TƯƠNG LAI XÂY DỰNG THÔNG MINH",
+          "count": 1
+        },
+        {
+          "name": "Bridge Digital Twin for Practical Bridge Operation and Maintenance by Integrating GIS and BIM",
+          "count": 1
+        },
+        {
+          "name": "How AI Is Reshaping Bridge Design And Infrastructure Delivery",
+          "count": 1
+        },
+        {
+          "name": "Smart Bridge Construction: BIM & 3D Printing | CADD Centre",
+          "count": 1
+        },
+        {
+          "name": "Sustainability-Based Lifecycle Management for Bridge Infrastructure Using 6D BIM",
+          "count": 1
+        },
+        {
+          "name": "https://caadria2024.org/wp-content/uploads/2024/04/386-BRIDGING-BIM-AND-AI.pdf",
+          "count": 1
+        },
+        {
+          "name": "https://dialnet.unirioja.es/descarga/articulo/9189357.pdf",
+          "count": 1
+        },
+        {
+          "name": "ỨNG DỤNG AI VÀ MACHINE LEARNING TRONG BIM: CUỘC CÁCH MẠNG TRONG NGÀNH XÂY DỰNG -",
+          "count": 1
+        },
+        {
+          "name": "Ứng dụng BIM trong thiết kế và thi công các cấu kiện đúc sẵn tại Xuân Mai Corp - CÔNG TY TNHH MTV XUÂN MAI BÌNH DƯƠNG",
+          "count": 1
+        },
+        {
+          "name": "Ứng dụng công nghệ số BIM và AI trong các dự án xây dựng thông minh tại Hà Nội | Tạp chí Vật liệu và Xây dựng - Bộ Xây dựng",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các nguồn tài liệu trên tập trung vào sự giao thoa mang tính đột phá giữa Trí tuệ nhân tạo (AI) và Mô hình thông tin xây dựng (BIM) nhằm hiện đại hóa ngành xây dựng công nghiệp. Các nội dung nhấn mạnh cách AI tối ưu hóa thiết kế kết cấu, tự động hóa việc lập kế hoạch dự án và nâng cao độ chính xác trong kiểm soát chi phí cũng như an toàn lao động. Thông qua các công nghệ như Thị giác máy tính và Robot tự hành, quy trình xây dựng được chuyển đổi từ quản lý thủ công sang mô hình Công trường thông minh với hiệu suất vượt trội. Ngoài ra, tài liệu còn giới thiệu các hệ thống hỗ trợ AI dựa trên mô hình ngôn ngữ lớn giúp cải thiện tương tác giữa đội ngũ dự án và dữ liệu mô hình. Những giải pháp này không chỉ giúp giảm thiểu sai sót kỹ thuật mà còn thúc đẩy các phương thức xây dựng bền vững và tối ưu hóa vòng đời công trình. Tổng thể, các nguồn tin khẳng định tích hợp công nghệ số là chìa khóa để giải quyết các thách thức về hạ tầng hiện đại một cách nhanh chóng và tiết kiệm."
+    },
+    {
+      "notebook_id": "1d26b485-1eb2-4698-9a6c-6b5c5b6c3e79",
+      "url": "https://notebook.google.com/notebook/1d26b485-1eb2-4698-9a6c-6b5c5b6c3e79",
+      "title": "Engineering Specifications for River Bridge Design Solutions",
+      "updated": "11 thg 3, 2026",
+      "declared_source_count": 23,
+      "observed_source_items": 23,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "22tcn247-98 thi cong va nghiem thu dam btct dul.pdf",
+          "count": 1
+        },
+        {
+          "name": "CHƯƠNG THỨ TƯ CẦU DẦM THÉP.docx",
+          "count": 1
+        },
+        {
+          "name": "Cau hoi tot nghiep cau.pdf",
+          "count": 1
+        },
+        {
+          "name": "Chapitre 1-2-Introduction de la conception des ponts-P&C64.pdf",
+          "count": 1
+        },
+        {
+          "name": "Chapitre 1-3-Equipement des ponts-P&C64.pdf",
+          "count": 1
+        },
+        {
+          "name": "CÂU HỎI ÔN TẬP.docx",
+          "count": 1
+        },
+        {
+          "name": "Câu Hỏi Cầu Dây Văng.docx",
+          "count": 2
+        },
+        {
+          "name": "Câu hỏi phản ứng nhanh.docx",
+          "count": 1
+        },
+        {
+          "name": "DCTN.pdf",
+          "count": 1
+        },
+        {
+          "name": "De_cuong_on_tap-CQ.pdf",
+          "count": 1
+        },
+        {
+          "name": "Huong dan tot nghiep cau duc hang.pdf",
+          "count": 1
+        },
+        {
+          "name": "Réference-Solution 1.pdf",
+          "count": 1
+        },
+        {
+          "name": "So tay kinh nghiem QL va to chuc thi cong XD1.pdf",
+          "count": 1
+        },
+        {
+          "name": "Sổ tay thuỷ văn cầu đường 2006.pdf",
+          "count": 1
+        },
+        {
+          "name": "cau hoi on tap.docx",
+          "count": 1
+        },
+        {
+          "name": "de duong ly soan cọc khoan nhoi1.docx",
+          "count": 1
+        },
+        {
+          "name": "quy_trinh_thi_cong_duc_hang_tan_thuan.pdf",
+          "count": 1
+        },
+        {
+          "name": "tcvn_4054_2005.pdf",
+          "count": 1
+        },
+        {
+          "name": "z7495807055380_a1dad85cad88acfa5d93717b0a11a3c9.jpg",
+          "count": 1
+        },
+        {
+          "name": "z7495807063911_865a38df65428cbfa8bae43ea866bb5b.jpg",
+          "count": 1
+        },
+        {
+          "name": "Đề Cương Đồ An Tốt Nghiệp.docx",
+          "count": 1
+        },
+        {
+          "name": "Ảnh chụp màn hình 2026-02-08 160827.png",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu này cung cấp quy chuẩn kỹ thuật và hướng dẫn chuyên môn về thiết kế, thi công và nghiệm thu các loại cầu giao thông. Nguồn văn bản tập trung chi tiết vào quy trình chế tạo dầm cầu bê tông dự ứng lực, bao gồm các yêu cầu khắt khe về vật liệu như xi măng, cốt thép và kỹ thuật căng kéo cáp. Bên cạnh đó, nội dung cũng giải thích về cấu tạo và nguyên lý làm việc của cầu dầm thép liên hợp, từ hệ thống liên kết ngang đến phương pháp điều chỉnh nội lực. Các tài liệu còn bao quát những biện pháp thi công tiên tiến như đúc hẫng cân bằng, đồng thời hướng dẫn cách tính toán tải trọng và kiểm soát độ vồng kết cấu. Nhìn chung, đây là bộ cẩm nang kỹ thuật quan trọng nhằm đảm bảo chất lượng, an toàn và tính bền vững cho các công trình cầu hiện nay."
+    },
+    {
+      "notebook_id": "b89dfcec-a096-48c6-8265-c5eb2b238e97",
+      "url": "https://notebook.google.com/notebook/b89dfcec-a096-48c6-8265-c5eb2b238e97",
+      "title": "cầu thép tổng",
+      "updated": "24 thg 6, 2026",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Đồ án cầu thép Đại học Xây dựng Hà Nội - SLIDE + BẢN VẼ | (15/11/2021)",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Nguồn tài liệu này là bản ghi hướng dẫn thực hiện đồ án cầu thép dành cho sinh viên Đại học Xây dựng Hà Nội (HUCE). Giảng viên tập trung phê bình cách trình bày slide, nhấn mạnh việc thay thế các bảng biểu số liệu khô khan bằng biểu đồ và hình ảnh minh họa trực quan. Người dạy yêu cầu sinh viên phải làm nổi bật quy trình tính toán thay vì chỉ đưa ra kết quả cuối cùng để thuyết phục người nghe. Ngoài ra, tài liệu còn cung cấp các lưu ý kỹ thuật về bản vẽ chuyên ngành và kỹ năng thuyết trình nhóm hiệu quả. Cuối cùng, nguồn tin nhấn mạnh tầm quan trọng của việc ứng dụng công nghệ BIM và phần mềm chuyên dụng để tiệm cận với tiêu chuẩn làm việc thực tế."
+    },
+    {
+      "notebook_id": "1f45bf0f-d984-4b93-9410-c286a4e12d4c",
+      "url": "https://notebook.google.com/notebook/1f45bf0f-d984-4b93-9410-c286a4e12d4c",
+      "title": "Design and Construction Analysis of an Extradosed Bridge",
+      "updated": "24 thg 6, 2026",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Thuyết Minh_Final_V10.docx",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này là nội dung thuyết minh chi tiết cho đồ án tốt nghiệp chuyên ngành Cầu - Đường bộ, tập trung vào phương án thiết kế và thi công cầu Extradosed bằng công nghệ đúc hẫng cân bằng. Nội dung bao gồm các số liệu về điều kiện tự nhiên, tiêu chuẩn kỹ thuật và quy trình tính toán nội lực cho hệ thống dầm chủ, mố trụ cũng như hệ cáp dây văng. Nguồn tài liệu còn đi sâu vào việc ứng dụng công nghệ BIM thông qua các phần mềm hiện đại như Midas Civil, Tekla và Grasshopper để tối ưu hóa mô hình hóa cấu kiện và quản lý dữ liệu. Ngoài ra, văn bản cũng trình bày chi tiết các biện pháp thi công thực tế, từ công tác làm cọc khoan nhồi, lắp đặt ván khuôn leo đến quy trình căng kéo cáp dự ứng lực. Đây là một hồ sơ kỹ thuật hoàn chỉnh nhằm đảm bảo tính ổn định kết cấu và thẩm mỹ cho công trình giao thông hiện đại."
+    },
+    {
+      "notebook_id": "0cd9d71a-bf6a-41c9-823f-48e8b9efad63",
+      "url": "https://notebook.google.com/notebook/0cd9d71a-bf6a-41c9-823f-48e8b9efad63",
+      "title": "Cao Tốc Đồng Đăng - Trà Lĩnh: Thiết Kế Cầu KM26+910",
+      "updated": "24 thg 11, 2025",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Quyen 2.3.6.1- HO SO BVTC MO TRU Cau Km26+910-(02-04).pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [
+        "ĐƯỜNG ĐEN TRONG THIẾT KẾ SƠ BỘ CẦU LÀ J",
+        "Hãy LỌC và TỔNG HỢP toàn bộ kiến thức cốt lõi của notebook này thành một tài liệu tham khảo kỹ thuật có cấu trúc, phục vụ kỹ sư cầu đường / BIM: (1) Chủ đề & phạm vi; (2) Khái niệm và định nghĩa then chốt; (3) Số liệu kỹ thuật quan trọng — LUÔN kèm đơn vị; (4) Công thức chính, giải thích ký hiệu; (5) Tiêu chuẩn/quy phạm được viện dẫn (TCVN, 22TCN, ISO, AASHTO, Eurocode...) và nội dung chính của chúng; (6) Quy trình / trình tự tính toán hoặc thi công theo từng bước; (7) Bài học, lưu ý thực hành, lỗi thường gặp. Khi thông tin quan trọng, ghi rõ lấy từ nguồn nào trong notebook. Bỏ qua nội dung trùng lặp. Trả lời càng đầy đủ càng tốt."
+      ],
+      "summary": "Tài liệu này là hồ sơ thiết kế bản vẽ thi công cho hạng mục cầu tại Km26+910, thuộc gói thầu EC01 của dự án cao tốc Đồng Đăng – Trà Lĩnh. Nguồn nội dung tập trung mô tả chi tiết kết cấu phần dưới, bao gồm các thông số kỹ thuật và bản vẽ bố trí cốt thép cho mố A1, A2 cùng các trụ từ P1 đến P4. Công trình được thiết kế vĩnh cửu bằng bê tông cốt thép dự ứng lực, vượt sông Kỳ Cùng với tổng chiều dài hơn 214 mét. Hồ sơ cũng cập nhật các điều chỉnh về chiều dài cọc khoan nhồi dựa trên kết quả khảo sát địa chất thực tế tại hiện trường. Ngoài ra, văn bản cung cấp đầy đủ danh mục quy chuẩn, tiêu chuẩn kỹ thuật áp dụng và các giải pháp thiết kế tổng thể cho dự án."
+    },
+    {
+      "notebook_id": "ddd15c01-4d8a-4eb9-bb68-5b68eba815c3",
+      "url": "https://notebook.google.com/notebook/ddd15c01-4d8a-4eb9-bb68-5b68eba815c3",
+      "title": "Preliminary Design of a Continuous PC Box Girder Bridge",
+      "updated": "5 thg 6, 2026",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Preliminary Design I II III.pdf",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này trình bày chi tiết về đồ án tốt nghiệp thiết kế sơ bộ một công trình cầu bê tông cốt thép dự ứng lực vĩnh cửu với tuổi thọ trên 100 năm. Phương án được tập trung phân tích là cầu dầm hộp liên tục gồm ba nhịp chính thi công theo phương pháp đúc hẫng cân bằng, kết hợp với các nhịp dẫn sử dụng dầm chữ I dài 33m. Nội dung cung cấp đầy đủ các thông số kỹ thuật về tải trọng thiết kế HL-93, đặc tính địa chất thủy văn, và các tiêu chuẩn vật liệu như bê tông cường độ cao cùng cáp dự ứng lực. Nguồn tin cũng đi sâu vào việc tính toán hình học mặt cắt dầm theo đường parabol, phân chia đốt dầm và kiểm tra khả năng chịu lực tại các tiết diện nguy hiểm ở đỉnh trụ và giữa nhịp. Ngoài ra, văn bản còn bao gồm các bảng số liệu về tĩnh tải, hoạt tải và các tổ hợp nội lực để xác định số lượng bó cáp cần thiết. Cuối cùng, tài liệu phác thảo các bước tính toán cho hệ thống mố trụ và nền móng cọc khoan nhồi nhằm đảm bảo tính ổn định toàn diện cho công trình."
+    },
+    {
+      "notebook_id": "dc0476b4-e1cc-47f3-a3f6-3e7e3e9ab397",
+      "url": "https://notebook.google.com/notebook/dc0476b4-e1cc-47f3-a3f6-3e7e3e9ab397",
+      "title": "tham khảo đồ án quốc têa",
+      "updated": "21 thg 6, 2026",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Chuong_IV_Lua_chon_phuong_an_TV.docx",
+          "count": 1
+        },
+        {
+          "name": "Chuong_VI_Tinh_ban_mat_cau_TV.docx",
+          "count": 1
+        },
+        {
+          "name": "THUYET_MINH_CAU_TIENG_VIET.docx",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu trên trình bày hồ sơ kỹ thuật chi tiết về thiết kế và tính toán kết cấu cầu theo tiêu chuẩn 22 TCN 272-05. Nội dung tập trung vào việc so sánh ba phương án gồm cầu dầm bê tông cốt thép dự ứng lực, cầu dây văng và cầu liên hợp, trong đó phương án cầu dầm liên tục ba nhịp được lựa chọn nhờ tính khả thi và kinh tế. Nguồn tin cung cấp các số liệu cụ thể về thông số hình học, đặc tính vật liệu và quy trình phân tích nội lực cho bản mặt cầu cũng như hệ thống mố trụ. Tài liệu còn đi sâu vào các bước kiểm tra sức kháng uốn, kháng cắt và tính toán số lượng cọc khoan nhồi cần thiết cho nền móng công trình. Tổng thể, đây là hướng dẫn kỹ thuật hoàn chỉnh phục vụ việc triển khai thiết kế chi tiết cho một dự án cầu giao thông vĩnh cửu."
+    },
+    {
+      "notebook_id": "bdb3aa3f-d50a-4d63-ba2f-5e14f15d5dfd",
+      "url": "https://notebook.google.com/notebook/bdb3aa3f-d50a-4d63-ba2f-5e14f15d5dfd",
+      "title": "Quy Định Thiết Kế Cầu Cao Tốc",
+      "updated": "26 thg 11, 2025",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Quy Định Thiết Kế Cầu Cao Tốc",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này cung cấp các quy định kỹ thuật chi tiết phục vụ công tác thiết kế cầu thuộc dự án đường cao tốc cửa khẩu Hữu Nghị - Chi Lăng. Nội dung tập trung xác định các loại tải trọng và tác động như tĩnh tải, hoạt tải xe HL-93, lực va chạm và các yếu tố môi trường theo tiêu chuẩn TCVN 11823-2017. Nguồn tin cũng đưa ra các yêu cầu cụ thể về vật liệu xây dựng bao gồm cường độ bê tông, đặc tính cốt thép và cáp dự ứng lực cho từng bộ phận công trình. Bên cạnh đó, văn bản thiết lập các thông số kỹ thuật cho kết cấu hạ tầng và thượng tầng, từ bệ móng, trụ cầu đến hệ thống lan can và khe co giãn. Các quy định về tĩnh không thông thuyền và hệ thống thoát nước cũng được trình bày nhằm đảm bảo an toàn vận hành. Đây là cơ sở pháp lý và kỹ thuật quan trọng để các đơn vị tư vấn triển khai hồ sơ thiết kế đồng bộ và chính xác."
+    },
+    {
+      "notebook_id": "519c3407-f2b3-4e47-adbc-b6fc0266f62e",
+      "url": "https://notebook.google.com/notebook/519c3407-f2b3-4e47-adbc-b6fc0266f62e",
+      "title": "ĐÚC HẪNG",
+      "updated": "19 thg 3, 2026",
+      "declared_source_count": 15,
+      "observed_source_items": 15,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Văn bản được dán",
+          "count": 15
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các nguồn tài liệu cung cấp một cái nhìn toàn diện về công nghệ thi công cầu đúc hẫng cân bằng tại Việt Nam trong giai đoạn 2025 - 2026. Nội dung tập trung phân tích sự giao thoa giữa kỹ thuật xây dựng chuyên sâu, quy trình logistics quốc tế và hệ thống văn bản pháp quy mới nhất như Luật Xây dựng và Luật Đường bộ. Người đọc có thể tìm thấy các hướng dẫn chi tiết về vận hành xe đúc hẫng, quản trị rủi ro an toàn lao động và các phương án tối ưu hóa chi phí giữa việc mua hoặc thuê thiết bị. Đặc biệt, tài liệu nhấn mạnh vào lộ trình số hóa thủ tục hành chính, từ khâu tạm nhập thiết bị đến nghiệm thu công trình trực tuyến trên các nền tảng như iHanoi. Đây là bộ cẩm nang quan trọng giúp các nhà quản lý nắm vững quy chuẩn kỹ thuật và pháp lý để làm chủ công nghệ hạ tầng hiện đại."
+    },
+    {
+      "notebook_id": "f64a04cb-88de-482d-b091-3bade8701871",
+      "url": "https://notebook.google.com/notebook/f64a04cb-88de-482d-b091-3bade8701871",
+      "title": "BIM Modeling for Complex Bridge Substructures",
+      "updated": "24 thg 6, 2026",
+      "declared_source_count": 12,
+      "observed_source_items": 12,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "BÀI 05. REVIT CẦU ĐƯỜNG - THỰC HÀNH VẼ LAN CAN",
+          "count": 2
+        },
+        {
+          "name": "Công nghệ Bim | Vẽ trụ cầu phức tạp bằng revit | Revit Cầu đường | Hướng dẫn revit cầu đường.",
+          "count": 1
+        },
+        {
+          "name": "REVIT CẦU ĐƯỜNG BUỔI 15: RÃI THÉP TUYẾN TÍNH (VARYING REBAR SET)",
+          "count": 1
+        },
+        {
+          "name": "REVIT CẦU ĐƯỜNG BUỔI 17: THAY ĐỔI KÍ HIỆU LEVEL (ANNOTATION)",
+          "count": 1
+        },
+        {
+          "name": "REVIT CẦU ĐƯỜNG: MÔ HÌNH CẦU ĐÚC HẪNG (BALANCED CANTILEVER BRIDGE MODEL) | Phần 1",
+          "count": 1
+        },
+        {
+          "name": "Revit chuyên đề cầu online | Tự học revit cầu đường | Revit brigde | revit cầu đường #1",
+          "count": 1
+        },
+        {
+          "name": "Tự học Revit cầu Full | Bim | Revit cầu Online | Buổi 6.4 Hoàn thiện 1 nhịp của Dự Án trong Revit.",
+          "count": 1
+        },
+        {
+          "name": "Tự học Revit cầu đường | Revit brigde | Vì sao nên ứng dụng Revit vào công trình cầu | Hay nhất",
+          "count": 1
+        },
+        {
+          "name": "Tự học revit cầu đường | Bim | Revit cầu đường Online | Buổi 1.1: Tổng quan về revit cầu đường.",
+          "count": 1
+        },
+        {
+          "name": "Tự học revit cầu đường | Revit cầu đường online | Cao độ, lưới trục trong revit | revit brigde #6.2",
+          "count": 2
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các nguồn tài liệu này cung cấp các hướng dẫn chi tiết về việc ứng dụng công nghệ BIM và phần mềm Revit trong lĩnh vực kỹ thuật cầu đường. Nội dung bao gồm quy trình xây dựng mô hình 3D cho các cấu kiện phức tạp như trụ cầu, dầm cầu đúc hẫng, lan can và cách bố trí cốt thép tự động. Người xem sẽ được tìm hiểu cách thiết lập môi trường làm việc, quản lý các family, cũng như kỹ thuật xuất bản vẽ 2D và bảng thống kê khối lượng từ mô hình gốc. Ngoài các bài thực hành vẽ bàn ghế cơ bản để làm quen, các video còn tập trung vào những kỹ năng chuyên sâu như sử dụng Dynamo và lệnh Varying Rebar Set để tối ưu hóa thiết kế. Mục tiêu chính của các nguồn này là giúp người dùng làm chủ công cụ để nâng cao tính chính xác và hiệu quả trong việc triển khai các dự án hạ tầng giao thông."
+    },
+    {
+      "notebook_id": "b683b37a-934a-427e-9658-6dc1a58da4eb",
+      "url": "https://notebook.google.com/notebook/b683b37a-934a-427e-9658-6dc1a58da4eb",
+      "title": "Steel Composite I-Beam Bridge Design Calculations",
+      "updated": "2 thg 7, 2026",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "ĐỒ ÁN HOÀN.docx",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu này là một đồ án thiết kế kết cấu thép chi tiết cho dầm cầu chữ I liên hợp bản bê tông cốt thép, tuân thủ tiêu chuẩn TCVN 11823:2017. Nội dung tập trung vào việc xác định kích thước hình học, tính toán đặc trưng tiết diện và thiết lập biểu đồ bao nội lực dưới tác động của tĩnh tải và hoạt tải HL-93. Nguồn tài liệu cung cấp quy trình kiểm toán toàn diện dầm tại các trạng thái giới hạn cường độ, sử dụng và mỏi, bao gồm cả khả năng kháng uốn và kháng cắt. Ngoài ra, văn bản còn hướng dẫn chi tiết cách thiết kế hệ thống phụ trợ như neo chống cắt, sườn tăng cường và các mối nối bằng bu lông cường độ cao. Đây là hướng dẫn kỹ thuật hoàn chỉnh phục vụ việc triển khai thuyết minh và bản vẽ kỹ thuật cho công trình cầu dầm thép nhịp giản đơn."
+    },
+    {
+      "notebook_id": "7245c1ba-2778-408c-a87e-c2a8c4421e91",
+      "url": "https://notebook.google.com/notebook/7245c1ba-2778-408c-a87e-c2a8c4421e91",
+      "title": "Bridge BIM Modeling Programming Workflow",
+      "updated": "3 thg 11, 2025",
+      "declared_source_count": 2,
+      "observed_source_items": 2,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Chuẩn Hóa Quy Trình Theo Giai Đoạn và Bước",
+          "count": 1
+        },
+        {
+          "name": "Quy Trình Lập Trình Dựng Mô Hình BIM Cầu",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Tài liệu cung cấp một cái nhìn tổng quan về việc chuẩn hóa quy trình lập trình để tự động hóa việc xây dựng mô hình BIM cho công trình cầu. Quy trình này được chia thành bảy giai đoạn chiến lược, bắt đầu từ việc chuẩn bị hạ tầng kỹ thuật, thiết lập hệ tọa độ cho đến khâu vận hành các kịch bản Python và Revit API. Các nguồn văn bản nhấn mạnh vào việc tối ưu hóa hiệu suất thông qua cấu trúc mã nguồn mô-đun hóa, giúp giảm thiểu đáng kể thời gian so với phương pháp thủ công. Ngoài ra, hệ thống còn tích hợp các cơ chế kiểm tra sai số tự động và xuất báo cáo để đảm bảo độ chính xác hình học cũng như tiêu chuẩn dữ liệu. Cuối cùng, giải pháp hướng tới việc đóng gói công cụ chuyên nghiệp trên nền tảng pyRevit, đi kèm với tài liệu hướng dẫn chi tiết để tái sử dụng cho nhiều dự án khác nhau."
+    },
+    {
+      "notebook_id": "e1c41614-091c-4f05-98c2-bd93ef460bfa",
+      "url": "https://notebook.google.com/notebook/e1c41614-091c-4f05-98c2-bd93ef460bfa",
+      "title": "AI Integration in Bridge BIM Modeling Automation",
+      "updated": "1 thg 5, 2026",
+      "declared_source_count": 2,
+      "observed_source_items": 2,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "DYNAMO_v2_enhanced_2.docx",
+          "count": 1
+        },
+        {
+          "name": "Mẫu Slide chuẩn INED NCKH SV INED 2025-2026.pptx",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Các tài liệu này tổng hợp kết quả nghiên cứu khoa học của sinh viên tại Đại học Giao thông Vận tải trong năm học 2025-2026, tập trung vào việc hiện đại hóa ngành kỹ thuật hạ tầng. Nguồn văn bản chính trình bày chi tiết về việc ứng dụng trí tuệ nhân tạo (AI) để tự động hóa quy trình thiết kế mô hình BIM 3D cho công trình cầu trên nền tảng phần mềm Revit. Nghiên cứu đi sâu vào các giải pháp tiên tiến như sử dụng Dynamo, lập trình Python và giao thức kết nối dữ liệu MCP Server để tối ưu hóa hiệu suất thiết kế. Bên cạnh đó, tài liệu còn bao gồm mẫu bài thuyết trình về phương pháp mạng thần kinh nhằm dự báo lưu lượng giao thông dựa trên dữ liệu định vị và bản đồ. Tổng thể các nguồn tin phản ánh xu hướng chuyển đổi số mạnh mẽ, giúp giảm thiểu rào cản kỹ thuật cho kỹ sư và nâng cao độ chính xác trong quản lý dự án. Quy trình thực nghiệm và các ví dụ minh họa trong báo cáo đã chứng minh khả năng thay thế các thao tác thủ công bằng những câu lệnh ngôn ngữ tự nhiên trực tiếp."
+    },
+    {
+      "notebook_id": "5e1b479e-fbfd-4c01-aa38-d7b3954ef91e",
+      "url": "https://notebook.google.com/notebook/5e1b479e-fbfd-4c01-aa38-d7b3954ef91e",
+      "title": "AI-BIM: Automating Bridge Modeling Through Artificial Intelligence",
+      "updated": "3 thg 5, 2026",
+      "declared_source_count": 3,
+      "observed_source_items": 3,
+      "non_item_source_count": 0,
+      "public": true,
+      "source_inventory": [
+        {
+          "name": "KICH_BAN_THUYET_TRINH_AI_BIM.md",
+          "count": 1
+        },
+        {
+          "name": "RESEARCH ON THE APPLICATION OF AI IN AUTOMATING 3D BIM MODELING OF BRIDGE (1).pptx",
+          "count": 1
+        },
+        {
+          "name": "RESEARCH ON THE APPLICATION OF AI IN AUTOMATING 3D BIM MODELING OF BRIDGE.docx",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Bộ tài liệu trình bày một nghiên cứu khoa học của sinh viên về việc tích hợp trí tuệ nhân tạo (AI) để tự động hóa quy trình thiết kế mô hình 3D BIM cho các công trình cầu. Nội dung tập trung khai thác các mô hình ngôn ngữ lớn như ChatGPT, Gemini và Claude nhằm hỗ trợ kỹ sư tạo mã Python và kịch bản Dynamo, giúp tối ưu hóa những tác vụ lặp lại vốn tốn nhiều thời gian. Đặc biệt, nghiên cứu đi sâu vào các tính năng đột phá của phiên bản Revit 2027, bao gồm trợ lý ảo Autodesk Assistant và giao thức kết nối MCP Server cho phép điều khiển mô hình bằng ngôn ngữ tự nhiên. Kết quả thực nghiệm cho thấy việc ứng dụng AI giúp giảm thiểu đáng kể thời gian xử lý dữ liệu và sai sót so với các phương pháp thủ công truyền thống. Qua đó, nhóm tác giả khẳng định AI là một cộng sự kỹ thuật số đắc lực, thúc đẩy tiến trình chuyển đổi số trong ngành xây dựng hạ tầng giao thông."
+    },
+    {
+      "notebook_id": "a6ea9c7a-3a14-4001-8bd9-32ce5f31bf59",
+      "url": "https://notebook.google.com/notebook/a6ea9c7a-3a14-4001-8bd9-32ce5f31bf59",
+      "title": "Quy Trình Dynamo: Mô Hình Hóa Thông Minh Kết Cấu Cầu",
+      "updated": "26 thg 11, 2025",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Quy Trình Dynamo: Mô Hình Hóa Thông Minh Kết Cấu Cầu",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [
+        "VIẾT LẠI THÀNH BÁO CÁO NGHIÊN CỨU"
+      ],
+      "summary": "Văn bản trình bày về quy trình khoa học nhằm ứng dụng công cụ Dynamo vào việc tự động hóa mô hình hóa các kết cấu cầu trong môi trường BIM. Quá trình này bắt đầu bằng việc phân tích kỹ lưỡng các yêu cầu thiết kế, từ thông số hình học đến các điều kiện biên và dữ liệu đầu ra cần thiết. Tiếp theo, người dùng cần xây dựng sơ đồ luồng xử lý logic để chuyển hóa các dữ liệu thô thành một hệ thống thông tin có cấu trúc và tính kết nối cao. Cuối cùng, việc lập trình trực quan được thực hiện thông qua các nút lệnh hoặc mã nguồn Python để tạo ra mô hình 3D chính xác và linh hoạt. Phương pháp này không chỉ giúp tối ưu hóa hiệu suất làm việc mà còn đảm bảo tính đồng bộ và khả năng kiểm soát sai số trong thiết kế công trình."
+    },
+    {
+      "notebook_id": "ad66b02e-3a13-454c-9c08-02ca0748480d",
+      "url": "https://notebook.google.com/notebook/ad66b02e-3a13-454c-9c08-02ca0748480d",
+      "title": "Automating BIM Bridge Modeling with Dynamo and Revit",
+      "updated": "25 thg 12, 2025",
+      "declared_source_count": 1,
+      "observed_source_items": 1,
+      "non_item_source_count": 0,
+      "public": false,
+      "source_inventory": [
+        {
+          "name": "Văn bản được dán",
+          "count": 1
+        }
+      ],
+      "conversation_prompts": [],
+      "summary": "Văn bản trình bày về việc ứng dụng công cụ lập trình trực quan Dynamo để tự động hóa quy trình thiết kế mô hình BIM 3D cho các công trình cầu đường. Quy trình này bắt đầu từ việc chuẩn hóa dữ liệu đầu vào, phân tích các ràng buộc tham số hình học, cho đến bước khởi tạo hệ trục và dựng khối cấu kiện chi tiết. Thông qua các nhóm nút chức năng và mã Python, Dynamo giúp chuyển đổi dữ liệu thành các đối tượng Revit một cách chính xác và đồng bộ. Phương pháp này không chỉ rút ngắn đáng kể thời gian thực hiện so với cách làm thủ công mà còn tăng cường tính linh hoạt khi cần điều chỉnh thiết kế. Cuối cùng, nguồn tài liệu khẳng định vai trò then chốt của việc số hóa và tự động hóa trong việc nâng cao hiệu quả cũng như độ tin cậy cho các dự án hạ tầng giao thông hiện đại."
+    }
+  ]
+}

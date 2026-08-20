@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knowledge_card.schema.json",
+  "title": "KnowledgeCard",
+  "description": "Thẻ tri thức kỹ thuật có cấu trúc — chỉ GỢI Ý, không thay verifier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["card_id", "type", "title", "applies_to", "guidance", "evidence",
+               "source", "status", "version"],
+  "properties": {
+    "card_id": { "type": "string", "pattern": "^KC-[0-9]{3}$" },
+    "type": { "enum": ["design_heuristic", "construction_method", "failure_mode", "repair_rule"] },
+    "title": { "type": "string" },
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "rules", "variables"],
+      "properties": {
+        "family": { "type": "string" },
+        "rules": { "type": "array", "items": { "type": "string" } },
+        "variables": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "guidance": { "type": "string" },
+    "evidence": { "type": "string" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": { "enum": ["experiment", "standard", "textbook", "project", "expert"] },
+        "ref": { "type": "string" }
+      }
+    },
+    "status": { "enum": ["DRAFT", "ENGINEER_APPROVED", "REJECTED"] },
+    "version": { "type": "integer", "minimum": 1 }
+  }
+}

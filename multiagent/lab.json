@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "lab_id": "DYLIGHT-BRIDGE-LAB",
+  "name": "DYLIGHT Multi-Agent Bridge Research Lab",
+  "protocol": "multiagent/PROTOCOL.md",
+  "physics_gates": "multiagent/PHYSICS_GATES.md",
+  "research_contract": "docs/01_research_contract.md",
+  "current_project_claim_ceiling": "SCREENED",
+  "agents": [
+    {"agent_id": "codex", "adapter": "AGENTS.md", "suggested_focus": "integration, implementation, tests"},
+    {"agent_id": "claude", "adapter": "CLAUDE.md", "suggested_focus": "research synthesis, hypotheses, critique"},
+    {"agent_id": "opencode", "adapter": "opencode.json", "suggested_focus": "independent implementation and reproduction"},
+    {"agent_id": "antigravity", "adapter": ".agents/rules/bridge-lab.md", "suggested_focus": "visual form exploration, BIM workflow, alternative concepts"}
+  ],
+  "human_authority": "responsible_bridge_engineer",
+  "credentials_policy": "Each tool authenticates locally; credentials never enter this repository."
+}

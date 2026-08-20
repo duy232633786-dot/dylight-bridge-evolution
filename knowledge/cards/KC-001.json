@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-001",
+  "type": "repair_rule",
+  "title": "Trượt kéo thớ dưới Sử dụng III: tăng cấp cáp DƯL trước tiên",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["SERV-001"],
+    "variables": ["prestress_layout_id"]
+  },
+  "guidance": "Khi trượt kiểm tra kéo thớ dưới ở tổ hợp Sử dụng III (SERV-001), nước sửa NÊN THỬ ĐẦU TIÊN là tăng cấp cáp DƯL thêm một mức (ví dụ PT-38 → PT-42): rẻ nhất và xóa được khoảng một nửa số vi phạm; phần còn lại cần tăng thêm mức nữa hoặc kết hợp chuyển sang tiết diện dầm cao hơn để tăng mô đun chống uốn. Tăng grade bê tông dầm là lựa chọn kém hiệu quả nhất về chi phí vì giới hạn kéo cho phép chỉ tăng theo căn bậc hai của f'c.",
+  "evidence": "Quét toàn miền hợp lệ hình học bằng solver L1: trong 428 cấu hình chỉ vi phạm SERV-001, +1 mức PT xóa vi phạm ở 198 trường hợp (~46%); 230 trường hợp còn lại cần ≥ +2 mức hoặc kết hợp tăng tiết diện. Chi phí mỗi bậc PT nhỏ hơn hẳn đổi dầm cao hơn hoặc nâng grade bê tông.",
+  "source": { "kind": "experiment", "ref": "experiments/results/run_b600_s42" },
+  "status": "DRAFT",
+  "version": 1
+}

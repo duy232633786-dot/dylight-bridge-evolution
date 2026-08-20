@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "audit_id": "oracle-20260820T154139.606695Z",
+  "evidence": {
+    "ref": "experiments/results/exhaustive_20260820T154139.606695Z/summary.json",
+    "sha256": "95cf0b23e918e32890099f2c3f292032c0a71a4219a93b3447236df45b944b86",
+    "complete_oracle": true,
+    "domain_size": 331776,
+    "versions": {
+      "software": "0.2.0",
+      "solver": "builtin-l1/0.2.0",
+      "ruleset": "BRIDGE-RULESET-V1/1.1.0",
+      "catalogs": "1.0.0",
+      "grammar": "1.0.0",
+      "source_revision": "unversioned"
+    }
+  },
+  "global_warnings": [
+    "6/9 card đang trích trực tiếp protocol thí nghiệm legacy.",
+    "3/9 card chứa claim định lượng bị mâu thuẫn hoặc chưa được kiểm chứng.",
+    "9/9 card trong audit snapshot vẫn là DRAFT; mọi card ngoài snapshot chưa được audit và toàn bộ kho chưa được kỹ sư phê duyệt.",
+    "Oracle dùng catalog placeholder và source_revision hiện là unversioned."
+  ],
+  "cards": {
+    "KC-001": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "RED",
+      "summary": "Tăng một bậc PT sửa được 43,9% case chỉ lỗi SERV-001, gần claim cũ; claim PT luôn rẻ hơn đổi grade/section bị dữ liệu hiện tại bác bỏ.",
+      "findings": [
+        "Trong 6.100 cấu hình chỉ lỗi SERV-001, +1 PT sửa 2.680 case; phần còn lại cần +2 hoặc +3 bậc.",
+        "Delta cost PT 47,63–57,17, cao hơn grade 35,33–47,09 và section 23,19–32,43 trong các cặp so sánh hiện tại."
+      ],
+      "next_action": "Viết lại guidance để bỏ claim chi phí; giữ heuristic PT như một lựa chọn hiệu quả có điều kiện."
+    },
+    "KC-002": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Kết luận loại bố trí 7–8 dầm được xác nhận, nhưng attribution GEOM-002 không xuất hiện trong exhaustive scan.",
+      "findings": [
+        "Miền L0-valid chỉ còn girder_count 5 hoặc 6.",
+        "Toàn scan không có GEOM-002; loại 7–8 dầm trong cấu hình hiện tại đến từ GEOM-001."
+      ],
+      "next_action": "Cập nhật rule attribution và source sang exhaustive oracle hiện tại."
+    },
+    "KC-003": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "Các miền spacing L0-valid cho 5 và 6 dầm được exhaustive oracle xác nhận.",
+      "findings": [
+        "5 dầm hợp lệ với spacing 2350–2800 mm.",
+        "6 dầm hợp lệ với spacing 2150 hoặc 2200 mm."
+      ],
+      "next_action": "Thay nguồn legacy bằng oracle và chờ kỹ sư duyệt trước khi đổi status."
+    },
+    "KC-004": {
+      "evidence_freshness": "CURRENT_RULESET",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "DG-5 là lựa chọn duy nhất qua CONS-001 trong mô hình hiện tại; provenance đang gắn nhầm rule nội bộ như một tiêu chuẩn độc lập.",
+      "findings": [
+        "Cả 18.036 case L0-valid đều dùng DG-5.",
+        "Exhaustive summary ghi 221.184 reject bởi CONS-001."
+      ],
+      "next_action": "Đổi source kind/ref sang ruleset nội bộ có hash hoặc bổ sung trích dẫn tiêu chuẩn thật."
+    },
+    "KC-005": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "SERV-001 vẫn là serviceability failure chi phối; claim cốt lõi được oracle xác nhận.",
+      "findings": [
+        "Võng hoạt tải 9,08–18,42 mm và không có SERV-002 trong exhaustive scan.",
+        "SERV-001 xuất hiện ở 8.106/10.464 case không khả thi (77,5%)."
+      ],
+      "next_action": "Cập nhật số liệu và provenance sang oracle hiện tại."
+    },
+    "KC-006": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Lõi claim về rủi ro cắt của bố trí 5 dầm được xác nhận nhưng các con số ví dụ đã trôi sau sửa mô hình tải.",
+      "findings": [
+        "5 dầm với spacing ≥2650 mm có utilization cắt 0,906–1,063 và 1.840 case STR-002.",
+        "6 dầm có utilization tối đa 0,915 và không fail STR-002."
+      ],
+      "next_action": "Thay toàn bộ số định lượng bằng khoảng từ oracle solver 0.2.0."
+    },
+    "KC-007": {
+      "evidence_freshness": "REGRESSION_ONLY",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Repair logic được regression test hỗ trợ nhưng case dùng section tổng hợp ngoài miền grammar và chưa được kỹ sư duyệt.",
+      "findings": [
+        "GC-05 vẫn tái hiện SOLVER_FAILED/SOLVER-001.",
+        "ST-TEST-SINGULAR không thuộc exhaustive grammar; gold matrix còn PENDING."
+      ],
+      "next_action": "Giữ như regression-only và không suy rộng sang lỗi solver thực địa."
+    },
+    "KC-008": {
+      "evidence_freshness": "EXPERT_UNVERIFIED",
+      "claim_audit": "NOT_TESTED",
+      "risk": "RED",
+      "summary": "Claim về giới hạn cẩu lắp chưa có dữ liệu thiết bị hoặc nguồn chuyên gia truy vết được và không được mô hình hiện tại kiểm chứng.",
+      "findings": [
+        "Khối lượng placeholder mỗi phiến khoảng 58,9–65,4 tấn theo section.",
+        "Mô hình không chứng minh quan hệ ít dầm đồng nghĩa mỗi phiến nặng hơn."
+      ],
+      "next_action": "Bổ sung crane chart, phương án nâng lắp và xác nhận chuyên gia trước khi sử dụng."
+    },
+    "KC-009": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "RED",
+      "summary": "PT hiệu quả hơn nâng grade về tỷ lệ sửa SERV-001 và carbon, nhưng claim chi phí thấp hơn grade bị oracle bác bỏ.",
+      "findings": [
+        "+1 PT sửa 43,9% case chỉ lỗi SERV-001; +1 grade chỉ sửa 1,6%.",
+        "PT có delta carbon thấp hơn grade trong 4.030 cặp nhưng không có cặp nào delta cost thấp hơn grade."
+      ],
+      "next_action": "Tách rõ hiệu quả kỹ thuật/carbon khỏi claim chi phí và cập nhật guidance."
+    }
+  }
+}

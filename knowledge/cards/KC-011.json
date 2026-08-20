@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-011",
+  "type": "construction_method",
+  "title": "Tăng tao cáp phải đi kèm mở bầu dưới — chỗ xếp cáp là ràng buộc riêng",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": ["FAB-003"],
+    "variables": ["bottom_bulb_width_mm", "bottom_bulb_height_mm", "prestress_layout_id"]
+  },
+  "guidance": "Số tao cáp và kích thước bầu dưới là một CẶP, không phải hai biến độc lập: mỗi bậc PT thêm tao đòi thêm diện tích bầu để giữ khoảng cách tao tối thiểu, lớp bảo vệ và chỗ cho cốt đai. Bầu quá nhỏ làm phương án không bố trí được cáp dù mọi kiểm tra chịu lực L1 đều đạt — mô hình L1 chỉ dùng trọng tâm cáp quy đổi nên hoàn toàn 'mù' với chuyện xếp tao. Khi trượt FAB-003, hướng sửa đúng là mở rộng bầu dưới (hoặc hạ một bậc PT), không phải tiếp tục chỉnh các biến chịu lực.",
+  "evidence": "Nhận định suy từ chính cách mô hình hóa hiện tại: prestress_layout trong catalog chỉ khai báo strand_count và centroid_from_bottom_m, không có sơ đồ xếp tao, nên L1 không thể phát hiện thiếu chỗ. Sức chứa thật của bầu phải đối chiếu lưới tao, lớp bảo vệ và cốt đai trên bản vẽ chi tiết; thẻ này CHƯA có số liệu đo cho một tỉ lệ diện tích-trên-tao cụ thể.",
+  "source": { "kind": "expert", "ref": "kinh nghiệm bố trí cáp DƯL dầm Super-T (chưa hiệu chỉnh bằng bản vẽ chi tiết)" },
+  "status": "DRAFT",
+  "version": 1
+}

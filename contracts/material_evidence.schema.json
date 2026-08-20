@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "material_evidence.schema.json",
+  "title": "MaterialEvidenceRecord",
+  "description": "Bằng chứng kỹ thuật và dữ liệu thực nghiệm kiểm chứng cho vật liệu cầu.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "material_id",
+    "material_type",
+    "mechanical_properties",
+    "durability_and_lifecycle",
+    "cost_and_carbon",
+    "standards_compliance",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "material_id": { "type": "string", "minLength": 1 },
+    "material_type": { "enum": ["CONCRETE", "PRESTRESSING_STEEL", "REBAR", "UHPC", "GEOPOLYMER", "FRP"] },
+    "mechanical_properties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fc_or_fy_characteristic_MPa", "E_modulus_GPa", "uncertainty_cv_percent"],
+      "properties": {
+        "fc_or_fy_characteristic_MPa": { "type": "number", "minimum": 10.0 },
+        "E_modulus_GPa": { "type": "number", "minimum": 5.0 },
+        "tensile_strength_MPa": { "type": "number", "minimum": 0.0 },
+        "uncertainty_cv_percent": { "type": "number", "minimum": 0.0, "maximum": 50.0 }
+      }
+    },
+    "durability_and_lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["creep_coefficient", "shrinkage_microstrain", "chloride_diffusion_coeff_m2_s", "fire_rating_hours"],
+      "properties": {
+        "creep_coefficient": { "type": "number", "minimum": 0.0, "maximum": 5.0 },
+        "shrinkage_microstrain": { "type": "number", "minimum": 0.0, "maximum": 2000.0 },
+        "chloride_diffusion_coeff_m2_s": { "type": "number", "minimum": 0.0 },
+        "fire_rating_hours": { "type": "number", "minimum": 0.5, "maximum": 10.0 }
+      }
+    },
+    "cost_and_carbon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit_cost_range", "embodied_carbon_kgCO2e_unit", "epd_boundary"],
+      "properties": {
+        "unit_cost_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max", "unit"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0.0 },
+            "max": { "type": "number", "minimum": 0.0 },
+            "unit": { "type": "string" }
+          }
+        },
+        "embodied_carbon_kgCO2e_unit": { "type": "number", "minimum": 0.0 },
+        "epd_boundary": { "enum": ["CRADLE_TO_GATE_A1_A3", "CRADLE_TO_GRAVE_A1_C4"] }
+      }
+    },
+    "standards_compliance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applicable_code", "section_reference"],
+      "properties": {
+        "applicable_code": { "type": "string" },
+        "section_reference": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ref", "test_report_id", "tested_by"],
+      "properties": {
+        "source_ref": { "type": "string" },
+        "test_report_id": { "type": "string" },
+        "tested_by": { "type": "string" }
+      }
+    }
+  }
+}

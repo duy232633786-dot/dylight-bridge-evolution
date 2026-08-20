@@ -1,0 +1,36 @@
+{
+  "matrix_version": "1.0",
+  "materials": [
+    {
+      "schema_version": "1.0",
+      "material_id": "C50-FLYASH-LOWCARBON",
+      "material_type": "CONCRETE",
+      "mechanical_properties": {
+        "fc_or_fy_characteristic_MPa": 50.0,
+        "E_modulus_GPa": 33.5,
+        "tensile_strength_MPa": 3.8,
+        "uncertainty_cv_percent": 6.5
+      },
+      "durability_and_lifecycle": {
+        "creep_coefficient": 1.6,
+        "shrinkage_microstrain": 450.0,
+        "chloride_diffusion_coeff_m2_s": 2.5e-12,
+        "fire_rating_hours": 3.0
+      },
+      "cost_and_carbon": {
+        "unit_cost_range": { "min": 3.8, "max": 4.2, "unit": "tr_vnd_per_m3" },
+        "embodied_carbon_kgCO2e_unit": 280.0,
+        "epd_boundary": "CRADLE_TO_GATE_A1_A3"
+      },
+      "standards_compliance": {
+        "applicable_code": "TCVN 11823:2017 Part 5",
+        "section_reference": "5.4.2"
+      },
+      "provenance": {
+        "source_ref": "Báo cáo thử nghiệm cấp phối bê tông tro bay đập tro Vĩnh Tân",
+        "test_report_id": "TR-MAT-2026-001",
+        "tested_by": "Viện Khoa học Công nghệ GTVT (ITST)"
+      }
+    }
+  ]
+}

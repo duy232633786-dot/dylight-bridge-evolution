@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "design_basis.schema.json",
+  "title": "DesignBasis",
+  "description": "Cơ sở thiết kế kỹ thuật cầu máy đọc được cho AI Agent trước khi tối ưu.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_id",
+    "bridge_name",
+    "governing_standard",
+    "design_life_years",
+    "exposure_class",
+    "units",
+    "geometry_constraints",
+    "load_requirements",
+    "materials_policy"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "project_id": { "type": "string", "minLength": 1 },
+    "bridge_name": { "type": "string", "minLength": 1 },
+    "governing_standard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "version", "jurisdiction"],
+      "properties": {
+        "code": { "enum": ["TCVN_11823", "AASHTO_LRFD", "EUROCODE_2"] },
+        "version": { "type": "string" },
+        "jurisdiction": { "type": "string" }
+      }
+    },
+    "design_life_years": { "type": "integer", "minimum": 20, "maximum": 200 },
+    "exposure_class": {
+      "enum": ["INLAND_MILD", "INLAND_AGGRESSIVE", "COASTAL_SPRAY", "MARINE_SUBMERGED", "INDUSTRIAL"]
+    },
+    "units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["length", "force", "stress", "mass", "temperature"],
+      "properties": {
+        "length": { "const": "m" },
+        "force": { "const": "kN" },
+        "stress": { "const": "MPa" },
+        "mass": { "const": "tonne" },
+        "temperature": { "const": "celsius" }
+      }
+    },
+    "geometry_constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["span_length_m", "deck_width_m", "vertical_clearance_m", "skew_angle_deg"],
+      "properties": {
+        "span_length_m": { "type": "number", "minimum": 5.0, "maximum": 500.0 },
+        "deck_width_m": { "type": "number", "minimum": 3.0, "maximum": 50.0 },
+        "vertical_clearance_m": { "type": "number", "minimum": 0.0 },
+        "skew_angle_deg": { "type": "number", "minimum": 0.0, "maximum": 60.0 }
+      }
+    },
+    "load_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["live_load_model", "impact_percentage", "pedestrian_load_kPa"],
+      "properties": {
+        "live_load_model": { "enum": ["HL-93", "TCVN_HL93", "LM1"] },
+        "impact_percentage": { "type": "number", "minimum": 0.0, "maximum": 100.0 },
+        "pedestrian_load_kPa": { "type": "number", "minimum": 0.0 }
+      }
+    },
+    "materials_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_concrete_grades", "allowed_prestress_types", "max_aggregate_size_mm"],
+      "properties": {
+        "allowed_concrete_grades": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "allowed_prestress_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "max_aggregate_size_mm": { "type": "number", "minimum": 5.0, "maximum": 40.0 }
+      }
+    }
+  }
+}

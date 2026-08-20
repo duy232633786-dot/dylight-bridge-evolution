@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-003",
+  "type": "design_heuristic",
+  "title": "Cửa sổ khoảng cách dầm hợp lệ: 5 dầm S ∈ [2350, 2800]; 6 dầm S ∈ {2150, 2200}",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["GEOM-001"],
+    "variables": ["girder_count", "girder_spacing_mm"]
+  },
+  "guidance": "Cửa sổ khoảng cách dầm hợp lệ suy từ ràng buộc cánh hẫng 0.4 m đến min(1.5 m, 0.6·S): với 5 dầm chỉ còn S ∈ [2350, 2800] mm; với 6 dầm chỉ còn S ∈ {2150, 2200} mm. Phương án ngoài các cửa sổ này chắc chắn vi phạm GEOM-001. Nên dùng cửa sổ này làm bộ lọc rẻ (check_geometry, không tốn budget solver) trước khi đánh giá thật, nhưng con số phải đối chiếu lại ruleset hiện hành trước khi hard-code.",
+  "evidence": "Suy dẫn giải tích từ ràng buộc cánh hẫng và được xác nhận bằng quét toàn miền girder_spacing_mm trong run_b600_s42: mọi cá thể ngoài cửa sổ đều GEOMETRY_INVALID.",
+  "source": { "kind": "experiment", "ref": "experiments/results/run_b600_s42" },
+  "status": "DRAFT",
+  "version": 1
+}

@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-007",
+  "type": "failure_mode",
+  "title": "Solver kỳ dị (I ≤ 0, E ≤ 0) là lỗi dữ liệu catalog, không phải phương án xấu",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["SOLVER-001"],
+    "variables": []
+  },
+  "guidance": "Khi solver báo kỳ dị số học (mô men quán tính I ≤ 0 hoặc mô đun đàn hồi E ≤ 0), đây là LỖI DỮ LIỆU trong catalog tiết diện/vật liệu, không phải dấu hiệu phương án thiết kế xấu. Quy trình đúng là dừng và báo người duyệt kiểm tra catalogs.json, không được 'sửa thiết kế' (đổi biến) chỉ để né lỗi. Né lỗi kiểu đó che giấu dữ liệu hỏng và làm sai lệch thống kê của vòng tìm kiếm.",
+  "evidence": "Gold case GC-05_solver_failure tái hiện đúng chế độ hỏng này: SOLVER_FAILED phát sinh từ dữ liệu đầu vào phi vật lý, không phụ thuộc chất lượng phương án.",
+  "source": { "kind": "experiment", "ref": "gold_cases/cases/GC-05_solver_failure.json" },
+  "status": "DRAFT",
+  "version": 1
+}

@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-002",
+  "type": "design_heuristic",
+  "title": "Khổ 12 m + Super-T: chỉ 5 hoặc 6 dầm khả thi, 7–8 dầm không bao giờ bố trí được",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["GEOM-001", "GEOM-002"],
+    "variables": ["girder_count"]
+  },
+  "guidance": "Với khổ cầu 12 m và dầm Super-T bề rộng cánh 2.06 m, phương án 7 hoặc 8 dầm không bao giờ bố trí được: chỉ riêng 6 khoảng dầm ở bước tối thiểu đã cần 6 × 2150 = 12 900 mm, vượt bề rộng khả dụng khoảng 11 200 mm sau khi trừ hai cánh hẫng tối thiểu. Chỉ 5 hoặc 6 dầm là khả thi về hình học. Loại 7–8 dầm ngay từ khâu sinh phương án (dùng check_geometry làm shield) để không đốt ngân sách solver vào các cá thể chắc chắn GEOMETRY_INVALID.",
+  "evidence": "Trong run_b600_s42, 100% cá thể girder_count ∈ {7, 8} đều GEOMETRY_INVALID do vi phạm GEOM-001/GEOM-002 ở mọi khoảng cách dầm trong miền.",
+  "source": { "kind": "experiment", "ref": "experiments/results/run_b600_s42" },
+  "status": "DRAFT",
+  "version": 1
+}

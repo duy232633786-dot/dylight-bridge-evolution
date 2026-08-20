@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-016",
+  "type": "failure_mode",
+  "title": "Vòng luẩn quẩn SERV-001 ↔ FAB-003: tăng tao cáp đơn lẻ không thoát ra được",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": ["FAB-003", "SERV-001"],
+    "variables": ["prestress_layout_id", "bottom_bulb_width_mm", "bottom_bulb_height_mm", "girder_depth_mm"]
+  },
+  "guidance": "Chế độ hỏng lặp dễ gặp trên grammar tham số: trượt kéo thớ dưới SERV-001 → tăng một bậc PT → vi phạm FAB-003 vì bầu dưới không đủ chỗ xếp tao → hạ PT về → lại trượt SERV-001. Dấu hiệu nhận biết là chuỗi đề xuất dao động qua lại giữa đúng hai rule này mà tổng mức vi phạm HARD không giảm. Lối ra là SỬA THEO CẶP: tăng chiều cao dầm để tăng mô đun chống uốn thớ dưới, hoặc mở rộng bầu dưới cùng lúc với tăng tao — không đổi prestress_layout_id một mình.",
+  "evidence": "SERV-001 là ràng buộc chi phối đã quan sát được trên grammar v1 (xem KC-005 và audit oracle hiện hành); FAB-003 là ràng buộc mới của grammar v2. Vòng lặp mô tả ở đây là SUY LUẬN từ tương tác giữa hai ràng buộc đó, CHƯA được đo tần suất trên bất kỳ run nào của grammar v2 — cần thống kê lại sau run đầu tiên trước khi dùng nó như một luật sửa tự động.",
+  "source": { "kind": "expert", "ref": "suy luận từ tương tác SERV-001 × FAB-003, chưa đo trên run grammar v2" },
+  "status": "DRAFT",
+  "version": 1
+}

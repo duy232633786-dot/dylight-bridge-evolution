@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knowledge_audit.schema.json",
+  "title": "KnowledgeCardAudit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "audit_id", "evidence", "global_warnings", "cards"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "audit_id": { "type": "string", "minLength": 1 },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "sha256", "complete_oracle", "domain_size", "versions"],
+      "properties": {
+        "ref": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "complete_oracle": { "type": "boolean" },
+        "domain_size": { "type": "integer", "minimum": 1 },
+        "versions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["software", "solver", "ruleset", "catalogs", "grammar", "source_revision"],
+          "properties": {
+            "software": { "type": "string" },
+            "solver": { "type": "string" },
+            "ruleset": { "type": "string" },
+            "catalogs": { "type": "string" },
+            "grammar": { "type": "string" },
+            "source_revision": { "type": "string" }
+          }
+        }
+      }
+    },
+    "global_warnings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "cards": {
+      "type": "object",
+      "patternProperties": {
+        "^KC-[0-9]{3}$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["evidence_freshness", "claim_audit", "risk", "summary", "findings", "next_action"],
+          "properties": {
+            "evidence_freshness": {
+              "enum": ["CURRENT_ORACLE", "CURRENT_RULESET", "REGRESSION_ONLY", "LEGACY", "EXPERT_UNVERIFIED"]
+            },
+            "claim_audit": {
+              "enum": ["CONFIRMED", "PARTIAL", "CONTRADICTED", "NOT_TESTED"]
+            },
+            "risk": { "enum": ["RED", "ORANGE", "GREEN"] },
+            "summary": { "type": "string", "minLength": 1 },
+            "findings": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1
+            },
+            "next_action": { "type": "string", "minLength": 1 }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

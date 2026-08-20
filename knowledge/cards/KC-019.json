@@ -1,0 +1,18 @@
+{
+  "card_id": "KC-019",
+  "type": "design_heuristic",
+  "title": "Mô hình hóa Open BIM chuẩn quốc tế: Tích hợp IFC 4.3 Infrastructure (IfcBridge) trong AI Generative Bridge Design",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["CONS-001", "CONS-002", "GEOM-001", "GEOM-002"],
+    "variables": ["girder_count", "girder_spacing_mm", "deck_slab_thickness_mm"]
+  },
+  "guidance": "Để kết quả sinh phương án tự động của AI Agent có thể ứng dụng trực tiếp trong thực tế công trình (CIM/BIM), phương án thiết kế sau khi tối ưu phải được xuất ra định dạng chuẩn quốc tế IFC 4.3 Infrastructure. Phải tổ chức cây phân cấp chuẩn: IfcProject -> IfcSite -> IfcBridge -> IfcBridgePart (SUPERSTRUCTURE). Dàn dầm được mô hình hóa bằng IfcBeam (PredefinedType=GIRDER_SEGMENT) với tiết diện SweptSolid từ đa giác giải tích, bản mặt cầu bằng IfcSlab (PredefinedType=FLOOR), và gắn kèm đầy đủ PropertySet kỹ thuật (chi phí, carbon, ứng suất).",
+  "evidence": "Tiêu chuẩn buildingSMART IFC 4.3 (ISO 19650 compliant) là chuẩn trao đổi dữ liệu BIM hạ tầng duy nhất được hỗ trợ đồng bộ trên cả Autodesk Revit, Civil 3D, Bentley OpenBridge, Midas Civil và BlenderBIM, giúp loại bỏ hoàn toàn lỗi mất mát thông tin khi chuyển giao mô hình từ AI sang kỹ sư thẩm tra.",
+  "source": {
+    "kind": "standard",
+    "ref": "buildingSMART International (2024), IFC 4.3 Infrastructure Standard Specification & IfcOpenShell documentation"
+  },
+  "status": "DRAFT",
+  "version": 1
+}

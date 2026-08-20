@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bridge_design_state.schema.json",
+  "title": "BridgeDesignState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["family", "project_inputs", "design_variables", "materials", "analysis", "constraints"],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^BT-(?:[0-9a-f]{8}|[0-9a-f]{16})$",
+      "description": "ID 8 hex cũ được nhận ở input; output luôn tái sinh bằng hash 16 hex."
+    },
+    "family": {
+      "enum": ["super_t_simple_v1", "super_t_parametric_v2"],
+      "description": "v1 = tiết diện định hình tra catalog; v2 = tiết diện tham số hóa (girder_catalog_id = ST-PARAM)."
+    },
+    "status": { "enum": ["CANDIDATE", "EVALUATED", "APPROVED", "REJECTED"] },
+    "project_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["span_length_m", "deck_width_m", "alignment_type", "skew_deg"],
+      "properties": {
+        "span_length_m": { "type": "number", "const": 38.3 },
+        "deck_width_m": { "type": "number", "const": 12.0 },
+        "alignment_type": { "const": "STRAIGHT" },
+        "skew_deg": { "const": 0 }
+      }
+    },
+    "design_variables": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["girder_catalog_id", "girder_count", "girder_spacing_mm",
+                   "deck_slab_thickness_mm", "diaphragm_layout_id", "prestress_layout_id"],
+      "properties": {
+        "girder_catalog_id": { "type": "string" },
+        "girder_count": { "type": "integer", "minimum": 2 },
+        "girder_spacing_mm": { "type": "integer", "exclusiveMinimum": 0 },
+        "deck_slab_thickness_mm": { "type": "integer", "exclusiveMinimum": 0 },
+        "diaphragm_layout_id": { "type": "string" },
+        "prestress_layout_id": { "type": "string" },
+
+        "girder_depth_mm": { "type": "integer", "exclusiveMinimum": 0,
+          "description": "H — chiều cao tiết diện. Chỉ dùng khi girder_catalog_id = ST-PARAM." },
+        "top_flange_width_mm": { "type": "integer", "exclusiveMinimum": 0,
+          "description": "bf — bề rộng cánh trên (tham số hóa)." },
+        "top_flange_thickness_mm": { "type": "integer", "exclusiveMinimum": 0,
+          "description": "tf — chiều dày cánh trên (tham số hóa)." },
+        "web_thickness_mm": { "type": "integer", "exclusiveMinimum": 0,
+          "description": "tw — chiều dày MỖI sườn (tham số hóa)." },
+        "bottom_bulb_width_mm": { "type": "integer", "exclusiveMinimum": 0,
+          "description": "bb — bề rộng MỖI bầu dưới (tham số hóa)." },
+        "bottom_bulb_height_mm": { "type": "integer", "exclusiveMinimum": 0,
+          "description": "hb — chiều cao MỖI bầu dưới (tham số hóa)." }
+      }
+    },
+    "materials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["girder_concrete_id", "deck_concrete_id", "prestressing_steel_id"],
+      "properties": {
+        "girder_concrete_id": { "type": "string" },
+        "deck_concrete_id": { "type": "string" },
+        "prestressing_steel_id": { "type": "string" }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fidelity", "solver", "load_profile_id"],
+      "properties": {
+        "fidelity": { "enum": ["L1_LINE_GIRDER", "L2_GRILLAGE", "L3_NONLINEAR"] },
+        "solver": { "enum": ["BUILTIN_L1", "MIDAS_CIVIL", "OPENSEESPY"] },
+        "load_profile_id": { "type": "string" }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_profile_id"],
+      "properties": { "rule_profile_id": { "type": "string" } }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "random_seed": { "type": ["integer", "null"] },
+        "parent_candidate_id": { "type": ["string", "null"] },
+        "generation_action": { "type": "string" },
+        "bim_guid_map": { "type": "object" },
+        "fe_element_map": { "type": "object" }
+      }
+    }
+  }
+}

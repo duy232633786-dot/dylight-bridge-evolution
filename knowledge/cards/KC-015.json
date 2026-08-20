@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-015",
+  "type": "design_heuristic",
+  "title": "Nâng cấp bê tông dầm không phải 'đổi một tham số': phải kiểm lại cả chuỗi",
+  "applies_to": {
+    "family": "super_t_parametric_v2",
+    "rules": [],
+    "variables": ["girder_concrete_id"]
+  },
+  "guidance": "Bê tông cường độ cao hơn cho phép thu nhỏ tiết diện nên rất hấp dẫn với vòng tối ưu, nhưng nó đồng thời làm đổi mô đun đàn hồi, co ngót–từ biến, cường độ lúc truyền lực căng và qua đó cả mất mát DƯL lẫn võng dài hạn. Không được đối xử với girder_concrete_id như một tham số độc lập: mỗi lần đổi cấp bê tông phải kiểm lại toàn chuỗi ứng suất theo giai đoạn, chứ không chỉ đọc lại giới hạn kéo Sử dụng III. Solver L1 hiện tại chỉ dùng f'c và E, nên phần kiểm tra này thuộc về L2/L3 và kỹ sư duyệt.",
+  "evidence": "Các hiệu ứng nêu trên nằm trong phạm vi TCVN 11823-5 (ứng suất cho phép lúc truyền lực, mất mát DƯL, co ngót–từ biến) nhưng KHÔNG có trong mô hình L1 của repo — thẻ này chỉ khoanh vùng phạm vi áp dụng, không đưa ra con số. Về mặt chi phí, các so sánh 'nâng grade so với tăng tao cáp' trong KC-001/KC-009 đang được audit oracle đặt lại vấn đề, nên chưa đủ căn cứ để xếp hạng hai đòn bẩy này.",
+  "source": { "kind": "standard", "ref": "TCVN 11823-5:2017 — ứng suất lúc truyền lực, mất mát DƯL, co ngót–từ biến" },
+  "status": "DRAFT",
+  "version": 1
+}

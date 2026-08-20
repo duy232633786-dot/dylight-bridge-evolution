@@ -1,0 +1,15 @@
+{
+  "card_id": "KC-004",
+  "type": "design_heuristic",
+  "title": "Nhịp 38.3 m bắt buộc DG-5: giới hạn khoảng cách dầm ngang 10 m",
+  "applies_to": {
+    "family": "super_t_simple_v1",
+    "rules": ["CONS-001"],
+    "variables": ["diaphragm_layout_id"]
+  },
+  "guidance": "Nhịp 38.3 m với giới hạn khoảng cách dầm ngang tối đa 10 m buộc phải dùng DG-5 (5 hàng tại các điểm L/4, khoảng cách ≈ 9.6 m). DG-END-ONLY và DG-3 cho khoảng cách lần lượt ≈ 38.3 m và ≈ 19.2 m, đều vi phạm CONS-001. Vì vậy với họ nhịp này có thể cố định diaphragm_layout_id = DG-5 ngay từ khâu sinh phương án.",
+  "evidence": "Giới hạn khoảng cách dầm ngang 10 m quy định trong BRIDGE-RULESET-V1 (rule CONS-001); 38.3/4 ≈ 9.575 m là bố trí duy nhất trong catalog thỏa mãn.",
+  "source": { "kind": "standard", "ref": "BRIDGE-RULESET-V1" },
+  "status": "DRAFT",
+  "version": 1
+}
