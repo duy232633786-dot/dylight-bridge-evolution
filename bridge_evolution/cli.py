@@ -310,7 +310,8 @@ def main(argv=None):
             build_agent_brief, claim_task, export_research_to_obsidian,
             create_research_brief, intake_and_plan, lab_status,
             orchestration_status, plan_research, provider_doctor,
-            review_handoff, run_orchestration, submit_handoff, validate_lab,
+            review_handoff, run_orchestration, set_knowledge_sync,
+            submit_handoff, validate_lab,
         )
         try:
             if args.lab_cmd == "status":
@@ -354,6 +355,10 @@ def main(argv=None):
                 advanced = run_orchestration(created["run"]["run_id"], execute=args.execute)
                 try:
                     obsidian = export_research_to_obsidian(args.vault)
+                    sync_state = "CONFLICT" if obsidian["conflicts"] else "SYNCED"
+                    set_knowledge_sync(created["run"]["run_id"], sync_state)
+                    if sync_state == "SYNCED":
+                        obsidian = export_research_to_obsidian(args.vault)
                 except (FileNotFoundError, OSError, RuntimeError, ValueError) as exc:
                     obsidian = {"status": "PENDING", "error": str(exc)}
                 print(json.dumps({**created, "status": advanced, "obsidian": obsidian},
@@ -363,6 +368,10 @@ def main(argv=None):
                 advanced = run_orchestration(args.run_id, execute=args.execute)
                 try:
                     obsidian = export_research_to_obsidian(args.vault)
+                    sync_state = "CONFLICT" if obsidian["conflicts"] else "SYNCED"
+                    set_knowledge_sync(args.run_id, sync_state)
+                    if sync_state == "SYNCED":
+                        obsidian = export_research_to_obsidian(args.vault)
                 except (FileNotFoundError, OSError, RuntimeError, ValueError) as exc:
                     obsidian = {"status": "PENDING", "error": str(exc)}
                 print(json.dumps({"status": advanced, "obsidian": obsidian},

@@ -15,5 +15,6 @@ from .orchestrator import (  # noqa: F401
     orchestration_status,
     plan_research,
     run_orchestration,
+    set_knowledge_sync,
 )
 from .providers import provider_doctor  # noqa: F401

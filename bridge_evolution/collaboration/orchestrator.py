@@ -335,6 +335,20 @@ def orchestration_status(run_id: str, lab_dir: str | Path | None = None) -> dict
     }
 
 
+def set_knowledge_sync(
+    run_id: str, status: str, *, lab_dir: str | Path | None = None
+) -> dict:
+    if status not in {"PENDING", "SYNCED", "CONFLICT"}:
+        raise ValueError(f"knowledge sync status không hợp lệ: {status}")
+    root = _lab_dir(lab_dir)
+    run = _load_json(_run_path(root, run_id))
+    if run["knowledge_sync"] != status:
+        run["knowledge_sync"] = status
+        _event(run, "KNOWLEDGE_SYNC", f"Obsidian mirror: {status}")
+        _save_run(root, run)
+    return run
+
+
 def _provider_ready(item: dict) -> bool:
     return bool(item.get("available") and item.get("callable") and item.get("authenticated") is not False)
 
