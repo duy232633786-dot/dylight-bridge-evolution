@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-023",
+  "title": "Sửa KC-017 để khớp grammar v2 và ranh giới sectionproperties",
+  "research_question": "Làm sao sửa thẻ KC-017 để truy vấn đúng các biến grammar v2, loại bỏ số định lượng không có artifact và phân biệt rõ tích phân Green trong vòng tối ưu với sectionproperties nằm ngoài vòng tối ưu?",
+  "workstream": "knowledge",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "knowledge/cards/KC-017.json",
+    "knowledge/audits/current.json",
+    "docs/runtime_capability_matrix.json",
+    "tests/test_knowledge.py"
+  ],
+  "acceptance_criteria": [
+    "KC-017 applies_to.variables chỉ chứa biến có thật trong super_t_parametric_v2, gồm bottom_bulb_width_mm và bottom_bulb_height_mm thay cho bottom_thickness_mm",
+    "Guidance ghi rõ vòng tối ưu grammar v2 dùng bridge_evolution/section.py với tích phân Green; sectionproperties chỉ là đường FEA 2D tùy chọn ngoài vòng tối ưu",
+    "Xóa các số 0,1% và 5–8% khỏi evidence nếu không có artifact đối chiếu truy vết được; không thay bằng số mới không có nguồn",
+    "Cập nhật audit KC-017 và gỡ đúng known_card_reference_exception đã hết lý do tồn tại",
+    "Có regression test chứng minh truy vấn bằng hai biến bầu dưới mới khớp KC-017 và runtime drift checker xanh",
+    "Toàn bộ pytest tests -q và lab validate vẫn xanh"
+  ],
+  "required_artifacts": [
+    "knowledge/cards/KC-017.json",
+    "knowledge/audits/current.json",
+    "docs/runtime_capability_matrix.json",
+    "tests/test_knowledge.py"
+  ],
+  "safety_notes": [
+    "Thẻ vẫn ở DRAFT; sửa metadata và ranh giới bằng chứng không phải phê duyệt kỹ thuật",
+    "Không gọi sectionproperties là solver của vòng tối ưu và không suy ra độ chính xác nếu chưa có benchmark có hash",
+    "Không sửa pyproject.toml trong task này; dependency packaging phải là task riêng"
+  ],
+  "review_notes": [
+    "Nguồn finding: knowledge/audits/current.json KC-017 và docs/runtime_capability_matrix.json known_card_reference_exceptions"
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "antigravity",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_knowledge.py",
+      "-q"
+    ],
+    [
+      "python",
+      "docs/check_runtime_drift.py"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}
