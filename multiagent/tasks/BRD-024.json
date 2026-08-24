@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-024",
+  "title": "Khai báo dependency tùy chọn và chặn FEA fallback im lặng",
+  "research_question": "Làm sao để cài đặt core/dev tái lập được, tính năng tùy chọn có extra rõ ràng, wheel chứa BIM package, và sectionproperties phải fail-closed thay vì trả kết quả Green khi FEA lỗi?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "BRD-023"
+  ],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "pyproject.toml",
+    "requirements-dev.lock",
+    "README.md",
+    "bridge_evolution/geometry_parametric.py",
+    "tests/test_parametric_geometry.py",
+    "tests/test_multigrammar_search.py",
+    "tests/test_ifc_exporter.py",
+    "tests/test_packaging_dependencies.py",
+    "docs/runtime_capability_matrix.json",
+    "docs/runtime_capability_matrix.md"
+  ],
+  "acceptance_criteria": [
+    "pyproject khai báo extras optimization, section-fea, ifc, all và dev có đủ pymoo, shapely, sectionproperties, ifcopenshell với bounds đã kiểm trên runtime",
+    "requirements-dev.lock ghim bốn dependency trực tiếp theo phiên bản môi trường audit và pip check xanh",
+    "bridge_evolution.bim được đóng gói trong wheel",
+    "Đường Green không import shapely; đường sectionproperties dùng API 3.10 get_c và không nuốt exception/fallback im lặng",
+    "Thiếu pymoo không skip các test multigrammar core; test IFC chỉ skip đúng module khi ifcopenshell vắng",
+    "Test FEA thật phân biệt J sectionproperties khỏi J xấp xỉ Green và lỗi backend phải nổi lên",
+    "README và capability matrix mô tả đúng extras, ranh giới FEA, claim IDEA/SCREENED và không nâng cấp L2/L3",
+    "runtime drift, full pytest, lab validate và provenance validation đều xanh"
+  ],
+  "required_artifacts": [
+    "pyproject.toml",
+    "requirements-dev.lock",
+    "README.md",
+    "bridge_evolution/geometry_parametric.py",
+    "tests/test_parametric_geometry.py",
+    "tests/test_multigrammar_search.py",
+    "tests/test_ifc_exporter.py",
+    "tests/test_packaging_dependencies.py",
+    "docs/runtime_capability_matrix.json",
+    "docs/runtime_capability_matrix.md"
+  ],
+  "safety_notes": [
+    "Không gọi sectionproperties là L2/L3; đây chỉ là FEA tiết diện 2D tùy chọn",
+    "Solver/backend lỗi phải STOP với exception rõ; không trả kết quả của backend khác mà không gắn nhãn",
+    "Bounds dependency là khả năng tái lập phần mềm, không phải bằng chứng kiểm chứng kết cấu",
+    "docs/runtime_capability_matrix.json đã là artifact ACCEPTED của BRD-023; mọi drift phải dùng correct-provenance và review độc lập"
+  ],
+  "review_notes": [
+    "Finding độc lập: sectionproperties 3.10.2 không có get_cy(); code hiện nuốt exception và trả J xấp xỉ 0.00552 m4 thay vì kết quả FEA khoảng 0.36868 m4",
+    "Kiểm Python metadata cục bộ: pymoo 0.6.2 >=3.10; shapely 2.1.2 >=3.10; sectionproperties 3.10.2 >=3.11; ifcopenshell 0.8.5 >=3.10,<3.15"
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_parametric_geometry.py",
+      "tests/test_multigrammar_search.py",
+      "tests/test_ifc_exporter.py",
+      "tests/test_packaging_dependencies.py",
+      "-q"
+    ],
+    [
+      "python",
+      "docs/check_runtime_drift.py"
+    ],
+    [
+      "python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}
