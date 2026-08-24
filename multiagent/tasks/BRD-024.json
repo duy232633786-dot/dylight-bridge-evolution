@@ -5,8 +5,8 @@
   "research_question": "Làm sao để cài đặt core/dev tái lập được, tính năng tùy chọn có extra rõ ràng, wheel chứa BIM package, và sectionproperties phải fail-closed thay vì trả kết quả Green khi FEA lỗi?",
   "workstream": "integration",
   "priority": "P0",
-  "status": "READY",
-  "owner": null,
+  "status": "ACTIVE",
+  "owner": "codex",
   "reviewer": null,
   "dependencies": [
     "BRD-023"

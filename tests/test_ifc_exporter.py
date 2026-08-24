@@ -2,7 +2,8 @@
 import json
 from pathlib import Path
 import pytest
-import ifcopenshell
+
+ifcopenshell = pytest.importorskip("ifcopenshell")
 
 from bridge_evolution.bim import export_bridge_to_ifc
 from bridge_evolution.state import new_state

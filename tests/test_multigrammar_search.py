@@ -211,10 +211,10 @@ def test_pymoo_v2_uses_full_gene_order():
 # ====================================================================
 # Hồi quy cho 3 lỗi của pymoo_adapter (review lõi BRD-009).
 # ====================================================================
-pymoo = pytest.importorskip("pymoo")
 
 
 def _pymoo_run(**kw):
+    pytest.importorskip("pymoo")
     from bridge_evolution.optimization.pymoo_adapter import run_pymoo_optimization
     return run_pymoo_optimization(**kw)
 
@@ -276,6 +276,7 @@ def test_pymoo_initial_population_survives_low_l0_density():
 
 def test_pymoo_initial_sampling_costs_no_solver_budget():
     """Sàng L0 lúc khởi tạo là cấp L0 — không được tiêu một lần gọi solver nào."""
+    pytest.importorskip("pymoo")
     from bridge_evolution.optimization.common import BudgetedEvaluator
     from bridge_evolution.optimization.pymoo_adapter import (
         BridgePymooProblem, l0_valid_initial_population,

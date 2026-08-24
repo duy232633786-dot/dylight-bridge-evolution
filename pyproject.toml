@@ -15,7 +15,29 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "pypdf>=6,<7"]
+optimization = ["pymoo>=0.6.2,<0.7"]
+section-fea = [
+  "shapely>=2.1.2,<3",
+  "sectionproperties>=3.10.2,<4",
+]
+ifc = [
+  "ifcopenshell>=0.8.5,<0.9",
+  "shapely>=2.1.2,<3",
+]
+all = [
+  "pymoo>=0.6.2,<0.7",
+  "shapely>=2.1.2,<3",
+  "sectionproperties>=3.10.2,<4",
+  "ifcopenshell>=0.8.5,<0.9",
+]
+dev = [
+  "pytest>=8,<10",
+  "pypdf>=6,<7",
+  "pymoo>=0.6.2,<0.7",
+  "shapely>=2.1.2,<3",
+  "sectionproperties>=3.10.2,<4",
+  "ifcopenshell>=0.8.5,<0.9",
+]
 pdf = ["pypdf>=6,<7"]
 
 [project.scripts]
@@ -26,6 +48,7 @@ include-package-data = true
 packages = [
   "bridge_evolution",
   "bridge_evolution.analysis",
+  "bridge_evolution.bim",
   "bridge_evolution.collaboration",
   "bridge_evolution.fe_adapter",
   "bridge_evolution.knowledge",

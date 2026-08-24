@@ -59,3 +59,34 @@ def test_compute_super_t_section_properties():
     assert "I_m4" in d
     assert "y_bottom_m" in d
     assert "web_width_total_m" in d
+
+
+def test_sectionproperties_backend_runs_instead_of_silent_green_fallback():
+    pytest.importorskip("shapely")
+    pytest.importorskip("sectionproperties")
+    compute_super_t_section_properties.cache_clear()
+
+    green = compute_super_t_section_properties(depth_m=1.75)
+    fem = compute_super_t_section_properties(
+        depth_m=1.75, use_sectionproperties_fem=True)
+
+    # Cùng đa giác nên A/I khớp, nhưng J Saint-Venant từ warping FEA
+    # phải phân biệt rõ với công thức thành mỏng xấp xỉ.
+    assert fem.area_m2 == pytest.approx(green.area_m2, rel=1e-9)
+    assert fem.I_m4 == pytest.approx(green.I_m4, rel=1e-9)
+    assert fem.J_m4 > 10.0 * green.J_m4
+    assert fem.J_m4 == pytest.approx(0.36764, rel=0.02)
+
+
+def test_sectionproperties_backend_error_is_not_silently_relabelled(monkeypatch):
+    pytest.importorskip("shapely")
+    sp_geom = pytest.importorskip("sectionproperties.pre.geometry")
+
+    def fail_geometry(*_args, **_kwargs):
+        raise RuntimeError("synthetic section FEA failure")
+
+    monkeypatch.setattr(sp_geom, "Geometry", fail_geometry)
+    compute_super_t_section_properties.cache_clear()
+    with pytest.raises(RuntimeError, match="synthetic section FEA failure"):
+        compute_super_t_section_properties(
+            depth_m=1.751, use_sectionproperties_fem=True)

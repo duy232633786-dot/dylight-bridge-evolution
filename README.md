@@ -36,15 +36,21 @@ Môi trường audit chính xác được ghi trong `requirements-dev.lock`. Khi
 wheel, schema/catalog/grammar/knowledge cards được đóng gói cùng package;
 `DYLIGHT_ARTIFACTS_DIR` có thể dùng để chọn thư mục artifact ghi được.
 
-> ⚠ **Lệnh trên CHƯA đủ để chạy toàn bộ test.** Bốn thư viện được import cứng
-> nhưng **không** khai báo trong `pyproject.toml` lẫn `requirements-dev.lock`:
-> `pymoo` (`optimization/pymoo_adapter.py`), `shapely` và `sectionproperties`
-> (`geometry_parametric.py`), `ifcopenshell` (`bim/ifc_bridge_exporter.py`).
-> Trên một máy sạch cài đúng theo lệnh trên, các module đó và test tương ứng sẽ
-> lỗi import — kể cả trong CI (`.github/workflows/tests.yml`). Cho tới khi
-> `pyproject.toml` được sửa, phải cài thêm bằng tay. Trạng thái này được
-> `docs/check_runtime_drift.py` giữ đúng: nếu ai đó khai báo chúng, bộ kiểm sẽ
-> báo đỏ để bắt cập nhật tài liệu.
+`.[dev]` cài đủ bốn backend để chạy toàn bộ test. Nếu chỉ dùng một
+năng lực, có thể cài nhỏ hơn bằng extra riêng:
+
+```bash
+python -m pip install -e ".[optimization]"  # pymoo / NSGA-II ngoài
+python -m pip install -e ".[section-fea]"   # Shapely + sectionproperties
+python -m pip install -e ".[ifc]"           # IfcOpenShell + Shapely
+python -m pip install -e ".[all]"           # toàn bộ backend tùy chọn
+```
+
+Không cài extra thì đường core/Green vẫn chạy. Khi yêu cầu FEA tiết diện
+2D, lỗi import/mesh/backend sẽ nổi lên và dừng; hệ thống không im lặng
+trả kết quả Green như thể `sectionproperties` đã chạy. FEA tiết diện
+này vẫn chỉ là năng lực nghiên cứu tùy chọn, không phải L2/L3 và
+không nâng trần claim `SCREENED` của dự án.
 
 ## Chạy nhanh
 

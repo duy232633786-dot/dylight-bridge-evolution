@@ -140,10 +140,10 @@
       "evidence": [
         "bridge_evolution/optimization/pymoo_adapter.py::run_pymoo_optimization"
       ],
-      "limits": "pymoo được import CỨNG nhưng KHÔNG khai báo trong pyproject.toml lẫn requirements-dev.lock. Trên môi trường cài đúng theo tài liệu, module này và test của nó sẽ lỗi import.",
+      "limits": "Backend tùy chọn, cài qua extra `optimization`; dev/all có sẵn. NSGA-II vẫn là heuristic phụ thuộc seed/ngân sách và không tự nâng fidelity hay claim kết cấu.",
       "probes": [
         { "kind": "module_attr", "module": "bridge_evolution.optimization.pymoo_adapter", "attr": "run_pymoo_optimization", "callable": true },
-        { "kind": "pyproject_dependency", "name": "pymoo", "declared": false }
+        { "kind": "pyproject_dependency", "name": "pymoo", "declared": true }
       ]
     },
     {
@@ -153,11 +153,11 @@
       "evidence": [
         "bridge_evolution/geometry_parametric.py::compute_super_t_section_properties"
       ],
-      "limits": "KHÔNG nằm trong vòng tối ưu: đây là mô hình tiết diện THỨ HAI, tham số khác hẳn grammar v2 (bottom_thickness_m…), chỉ gọi được khi truyền use_sectionproperties_fem=True qua CLI `section --fem` hoặc bộ xuất IFC. shapely và sectionproperties KHÔNG khai báo trong pyproject.toml.",
+      "limits": "KHÔNG nằm trong vòng tối ưu: đây là mô hình tiết diện THỨ HAI, tham số khác grammar v2 (bottom_thickness_m…), chỉ chạy khi use_sectionproperties_fem=True/CLI `section --fem`. Cài qua extra `section-fea`; lỗi import/mesh/backend fail-closed. Chưa có benchmark, mesh-convergence hay V&V để gọi là L2/L3.",
       "probes": [
         { "kind": "module_attr", "module": "bridge_evolution.geometry_parametric", "attr": "compute_super_t_section_properties", "callable": true },
-        { "kind": "pyproject_dependency", "name": "shapely", "declared": false },
-        { "kind": "pyproject_dependency", "name": "sectionproperties", "declared": false }
+        { "kind": "pyproject_dependency", "name": "shapely", "declared": true },
+        { "kind": "pyproject_dependency", "name": "sectionproperties", "declared": true }
       ]
     },
     {
@@ -167,10 +167,10 @@
       "evidence": [
         "bridge_evolution/bim/ifc_bridge_exporter.py::export_bridge_to_ifc"
       ],
-      "limits": "ifcopenshell KHÔNG khai báo trong pyproject.toml lẫn requirements-dev.lock. Hình học xuất ra lấy từ geometry_parametric.py, KHÔNG phải tiết diện mà vòng tối ưu grammar v2 thực sự dùng.",
+      "limits": "Cài qua extra `ifc`; bridge_evolution.bim được đóng gói trong wheel. Hình học xuất ra vẫn lấy từ geometry_parametric.py, KHÔNG phải tiết diện mà vòng tối ưu grammar v2 thực sự dùng.",
       "probes": [
         { "kind": "module_attr", "module": "bridge_evolution.bim.ifc_bridge_exporter", "attr": "export_bridge_to_ifc", "callable": true },
-        { "kind": "pyproject_dependency", "name": "ifcopenshell", "declared": false }
+        { "kind": "pyproject_dependency", "name": "ifcopenshell", "declared": true }
       ]
     },
     {

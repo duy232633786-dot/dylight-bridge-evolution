@@ -1,8 +1,9 @@
-"""Mô-đun hình học tham số và phân tích đặc trưng tiết diện cầu tùy biến.
+"""Hình học tham số và đặc trưng tiết diện cầu tùy biến.
 
-Sử dụng shapely và sectionproperties (FEA 2D) để tính toán chính xác
-diện tích A, mômen quán tính Ixx, Iyy, trọng tâm y_bottom, hằng số xoắn J,
-và sinh đa giác 2D phục vụ xuất mô hình 3D BIM / IFC 4.3.
+Đường mặc định dùng tích phân Green thuần Python/NumPy. Khi người dùng
+bật ``use_sectionproperties_fem``, Shapely và sectionproperties được nạp như
+một backend FEA tiết diện 2D tùy chọn. Backend lỗi phải ném exception;
+không được im lặng trả kết quả của đường Green như thể FEA đã chạy.
 """
 from __future__ import annotations
 
@@ -12,7 +13,6 @@ from functools import lru_cache
 from typing import Any, List, Tuple
 
 import numpy as np
-from shapely.geometry import MultiPolygon, Polygon
 
 
 @dataclass(frozen=True)
@@ -228,34 +228,34 @@ def compute_super_t_section_properties(
         + 2 * (H * (params.web_thickness_m**3) / 3.0)
     )
 
-    # 2. Nếu yêu cầu phân tích FEA 2D chuyên sâu qua sectionproperties
+    # 2. Backend FEA tiết diện 2D tùy chọn. Import để trong nhánh này
+    # để đường Green/core không phụ thuộc Shapely. Mọi lỗi import,
+    # mesh hay API phải nổi lên (fail-closed); không fallback im lặng.
     if use_sectionproperties_fem:
-        try:
-            import sectionproperties.pre.geometry as sp_geom
-            from sectionproperties.analysis.section import Section
+        import sectionproperties.pre.geometry as sp_geom
+        from sectionproperties.analysis.section import Section
+        from shapely.geometry import Polygon
 
-            poly_out = Polygon(outer_pts)
-            if void_pts:
-                poly_void = Polygon(void_pts)
-                diff = poly_out.difference(poly_void)
-                geom = sp_geom.Geometry(diff)
-            else:
-                geom = sp_geom.Geometry(poly_out)
+        poly_out = Polygon(outer_pts)
+        if void_pts:
+            poly_void = Polygon(void_pts)
+            diff = poly_out.difference(poly_void)
+            geom = sp_geom.Geometry(diff)
+        else:
+            geom = sp_geom.Geometry(poly_out)
 
-            geom.create_mesh(mesh_sizes=[0.02])
-            sec = Section(geom)
-            sec.calculate_geometric_properties()
-            sec.calculate_warping_properties()
+        geom.create_mesh(mesh_sizes=[0.02])
+        sec = Section(geom)
+        sec.calculate_geometric_properties()
+        sec.calculate_warping_properties()
 
-            A = float(sec.get_area())
-            y_bot = float(sec.get_cy())
-            y_top = H - y_bot
-            I_xx = float(sec.get_ic()[0])
-            I_yy = float(sec.get_ic()[1])
-            J_approx = float(sec.get_j())
-        except Exception:
-            # Tự động fallback về tính toán giải tích nếu FEA mesh gặp lỗi hội tụ
-            pass
+        A = float(sec.get_area())
+        _, cy = sec.get_c()
+        y_bot = float(cy)
+        y_top = H - y_bot
+        I_xx = float(sec.get_ic()[0])
+        I_yy = float(sec.get_ic()[1])
+        J_approx = float(sec.get_j())
 
     Z_bot = I_xx / y_bot if y_bot > 0 else 0.0
     Z_top = I_xx / y_top if y_top > 0 else 0.0
