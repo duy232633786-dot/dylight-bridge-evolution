@@ -5,9 +5,9 @@
   "research_question": "Làm sao để cài đặt core/dev tái lập được, tính năng tùy chọn có extra rõ ràng, wheel chứa BIM package, và sectionproperties phải fail-closed thay vì trả kết quả Green khi FEA lỗi?",
   "workstream": "integration",
   "priority": "P0",
-  "status": "REVIEW",
+  "status": "ACCEPTED",
   "owner": "codex",
-  "reviewer": null,
+  "reviewer": "opencode",
   "dependencies": [
     "BRD-023"
   ],
@@ -57,7 +57,8 @@
   ],
   "review_notes": [
     "Finding độc lập: sectionproperties 3.10.2 không có get_cy(); code hiện nuốt exception và trả J xấp xỉ 0.00552 m4 thay vì kết quả FEA khoảng 0.36868 m4",
-    "Kiểm Python metadata cục bộ: pymoo 0.6.2 >=3.10; shapely 2.1.2 >=3.10; sectionproperties 3.10.2 >=3.11; ifcopenshell 0.8.5 >=3.10,<3.15"
+    "Kiểm Python metadata cục bộ: pymoo 0.6.2 >=3.10; shapely 2.1.2 >=3.10; sectionproperties 3.10.2 >=3.11; ifcopenshell 0.8.5 >=3.10,<3.15",
+    "OpenCode independent read-only APPROVE. Non-blocking: các ngưỡng 1e-9 và J ±2% chỉ là regression với polygon/mesh cố định, không phải mesh convergence hoặc V&V; header Markdown cũ là cosmetic. Operator đã chạy lại toàn bộ executable gates xanh."
   ],
   "preferred_provider": "codex",
   "preferred_role": "bim_fem_integrator",
