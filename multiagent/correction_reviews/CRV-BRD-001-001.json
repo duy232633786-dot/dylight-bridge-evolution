@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-001-001",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-001",
+  "correction_sha256": "b179a53e8e112020c75d0130c9aa2ee9ef7d44a17b22c9f16ad899f2a5f73f7b",
+  "reviewer_id": "kc017_provenance_review",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Old snapshot SHA-256 matches the accepted BRD-001 handoff and Git checkpoint 9594dcd byte-for-byte.",
+    "Current audit SHA-256 matches the correction; BRD-023 remains DRAFT/PARTIAL/ORANGE and introduces no technical claim promotion.",
+    "Targeted tests and runtime drift check pass; the only pre-review validation failures were the intentionally pending independent correction review."
+  ],
+  "notes": "Independent read-only audit recomputed hashes and verified scope, semantics, and claim ceiling. APPROVE provenance correction only, not engineering validity."
+}
