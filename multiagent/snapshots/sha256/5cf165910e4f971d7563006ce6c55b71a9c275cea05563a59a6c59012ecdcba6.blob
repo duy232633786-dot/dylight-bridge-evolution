@@ -1,0 +1,305 @@
+"""Lõi tìm kiếm đa grammar: v2 (14 biến) chạy được mà v1 (8 biến) không đổi.
+
+Trước thay đổi này, ``GENE_ORDER`` là hằng 8 biến của grammar v1 và
+``gene_domains`` lọc theo hằng đó, nên mọi thuật toán tối ưu ÂM THẦM vứt 6 biến
+hình dạng của ``super_t_parametric_v2`` — không thuật toán nào thật sự tìm kiếm
+trên v2. File này khóa hai khẳng định đối nghịch:
+
+  1. **v1 đóng băng** — thứ tự biến, thứ tự rút số ngẫu nhiên và toàn bộ lịch sử
+     của grammar v1 phải y hệt bản cũ (arm đối chứng của mọi so sánh trước đây).
+  2. **v2 thật sự tham số hóa** — gene mang đủ 6 biến hình dạng, state sinh ra
+     thuộc family v2, và ràng buộc chế tạo FAB-*/GEOM-* chặn ở L0 mà KHÔNG tiêu
+     một lời gọi solver nào.
+
+Ngân sách ở đây vẫn theo đúng định nghĩa của ``BudgetedEvaluator``: số lần
+``solver.status != NOT_RUN``. Không test nào được nới ngưỡng để một arm "thắng".
+"""
+import pytest
+
+from bridge_evolution.catalogs import all_domains, load_grammar
+from bridge_evolution.optimization import nsga2, random_search
+from bridge_evolution.optimization.common import (
+    GENE_ORDER, gene_domains, gene_order, gene_sizes,
+)
+
+GRAMMAR_V1 = "super_t_simple_v1"
+GRAMMAR_V2 = "super_t_parametric_v2"
+
+#: 6 biến hình dạng mà v2 thêm vào so với v1 (AI tự thiết kế mặt cắt).
+SHAPE_VARS = (
+    "girder_depth_mm", "top_flange_width_mm", "top_flange_thickness_mm",
+    "web_thickness_mm", "bottom_bulb_width_mm", "bottom_bulb_height_mm",
+)
+
+#: Ngân sách chung của các ca v2 — cố định TRƯỚC, không suy từ kết quả.
+V2_BUDGET = 80
+V2_RS_SEED = 5
+V2_GA_SEED = 44          # seed cho archive KHÁC RỖNG — xem test_nsga2_v2_empty_seed
+V2_GA_EMPTY_SEED = 7     # kết quả ÂM đã biết: 0 phương án khả thi trên cùng ngân sách
+
+
+@pytest.fixture(scope="module")
+def v2_random_run():
+    """Một lần chạy random_search trên v2 dùng chung cho nhiều khẳng định.
+
+    Chạy chung để bộ test giữ dưới 90 giây; mọi test đọc CÙNG một run nên không
+    có nguy cơ hai test nhìn hai lịch sử khác nhau.
+    """
+    return random_search(budget=V2_BUDGET, seed=V2_RS_SEED, grammar_id=GRAMMAR_V2)
+
+
+def solver_records(run: dict) -> list[dict]:
+    return [r for r in run["history"] if r["solver_call_index"] is not None]
+
+
+# ------------------------------------------------------------------ v1 đóng băng
+def test_v1_gene_order_frozen():
+    """gene_order phải đọc ra ĐÚNG dãy 8 biến v1 theo thứ tự khai báo JSON."""
+    assert gene_order(GRAMMAR_V1) == GENE_ORDER
+    assert gene_order() == GENE_ORDER          # mặc định vẫn là v1
+    assert len(GENE_ORDER) == 8
+
+    domains = gene_domains(GRAMMAR_V1)
+    # Cùng khóa, cùng THỨ TỰ, cùng miền như cách lọc bằng hằng cũ.
+    assert list(domains) == GENE_ORDER
+    raw = all_domains(load_grammar(GRAMMAR_V1))
+    assert domains == {name: raw[name] for name in GENE_ORDER}
+    assert gene_sizes(GRAMMAR_V1) == [len(domains[name]) for name in GENE_ORDER]
+
+
+def test_v2_has_shape_variables():
+    """v2 phải lộ đủ 14 biến, và miền 6 biến hình dạng khớp file grammar."""
+    order = gene_order(GRAMMAR_V2)
+    assert len(order) == 14
+    assert order[:8] == GENE_ORDER            # 8 biến v1 giữ nguyên vị trí đầu
+    assert order[8:] == list(SHAPE_VARS)
+
+    domains = gene_domains(GRAMMAR_V2)
+    assert list(domains) == order             # dict giữ insertion order
+    assert set(SHAPE_VARS) <= set(domains)
+
+    raw = all_domains(load_grammar(GRAMMAR_V2))
+    for name in SHAPE_VARS:
+        assert domains[name] == raw[name]
+        assert len(domains[name]) > 1         # biến thật, không phải hằng khóa cứng
+
+    # Vài mốc miền lấy thẳng từ super_t_parametric_v2.json.
+    assert domains["girder_depth_mm"][0] == 1500
+    assert domains["girder_depth_mm"][-1] == 2100
+    assert domains["web_thickness_mm"] == list(range(90, 161, 10))
+    assert domains["girder_catalog_id"] == ["ST-PARAM"]
+
+
+def test_v1_behaviour_unchanged():
+    """Cùng seed ⇒ cùng lịch sử; và mặc định ≡ truyền grammar_id v1 tường minh."""
+    rs_a = random_search(budget=60, seed=11)
+    rs_b = random_search(budget=60, seed=11)
+    assert [r["case_id"] for r in rs_a["history"]] == [r["case_id"] for r in rs_b["history"]]
+
+    ga_a = nsga2(budget=60, seed=11, pop_size=12)
+    ga_b = nsga2(budget=60, seed=11, pop_size=12)
+    assert [r["case_id"] for r in ga_a["history"]] == [r["case_id"] for r in ga_b["history"]]
+
+    rs_explicit = random_search(budget=60, seed=11, grammar_id=GRAMMAR_V1)
+    ga_explicit = nsga2(budget=60, seed=11, pop_size=12, grammar_id=GRAMMAR_V1)
+    assert rs_explicit["history"] == rs_a["history"]
+    assert rs_explicit["counters"] == rs_a["counters"]
+    assert ga_explicit["history"] == ga_a["history"]
+    assert ga_explicit["counters"] == ga_a["counters"]
+
+    # Gene v1 KHÔNG được mọc thêm biến hình dạng của v2.
+    for run in (rs_a, ga_a):
+        assert run["config"]["grammar_id"] == GRAMMAR_V1
+        for rec in run["history"]:
+            assert list(rec["gene"]) == GENE_ORDER
+            assert rec["design_state"]["family"] == GRAMMAR_V1
+
+
+# ------------------------------------------------------------------ v2 chạy thật
+def test_v2_search_runs_and_is_parametric(v2_random_run):
+    run = v2_random_run
+    assert run["config"]["grammar_id"] == GRAMMAR_V2
+    assert run["counters"]["solver_calls"] <= V2_BUDGET
+    assert run["history"]
+
+    for rec in run["history"]:
+        assert list(rec["gene"]) == gene_order(GRAMMAR_V2)
+        assert set(SHAPE_VARS) <= set(rec["gene"])
+        state = rec["design_state"]
+        assert state["family"] == GRAMMAR_V2
+        assert state["design_variables"]["girder_catalog_id"] == "ST-PARAM"
+        # 6 biến hình dạng phải vào design_variables của state, đúng giá trị gene.
+        for name in SHAPE_VARS:
+            assert state["design_variables"][name] == rec["gene"][name]
+
+    # Không gian v2 thật sự được quét: 6 biến hình dạng phải nhận >1 giá trị.
+    for name in SHAPE_VARS:
+        assert len({rec["gene"][name] for rec in run["history"]}) > 1
+
+    # Ngân sách phải được TIÊU thật, và có phương án chạy được solver tới nơi.
+    # Nếu khẳng định này hỏng thì đó là kết quả ÂM cần báo cáo, không được nới.
+    assert run["counters"]["solver_calls"] == V2_BUDGET
+    assert any(rec["status"] == "SUCCESS" for rec in run["history"])
+
+
+def test_v2_fab_blocked_at_l0(v2_random_run):
+    """Ràng buộc chế tạo/hình học loại phương án ở L0 mà không tốn solver call."""
+    run = v2_random_run
+    counters = run["counters"]
+    assert counters["l0_rejected"] > 0
+    # Bộ đếm ngân sách và lịch sử phải khớp nhau tuyệt đối.
+    assert counters["solver_calls"] == len(solver_records(run))
+
+    blocked = [r for r in run["history"] if r["solver_call_index"] is None]
+    assert blocked, "không có proposal nào bị chặn trước solver"
+
+    fab_or_geom = set()
+    for rec in blocked:
+        assert rec["solver_status"] == "NOT_RUN"    # L0 reject KHÔNG mở solver
+        assert rec["status"] in ("GEOMETRY_INVALID", "SCHEMA_INVALID")
+        for v in rec["violations"]:
+            if v["severity"] == "HARD" and v["rule_id"].startswith(("FAB", "GEOM")):
+                fab_or_geom.add(v["rule_id"])
+    assert fab_or_geom, "không thấy vi phạm HARD FAB-*/GEOM-* nào ở L0"
+
+
+def test_nsga2_v2_runs():
+    run = nsga2(budget=V2_BUDGET, seed=V2_GA_SEED, pop_size=16, grammar_id=GRAMMAR_V2)
+    assert run["config"]["grammar_id"] == GRAMMAR_V2
+    assert run["config"]["p_mutation"] == pytest.approx(1.0 / 14)  # co giãn theo 14 biến
+    assert run["counters"]["solver_calls"] <= V2_BUDGET
+    assert run["counters"]["solver_calls"] == len(solver_records(run))
+    assert run["termination"] in ("budget_exhausted", "proposal_guard")
+
+    for rec in run["history"]:
+        assert list(rec["gene"]) == gene_order(GRAMMAR_V2)
+        assert rec["design_state"]["family"] == GRAMMAR_V2
+
+    # Archive chỉ được chứa phương án FEASIBLE THẬT, đối chiếu ngược vào history.
+    # Khẳng định archive khác rỗng TRƯỚC vòng lặp: với seed 7 archive rỗng nên cả
+    # khối kiểm tra bên dưới chạy 0 lần và trở thành assertion rỗng — đúng loại
+    # test tạo cảm giác an toàn sai (review lõi BRD-009).
+    assert run["archive"].entries, (
+        "archive rỗng — khối kiểm tra toàn vẹn archive sẽ không chạy lần nào")
+    feasible = {r["case_id"]: r for r in run["history"] if r["feasible"]}
+    for entry in run["archive"].entries:
+        rec = feasible.get(entry["case_id"])
+        assert rec is not None, f"archive chứa case không feasible: {entry['case_id']}"
+        assert rec["objectives"] == entry["objectives"]
+        assert rec["solver_call_index"] is not None
+        assert rec["cv"] == 0.0
+
+
+def test_pymoo_v2_uses_full_gene_order():
+    """Đường pymoo cũng phải thấy 14 biến, không bị cắt về 8 biến v1."""
+    pytest.importorskip("pymoo")
+    from bridge_evolution.optimization.common import BudgetedEvaluator
+    from bridge_evolution.optimization.pymoo_adapter import BridgePymooProblem
+
+    ev1 = BudgetedEvaluator(budget=0, seed=42)
+    assert BridgePymooProblem(evaluator=ev1).n_var == 8
+
+    ev2 = BudgetedEvaluator(budget=0, seed=42, grammar_id=GRAMMAR_V2)
+    problem = BridgePymooProblem(evaluator=ev2, grammar_id=GRAMMAR_V2)
+    assert problem.n_var == 14
+    assert problem.var_names == gene_order(GRAMMAR_V2)
+    gene = problem.vector_to_gene([0] * 14)
+    assert set(SHAPE_VARS) <= set(gene)
+    assert gene["girder_catalog_id"] == "ST-PARAM"
+
+
+# ====================================================================
+# Hồi quy cho 3 lỗi của pymoo_adapter (review lõi BRD-009).
+# ====================================================================
+
+
+def _pymoo_run(**kw):
+    pytest.importorskip("pymoo")
+    from bridge_evolution.optimization.pymoo_adapter import run_pymoo_optimization
+    return run_pymoo_optimization(**kw)
+
+
+def test_pymoo_reports_real_objectives_not_penalty():
+    """CRITICAL cũ: nhánh đọc objective là nhánh chết nên F luôn = 1e6.
+
+    pymoo khi đó tối ưu một hàm HẰNG SỐ và báo cáo 1e6 như thể đó là chi phí
+    đã tính. Test khóa: mọi nghiệm báo cáo phải mang giá trị thật, trùng đúng
+    bản ghi mà solver đã chạy.
+    """
+    from bridge_evolution.objectives import OBJECTIVE_KEYS
+    from bridge_evolution.optimization.pymoo_adapter import PENALTY
+
+    run = _pymoo_run(budget=60, pop_size=12, seed=42)
+    feasible = [r for r in run["history"] if r["feasible"]]
+    assert feasible, "cần ít nhất một phương án khả thi để test có nghĩa"
+
+    for solution in run["pareto_solutions"]:
+        assert list(solution["objectives"]) == list(OBJECTIVE_KEYS)
+        assert solution["objectives"]["relative_cost"] < PENALTY
+
+    # Archive phải dựng từ bản ghi THẬT, không từ F nội bộ của pymoo.
+    real_costs = {round(r["objectives"][0], 6) for r in feasible}
+    for entry in run["archive"].entries:
+        assert round(entry["objectives"][0], 6) in real_costs
+
+
+def test_pymoo_spends_solver_budget_and_reports_termination():
+    """MAJOR cũ: dừng theo n_gen nên arm pymoo tiêu ít ngân sách hơn arm khác.
+
+    Cache hit và L0-reject vẫn chiếm slot đánh giá của pymoo nhưng không tiêu
+    ngân sách, nên "cùng n_gen" KHÔNG phải "cùng solver budget".
+    """
+    budget = 60
+    run = _pymoo_run(budget=budget, pop_size=12, seed=42)
+    counters = run["counters"]
+    assert counters["solver_calls"] <= budget
+    assert counters["solver_calls"] == budget, (
+        "ngân sách phải được tiêu hết ở cấu hình này; nếu không thì termination "
+        f"phải nói rõ lý do: {run['termination']}")
+    assert run["termination"] in (
+        "budget_exhausted", "stalled_no_new_solver_calls", "generation_guard")
+    # Mọi báo cáo phải thấy được arm nào tiêu thiếu ngân sách.
+    assert run["config"]["budget_solver_calls"] == budget
+
+
+def test_pymoo_initial_population_survives_low_l0_density():
+    """Quần thể khởi tạo toàn cá thể L0-invalid làm NSGA-II không thoát ra được.
+
+    Tái hiện được với pop_size=20, seed=42: 0/308 ứng viên qua L0 và 0 lần gọi
+    solver trên ngân sách 200. Lấy mẫu khởi tạo qua L0 (miễn phí) đóng lỗ này.
+    """
+    run = _pymoo_run(budget=120, pop_size=20, seed=42)
+    assert run["counters"]["l0_passed"] > 0
+    assert run["counters"]["solver_calls"] > 0
+    assert any(r["feasible"] for r in run["history"])
+
+
+def test_pymoo_initial_sampling_costs_no_solver_budget():
+    """Sàng L0 lúc khởi tạo là cấp L0 — không được tiêu một lần gọi solver nào."""
+    pytest.importorskip("pymoo")
+    from bridge_evolution.optimization.common import BudgetedEvaluator
+    from bridge_evolution.optimization.pymoo_adapter import (
+        BridgePymooProblem, l0_valid_initial_population,
+    )
+
+    evaluator = BudgetedEvaluator(budget=50, seed=42)
+    problem = BridgePymooProblem(evaluator=evaluator)
+    population = l0_valid_initial_population(problem, pop_size=16, seed=42)
+
+    assert population.shape == (16, len(problem.var_names))
+    assert evaluator.n_solver_calls == 0
+    assert evaluator.n_l0_checks > 0
+
+
+def test_nsga2_v2_empty_seed_is_reported_not_hidden():
+    """KẾT QUẢ ÂM đã biết: NSGA-II trên v2, seed 7, ngân sách 80 → 0 phương án khả thi.
+
+    Giữ lại như một khẳng định tường minh thay vì im lặng đổi seed: mật độ L0 của
+    grammar v2 rất thấp nên một seed đơn KHÔNG kết luận được gì về v2, và mọi
+    thí nghiệm trên v2 bắt buộc phải chạy nhiều seed và báo cả run rỗng.
+    """
+    run = nsga2(budget=V2_BUDGET, seed=V2_GA_EMPTY_SEED, pop_size=16,
+                grammar_id=GRAMMAR_V2)
+    assert run["counters"]["solver_calls"] == V2_BUDGET
+    assert not any(r["feasible"] for r in run["history"])
+    assert run["archive"].entries == []
