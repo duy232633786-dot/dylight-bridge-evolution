@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-024",
+  "agent_id": "codex",
+  "role": "bim_fem_integrator",
+  "summary": "Khai báo extras optimization/section-fea/ifc/all và dev đầy đủ; ghim bốn backend trong audit lock; đóng gói bridge_evolution.bim; tách Shapely khỏi đường Green; sửa sectionproperties 3.10 sang get_c(); bỏ catch-all fallback để backend FEA fail-closed; giữ test core khi thiếu pymoo/ifcopenshell; thêm regression packaging và FEA thật. Full pytest xanh (1 skip), targeted xanh, runtime drift/lab validate/pip check xanh. Hai capability artifacts lịch sử được bảo toàn và review độc lập qua COR-BRD-001-002, COR-BRD-023-001.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "pyproject.toml",
+      "sha256": "76f0a14a85582061a782a241de213a0dbf786f18c16b6e97fc8d5389e5dc5996",
+      "kind": "code"
+    },
+    {
+      "path": "requirements-dev.lock",
+      "sha256": "31419ca4385e6112b979fd125c73dffb6e1595f47f169879eaf2ed192128f450",
+      "kind": "code"
+    },
+    {
+      "path": "README.md",
+      "sha256": "45994ce0f644c59e1ba387327ad050c6557f6ef818e0aa3efd7da3035c5c330e",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/geometry_parametric.py",
+      "sha256": "deeb57ca7700e6cd85596de792e0867ab402048d4c31fb3ced81f3afb1c95a81",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_parametric_geometry.py",
+      "sha256": "595aed04ccdf12a36c781a4881024e88bdfcffce87bb2ddd9f5652a452601024",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_multigrammar_search.py",
+      "sha256": "5cf165910e4f971d7563006ce6c55b71a9c275cea05563a59a6c59012ecdcba6",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_ifc_exporter.py",
+      "sha256": "c65d86459538360a90f2b2cec041da62414fda9c54740f94f9654af764845af6",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_packaging_dependencies.py",
+      "sha256": "8c3c4fb5bbfde19b3ba2f9f1884bf24d27e1841bb0e584aa93bebfcd49dab336",
+      "kind": "code"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.json",
+      "sha256": "ab750104e4a704e2430949bc609698b2b81f88b8466e6e4d15ac6178a5c67d39",
+      "kind": "code"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.md",
+      "sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Bounds dựa trên runtime audit đã chạy: pymoo 0.6.2, shapely 2.1.2, sectionproperties 3.10.2, ifcopenshell 0.8.5; upper bound khóa major/minor API.",
+    "FEA test dùng cùng polygon và mesh size 0.02 để xác nhận backend thực sự chạy, chưa phải nghiên cứu hội tụ lưới."
+  ],
+  "unresolved_risks": [
+    "SECTION_FEA_2D vẫn PARTIAL: chưa có benchmark độc lập, mesh convergence, uncertainty hoặc V&V L2/L3.",
+    "IFC exporter vẫn dùng geometry_parametric.py tách khỏi grammar v2; round-trip nội bộ chưa chứng minh tương tác phần mềm BIM ngoài."
+  ],
+  "next_action": "OpenCode review độc lập BRD-024: tái chạy G2/full suite, kiểm clean-install extras, fail-closed FEA và không nâng claim; sau đó mới ACCEPT."
+}
