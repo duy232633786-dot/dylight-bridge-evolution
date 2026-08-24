@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-001-002",
+  "task_id": "BRD-001",
+  "detected_at_utc": "2026-08-24T11:22:22.772721Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-001.claude.r001.json",
+  "original_handoff_sha256": "42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874",
+  "artifact_path": "docs/runtime_capability_matrix.md",
+  "recorded_sha256": "08015ae57ac9072ddb8b458595d3662d65cf20836b09822be5d4706432ad57b3",
+  "observed_sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f",
+  "reason": "BRD-024 khai báo các backend tùy chọn, đóng gói BIM và cập nhật capability prose sau khi test runtime; thay đổi tài liệu đã được task mới cho phép nhưng artifact BRD-001 phải giữ bytes lịch sử.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

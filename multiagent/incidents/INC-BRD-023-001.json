@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-023-001",
+  "task_id": "BRD-023",
+  "detected_at_utc": "2026-08-24T11:22:23.303481Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-023.codex.r001.json",
+  "original_handoff_sha256": "d2de17e8c62a08877eb5e21458c43dcd09f35aaf392ccd05eb189723e4eebf1e",
+  "artifact_path": "docs/runtime_capability_matrix.json",
+  "recorded_sha256": "a3d8273e1d7f9b2e2651b7b6273083ab145578bb40069e04385ff9304c51447b",
+  "observed_sha256": "ab750104e4a704e2430949bc609698b2b81f88b8466e6e4d15ac6178a5c67d39",
+  "reason": "BRD-024 thay declared dependency probes từ false sang true và ghi giới hạn FEA fail-closed; artifact BRD-023 đã ACCEPTED nên phải bảo toàn bytes lịch sử thay vì sửa hash cũ.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

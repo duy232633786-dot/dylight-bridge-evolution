@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-001-002",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-002",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Bảo toàn bản capability matrix Markdown cũ đúng SHA-256 và liên kết bản mới mô tả extras, FEA fail-closed cùng giới hạn L2/L3.",
+  "original_handoff_path": "multiagent/handoffs/BRD-001.claude.r001.json",
+  "original_handoff_sha256": "42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/08015ae57ac9072ddb8b458595d3662d65cf20836b09822be5d4706432ad57b3.blob",
+    "sha256": "08015ae57ac9072ddb8b458595d3662d65cf20836b09822be5d4706432ad57b3"
+  },
+  "corrected_artifact": {
+    "path": "docs/runtime_capability_matrix.md",
+    "previous_sha256": "08015ae57ac9072ddb8b458595d3662d65cf20836b09822be5d4706432ad57b3",
+    "current_sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "docs/check_runtime_drift.py"
+    ]
+  ],
+  "assumptions": [
+    "Bản snapshot lấy từ commit 011558d và khớp SHA-256 trong handoff BRD-001."
+  ],
+  "unresolved_risks": [
+    "Nội dung mới cần independent correction review; không nâng claim kỹ thuật."
+  ],
+  "supersedes_correction_sha256": null
+}

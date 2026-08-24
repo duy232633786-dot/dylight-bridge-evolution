@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-023-001",
+  "task_id": "BRD-023",
+  "incident_id": "INC-BRD-023-001",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Bảo toàn runtime capability JSON cũ đúng SHA-256 và liên kết bản mới với dependency probes đã khai báo, vẫn giữ SECTION_FEA_2D/IFC ở PARTIAL.",
+  "original_handoff_path": "multiagent/handoffs/BRD-023.codex.r001.json",
+  "original_handoff_sha256": "d2de17e8c62a08877eb5e21458c43dcd09f35aaf392ccd05eb189723e4eebf1e",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/a3d8273e1d7f9b2e2651b7b6273083ab145578bb40069e04385ff9304c51447b.blob",
+    "sha256": "a3d8273e1d7f9b2e2651b7b6273083ab145578bb40069e04385ff9304c51447b"
+  },
+  "corrected_artifact": {
+    "path": "docs/runtime_capability_matrix.json",
+    "previous_sha256": "a3d8273e1d7f9b2e2651b7b6273083ab145578bb40069e04385ff9304c51447b",
+    "current_sha256": "ab750104e4a704e2430949bc609698b2b81f88b8466e6e4d15ac6178a5c67d39"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "docs/check_runtime_drift.py"
+    ]
+  ],
+  "assumptions": [
+    "Bản snapshot lấy từ commit 011558d và khớp SHA-256 trong handoff BRD-023."
+  ],
+  "unresolved_risks": [
+    "Nội dung mới cần independent correction review; không nâng claim kỹ thuật."
+  ],
+  "supersedes_correction_sha256": null
+}
