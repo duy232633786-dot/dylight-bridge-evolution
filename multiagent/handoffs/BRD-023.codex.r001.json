@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-023",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Sửa KC-017 khớp grammar super_t_parametric_v2; thay bottom_thickness_mm bằng hai biến bầu dưới có thật; tách tích phân Green trong vòng tối ưu khỏi sectionproperties tùy chọn; bỏ các số độ chính xác không có artifact; cập nhật audit và regression test. Provenance của audit được bảo toàn qua COR-BRD-001-001 và review độc lập CRV-BRD-001-001. Targeted 26 passed; full tests passed, 1 skipped; lab validate và runtime drift xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "knowledge/cards/KC-017.json",
+      "sha256": "c0879993da5896642fa1cb033becb32cf81cdf49fe7a93e6e182dbe3f3214d73",
+      "kind": "code"
+    },
+    {
+      "path": "knowledge/audits/current.json",
+      "sha256": "68aa303815c44b67424d3a233c4dd8feda97280212895f46a1f255e8b8296db7",
+      "kind": "code"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.json",
+      "sha256": "a3d8273e1d7f9b2e2651b7b6273083ab145578bb40069e04385ff9304c51447b",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_knowledge.py",
+      "sha256": "22a3a4b45b3b1cf0ec0c5cc4cc2707a5e1262bc70aec7b4c7955a48bf330dd41",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "KC-017 tiếp tục ở trạng thái DRAFT và không cấp quyền dùng kỹ thuật.",
+    "Chưa có benchmark định lượng có hash cho đường sectionproperties tùy chọn."
+  ],
+  "unresolved_risks": [
+    "sectionproperties và các dependency mô phỏng tùy chọn vẫn chưa được khai báo trong pyproject.toml; xử lý bằng task đóng gói riêng.",
+    "Dự án chưa có L2/L3 hoặc hiệu chỉnh theo hồ sơ cầu thật; claim ceiling vẫn là SCREENED."
+  ],
+  "next_action": "Antigravity review độc lập BRD-023: chạy lại G2, kiểm ranh giới claim và xác nhận Obsidian mirror; không nâng claim kỹ thuật."
+}

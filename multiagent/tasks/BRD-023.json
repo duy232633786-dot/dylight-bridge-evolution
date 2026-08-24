@@ -5,7 +5,7 @@
   "research_question": "Làm sao sửa thẻ KC-017 để truy vấn đúng các biến grammar v2, loại bỏ số định lượng không có artifact và phân biệt rõ tích phân Green trong vòng tối ưu với sectionproperties nằm ngoài vòng tối ưu?",
   "workstream": "knowledge",
   "priority": "P0",
-  "status": "ACTIVE",
+  "status": "REVIEW",
   "owner": "codex",
   "reviewer": null,
   "dependencies": [],
