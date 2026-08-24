@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-023-001",
+  "task_id": "BRD-023",
+  "incident_id": "INC-BRD-023-001",
+  "correction_sha256": "bc0fa02575cef1884414447ce3355ab5dc7dd2f1bb621517483487a11e8ca432",
+  "reviewer_id": "dependency_audit",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot a3d8273e1d7f9b2e2651b7b6273083ab145578bb40069e04385ff9304c51447b byte-equal 011558d:docs/runtime_capability_matrix.json; original handoff d2de17e8c62a08877eb5e21458c43dcd09f35aaf392ccd05eb189723e4eebf1e và current artifact ab750104e4a704e2430949bc609698b2b81f88b8466e6e4d15ac6178a5c67d39 đều khớp; dependency probe true chỉ là packaging, không nâng claim."
+  ],
+  "notes": "Independent read-only provenance audit APPROVE; schema, runtime drift, scope và claim boundary đều đạt."
+}
