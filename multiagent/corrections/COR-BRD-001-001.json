@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-001-001",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-001",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Preserved the exact BRD-001 audit bytes from Git checkpoint 9594dcd and linked the new audit hash after the scoped KC-017 evidence-boundary correction.",
+  "original_handoff_path": "multiagent/handoffs/BRD-001.claude.r001.json",
+  "original_handoff_sha256": "42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/634fb3e9b9e719360bb399a78cf936997dea32bf3266a94c93f9c72f2452a327.blob",
+    "sha256": "634fb3e9b9e719360bb399a78cf936997dea32bf3266a94c93f9c72f2452a327"
+  },
+  "corrected_artifact": {
+    "path": "knowledge/audits/current.json",
+    "previous_sha256": "634fb3e9b9e719360bb399a78cf936997dea32bf3266a94c93f9c72f2452a327",
+    "current_sha256": "68aa303815c44b67424d3a233c4dd8feda97280212895f46a1f255e8b8296db7"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_knowledge.py",
+      "tests/test_obsidian.py",
+      "-q"
+    ],
+    [
+      "python",
+      "docs/check_runtime_drift.py"
+    ]
+  ],
+  "assumptions": [
+    "KC-017 remains DRAFT and no technical performance claim is promoted."
+  ],
+  "unresolved_risks": [
+    "Independent provenance review is required before lab validation and Obsidian sync can return green."
+  ],
+  "supersedes_correction_sha256": null
+}

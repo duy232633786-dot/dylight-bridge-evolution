@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "audit_id": "oracle-20260820T154139.606695Z+brd001-cov20",
+  "evidence": {
+    "ref": "experiments/results/exhaustive_20260820T154139.606695Z/summary.json",
+    "sha256": "95cf0b23e918e32890099f2c3f292032c0a71a4219a93b3447236df45b944b86",
+    "complete_oracle": true,
+    "domain_size": 331776,
+    "versions": {
+      "software": "0.2.0",
+      "solver": "builtin-l1/0.2.0",
+      "ruleset": "BRIDGE-RULESET-V1/1.1.0",
+      "catalogs": "1.0.0",
+      "grammar": "1.0.0",
+      "source_revision": "unversioned"
+    }
+  },
+  "global_warnings": [
+    "Audit này phủ 20/20 card mà bridge_evolution.knowledge.load_cards() nạp. Trước BRD-001 nó chỉ phủ 9/20 — chênh lệch đó là lệch docs–runtime, không phải kho thẻ nhỏ đi.",
+    "0/20 card ở trạng thái ENGINEER_APPROVED; toàn kho vẫn là DRAFT. Phủ đủ audit KHÔNG phải là đã kiểm chứng, và KHÔNG card nào được dùng làm căn cứ kết luận.",
+    "Khối evidence dưới đây chỉ có MỘT nguồn: oracle vét cạn grammar v1 (grammar 1.0.0, ruleset BRIDGE-RULESET-V1). KC-010…KC-020 thuộc grammar v2 hoặc hạ tầng ngoài vòng tối ưu nên KHÔNG có oracle tương ứng — phần lớn mang claim_audit NOT_TESTED hoặc PARTIAL đúng theo sự thật đó.",
+    "2 card bị CONTRADICTED khi đối chiếu runtime: KC-018 (mô tả năng lực L2/grillage mà runtime không có) và KC-017 (tham chiếu biến bottom_thickness_mm không tồn tại trong grammar super_t_parametric_v2).",
+    "6/9 card đầu đang trích trực tiếp protocol thí nghiệm legacy.",
+    "3/9 card đầu chứa claim định lượng bị mâu thuẫn hoặc chưa được kiểm chứng.",
+    "Ngưỡng FAB-* (bề dày tối thiểu, sức nâng cẩu, tĩnh không vận chuyển, độ vát ván khuôn) là giá trị mặc định của repo/rule profile, chưa gắn nguồn chế tạo truy vết được.",
+    "rule_profiles.BRIDGE-RULESET-V2.fab_limits KHÔNG khai concrete_density_t_per_m3, nên FAB-004 lặng lẽ dùng mặc định 2,5 t/m³ của bridge_evolution/section.py.",
+    "Oracle dùng catalog placeholder và source_revision hiện là unversioned.",
+    "Việc audit phủ đủ tập card được giữ bằng máy tại docs/check_runtime_drift.py (so TẬP card_id, không chỉ so số lượng)."
+  ],
+  "cards": {
+    "KC-001": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "RED",
+      "summary": "Tăng một bậc PT sửa được 43,9% case chỉ lỗi SERV-001, gần claim cũ; claim PT luôn rẻ hơn đổi grade/section bị dữ liệu hiện tại bác bỏ.",
+      "findings": [
+        "Trong 6.100 cấu hình chỉ lỗi SERV-001, +1 PT sửa 2.680 case; phần còn lại cần +2 hoặc +3 bậc.",
+        "Delta cost PT 47,63–57,17, cao hơn grade 35,33–47,09 và section 23,19–32,43 trong các cặp so sánh hiện tại."
+      ],
+      "next_action": "Viết lại guidance để bỏ claim chi phí; giữ heuristic PT như một lựa chọn hiệu quả có điều kiện."
+    },
+    "KC-002": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Kết luận loại bố trí 7–8 dầm được xác nhận, nhưng attribution GEOM-002 không xuất hiện trong exhaustive scan.",
+      "findings": [
+        "Miền L0-valid chỉ còn girder_count 5 hoặc 6.",
+        "Toàn scan không có GEOM-002; loại 7–8 dầm trong cấu hình hiện tại đến từ GEOM-001."
+      ],
+      "next_action": "Cập nhật rule attribution và source sang exhaustive oracle hiện tại."
+    },
+    "KC-003": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "Các miền spacing L0-valid cho 5 và 6 dầm được exhaustive oracle xác nhận.",
+      "findings": [
+        "5 dầm hợp lệ với spacing 2350–2800 mm.",
+        "6 dầm hợp lệ với spacing 2150 hoặc 2200 mm."
+      ],
+      "next_action": "Thay nguồn legacy bằng oracle và chờ kỹ sư duyệt trước khi đổi status."
+    },
+    "KC-004": {
+      "evidence_freshness": "CURRENT_RULESET",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "DG-5 là lựa chọn duy nhất qua CONS-001 trong mô hình hiện tại; provenance đang gắn nhầm rule nội bộ như một tiêu chuẩn độc lập.",
+      "findings": [
+        "Cả 18.036 case L0-valid đều dùng DG-5.",
+        "Exhaustive summary ghi 221.184 reject bởi CONS-001."
+      ],
+      "next_action": "Đổi source kind/ref sang ruleset nội bộ có hash hoặc bổ sung trích dẫn tiêu chuẩn thật."
+    },
+    "KC-005": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "SERV-001 vẫn là serviceability failure chi phối; claim cốt lõi được oracle xác nhận.",
+      "findings": [
+        "Võng hoạt tải 9,08–18,42 mm và không có SERV-002 trong exhaustive scan.",
+        "SERV-001 xuất hiện ở 8.106/10.464 case không khả thi (77,5%)."
+      ],
+      "next_action": "Cập nhật số liệu và provenance sang oracle hiện tại."
+    },
+    "KC-006": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Lõi claim về rủi ro cắt của bố trí 5 dầm được xác nhận nhưng các con số ví dụ đã trôi sau sửa mô hình tải.",
+      "findings": [
+        "5 dầm với spacing ≥2650 mm có utilization cắt 0,906–1,063 và 1.840 case STR-002.",
+        "6 dầm có utilization tối đa 0,915 và không fail STR-002."
+      ],
+      "next_action": "Thay toàn bộ số định lượng bằng khoảng từ oracle solver 0.2.0."
+    },
+    "KC-007": {
+      "evidence_freshness": "REGRESSION_ONLY",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Repair logic được regression test hỗ trợ nhưng case dùng section tổng hợp ngoài miền grammar và chưa được kỹ sư duyệt.",
+      "findings": [
+        "GC-05 vẫn tái hiện SOLVER_FAILED/SOLVER-001.",
+        "ST-TEST-SINGULAR không thuộc exhaustive grammar; gold matrix còn PENDING."
+      ],
+      "next_action": "Giữ như regression-only và không suy rộng sang lỗi solver thực địa."
+    },
+    "KC-008": {
+      "evidence_freshness": "EXPERT_UNVERIFIED",
+      "claim_audit": "NOT_TESTED",
+      "risk": "RED",
+      "summary": "Claim về giới hạn cẩu lắp chưa có dữ liệu thiết bị hoặc nguồn chuyên gia truy vết được và không được mô hình hiện tại kiểm chứng.",
+      "findings": [
+        "Khối lượng placeholder mỗi phiến khoảng 58,9–65,4 tấn theo section.",
+        "Mô hình không chứng minh quan hệ ít dầm đồng nghĩa mỗi phiến nặng hơn."
+      ],
+      "next_action": "Bổ sung crane chart, phương án nâng lắp và xác nhận chuyên gia trước khi sử dụng."
+    },
+    "KC-009": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "RED",
+      "summary": "PT hiệu quả hơn nâng grade về tỷ lệ sửa SERV-001 và carbon, nhưng claim chi phí thấp hơn grade bị oracle bác bỏ.",
+      "findings": [
+        "+1 PT sửa 43,9% case chỉ lỗi SERV-001; +1 grade chỉ sửa 1,6%.",
+        "PT có delta carbon thấp hơn grade trong 4.030 cặp nhưng không có cặp nào delta cost thấp hơn grade."
+      ],
+      "next_action": "Tách rõ hiệu quả kỹ thuật/carbon khỏi claim chi phí và cập nhật guidance."
+    },
+    "KC-010": {
+      "evidence_freshness": "CURRENT_RULESET",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Cơ chế 'FAB-001 chặn trước ngưỡng chịu lực' tồn tại thật và kích hoạt được trong runtime; nhưng con số ~100 mm là mặc định của repo, chưa có nguồn chế tạo truy vết được.",
+      "findings": [
+        "FAB-001 kích hoạt thật ở L0 với web_thickness_mm = 90 trong check_geometry (probe l0_pipeline_probe của docs/runtime_capability_matrix.json), và có regression test tests/test_section.py::test_fabrication_rules_fire.",
+        "Ngưỡng web_thickness_min_mm nằm trong rule_profiles.BRIDGE-RULESET-V2.fab_limits và section.FAB_DEFAULTS; không có bản vẽ, số liệu đo hay xác nhận nhà máy nào gắn với con số này.",
+        "Phương án tốt nhất của đợt A/B BRD-009 (BT-0d93101c48b28dca) nằm ĐÚNG trên ngưỡng 100 mm — nhất quán với claim, nhưng đó là một run sàng lọc, không phải oracle grammar v2."
+      ],
+      "next_action": "Lấy ngưỡng đổ/đầm thực tế (Dmax cốt liệu, lớp bảo vệ hai mặt, thiết bị đầm) từ nhà máy đúc và gắn nguồn vào rule profile trước khi trích con số ra ngoài repo."
+    },
+    "KC-011": {
+      "evidence_freshness": "CURRENT_RULESET",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "FAB-003 tồn tại và chặn được thật, nhưng mô hình sức chứa bầu dưới là lý tưởng hoá hình học chứ không phải sơ đồ xếp tao thật.",
+      "findings": [
+        "FAB-003 kích hoạt được với strand_count vượt sức chứa (probe fabrication_rule_probes).",
+        "section._strand_capacity dùng lưới ô vuông đều 50×50 mm với lớp bảo vệ 50 mm; không xét cốt đai, ống ghen, vùng neo hay tao xiên.",
+        "catalogs.prestress_layouts chỉ khai strand_count và centroid_from_bottom_m — đúng như thẻ nói, L1 hoàn toàn 'mù' với chuyện xếp tao.",
+        "Không có bản vẽ bố trí cáp nào trong repo để đối chiếu sức chứa tính được."
+      ],
+      "next_action": "Đối chiếu capacity tính được với ít nhất một bản vẽ bố trí cáp Super-T thực; nếu lệch thì thay mô hình lưới bằng bảng tra của nhà máy."
+    },
+    "KC-012": {
+      "evidence_freshness": "EXPERT_UNVERIFIED",
+      "claim_audit": "PARTIAL",
+      "risk": "RED",
+      "summary": "Hai rule FAB-004/FAB-005 chạy thật, nhưng mọi ngưỡng cẩu lắp và vận chuyển đang dùng đều là giá trị mặc định không gắn thiết bị hay tuyến đường nào.",
+      "findings": [
+        "FAB-004 và FAB-005 đều kích hoạt được (probe fabrication_rule_probes) — cơ chế chặn ở L0 là có thật.",
+        "lift_capacity_t và transport_height_mm là số liệu THEO TỪNG DỰ ÁN; giá trị đang dùng không gắn với crane chart hay khảo sát tuyến nào trong repo.",
+        "rule_profiles.BRIDGE-RULESET-V2.fab_limits không khai concrete_density_t_per_m3, nên FAB-004 lặng lẽ dùng mặc định 2,5 t/m³ của section.py — một giả thiết ẩn ảnh hưởng trực tiếp tới khối lượng phiến.",
+        "Khoảng 60–80 tấn nêu trong thẻ là kinh nghiệm lao lắp, chưa đo cho các tiết diện do agent tự sinh."
+      ],
+      "next_action": "Bổ sung concrete_density_t_per_m3 vào rule profile và thay lift/transport bằng số liệu thiết bị + tuyến vận chuyển thực của dự án trước khi dùng thẻ này."
+    },
+    "KC-013": {
+      "evidence_freshness": "CURRENT_RULESET",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "FAB-006 chặn được sườn thẳng đứng thật, nhưng ngưỡng độ vát là hằng số repo và mệnh đề 'tối ưu luôn cho sườn thẳng đứng' vẫn chưa được đo trên run v2 nào.",
+      "findings": [
+        "FAB-006 kích hoạt khi bottom_bulb_width_mm = web_thickness_mm (draft = 0), có probe và regression test tests/test_section.py::test_fab006_vertical_web_is_violation.",
+        "min_draft_ratio = 1/25 nằm trong section.FAB_DEFAULTS, không kèm nguồn hệ ván khuôn nào.",
+        "Mệnh đề 'tối ưu toán học luôn đẩy về sườn thẳng đứng' vẫn là SUY LUẬN từ dạng hàm mục tiêu; đợt A/B BRD-009 chỉ cho thấy nghiệm nằm sát FAB-001/FAB-002, không đo riêng tần suất FAB-006."
+      ],
+      "next_action": "Thống kê tần suất FAB-006 trên một run grammar v2 và lấy góc vát tối thiểu từ hệ ván khuôn thực tế của nhà máy đúc."
+    },
+    "KC-014": {
+      "evidence_freshness": "REGRESSION_ONLY",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Hướng 'tăng chiều cao thì I tăng nhanh hơn khối lượng' được regression test xác nhận về mặt ĐƠN ĐIỆU; số mũ bậc ba và giá trị của heuristic trong không gian có ràng buộc FAB thì chưa đo.",
+      "findings": [
+        "tests/test_section.py::test_monotonic_depth xác nhận I_m4 tăng đơn điệu ngặt theo girder_depth_mm; test_green_theorem_on_rectangle/composite neo công thức Green vào lời giải giải tích.",
+        "Quan hệ I ~ h³ là kết quả giải tích cho tiết diện chữ I/T, KHÔNG phải số đo của repo; đợt A/B ghi +14,3% chiều cao đi cùng +63,0% I, không khớp đúng luỹ thừa ba vì các biến khác cũng đổi.",
+        "Solver L1 không kiểm ổn định thành mỏng và xoắn — đúng hai chế độ hỏng mà hướng 'cao và mỏng' làm nặng thêm."
+      ],
+      "next_action": "Chỉ dùng như hướng dò tìm. Muốn nâng trạng thái thì phải có L1.5/L2 kiểm ổn định thành mỏng và xoắn cho dải chiều cao mà v2 sinh ra."
+    },
+    "KC-015": {
+      "evidence_freshness": "CURRENT_RULESET",
+      "claim_audit": "CONFIRMED",
+      "risk": "ORANGE",
+      "summary": "Phát biểu 'runtime hiện tại không kiểm được chuỗi hiệu ứng theo giai đoạn khi đổi cấp bê tông' được runtime xác nhận trực tiếp; thẻ khoanh vùng phạm vi chứ không đưa số.",
+      "findings": [
+        "Runtime không phát ra bất kỳ rule nào cho ứng suất lúc truyền lực, mất mát DƯL hay co ngót–từ biến — đối chiếu runtime_rule_inventory trong docs/runtime_capability_matrix.json (năng lực STAGED_PRESTRESS_EFFECTS = ABSENT).",
+        "fe_adapter/line_girder chỉ dùng f'c và E của cấp bê tông, đúng như thẻ mô tả.",
+        "Thẻ không chứa con số định lượng nào nên không có số nào để oracle bác bỏ; giá trị của nó nằm ở việc chặn hiểu nhầm 'đổi một tham số'."
+      ],
+      "next_action": "Giữ nguyên nội dung. Chỉ mở cấp tự do vật liệu (cấp 3) sau khi có kiểm giai đoạn L1.5/L2 theo docs/03_shape_evolution.md §5 mục 4."
+    },
+    "KC-016": {
+      "evidence_freshness": "EXPERT_UNVERIFIED",
+      "claim_audit": "NOT_TESTED",
+      "risk": "ORANGE",
+      "summary": "Cả hai rule của vòng lặp đều tồn tại, nhưng bản thân vòng luẩn quẩn SERV-001 ↔ FAB-003 chưa được đo tần suất trên bất kỳ run grammar v2 nào.",
+      "findings": [
+        "SERV-001 và FAB-003 đều nằm trong tập rule runtime phát ra được, nên chế độ hỏng mô tả là khả dĩ về mặt cơ chế.",
+        "Không có log chuỗi đề xuất hay thống kê nào trong repo cho thấy vòng dao động này thực sự xảy ra và với tần suất bao nhiêu.",
+        "Không có oracle grammar v2 để đếm; audit này KHÔNG đo được tần suất và không tự nhận là đã đo."
+      ],
+      "next_action": "Bật log chuỗi đề xuất trên một run grammar v2, đếm tần suất chuỗi SERV-001 ↔ FAB-003, rồi mới cân nhắc dùng làm luật sửa tự động."
+    },
+    "KC-017": {
+      "evidence_freshness": "EXPERT_UNVERIFIED",
+      "claim_audit": "CONTRADICTED",
+      "risk": "RED",
+      "summary": "Thẻ mô tả sai cái đang chạy: vòng tối ưu grammar v2 dùng tích phân Green trong section.py chứ không dùng sectionproperties, và thẻ tham chiếu một biến không tồn tại nên không bao giờ khớp truy vấn.",
+      "findings": [
+        "applies_to.variables chứa bottom_thickness_mm — biến này KHÔNG có trong grammar super_t_parametric_v2 (biến thật là bottom_bulb_width_mm và bottom_bulb_height_mm). Đây là biến của mô hình thứ hai geometry_parametric.py.",
+        "Vòng tối ưu v2 gọi section.section_from_params (Green, thuần toán). sectionproperties chỉ chạy khi truyền use_sectionproperties_fem=True qua CLI section --fem hoặc bộ xuất IFC — nằm NGOÀI vòng tối ưu.",
+        "Hai con số 'sai số dưới 0,1%' và 'lệch trục trung hoà 5–8%' không có artifact đối chiếu nào trong repo.",
+        "shapely và sectionproperties không được khai báo trong pyproject.toml nên kết quả của thẻ không tái lập được trên môi trường cài theo README."
+      ],
+      "next_action": "Sửa applies_to.variables về đúng biến grammar v2; gỡ hoặc gắn artifact cho hai con số 0,1% và 5–8%; ghi rõ sectionproperties nằm ngoài vòng tối ưu."
+    },
+    "KC-018": {
+      "evidence_freshness": "EXPERT_UNVERIFIED",
+      "claim_audit": "CONTRADICTED",
+      "risk": "RED",
+      "summary": "Thẻ hướng dẫn 'kích hoạt solver L2 tự động' cho một năng lực runtime KHÔNG có, và dùng nó để gợi ý cắt bớt cáp DƯL — đây là loại claim nguy hiểm nhất trong hệ này.",
+      "findings": [
+        "Runtime không chạy được L2: cả MIDAS_CIVIL lẫn OPENSEESPY đều ném SolverError, và không module nào trong bridge_evolution/ import ospgrillage (năng lực GRILLAGE_3D = ABSENT).",
+        "Khoảng 'bảo thủ 10–25%' là số của tài liệu tham chiếu ngoài (Ngan & Caprani, 2022), chưa đo trên bất kỳ mô hình nào của repo.",
+        "applies_to.family = super_t_simple_v1 nhưng nội dung nói về năng lực L2 mà cả hai grammar đều chưa có.",
+        "Guidance 'mở ra không gian tiết kiệm lượng cáp DƯL' là hệ quả suy ra từ một năng lực không tồn tại — không được dùng để biện minh giảm cáp."
+      ],
+      "next_action": "Viết lại guidance ở dạng điều kiện ('khi nào CÓ adapter L2 thì...') hoặc chuyển sang REJECTED cho tới khi adapter L2 tồn tại và có bảng sai lệch L1–L2."
+    },
+    "KC-019": {
+      "evidence_freshness": "REGRESSION_ONLY",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Phần 'xuất được IFC 4X3' là đúng và có regression test; phần 'loại bỏ hoàn toàn lỗi mất mát thông tin' là khẳng định tuyệt đối không kiểm được.",
+      "findings": [
+        "bim/ifc_bridge_exporter.export_bridge_to_ifc chạy thật và có tests/test_ifc_exporter.py.",
+        "ifcopenshell KHÔNG khai báo trong pyproject.toml lẫn requirements-dev.lock — cài đúng theo README thì cả module lẫn test của nó lỗi import, tức kết quả của thẻ không tái lập được.",
+        "Chưa có round-trip test nào với Revit/Midas/Bentley để chống lưng cho claim 'loại bỏ hoàn toàn lỗi mất mát thông tin'.",
+        "Hình học IFC dựng từ geometry_parametric.py, KHÔNG phải tiết diện mà vòng tối ưu grammar v2 thực sự dùng — mô hình xuất ra có thể khác phương án đã tối ưu."
+      ],
+      "next_action": "Bỏ chữ 'hoàn toàn'; khai báo ifcopenshell như phụ thuộc thật; ghi rõ IFC đang dựng từ mô hình tiết diện thứ hai và cần round-trip test trước khi giao cho kỹ sư thẩm tra."
+    },
+    "KC-020": {
+      "evidence_freshness": "CURRENT_ORACLE",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Claim tiết kiệm solver nhờ lọc L0 được oracle xác nhận và còn mạnh hơn thẻ nói; claim 'nhanh gấp 3,5 lần Random Search' thì không có artifact nào chống lưng.",
+      "findings": [
+        "Oracle vét cạn cho l0_valid_rate = 5,44% (18.036/331.776), tức 94,6% cấu hình bị loại trước khi tiêu ngân sách solver — claim 'tiết kiệm hơn 80%' được XÁC NHẬN.",
+        "Claim 'hội tụ nhanh gấp 3,5 lần Random Search' KHÔNG có artifact nào trong repo; đợt A/B đã đăng ký cho phán quyết VÔ HIỆU và docs/03_shape_evolution.md §5b.4 cấm diễn giải hypervolume/hình dạng Pareto khi cờ DEGENERATE_FRONT bật.",
+        "pymoo không khai báo trong pyproject.toml lẫn requirements-dev.lock nên adapter không tái lập được trên môi trường cài theo README."
+      ],
+      "next_action": "Xoá hoặc thay con số 3,5 lần bằng một số đo có artifact và pre-registration; khai báo pymoo như phụ thuộc thật."
+    }
+  }
+}
