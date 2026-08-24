@@ -19,7 +19,7 @@
     "Audit này phủ 20/20 card mà bridge_evolution.knowledge.load_cards() nạp. Trước BRD-001 nó chỉ phủ 9/20 — chênh lệch đó là lệch docs–runtime, không phải kho thẻ nhỏ đi.",
     "0/20 card ở trạng thái ENGINEER_APPROVED; toàn kho vẫn là DRAFT. Phủ đủ audit KHÔNG phải là đã kiểm chứng, và KHÔNG card nào được dùng làm căn cứ kết luận.",
     "Khối evidence dưới đây chỉ có MỘT nguồn: oracle vét cạn grammar v1 (grammar 1.0.0, ruleset BRIDGE-RULESET-V1). KC-010…KC-020 thuộc grammar v2 hoặc hạ tầng ngoài vòng tối ưu nên KHÔNG có oracle tương ứng — phần lớn mang claim_audit NOT_TESTED hoặc PARTIAL đúng theo sự thật đó.",
-    "2 card bị CONTRADICTED khi đối chiếu runtime: KC-018 (mô tả năng lực L2/grillage mà runtime không có) và KC-017 (tham chiếu biến bottom_thickness_mm không tồn tại trong grammar super_t_parametric_v2).",
+    "1 card còn bị CONTRADICTED khi đối chiếu runtime: KC-018 mô tả năng lực L2/grillage mà runtime không có. KC-017 đã sửa biến grammar và ranh giới sectionproperties ở version 2 nhưng vẫn chỉ PARTIAL vì chưa có benchmark định lượng.",
     "6/9 card đầu đang trích trực tiếp protocol thí nghiệm legacy.",
     "3/9 card đầu chứa claim định lượng bị mâu thuẫn hoặc chưa được kiểm chứng.",
     "Ngưỡng FAB-* (bề dày tối thiểu, sức nâng cẩu, tĩnh không vận chuyển, độ vát ván khuôn) là giá trị mặc định của repo/rule profile, chưa gắn nguồn chế tạo truy vết được.",
@@ -214,17 +214,17 @@
       "next_action": "Bật log chuỗi đề xuất trên một run grammar v2, đếm tần suất chuỗi SERV-001 ↔ FAB-003, rồi mới cân nhắc dùng làm luật sửa tự động."
     },
     "KC-017": {
-      "evidence_freshness": "EXPERT_UNVERIFIED",
-      "claim_audit": "CONTRADICTED",
-      "risk": "RED",
-      "summary": "Thẻ mô tả sai cái đang chạy: vòng tối ưu grammar v2 dùng tích phân Green trong section.py chứ không dùng sectionproperties, và thẻ tham chiếu một biến không tồn tại nên không bao giờ khớp truy vấn.",
+      "evidence_freshness": "REGRESSION_ONLY",
+      "claim_audit": "PARTIAL",
+      "risk": "ORANGE",
+      "summary": "Version 2 đã khớp đúng biến grammar v2 và ranh giới runtime: vòng tối ưu dùng tích phân Green trong section.py; sectionproperties là đường FEA 2D tùy chọn ngoài vòng tối ưu. Chưa có benchmark định lượng để tuyên bố độ chính xác tương đối.",
       "findings": [
-        "applies_to.variables chứa bottom_thickness_mm — biến này KHÔNG có trong grammar super_t_parametric_v2 (biến thật là bottom_bulb_width_mm và bottom_bulb_height_mm). Đây là biến của mô hình thứ hai geometry_parametric.py.",
-        "Vòng tối ưu v2 gọi section.section_from_params (Green, thuần toán). sectionproperties chỉ chạy khi truyền use_sectionproperties_fem=True qua CLI section --fem hoặc bộ xuất IFC — nằm NGOÀI vòng tối ưu.",
-        "Hai con số 'sai số dưới 0,1%' và 'lệch trục trung hoà 5–8%' không có artifact đối chiếu nào trong repo.",
-        "shapely và sectionproperties không được khai báo trong pyproject.toml nên kết quả của thẻ không tái lập được trên môi trường cài theo README."
+        "applies_to.variables đã thay bottom_thickness_mm không tồn tại bằng bottom_bulb_width_mm và bottom_bulb_height_mm có thật trong super_t_parametric_v2.",
+        "Guidance đã khóa vòng tối ưu vào section.section_from_params (Green) và chỉ cho phép sectionproperties làm đối chiếu độc lập khi cùng hình học, đơn vị, lưới và điều kiện tính.",
+        "Hai số 0,1% và 5–8% đã bị gỡ vì không có artifact benchmark có hash trong repo.",
+        "shapely và sectionproperties vẫn chưa được khai báo trong pyproject.toml; khả năng FEA 2D tùy chọn vì vậy chưa tái lập được từ clean install."
       ],
-      "next_action": "Sửa applies_to.variables về đúng biến grammar v2; gỡ hoặc gắn artifact cho hai con số 0,1% và 5–8%; ghi rõ sectionproperties nằm ngoài vòng tối ưu."
+      "next_action": "Khai báo dependency tùy chọn rồi pre-register benchmark Green–sectionproperties trên cùng hình học; lưu input, mesh, version và raw output có hash trước khi cân nhắc nâng claim."
     },
     "KC-018": {
       "evidence_freshness": "EXPERT_UNVERIFIED",

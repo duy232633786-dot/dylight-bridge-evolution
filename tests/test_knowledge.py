@@ -1,6 +1,7 @@
 """Test lớp tri thức: schema thẻ, nạp kho thẻ, truy vấn có chấm điểm."""
 from bridge_evolution.knowledge import load_cards, query_knowledge, validate_card
 from bridge_evolution.knowledge.store import CARDS_DIR
+from bridge_evolution.catalogs import load_grammar
 
 
 def _valid_card(card_id: str = "KC-999", status: str = "DRAFT") -> dict:
@@ -89,3 +90,21 @@ def test_duplicate_card_id_rejected(tmp_path):
                                      encoding="utf-8")
     with pytest.raises(ValueError, match="KC-100"):
         load_cards(cards_dir=tmp_path)
+
+
+def test_kc017_matches_real_v2_bottom_bulb_variables():
+    cards = load_cards()
+    card = next(card for card in cards if card["card_id"] == "KC-017")
+    grammar_variables = set(load_grammar("super_t_parametric_v2")["design_variables"])
+
+    assert set(card["applies_to"]["variables"]) <= grammar_variables
+    assert "bottom_thickness_mm" not in card["applies_to"]["variables"]
+    for variable in ("bottom_bulb_width_mm", "bottom_bulb_height_mm"):
+        assert variable in card["applies_to"]["variables"]
+        hits = query_knowledge(
+            family="super_t_parametric_v2",
+            variables=[variable],
+            cards=cards,
+            top_k=len(cards),
+        )
+        assert "KC-017" in {hit["card"]["card_id"] for hit in hits}

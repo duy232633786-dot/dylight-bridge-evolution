@@ -1,18 +1,23 @@
 {
   "card_id": "KC-017",
   "type": "design_heuristic",
-  "title": "Hình học tiết diện tự do: Phân tích 2D FEA (sectionproperties) để xác định chính xác đặc trưng mặt cắt",
+  "title": "Grammar v2: tích phân Green trong tối ưu, FEA 2D chỉ để đối chiếu độc lập",
   "applies_to": {
     "family": "super_t_parametric_v2",
     "rules": ["GEOM-001", "GEOM-002", "STR-001", "STR-002"],
-    "variables": ["top_flange_width_mm", "web_thickness_mm", "bottom_thickness_mm"]
+    "variables": [
+      "top_flange_width_mm",
+      "web_thickness_mm",
+      "bottom_bulb_width_mm",
+      "bottom_bulb_height_mm"
+    ]
   },
-  "guidance": "Khi thoát khỏi catalog rời rạc để AI Agent tự do tối ưu hóa các kích thước mặt cắt dầm, không được dùng các công thức diện tích và mômen quán tính gần đúng thô sơ. Phải sử dụng tích phân giải tích đa giác (Green's Theorem) hoặc lưới phần tử hữu hạn 2D (sectionproperties) để tính chính xác diện tích A, trọng tâm y_bottom, mômen quán tính chính Ixx, Iyy, hằng số xoắn J và mômen kháng uốn W. Cần kết hợp bộ đệm (lru_cache) để bảo đảm tốc độ đánh giá hàng ngàn phương án trong thời gian thực.",
-  "evidence": "Đối chiếu giữa tích phân giải tích chính xác và FEA 2D trên các tiết diện Super-T tiêu chuẩn (ST-1650, ST-1750, ST-1850) cho sai số diện tích và trục trung hòa dưới 0.1%, trong khi mô hình gần đúng chữ T đơn giản có thể gây sai lệch vị trí trục trung hòa tới 5-8%, dẫn tới tính sai ứng suất thớ kéo đáy trong SERV-001.",
+  "guidance": "Trong vòng tối ưu super_t_parametric_v2, đặc trưng tiết diện phải được lấy từ bridge_evolution.section.section_from_params, tức tích phân đa giác theo Green's Theorem trên đúng hình học grammar v2. Đường sectionproperties trong geometry_parametric.py là mô hình tiết diện thứ hai, chỉ chạy khi bật FEA 2D tùy chọn ngoài vòng tối ưu; chỉ dùng nó làm phép đối chiếu độc lập khi cùng hình học, đơn vị, lưới và điều kiện tính đã được khóa. Không được gọi kết quả của hai mô hình là tương đương nếu chưa có artifact benchmark có hash.",
+  "evidence": "Kiểm tra runtime và regression test xác nhận vòng tối ưu grammar v2 gọi section.section_from_params, còn sectionproperties chỉ được gọi qua cờ use_sectionproperties_fem của mô hình geometry_parametric.py/CLI liên quan. Repo hiện chưa có artifact benchmark truy vết được để định lượng sai lệch giữa hai đường tính, nên thẻ không nêu phần trăm độ chính xác hay độ lệch trục trung hòa.",
   "source": {
-    "kind": "textbook",
-    "ref": "Robbie van Leeuwen (2024), sectionproperties: A Python package for the analysis of arbitrary cross-sections using the Finite Element Method"
+    "kind": "project",
+    "ref": "bridge_evolution/section.py; bridge_evolution/geometry_parametric.py; docs/runtime_capability_matrix.json; knowledge/audits/current.json"
   },
   "status": "DRAFT",
-  "version": 1
+  "version": 2
 }

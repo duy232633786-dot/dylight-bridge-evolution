@@ -297,16 +297,7 @@
       ]
     }
   ],
-  "known_card_reference_exceptions": [
-    {
-      "card_id": "KC-017",
-      "kind": "variable",
-      "value": "bottom_thickness_mm",
-      "reason": "Thẻ trỏ tới biến của mô hình tiết diện THỨ HAI (geometry_parametric.py dùng bottom_thickness_m) chứ không phải biến của grammar super_t_parametric_v2, nên query_knowledge không bao giờ khớp được theo biến này. Đây là lệch THẬT, được ghi nhận chứ không được che.",
-      "blocked_by": "knowledge/cards/ nằm ngoài write_scope của BRD-001; sửa thẻ mà không có kỹ sư duyệt cũng vi phạm ràng buộc an toàn của task.",
-      "must_fix_in": "Task sửa thẻ tri thức KC-017 (đổi applies_to.variables sang bottom_bulb_width_mm/bottom_bulb_height_mm) — xem knowledge/audits/current.json mục KC-017.next_action."
-    }
-  ],
+  "known_card_reference_exceptions": [],
   "declared_counts": [
     {
       "id": "knowledge_cards",
