@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-015",
+  "handoff_sha256": "88c4b6c4569415e55147ee243756f69ec7ccb70d1d6ca6ce8b26ed4377a42380",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Handoff nop khi full --seeds 20 van dang chay; khong co output 160-run duoc hash/review, nen acceptance rerun du 20 seed chua dat."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "test_summarizer_agrees_with_independent_count khong goi run_single_arm va khong so sanh feasible_count/best_cost voi history cung run; no chi chay nsga2 rieng va source-scan."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Nhanh n_paired_seeds=0 van ghi summary, in Trial Complete, tra exit 0 va gan field verdict; test cung chi source-scan, chua chung minh STOP fail-closed."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Preregistration khoa paired_wilcoxon_and_bootstrap_ci va H1 p<0.05 + median>=2%; runner chi bootstrap CI cua mean, khong Wilcoxon/p-value/median, nen khong duoc phat bieu verdict khoa hoc."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Seed compliance chi so sanh len(seeds), khong exact seed set 42..61; invalidation solver_calls!=600/crash_rate chua duoc enforce truoc verdict."
+    }
+  ],
+  "notes": "REVISE. Provenance runner da duoc giai quyet boi COR-BRD-013-001/002 va test boi COR-BRD-013-003/CRV-003; validator xanh. Khong chap nhan smoke 2 seed hay handoff nop truoc khi full run xong. Can sua tests thanh behavioral tests, enforce STOP/seed/invalidation, tuan prereg Wilcoxon+bootstrap, va nop ket qua 20 seed bat bien/hash trong scope duoc govern truoc review lai."
+}

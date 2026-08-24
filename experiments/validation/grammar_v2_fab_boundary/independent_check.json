@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.0",
+  "check_id": "CHK-BLIND-INDEP-014",
+  "task_id": "BRD-014",
+  "checker_metadata": {
+    "checker_agent_id": "codex",
+    "role": "independent_reproducer",
+    "independent_method": "3D Direct Stiffness Frame with Timoshenko Shear Flexibility Formulation",
+    "is_blind": true
+  },
+  "strata_verification_results": [
+    {
+      "stratum_id": "FAB_BOUNDARY_OPTIMUM",
+      "candidate_id": "CAND-V2-FAB-NEAR-01",
+      "l1_prediction": {
+        "moment_kNm": 4080.0,
+        "deflection_mm": 23.1,
+        "governing_check": "SERVICE_STRESS",
+        "feasible": true
+      },
+      "l2_fe_result": {
+        "moment_kNm": 4148.0,
+        "deflection_mm": 24.2,
+        "stress_bottom_MPa": 18.2
+      },
+      "independent_check_result": {
+        "moment_kNm": 4172.0,
+        "deflection_mm": 24.5,
+        "discrepancy_vs_l2_pct": 0.58,
+        "tolerance_pct": 4.0,
+        "verified_pass": true
+      },
+      "l1_vs_l2_discrepancy_pct": 1.64,
+      "failure_mode": "Uốn đàn hồi kiểm soát, không xuất hiện mất ổn định cục bộ bản bụng (web margin = 1.42)",
+      "verdict": "CONFIRMED_VALID_AT_BOUNDARY"
+    },
+    {
+      "stratum_id": "INTERIOR_CONTROL",
+      "candidate_id": "CAND-V2-INTERIOR-01",
+      "l1_prediction": {
+        "moment_kNm": 4210.0,
+        "deflection_mm": 21.0,
+        "governing_check": "SERVICE_STRESS",
+        "feasible": true
+      },
+      "l2_fe_result": {
+        "moment_kNm": 4245.0,
+        "deflection_mm": 21.8,
+        "stress_bottom_MPa": 16.9
+      },
+      "independent_check_result": {
+        "moment_kNm": 4260.0,
+        "deflection_mm": 22.0,
+        "discrepancy_vs_l2_pct": 0.35,
+        "tolerance_pct": 4.0,
+        "verified_pass": true
+      },
+      "l1_vs_l2_discrepancy_pct": 0.82,
+      "failure_mode": "Nội lực chuẩn, margin lớn",
+      "verdict": "CONFIRMED_VALID_INTERIOR"
+    },
+    {
+      "stratum_id": "FAILING_BOUNDARY",
+      "candidate_id": "CAND-V2-FAIL-01",
+      "l1_prediction": {
+        "moment_kNm": 3950.0,
+        "deflection_mm": 38.5,
+        "governing_check": "DEFLECTION_EXCEEDED",
+        "feasible": false
+      },
+      "l2_fe_result": {
+        "moment_kNm": 4010.0,
+        "deflection_mm": 41.2,
+        "stress_bottom_MPa": 26.4
+      },
+      "independent_check_result": {
+        "moment_kNm": 4025.0,
+        "deflection_mm": 41.8,
+        "discrepancy_vs_l2_pct": 0.37,
+        "tolerance_pct": 4.0,
+        "verified_pass": true
+      },
+      "l1_vs_l2_discrepancy_pct": 1.50,
+      "failure_mode": "Võng quá giới hạn L/800 và nguy cơ mất ổn định bản bụng mảnh",
+      "verdict": "CONFIRMED_CORRECTLY_REJECTED"
+    }
+  ],
+  "synthesis_and_uncertainty": {
+    "mean_l1_l2_discrepancy_pct": 1.32,
+    "max_l1_l2_discrepancy_pct": 1.64,
+    "max_independent_discrepancy_pct": 0.58,
+    "conclusion": "L1 line-girder model có độ chính xác cao trong dải sai số < 2% khi so sánh với mô hình L2 3D FE và phép tính độc lập trên cả 3 tầng mẫu phân tầng. Không có hiện tượng đổi failure mode bất thường tại vùng biên FAB 160 mm."
+  }
+}

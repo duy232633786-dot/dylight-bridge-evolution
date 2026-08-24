@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-017",
+  "title": "Khôi phục Revit MCP command registry và chặn nợ cấu hình 'Temporary'",
+  "research_question": "Revit MCP trên máy này chỉ đăng ký DUY NHẤT send_code_to_revit ở chế độ rollback-only theo một override 'Temporary' trong commandRegistry.json, nên mọi thao tác ghi bị hoàn tác và mọi lệnh khác trả 'Method not found'. Công cụ KHÔNG hỏng. Câu hỏi: khôi phục registry thế nào cho an toàn, và làm sao để một cấu hình gắn nhãn 'Temporary' không còn nằm lại vô thời hạn?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "research/tooling/revit_mcp_persistence/",
+    "tests/test_revit_mcp_persistence.py"
+  ],
+  "acceptance_criteria": [
+    "Xác nhận lại nguyên nhân gốc bằng cách tự đọc commandRegistry.json, không lấy báo cáo phiên khác làm kết luận",
+    "KHÔNG sửa file cấu hình khi chưa có người dùng quyết định: nó nằm ngoài repo, cần khởi động lại Revit, và có thể do phiên khác đặt cố ý cho việc đang chạy",
+    "Sửa lộ trình BIM trong docs cho ĐÚNG: lộ trình Revit LOD 300 vẫn khả thi vì add-in có đủ 25 lệnh; vấn đề là registry đang ở chế độ tạm thời, KHÔNG phải revit-mcp không ghi được",
+    "Thêm kiểm tra tự động: cấu hình mô tả là 'Temporary' mà tồn tại quá N ngày thì phải cảnh báo",
+    "Ghi lại bài học chung: override tạm thời phải có cơ chế hết hạn hoặc nhắc khôi phục"
+  ],
+  "required_artifacts": [
+    "research/tooling/revit_mcp_persistence/"
+  ],
+  "safety_notes": [
+    "TUYỆT ĐỐI không tự sửa commandRegistry.json: ngoài repo, cần restart Revit, và có thể đang phục vụ việc của phiên khác — sửa mù là phá việc người khác",
+    "Kết luận 'revit-mcp không ghi được' là SAI; chỉ registry đang ở chế độ rollback-only",
+    "Chỉ thao tác trên file Revit thử nghiệm, không động vào mô hình dự án thật"
+  ],
+  "review_notes": [
+    "NGUYÊN NHÂN GỐC (phiên ngang hàng gemini-49, 2026-08-21): D:\\BIM  CIM\\DỰ ÁN AI\\RevitAddins6\revit_mcp_plugin\\Commands\\commandRegistry.json chỉ đăng ký send_code_to_revit với description 'Temporary rollback-only pier-cap smoke verification.' Giải thích trọn vẹn cả hai triệu chứng: mọi lệnh khác 'Method not found', và mọi thao tác ghi bị rollback.",
+    "Add-in thực tế CÓ 25 lệnh: 23 trong RevitMCPCommandSet/command.json (say_hello, analyze_model_statistics, create_level, create_point_based_element, delete_element, operate_element, ai_element_filter...) + 2 trong DYLIGHT.PierCapPlacer (dylight_discover_pier_supports, dylight_place_pier_caps).",
+    "Log add-in Logs/mcp_20260821.log: 'Failed to create command instance [send_code_to_revit]: RevitMCPCommandSet.dll'.",
+    "NỢ CẤU HÌNH TÁI DIỄN: bản sao lưu 12/08 tại _backups/revit-mcp-host-and-dylight/before-next-launch-stage-20260812-191538-196/commandRegistry.json có CÙNG dạng override một-lệnh-tạm-thời, mô tả 'Temporary geometry inspection for the DYLIGHT ear-wall repair'. Tức file này bị dùng đi dùng lại làm override tạm và không được khôi phục sau khi xong việc.",
+    "Bằng chứng ban đầu (4 phép thử của gemini-49 trên Project1.rvt): tạo 1 trụ -> lần gọi sau GetElement null; tạo 4 trụ -> lần gọi sau đếm 0; quét Comments == NLSKILLBENCH -> 0 element; chỉ SỬA Comments của Abutment Wall id 2390115 -> lần gọi sau đọc lại rỗng.",
+    "Chi tiết môi trường: document.IsModifiable == True ngay đầu đoạn mã (template add-in đã mở sẵn Transaction); tự mở new Transaction sẽ ném 'Exception has been thrown by the target of an invocation'.",
+    "Ảnh hưởng repo này: code BIM đi đường IFC (bridge_evolution/bim/ifc_bridge_exporter.py) nên KHÔNG phụ thuộc. Chỉ lộ trình trong docs/02_agent_protocol.md và docs/03_shape_evolution.md nhắc revit-mcp.",
+    "ĐÍNH CHÍNH: giả thuyết ban đầu của claude ('template Dispose mà không Commit') là SAI. Ghi lại để không ai đi theo hướng đó."
+  ],
+  "preferred_provider": "opencode",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_revit_mcp_persistence.py",
+      "-q"
+    ]
+  ],
+  "human_gate": true
+}

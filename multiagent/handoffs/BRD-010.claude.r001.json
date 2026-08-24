@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-010",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Provenance khai dung rule profile thuc su ap dung. Truoc: RULESET_VERSION la hang co dinh trong verifier/rules.py nen MOI EvaluationResult deu tu khai BRIDGE-RULESET-V1/1.1.0, ke ca phuong an grammar v2 chay duoi BRIDGE-RULESET-V2 (co them FAB-001..FAB-007). Phep tinh van dung vi rule profile duoc doc tu state khi danh gia; chi NHAN truy vet sai. Sau: ruleset_version_for(state) suy nhan tu state[constraints][rule_profile_id] va version cua chinh profile do trong catalog; state hong tra UNRESOLVED thay vi bia la V1. Kiem chung: chay lai toan bo thi nghiem A/B 18 run, 0/18 o metric thay doi (ban sua thuan tuy la nhan), arm A1 khai V1/1.1.0 va arm A2/A3 khai V2/2.0.0. Neo hoi quy grammar v1 giu nguyen tung ky tu.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "tests/test_ruleset_provenance.py",
+      "sha256": "123f0a53189effe1236b4a607acc2e70111696c7129503e18453cab792e5f835",
+      "kind": "test"
+    }
+  ],
+  "assumptions": [
+    "Rule profile van duoc ap dung dung tu truoc khi sua; day la loi nhan chu khong phai loi tinh toan",
+    "Nhan suy tu catalogs.json nen tu dong theo khi catalog doi version"
+  ],
+  "unresolved_risks": [
+    "Moi artifact thi nghiem sinh TRUOC ban sua deu mang nhan ruleset sai; chi duoc trich dan run tu grammar_ab_20260821T044619 tro di",
+    "Chua ra soat cac truong provenance khac (solver_version, catalogs_version) xem co bi hard-code tuong tu khong"
+  ],
+  "next_action": "Ra soat solver_version va grammar_version theo cung cach; them test chan hoi quy cho ca hai"
+}

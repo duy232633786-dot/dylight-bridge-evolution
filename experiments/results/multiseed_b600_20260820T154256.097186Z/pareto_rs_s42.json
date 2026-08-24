@@ -1,0 +1,20 @@
+[
+  {
+    "case_id": "BT-344472cf014f2174",
+    "objectives": {
+      "relative_cost": 2114.57,
+      "material_mass_t": 527.38,
+      "embodied_carbon_kgCO2e": 91547.9
+    },
+    "gene": {
+      "girder_catalog_id": "ST-1650",
+      "girder_count": 5,
+      "girder_spacing_mm": 2400,
+      "deck_slab_thickness_mm": 180,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C35",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-46"
+    }
+  }
+]

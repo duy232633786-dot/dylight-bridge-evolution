@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-03",
+  "title": "Sàng lọc physics-in-the-loop tái lập được",
+  "research_question": "Giả thuyết 480 m còn đứng vững sau audit đại số, cân bằng, Timoshenko và đồng nhất hóa năng lượng unit-cell/truss nào, trước khi yêu cầu L2?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-b471879e-01",
+    "RND-b471879e-02"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "research/orchestration/RND-20260821-b471879e/03_physics_screening.md"
+  ],
+  "acceptance_criteria": [
+    "Input, units, solver/version, seed và raw output truy vết được; kiểm tra thứ nguyên của từng hạng năng lượng",
+    "Kiểm equilibrium/reactions và báo solver failure như STOP; bổ sung N, torsion/warping, P-Delta, liên kết và construction stage vào danh sách thiếu",
+    "So độc lập Timoshenko với unit-cell/truss-energy homogenization; định nghĩa GA_eq theo hướng và dải tải, không mặc nhiên dùng scalar",
+    "Tách dead-load inventory và tái lập đại số 5.5 xuống 2.2 hoặc giải trình đầy đủ điều kiện để đạt 1.8",
+    "Báo cả phương án bị loại; runtime hiện tại không hỗ trợ geometry 480 m nên kết quả chỉ F0 IDEA nếu chưa có mô hình L2 thật"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-b471879e/03_physics_screening.md"
+  ],
+  "safety_notes": [
+    "Không ép mô hình super_t_simple_v1 38.3 m hiện có để đại diện dầm liên tục 480 m",
+    "Thiếu design basis hoặc mô hình phù hợp phải ghi STOP/BLOCKED; không gắn SCREENED chỉ vì đã chạy một script"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260821-b471879e",
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

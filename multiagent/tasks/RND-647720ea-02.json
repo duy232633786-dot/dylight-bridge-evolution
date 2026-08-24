@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-647720ea-02",
+  "title": "Sinh tập giả thuyết và concept đa dạng",
+  "research_question": "Những concept nào có load path/cơ chế vật liệu hợp lý và khác biệt thực sự?",
+  "workstream": "geometry",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G1"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-647720ea/02_concept_portfolio.md"
+  ],
+  "acceptance_criteria": [
+    "Tối thiểu ba concept khác cơ chế, không chỉ đổi kích thước",
+    "Mỗi concept nêu load path, novelty, chế tạo, bảo trì và failure hypothesis",
+    "Render hoặc ý tưởng AI được gắn nhãn IDEA"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-647720ea/02_concept_portfolio.md"
+  ],
+  "safety_notes": [
+    "Hình đẹp không phải bằng chứng chịu lực; vật liệu mới không vào production catalog"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260821-647720ea",
+  "preferred_provider": "antigravity",
+  "preferred_role": "form_inventor",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-015",
+  "agent_id": "claude",
+  "role": "independent_reproducer",
+  "summary": "Sua loi lam thi nghiem xac nhan 20 seed sinh phan quyet tu du lieu RONG. LOI GOC: runner doc record objectives nhu DICT (item[objectives][relative_cost], gate bang '\"relative_cost\" in item[objectives]') trong khi BudgetedEvaluator luu objectives la TUPLE theo thu tu OBJECTIVE_KEYS. Dieu kien do kiem mot CHUOI co nam trong tuple cac SO hay khong nen LUON False. Hau qua do duoc: moi run bao feasible_count 0 va best_cost None, ke ca arm A1 nsga2 la arm ma ta biet chac tim duoc 312-358 phuong an kha thi va cham toi uu vet can 2072.94; archive_size lai 1-4 nen ban ghi TU MAU THUAN; n_paired_seeds 0; va tu do runner van phat bieu phan quyet KHONG DAT (H0 giu vung). Kiem chung trUC tiep: cung mot run nsga2(120, seed 42) cho 0 phuong an kha thi theo cach doc cu va 85 phuong an theo cach doc dung. Day la CUNG LOP LOI voi pymoo_adapter da va o BRD-009. Ngoai ra ket qua da ACCEPTED chi chay 1 seed (n_runs_total 8 = 4 arm x 2 thuat toan x 1 seed) trong khi pre-registration dang ky 20 seed. DA SUA BA THU: (1) doc objectives bang OBJECTIVE_KEYS.index; (2) CAM phat bieu phan quyet khi n_paired_seeds bang 0 hoac duoi nua so seed dang ky - tra ve KHONG KET LUAN DUOC thay vi KHONG DAT, vi khong dat nghia la da kiem va bac bo con day la chua kiem duoc; (3) ghi seeds_registered, seeds_executed va seed_compliance vao summary, in canh bao khi chay lech so seed. Da them 5 test hoi quy chan ca lop loi. Chay thu 2 seed sau khi va: best_cost ra so that va KHOP CHINH XAC voi run A/B truoc (A2 nsga2 seed 42 = 2008.95; A3 nsga2 seed 43 = 2057.71), phan quyet tu choi ket luan dung cach. Da phong chay day du 20 seed o nen.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "experiments/run_grammar_ab_confirmatory.py",
+      "sha256": "cf5c5e96f5dbae21c25191f760394663f393fe117ea7586a606a594493c5ac6d",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_grammar_ab_confirmatory.py",
+      "sha256": "4b3b0bf084d20c3b2fe68f88a43ae9aeca8190ea9d854d8a644419838ed9d177",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Phan quyet KHONG DAT trong confirmatory_ab_20260821T081427Z la VO GIA TRI, sinh tu du lieu rong; khong duoc trich dan",
+    "NgUONG toi thieu seed ghep cap dat la max(3, 50 phan tram so seed dang ky) - day la lua chon ky thuat cua owner, chua co trong pre-registration goc"
+  ],
+  "unresolved_risks": [
+    "SU CO PROVENANCE do chinh owner gay ra: hai file nay da duoc BRD-013 hash va ACCEPTED; sua chung lam drift hash va lam lab validate DO. Da chay correct-provenance cho tests/test_grammar_ab_confirmatory.py (INC-BRD-013-003) va dang CHO review doc lap",
+    "Bytes goc cua experiments/run_grammar_ab_confirmatory.py KHONG TAI DUNG DUOC (khong co trong git, buoc sua da chuan hoa line-ending) nen CHUA the correct-provenance cho artifact do; can reviewer hoac chu du an quyet dinh cach xu ly",
+    "Bai hoc: truoc khi sua bat ky file nao, phai kiem xem no co nam trong artifact cua mot handoff da ACCEPTED khong"
+  ],
+  "next_action": "codex chay lab review-provenance cho INC-BRD-013-003; quyet dinh cach xu ly artifact runner khong tai dung duoc; sau do doc ket qua chay 20 seed"
+}

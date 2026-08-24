@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-013",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "Hoan tat pre-registration khoa truoc, script chay thu nghiem A/B xac nhan 20 seed voi 4 arm (A1, A4 kiem soat girder_count 5-6, A2, A3), phuong phap bootstrap 95% CI va bo test hoi quy.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "experiments/preregistration/grammar_ab_confirmatory.json",
+      "sha256": "16f1b79905298e5b7de8d328e3723b4467900423fb561cdf3f9cd1ce434cfe4d",
+      "kind": "code"
+    },
+    {
+      "path": "experiments/run_grammar_ab_confirmatory.py",
+      "sha256": "0fcadbe7558db4f82ad38870ee0a29dcf4117d5207f6d1210690f8e8641947d6",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_grammar_ab_confirmatory.py",
+      "sha256": "da1f9db9e70247c7fa642c379d1aa02f40ccda283d618078596d93cf410f96bd",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "20 seed (42..61) giam sai so lay mau so voi 3 seed cua pilot",
+    "Arm A4 bo confound so luong dam de danh gia chinh xac hieu ung tu do hinh dang v2"
+  ],
+  "unresolved_risks": [
+    "Ket qua L1 can duoc kiem chung L2 Midas o BRD-014 truoc khi ap dung thuc te"
+  ],
+  "next_action": "Independent review boi Codex/OpenCode va chay full matrix 20 seed"
+}

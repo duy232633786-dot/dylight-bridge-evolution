@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-013-005",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-005",
+  "agent_id": "antigravity",
+  "role": "evidence_safety_auditor",
+  "summary": "Cap nhat test suite theo BRD-015",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/4b3b0bf084d20c3b2fe68f88a43ae9aeca8190ea9d854d8a644419838ed9d177.blob",
+    "sha256": "4b3b0bf084d20c3b2fe68f88a43ae9aeca8190ea9d854d8a644419838ed9d177"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_grammar_ab_confirmatory.py",
+    "previous_sha256": "4b3b0bf084d20c3b2fe68f88a43ae9aeca8190ea9d854d8a644419838ed9d177",
+    "current_sha256": "09a1073df491d4df6f2fffcbc7ecea2c483b5001f746d6861da3b2ac5888f02d"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_grammar_ab_confirmatory.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": "9302b47259688d98c15438d96a6c3665bf6e193a57eccb6792d6d1f9b1408bec"
+}

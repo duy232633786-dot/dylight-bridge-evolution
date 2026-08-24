@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-de91cf48b8434185",
+  "amendment_sha256": "aae408efdc66a42c97e8198a066d56c2829aebaa2778dd83aa3fb8252c6b4d8b",
+  "created_at": "2026-08-21T09:55:04.524740Z",
+  "task_id": "RND-b471879e-05",
+  "authorized_by": "user-via-codex",
+  "reason": "Fail-closed re-scope: synthesis knowledge F0 khong duoc tu phe duyet G0; chi tong hop lineage, negative results va lo trinh kiem chung.",
+  "pre_task_sha256": "b6a6c19d1d01e5cd64a8030633dd3460d91de9a626f993a57a93b4600b7cea6e",
+  "post_task_sha256": "f167ef04fb456f21b36672e21a2b9237e4594c9d36658908a3c6a04bde29723a",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/b6a6c19d1d01e5cd64a8030633dd3460d91de9a626f993a57a93b4600b7cea6e.json",
+    "sha256": "b6a6c19d1d01e5cd64a8030633dd3460d91de9a626f993a57a93b4600b7cea6e"
+  },
+  "changes": [
+    {
+      "field": "acceptance_criteria",
+      "before": [
+        "Liên kết mọi kết luận tới artifact/hash và nêu uncertainty",
+        "Giữ kết quả âm, failed hypotheses và next experiment",
+        "Nêu rõ claims allowed/forbidden và human gates còn thiếu"
+      ],
+      "after": [
+        "Liên kết mọi phát biểu tới brief, amendment, artifact, handoff và review hash; nêu uncertainty",
+        "Giữ nguyên kết quả âm, failed hypotheses, STOP conditions và cả ba concept NOT_TESTED",
+        "Nêu rõ allowed claims chỉ ở IDEA/F0 và forbidden claims gồm GA_eq 85%, web area -60%, MD/ML 1.8, nhịp 480 m khả thi hay build-ready",
+        "Lập checklist thí nghiệm tiếp theo cho design basis G0, equilibrium/G1, reproducibility/G2, L2 verification và material provenance/durability G6",
+        "Xác nhận knowledge mirror Obsidian và không gọi báo cáo STOP là thiết kế thực"
+      ]
+    },
+    {
+      "field": "required_gates",
+      "before": [
+        "G0"
+      ],
+      "after": []
+    },
+    {
+      "field": "research_question",
+      "before": "Có thể kết luận điều gì, chưa thể kết luận điều gì và thử nghiệm tiếp theo là gì?",
+      "after": "Từ các artifacts F0 đã review, có thể kết luận điều gì, tuyệt đối chưa thể kết luận điều gì, và dữ liệu/thử nghiệm nào phải hoàn thành trước G0-G2/L2/G6?"
+    },
+    {
+      "field": "safety_notes",
+      "before": [
+        "Không gọi kết quả SCREENED là thiết kế thực hoặc build-ready"
+      ],
+      "after": [
+        "Synthesis không phê duyệt physics gate; mọi performance target vẫn UNVERIFIED",
+        "Không gọi kết quả IDEA/F0 là SCREENED, thiết kế thực hoặc build-ready"
+      ]
+    },
+    {
+      "field": "title",
+      "before": "Tổng hợp quyết định, lineage và bài học dài hạn",
+      "after": "Tổng hợp quyết định F0, lineage và lộ trình kiểm chứng vật lý"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "READY",
+  "run_id": "RUN-20260821-b471879e"
+}

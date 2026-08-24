@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-011",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Task khac phuc quy trinh do reviewer codex yeu cau o BRD-009 (gate G2 FAIL: sua file ngoai write_scope). Hai file test duoi day duoc viet TRONG BRD-009 nhung nam NGOAI write_scope cua task do; task nay nhan trach nhiem ve chung, khong xoa va khong noi long khang dinh nao cua test cu. NOI DUNG: (1) tests/test_rl_env.py them 4 test khoa lo hong reward hacking muc CRITICAL. Ban va truoc do chi dong duong feasible sang feasible, va chinh test cu tao cam giac an toan SAI vi no chi kiem dung nhanh do. Duong farm THAT la infeasible sang feasible tren hai gene DA CACHE: ban cu cong thang +1.0 moi lan vao vung kha thi trong khi buoc ra chi mat khoang 0.07, nen chu trinh sinh reward duong lon ma KHONG ton mot lan goi solver nao; do duoc tren Q-learning that: 53 phan tram so buoc la cache hit va chung chiem 71-78 phan tram tong reward. Bon test moi kiem MOI loai chu trinh dong (feasible-feasible, feasible-chinh no, feasible-infeasible, infeasible-infeasible), chu trinh dai 25 buoc phai lo va phai thua ca SUBMIT ngay, tinh chat potential-based cua shaping, va dong luc vao vung kha thi khong bi mat. Do duoc: dao dong 25 buoc tu +9.79 xuong -3.45. (2) tests/test_surrogate.py them 3 test khoa KET QUA AM ve surrogate ranking: mac dinh khong duoc quay lai 'reward' (ban do duoc la te nhat, thua 5/6 lan chay), ba che do ranking deu chay va ton trong ngan sach, va ranking la khong hop le thi phai raise. Ly do ky thuat cua ket qua am: phuong an toi uu nam DUNG tren bien kha thi noi P(kha thi) thap nhat, nen toi da hoa P(kha thi) keo tim kiem ROI KHOI vung toi uu. Toan bo 290 test xanh.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "tests/test_rl_env.py",
+      "sha256": "5e380e59129dd33f609f47ad5f72f1902fd875e04dbbfb290e6753c64ed64964",
+      "kind": "test"
+    }
+  ],
+  "assumptions": [
+    "Cac test nay chi khoa hanh vi HAM REWARD va CHU KY XEP HANG, khong khang dinh gi ve chat luong thiet ke cau",
+    "Ket luan ve surrogate ranking dua tren 3 seed moi grammar, budget 150 - qua it de chac chan, chi la tin hieu dinh huong"
+  ],
+  "unresolved_risks": [
+    "Test hoi quy la thu duy nhat chan reward hacking tai phat; bat ky thay doi nao lam chung yeu di phai bi reviewer chan",
+    "File test duoc viet truoc khi task nay ton tai; day la hop thuc hoa co khai bao, khong phai quy trinh chuan va khong duoc lay lam tien le"
+  ],
+  "next_action": "Reviewer khac claude kiem lai do chat cua 7 test moi va xac nhan khong test cu nao bi noi long"
+}

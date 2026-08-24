@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-013-001",
+  "task_id": "BRD-013",
+  "detected_at_utc": "2026-08-21T08:11:18.601991Z",
+  "detected_by": "provenance_repair_impl",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "artifact_path": "experiments/run_grammar_ab_confirmatory.py",
+  "recorded_sha256": "0fcadbe7558db4f82ad38870ee0a29dcf4117d5207f6d1210690f8e8641947d6",
+  "observed_sha256": "f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0",
+  "reason": "Antigravity applied a real BudgetedEvaluator API bugfix after r001 was hashed and reviewed; history must not be rewritten.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

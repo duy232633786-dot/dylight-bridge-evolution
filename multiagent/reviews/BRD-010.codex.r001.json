@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-010",
+  "handoff_sha256": "5ddd280a8d66e24be32b6008d6c95aa5f32155f662f9f1d2a396848af0a646f2",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Artifact SHA-256 matches. Targeted and full tests pass. Independent samples from the reviewed run report BRIDGE-RULESET-V1/1.1.0 for A1 and BRIDGE-RULESET-V2/2.0.0 for A2; v1 history/counters/proposals/Pareto also match baseline byte-for-byte in a detached worktree smoke rerun."
+    }
+  ],
+  "notes": "APPROVE: nhãn provenance nay phản ánh đúng rule profile thực sự áp dụng. Hash artifact khớp, test targeted và toàn bộ đều xanh; mẫu raw A1/V1 và A2/V2 khai đúng version. Việc rà solver_version/grammar_version là hardening kế tiếp, không chặn acceptance BRD-010."
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-009",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "[DINH CHINH BAN GHI] Ban r001 nay ban dau bi nop voi mot summary GIA do mot lenh chan doan cua chinh owner (dang thu tim nguyen nhan loi submit) vo tinh nop that. Noi dung duoi day la ban ghi dung, viet lai ngay sau do; khong truong nao khac bi sua va artifact sha256 giu nguyen. Su co duoc khai bao tai day thay vi giau di.\n\nKET QUA BRD-009. (1) LOI DA GRAMMAR: gene_order/gene_domains suy tu file grammar thay vi hang GENE_ORDER 8 bien v1; random_search/nsga2/pymoo/surrogate/rl_env deu nhan grammar_id. Tuong thich nguoc v1 duoc reviewer doc lap xac nhan TRUNG TUNG BYTE qua hai duong doc lap: dung lai ban cu chay doi dau (history/counters/Pareto trung 100%) va so voi artifact ghi TRUOC khi sua. (2) THI NGHIEM A/B: 3 arm x 2 thuat toan x 3 seed x 600 solver call, khop run matrix da dang ky; ca 18 run tieu DUNG 600 solver call (dieu kien cung ngan sach kiem chung duoc trong artifact). Phan quyet theo tieu chi khoa truoc la VO HIEU - khong ket luan duoc theo huong nao - vi dieu kien DEGENERATE_FRONT kich hoat o 7/18 run: Pareto front co ve 1-2 diem nen ve hypervolume cua tieu chi mat y nghia. VO HIEU KHONG phai ket qua duong. Ban runner dau tien tung xuat ra 'KET QUA AM' cho chinh bo so lieu nay vi khong ap dung chinh cac dieu kien vo hieu ma pre-registration da khai; reviewer doi khang phat hien, sau khi sua thi cung du lieu cho phan quyet dung la VO HIEU. (3) QUAN SAT PHU (khong phai ket luan da kiem): NSGA-II tren arm A1 tai lap DUNG toi uu toan cuc da vet can 2072.94, seed 43/44 dat exact_oracle_front va oracle_recall 1.0. Arm A2 (tham so hoa, CUNG dai be tong C40-C50 nhu v1) cho 2027.90 / 2021.39 / 2008.95 tren ba seed, tuc gap -2.17 / -2.49 / -3.09 phan tram so oracle va hv_2d_ratio > 1. Arm A3 (them C55/C60) KEM HON A2 nen theo quy tac quy ket da dang ky, phan cai thien KHONG quy duoc cho be tong cuong do cao. Tiet dien AI tu thiet ke cao hon 14.3 phan tram, dien tich chi hon 6.8 phan tram nhung mo men quan tinh hon 63 phan tram, va giam tu 42 xuong 34 tao cap; phuong an nam DUNG tren bien che tao (suon 100mm = nguong FAB-001, canh 90mm = nguong FAB-002) - xac nhan thuc nghiem rang nhom rule FAB la thu giu toi uu trong vung san xuat duoc. (4) KET QUA AM VE SURROGATE: sau khi sua tap fit (tren v2 loai 5396/5474 ban ghi khong chay solver), xep hang bang P(kha thi) VAN TE HON ban bo han surrogate (thua 5/6 lan chay, budget 150). Nguyen nhan ky thuat: phuong an toi uu nam dung tren bien kha thi - noi P(kha thi) thap nhat - nen toi da hoa P(kha thi) keo tim kiem ROI KHOI vung toi uu. Da doi mac dinh ranking ve 'none' va khoa bang test. (5) DA SUA 12 finding CONFIRMED cua reviewer doi khang, gom 2 CRITICAL: reward hacking qua chu trinh infeasible-feasible tren gene da cache (Q-learning that lay 71-78 phan tram tong reward tu cache hit; dong bang potential-based shaping, dao dong 25 buoc tu +9.79 xuong -3.45), va pymoo_adapter doc objective qua nhanh chet nen F luon 1e6 (pymoo toi uu ham hang so va bao cao 1e6 nhu chi phi da tinh; sau khi sua, pymoo tim dung 2072.94). Toan bo 290 test xanh.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "experiments/results/grammar_ab_20260821T061537.020446Z/summary.md",
+      "sha256": "b959c2a5e37dfa225c869a4b703f83925ca299bc77872c8917719b490d765635",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Don gia va he so carbon trong catalogs.json van la placeholder (gate muc 7 research contract) nen moi con so tiet kiem chi la tuong doi trong cung mot run",
+    "Oracle vet can duoc tinh voi catalogs 1.0.0; catalogs 1.1.0 chi THEM entry nen ket qua v1 khong doi - da xac nhan bang viec A1 nsga2 tim dung 2072.94",
+    "Ba muc tieu tuong quan rat manh (cost-carbon 0.93) nen bai toan gan don muc tieu; moi nhan dinh dua vao best cost chu khong dua vao hinh dang Pareto"
+  ],
+  "unresolved_risks": [
+    "VO HIEU nghia la CHUA KIEM DUOC; can chay lai voi it nhat 20 seed va thiet ke lai tieu chi de tach hai cau hoi: khong gian thiet ke co tot hon khong, va thuat toan co du manh de khai thac khong",
+    "Confound chua boc tach: A1 tim tren girder_count 5-8 con A2/A3 chi co 5-6; can arm thu tu la v1 gioi han 5-6",
+    "Ket qua L1 line-girder kem tin cay nhat DUNG voi tiet dien manh sat bien FAB - dung loai phuong an ma A2 tim ra; bat buoc doi chieu L2 Midas truoc khi ban tiep",
+    "tests/test_pymoo_optimization.py import pymoo o cap module nen se lam DUNG ca bo test neu moi truong khong co pymoo; nam ngoai write_scope BRD-009",
+    "Ket luan ve surrogate chi dua tren 3 seed moi grammar - qua it de chac chan, moi la tin hieu dinh huong"
+  ],
+  "next_action": "Chay lai A/B voi >=20 seed va them arm v1 gioi han girder_count 5-6, pre-register tieu chi moi TRUOC khi chay; doi chieu L2 Midas Civil cho nhom phuong an sat bien FAB; mo task moi de them pytest.importorskip cho tests/test_pymoo_optimization.py"
+}

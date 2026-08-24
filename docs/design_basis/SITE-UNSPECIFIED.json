@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.1",
+  "site_id": "SITE-UNSPECIFIED",
+  "site_status": "UNSPECIFIED_PLACEHOLDER",
+  "site_status_note": "HỒ SƠ RỖNG CÓ CHỦ ĐÍCH — ĐÂY KHÔNG PHẢI MỘT VỊ TRÍ THẬT. Dự án NCKH 2026 (docs/01_research_contract.md, RC-1.1) khóa nhịp 38,3 m, khổ 12,0 m, tải HL-93 và tuyến thẳng skew 0, nhưng KHÔNG có tọa độ, KHÔNG có hố khoan địa chất, KHÔNG có số liệu thủy văn, KHÔNG có vùng động đất và KHÔNG có cấp ăn mòn đo đạc. Vì vậy mọi trường hazard dưới đây đều UNKNOWN. Việc để trống là KẾT LUẬN của hồ sơ, không phải thiếu sót: điền một tỉnh/thành, một cấp động đất, một vận tốc gió hay một loại đất 'nghe hợp lý' vào đây là lỗi nghiêm trọng hơn để trống. Schema (contracts/site_hazard_profile.schema.json) tự chặn: khi site_status = UNSPECIFIED_PLACEHOLDER, không trường hazard nào được mang trạng thái KNOWN.",
+  "applicable_design_basis_ref": "docs/design_basis/DB-SUPERT-38M.json",
+  "coordinate_reference_system": {
+    "horizontal_crs": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cần hồ sơ khảo sát trắc địa tuyến của chủ đầu tư: hệ tọa độ quốc gia, múi chiếu và mốc khống chế. Repo không có hồ sơ vị trí nào."
+    },
+    "vertical_datum": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cần mốc và hệ cao độ quốc gia trong hồ sơ khảo sát trắc địa; chưa có."
+    },
+    "survey_control": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cần sơ đồ mốc khống chế mặt bằng/cao độ được nghiệm thu; chưa có."
+    },
+    "station_reference": {
+      "status": "UNKNOWN",
+      "resolution_path": "Lý trình đầu/cuối cầu trên tuyến lấy từ hồ sơ thiết kế tuyến; chưa có."
+    }
+  },
+  "geographic_location": {
+    "latitude": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tọa độ vị trí do chủ đầu tư/nhiệm vụ thiết kế cung cấp kèm hồ sơ khảo sát trắc địa. Không được suy đoán từ việc dự án áp dụng TCVN."
+    },
+    "longitude": {
+      "status": "UNKNOWN",
+      "resolution_path": "Như trên — tọa độ phải đến từ hồ sơ vị trí thật, không từ giả định."
+    },
+    "terrain_category": {
+      "status": "UNKNOWN",
+      "resolution_path": "Phân loại dạng địa hình (phục vụ tính gió) chỉ xác định được sau khi có vị trí: khảo sát địa hình và độ nhám bề mặt xung quanh trong phạm vi ảnh hưởng theo tiêu chuẩn tải trọng gió hiện hành (kỹ sư xác nhận phiên bản áp dụng)."
+    },
+    "administrative_area": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tỉnh/thành và địa giới hành chính lấy từ quyết định phê duyệt dự án; chưa có. TUYỆT ĐỐI không được điền một địa danh minh họa."
+    },
+    "elevation_m": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cao độ tự nhiên tại vị trí lấy từ bình đồ/trắc dọc khảo sát; chưa có."
+    }
+  },
+  "seismic_hazard": {
+    "pga_g": {
+      "status": "UNKNOWN",
+      "resolution_path": "Gia tốc nền thiết kế tra theo bản đồ phân vùng gia tốc nền/đỉnh gia tốc nền quốc gia cho ĐÚNG tọa độ vị trí (tiêu chuẩn thiết kế công trình chịu động đất hiện hành; kỹ sư xác nhận phiên bản). Chưa có tọa độ ⇒ không tra được."
+    },
+    "site_class": {
+      "status": "UNKNOWN",
+      "resolution_path": "Phân loại nền theo kết quả khảo sát địa chất công trình (Vs30 hoặc N-SPT/Su theo chiều sâu 30 m). Repo chưa có bất kỳ hố khoan nào."
+    },
+    "seismic_performance_zone": {
+      "status": "UNKNOWN",
+      "resolution_path": "Vùng tính năng động đất suy ra từ gia tốc nền thiết kế và phân loại nền theo TCVN 11823 — cả hai đầu vào đều đang UNKNOWN."
+    },
+    "design_response_spectrum": {
+      "status": "UNKNOWN",
+      "resolution_path": "Phổ phản ứng thiết kế chỉ dựng được sau khi có gia tốc nền và phân loại nền tại vị trí."
+    },
+    "liquefaction_potential": {
+      "status": "UNKNOWN",
+      "resolution_path": "Đánh giá hóa lỏng cần địa tầng, mực nước ngầm và N-SPT hiệu chỉnh từ khảo sát địa chất; chưa có."
+    }
+  },
+  "wind_hazard": {
+    "basic_wind_speed_m_s": {
+      "status": "UNKNOWN",
+      "resolution_path": "Vận tốc gió cơ bản tra theo số liệu điều kiện tự nhiên dùng trong xây dựng cho đúng vị trí, quy đổi về chu kỳ lặp mà TCVN 11823-3 yêu cầu. Chưa có vị trí ⇒ không tra được."
+    },
+    "gust_effect_factor": {
+      "status": "UNKNOWN",
+      "resolution_path": "Hệ số giật phụ thuộc dạng địa hình và chu kỳ dao động kết cấu; dạng địa hình đang UNKNOWN."
+    },
+    "aerodynamic_risk_level": {
+      "status": "UNKNOWN",
+      "resolution_path": "Đánh giá rủi ro khí động cần vận tốc gió tại vị trí và phân tích ổn định khí động (flutter/galloping/vortex shedding). Runtime hiện chỉ có L0 + L1 tĩnh, không có bất kỳ mô-đun khí động nào (docs/runtime_capability_matrix.md).",
+      "note": "Với dầm Super-T giản đơn 38,3 m, rủi ro khí động thường thấp — nhưng 'thường thấp' KHÔNG phải bằng chứng, nên trường này vẫn là UNKNOWN chứ không được hạ thành LOW."
+    },
+    "wind_return_period_years": {
+      "status": "UNKNOWN",
+      "resolution_path": "Chu kỳ lặp thiết kế do tiêu chuẩn áp dụng và cấp công trình quy định; cấp công trình chưa được ấn định trong RC-1.1."
+    },
+    "typhoon_exposure": {
+      "status": "UNKNOWN",
+      "resolution_path": "Mức phơi nhiễm bão phụ thuộc vùng ven biển/nội địa của vị trí; chưa có vị trí."
+    }
+  },
+  "hydrology_scour": {
+    "design_flood_frequency_years": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tần suất lũ thiết kế do cấp công trình và tiêu chuẩn thủy văn cầu quy định, áp cho lưu vực THỰC tại vị trí. Chưa biết cầu vượt sông hay vượt đường ⇒ chưa xác định được."
+    },
+    "estimated_scour_depth_m": {
+      "status": "UNKNOWN",
+      "resolution_path": "Chiều sâu xói tính từ khảo sát thủy văn (chuỗi mực nước, lưu lượng, mặt cắt lòng sông, thành phần hạt lòng sông) theo TCVN 11823-2; repo không có số liệu thủy văn nào."
+    },
+    "tidal_range_m": {
+      "status": "UNKNOWN",
+      "resolution_path": "Biên độ triều chỉ có nghĩa khi biết vị trí có chịu ảnh hưởng triều hay không; cần trạm đo triều gần nhất sau khi có vị trí."
+    },
+    "design_water_level_m": {
+      "status": "UNKNOWN",
+      "resolution_path": "Mực nước thiết kế/mực nước thông thuyền lấy từ tính toán thủy văn cho lưu vực thật; chưa có."
+    },
+    "navigation_clearance": {
+      "status": "UNKNOWN",
+      "resolution_path": "Khổ thông thuyền do cấp đường thủy nội địa tại vị trí quy định; chưa biết cầu vượt vật cản gì. Trường này chỉ được chuyển sang NOT_APPLICABLE kèm lý do khi hồ sơ xác nhận cầu KHÔNG vượt tuyến đường thủy."
+    },
+    "debris_or_vessel_impact": {
+      "status": "UNKNOWN",
+      "resolution_path": "Lực va do vật trôi/tàu thuyền cần cấp đường thủy, kích cỡ tàu thiết kế và vận tốc dòng tại vị trí; chưa có."
+    }
+  },
+  "geotechnical_category": {
+    "status": "UNKNOWN",
+    "resolution_path": "Phân loại nền cần khảo sát địa chất công trình thật: hố khoan, thí nghiệm hiện trường (SPT/CPT), thí nghiệm trong phòng và mặt cắt địa chất dọc tim cầu, theo bộ TCVN về khảo sát địa kỹ thuật và TCVN 11823-10. Repo hiện KHÔNG có một hố khoan nào.",
+    "note": "Không có địa chất thì không có sức chịu tải cọc, không có độ lún, không có phân loại nền động đất — nghĩa là không có mố trụ và móng. Đây là lý do L2 sau này chỉ kiểm chứng được kết cấu nhịp/cấu kiện."
+  },
+  "corrosion_exposure": {
+    "status": "UNKNOWN",
+    "resolution_path": "Cấp ăn mòn/phơi nhiễm cần: khoảng cách tới bờ biển, hàm lượng clorua trong không khí/nước, nguồn hóa chất công nghiệp, chu kỳ ẩm–khô tại vị trí. Chưa có vị trí ⇒ chưa xác định được. Trường này phải đồng bộ với exposure_class trong docs/design_basis/DB-SUPERT-38M.json (cũng đang UNKNOWN)."
+  },
+  "thermal_environment": {
+    "design_temperature_range": {
+      "status": "UNKNOWN",
+      "resolution_path": "Biên độ nhiệt thiết kế và gradient nhiệt lấy theo số liệu khí hậu tại vị trí; chưa có vị trí. Runtime cũng chưa có trường hợp tải nhiệt."
+    },
+    "thermal_gradient": {
+      "status": "UNKNOWN",
+      "resolution_path": "Gradient nhiệt theo TCVN 11823-3 phụ thuộc vùng khí hậu và loại kết cấu; chưa xác định được vùng khí hậu."
+    }
+  },
+  "obstacle_crossed": {
+    "obstacle_type": {
+      "status": "UNKNOWN",
+      "resolution_path": "Chưa biết cầu vượt sông, vượt đường bộ, đường sắt hay thung lũng. Đây là đầu vào gốc quyết định thủy văn/xói, tĩnh không, va tàu/va xe — nên nó phải được khóa TRƯỚC các trường trên."
+    },
+    "clearance_requirement": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tĩnh không đứng/ngang do cơ quan quản lý vật cản bên dưới quy định; chưa có vật cản xác định."
+    }
+  },
+  "g0_gate": {
+    "gate": "G0",
+    "status": "BLOCKED",
+    "assessed_by": "claude (agent) — CHƯA có kỹ sư cầu duyệt",
+    "assessed_on": "2026-08-21",
+    "blocking_items": [
+      "Không có tọa độ vị trí và không có hệ quy chiếu tọa độ/cao độ.",
+      "Không có khảo sát địa chất công trình: không hố khoan, không SPT/CPT, không mặt cắt địa chất.",
+      "Không có số liệu thủy văn: không mực nước, không lưu lượng, không tính xói.",
+      "Không có số liệu gió tại vị trí và không có mô-đun khí động trong runtime.",
+      "Không có phân vùng động đất, phổ phản ứng hay phân loại nền động đất.",
+      "Không có cấp ăn mòn/phơi nhiễm đo đạc.",
+      "Chưa biết cầu vượt vật cản gì nên chưa khóa được tĩnh không và lực va."
+    ],
+    "blocked_claims": [
+      "Mọi phát biểu về khả năng chịu động đất, gió/khí động, xói, va tàu/va xe của phương án.",
+      "Mọi phát biểu về tuổi thọ theo môi trường, độ bền lâu, lớp bảo vệ cốt thép.",
+      "Mọi phát biểu về mố trụ, móng, sức chịu tải cọc và độ lún.",
+      "Mọi phát biểu dạng 'cây cầu này khả thi tại vị trí X'."
+    ],
+    "note": "G0 BLOCKED là kết luận ĐÚNG SỰ THẬT của hồ sơ này, không phải lỗi quy trình. multiagent/PHYSICS_GATES.md: 'Thiếu dữ liệu thì dừng'. Hồ sơ vẫn hợp lệ về mặt schema vì mỗi ô trống đều nói rõ cái gì sẽ lấp nó."
+  },
+  "document_provenance": {
+    "task_id": "BRD-002",
+    "prepared_by": "claude (agent)",
+    "prepared_on": "2026-08-21",
+    "review_status": "PENDING_HUMAN_REVIEW",
+    "claim_ceiling": "IDEA",
+    "note": "Không có trường KNOWN nào trong hồ sơ này — theo đúng thiết kế. Tên các tiêu chuẩn nêu trong resolution_path là CHỈ DẪN HƯỚNG GIẢI QUYẾT, kỹ sư phải xác nhận phiên bản hiệu lực trước khi dùng."
+  }
+}

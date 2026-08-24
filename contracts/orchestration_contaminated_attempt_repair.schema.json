@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "orchestration_contaminated_attempt_repair.schema.json",
+  "title": "BridgeLabContaminatedAttemptRepair",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "repair_id", "created_at", "kind", "run_id", "task_id",
+    "attempt", "authorized_by", "reason", "run_status_unchanged",
+    "previous_run_sha256", "knowledge_sync_before", "knowledge_sync_after",
+    "failed_attempt", "manifest_sha256", "tasks", "moved",
+    "evidence_disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "repair_id": {"type": "string", "pattern": "^CAR-[a-f0-9]{16}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "kind": {"const": "CONTAMINATED_ATTEMPT_FAIL_CLOSED_REPAIR"},
+    "run_id": {"type": "string", "pattern": "^RUN-[0-9]{8}-[a-f0-9]{8}$"},
+    "task_id": {"type": "string", "pattern": "^RND-[a-f0-9]{8}-[0-9]{2}$"},
+    "attempt": {"type": "integer", "minimum": 1, "maximum": 6},
+    "authorized_by": {"type": "string", "minLength": 2, "maxLength": 64},
+    "reason": {"type": "string", "minLength": 5, "maxLength": 1000},
+    "run_status_unchanged": {"const": "FAILED"},
+    "previous_run_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "knowledge_sync_before": {"enum": ["PENDING", "SYNCED", "CONFLICT"]},
+    "knowledge_sync_after": {"const": "PENDING"},
+    "failed_attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "provider", "success"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^runs/RUN-[^/]+/attempts/[^/]+\\.work\\.r[0-9]{3}\\.json$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "provider": {"enum": ["codex", "claude", "opencode", "antigravity"]},
+        "success": {"const": false}
+      }
+    },
+    "manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path", "task_id", "relationship", "attempt_count",
+          "pre_task_sha256", "post_task_sha256", "pre_lifecycle", "post_lifecycle"
+        ],
+        "properties": {
+          "path": {"type": "string", "pattern": "^multiagent/tasks/RND-[^/]+\\.json$"},
+          "task_id": {"type": "string", "pattern": "^RND-[a-f0-9]{8}-[0-9]{2}$"},
+          "relationship": {"enum": ["TRIGGER", "DOWNSTREAM"]},
+          "attempt_count": {"type": "integer", "minimum": 0, "maximum": 6},
+          "pre_task_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "post_task_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "pre_lifecycle": {"$ref": "#/$defs/lifecycle"},
+          "post_lifecycle": {"$ref": "#/$defs/lifecycle"}
+        }
+      }
+    },
+    "moved": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_path", "quarantine_path", "category", "sha256", "disposition"
+        ],
+        "properties": {
+          "source_path": {"type": "string", "minLength": 3},
+          "quarantine_path": {
+            "type": "string",
+            "pattern": "^quarantine/contaminated_attempts/CAR-[a-f0-9]{16}/(handoffs|reviews|artifacts)/[^/]+$"
+          },
+          "category": {"enum": ["HANDOFF", "REVIEW", "ARTIFACT"]},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "disposition": {"const": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"}
+        }
+      }
+    },
+    "evidence_disposition": {"const": "REPAIR_RECORD_NOT_TECHNICAL_EVIDENCE"}
+  },
+  "$defs": {
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "owner", "reviewer", "review_notes"],
+      "properties": {
+        "status": {"enum": ["READY", "ACTIVE", "REVIEW", "BLOCKED", "ACCEPTED", "REJECTED"]},
+        "owner": {"type": ["string", "null"]},
+        "reviewer": {"type": ["string", "null"]},
+        "review_notes": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

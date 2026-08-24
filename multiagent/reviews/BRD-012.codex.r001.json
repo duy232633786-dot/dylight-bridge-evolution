@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-012",
+  "handoff_sha256": "c5b26fcfdd05074acee2aba0214e70138d94ff4a90d0fb21d47c8e6cd36375ac",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Artifact SHA def686337c9c3e82d0d29ac44aa81c4d1c6a267b058370d614fbaa5307aa1edc matches and targeted/full tests pass, but the submitted handoff declares only G0 while the task contract requires G2; immutable handoff metadata must record the tested gate."
+    }
+  ],
+  "notes": "Implementation is correct: pytest.importorskip precedes adapter import and does not catch internal ImportError. Resubmit a new revision with G2 in gates_completed and cite the passing test; this does not by itself declare pymoo as an installed runtime dependency."
+}

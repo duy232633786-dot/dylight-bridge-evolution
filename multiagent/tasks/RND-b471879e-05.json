@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-05",
+  "title": "Tổng hợp quyết định F0, lineage và lộ trình kiểm chứng vật lý",
+  "research_question": "Từ các artifacts F0 đã review, có thể kết luận điều gì, tuyệt đối chưa thể kết luận điều gì, và dữ liệu/thử nghiệm nào phải hoàn thành trước G0-G2/L2/G6?",
+  "workstream": "knowledge",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-b471879e-01",
+    "RND-b471879e-02",
+    "RND-b471879e-03",
+    "RND-b471879e-04"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-b471879e/05_research_synthesis.md"
+  ],
+  "acceptance_criteria": [
+    "Liên kết mọi phát biểu tới brief, amendment, artifact, handoff và review hash; nêu uncertainty",
+    "Giữ nguyên kết quả âm, failed hypotheses, STOP conditions và cả ba concept NOT_TESTED",
+    "Nêu rõ allowed claims chỉ ở IDEA/F0 và forbidden claims gồm GA_eq 85%, web area -60%, MD/ML 1.8, nhịp 480 m khả thi hay build-ready",
+    "Lập checklist thí nghiệm tiếp theo cho design basis G0, equilibrium/G1, reproducibility/G2, L2 verification và material provenance/durability G6",
+    "Xác nhận knowledge mirror Obsidian và không gọi báo cáo STOP là thiết kế thực"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-b471879e/05_research_synthesis.md"
+  ],
+  "safety_notes": [
+    "Synthesis không phê duyệt physics gate; mọi performance target vẫn UNVERIFIED",
+    "Không gọi kết quả IDEA/F0 là SCREENED, thiết kế thực hoặc build-ready"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260821-b471879e",
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

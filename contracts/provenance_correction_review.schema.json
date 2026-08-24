@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "provenance_correction_review.schema.json",
+  "title": "BridgeLabProvenanceCorrectionReview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "review_id", "task_id", "incident_id", "correction_sha256",
+    "reviewer_id", "decision", "independence_confirmed", "findings", "notes"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "review_id": {"type": "string", "pattern": "^CRV-(?:BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})-[0-9]{3}$"},
+    "task_id": {"type": "string", "pattern": "^(?:BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})$"},
+    "incident_id": {"type": "string", "pattern": "^INC-(?:BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})-[0-9]{3}$"},
+    "correction_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "reviewer_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$"},
+    "decision": {"enum": ["APPROVE", "REVISE", "REJECT"]},
+    "independence_confirmed": {"const": true},
+    "findings": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "string", "minLength": 5}
+    },
+    "notes": {"type": "string", "minLength": 5}
+  }
+}

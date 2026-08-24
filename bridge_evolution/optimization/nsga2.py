@@ -8,7 +8,7 @@ import math
 import random
 
 from ..pareto import ParetoArchive, dominates
-from .common import BudgetedEvaluator, gene_domains, GENE_ORDER
+from .common import DEFAULT_GRAMMAR_ID, BudgetedEvaluator, gene_domains, gene_order
 
 
 def _c_dominates(a: dict, b: dict) -> bool:
@@ -68,19 +68,24 @@ def _crowding(pop: list[dict], front: list[int]) -> dict[int, float]:
 
 
 def nsga2(budget: int, seed: int, pop_size: int = 40,
-          p_crossover: float = 0.9) -> dict:
+          p_crossover: float = 0.9,
+          grammar_id: str = DEFAULT_GRAMMAR_ID) -> dict:
     rng = random.Random(seed)
-    domains = gene_domains()
-    sizes = [len(domains[k]) for k in GENE_ORDER]
-    n_var = len(GENE_ORDER)
+    # Chiều dài gene lấy từ grammar; p_mut = 1/n_var nên tự co giãn khi grammar
+    # v2 thêm 6 biến hình dạng. Với v1, order == GENE_ORDER ⇒ hành vi không đổi.
+    order = gene_order(grammar_id)
+    domains = gene_domains(grammar_id)
+    sizes = [len(domains[k]) for k in order]
+    n_var = len(order)
     p_mut = 1.0 / n_var
 
-    ev = BudgetedEvaluator(budget, generation_action="NSGA2", seed=seed)
+    ev = BudgetedEvaluator(budget, generation_action="NSGA2", seed=seed,
+                           grammar_id=grammar_id)
     archive = ParetoArchive()
     max_proposals = max(10_000, budget * 1000)
 
     def decode(idx_vec):
-        return {k: domains[k][i] for k, i in zip(GENE_ORDER, idx_vec)}
+        return {k: domains[k][i] for k, i in zip(order, idx_vec)}
 
     def evaluate(idx_vec):
         rec = ev.evaluate_gene(decode(idx_vec))
@@ -181,7 +186,8 @@ def nsga2(budget: int, seed: int, pop_size: int = 40,
     config = {**ev.config, "algorithm": "nsga2", "pop_size": pop_size,
               "p_crossover": p_crossover, "p_mutation": p_mut,
               "max_proposals": max_proposals}
-    return {"algorithm": "nsga2", "seed": seed, "pop_size": pop_size,
+    return {"algorithm": "nsga2", "seed": seed, "grammar_id": grammar_id,
+            "pop_size": pop_size,
             "generations": generations, "config": config, "counters": ev.counters,
             "history": ev.history, "proposal_history": ev.proposal_history,
             "archive": archive,

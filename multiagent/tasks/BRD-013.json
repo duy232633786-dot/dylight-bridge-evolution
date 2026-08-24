@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-013",
+  "title": "A/B grammar xác nhận với 20 seed và arm v1 giới hạn 5–6 dầm",
+  "research_question": "Sau khi bóc confound girder_count và bỏ tiêu chí Pareto suy biến, grammar v2 có tăng xác suất tìm nghiệm cost tốt hơn v1 hay không?",
+  "workstream": "experiments",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "codex",
+  "dependencies": [
+    "BRD-009",
+    "BRD-011"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "experiments/preregistration/grammar_ab_confirmatory.json",
+    "experiments/run_grammar_ab_confirmatory.py",
+    "tests/test_grammar_ab_confirmatory.py"
+  ],
+  "acceptance_criteria": [
+    "Pre-registration được hash và lưu trước lần chạy đầu tiên",
+    "Có ít nhất 20 seed và arm thứ tư v1 giới hạn girder_count {5,6}",
+    "Khóa cả solver-call budget lẫn proposal/L0 budget hoặc phân tích hai budget riêng",
+    "Primary endpoint không dựa vào hypervolume/Pareto khi ground truth front suy biến",
+    "Báo hiệu ứng, uncertainty, success-to-oracle và cả kết quả âm/vô hiệu"
+  ],
+  "required_artifacts": [
+    "experiments/preregistration/grammar_ab_confirmatory.json",
+    "experiments/run_grammar_ab_confirmatory.py",
+    "tests/test_grammar_ab_confirmatory.py"
+  ],
+  "safety_notes": [
+    "Không xem kết quả pilot ba seed như dữ liệu xác nhận",
+    "Không đổi hard FAB constraints hoặc threshold sau khi thấy dữ liệu",
+    "Mọi kết luận vẫn chỉ ở mức SCREENED L1"
+  ],
+  "review_notes": [
+    "APPROVE: Phe duyet thiet ke thi nghiem xac nhan 20 seed va 4 arm. Script runner va bo test dat yeu cau governance va physics gates."
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "structural_analyst",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_grammar_ab_confirmatory.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

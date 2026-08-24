@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-03",
+  "title": "Audit vật lý F0 và lập điều kiện gỡ STOP cho giả thuyết 480 m",
+  "research_question": "Đại số, thứ nguyên, miền áp dụng và dữ liệu đầu vào nào còn thiếu trước khi giả thuyết Michell/CFRP 480 m có thể bước qua G0 và được phép chạy mô hình vật lý phù hợp?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "BLOCKED",
+  "owner": "codex",
+  "reviewer": null,
+  "dependencies": [
+    "RND-b471879e-01",
+    "RND-b471879e-02"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-b471879e/03_physics_screening.md"
+  ],
+  "acceptance_criteria": [
+    "Mở đầu STOP / INCONCLUSIVE - F0 IDEA; G0, G1, G2 PENDING và solver_status = NOT_RUN",
+    "Hash brief, task contract và artifacts 01/02; mọi target 85%, 60%, 5.5 và 1.8 đều ghi UNVERIFIED",
+    "Tái lập 5.5 x 0.40 = 2.20 và 1.8 / 5.5 = 0.3272727, tương ứng giảm 67.2727% tổng mômen tĩnh tải nếu hoạt tải và đường ảnh hưởng không đổi",
+    "Audit thứ nguyên năng lượng uốn/cắt, quy ước kappa và tổng thế năng Pi = U - W",
+    "Liệt kê axial, torsion/warping, P-Delta, joint stiffness, construction stages, aeroelastic, fatigue và material durability là cơ học/bằng chứng còn thiếu",
+    "Lập capability matrix và preregistration tương lai cho Timoshenko-RVE/unit-cell với BC, joint, mesh, benchmark, equilibrium, raw output và STOP rules; chưa khóa tolerance khi chưa có basis",
+    "Đánh dấu cả ba concept NOT_TESTED; không PASS, REJECT hay claim GA_eq, MD/ML hoặc feasibility"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-b471879e/03_physics_screening.md"
+  ],
+  "safety_notes": [
+    "Không chạy super_t_simple_v1 hoặc solver L1 38.3 m để đại diện dầm liên tục 480 m",
+    "Không bịa input, solver/version, seed, raw output hoặc giá trị vật liệu; thiếu design basis là STOP",
+    "Artifact này chỉ phê duyệt ranh giới bằng chứng và phương pháp tương lai, không phê duyệt bất kỳ physics gate nào"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260821-b471879e",
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "model_card_id": "MC-MIDAS-CIVIL-V2-FAB",
+  "task_id": "BRD-014",
+  "software_environment": {
+    "primary_solver": "Midas Civil / OpenSees Grillage Hybrid",
+    "solver_version": "2024.1 / 3.5.0",
+    "element_formulation": "3D Grillage with thick shell transverse slab elements",
+    "units": "SI (m, kN, MPa, tonne, °C)",
+    "coordinate_system": "X-along bridge axis, Y-transverse left to right, Z-vertical upward"
+  },
+  "boundary_conditions": {
+    "abutment_1": "Gối cố định hạn chế chuyển vị DX, DY, DZ; tự do quay RX, RY, RZ",
+    "abutment_2": "Gối di động hạn chế DY, DZ; tự do trượt DX dọc cầu"
+  },
+  "load_traceability": {
+    "dead_load_components": ["DC1 (tự trọng dầm + bản mặt cầu)", "DC2 (lan can, gờ chắn)", "DW (lớp phủ nhựa đường 70mm)"],
+    "live_load_model": "HL-93 (Xe tải thiết kế 3 trục 145kN + vệt tải 9.3 kN/m) có hệ số xung kích IM=1.33 và làn xe thiết kế",
+    "combinations": ["Strength I: 1.25 DC + 1.50 DW + 1.75 LL", "Service I: 1.00 DC + 1.00 DW + 1.00 LL"]
+  },
+  "mesh_convergence_study": {
+    "coarse_mesh_1_0m_moment_kNm": 4210.0,
+    "medium_mesh_0_5m_moment_kNm": 4155.0,
+    "fine_mesh_0_25m_moment_kNm": 4148.0,
+    "convergence_relative_error_pct": 0.17,
+    "convergence_status": "CONVERGED"
+  },
+  "equilibrium_audit": {
+    "total_applied_vertical_load_kN": 5840.0,
+    "total_reaction_vertical_kN": 5839.998,
+    "residual_kN": 0.002,
+    "equilibrium_status": "PASS"
+  }
+}

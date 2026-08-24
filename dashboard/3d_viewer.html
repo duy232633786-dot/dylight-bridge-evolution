@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mô hình 3D Dầm Liên tục 480m Bản bụng Giàn Michell & Cáp CFRP</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-bg: rgba(30, 41, 59, 0.85);
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg-dark); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; }
+    
+    #canvas3d { width: 100%; height: 100%; display: block; }
+
+    /* Top Overlay Header */
+    .header-bar {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .header-title-box {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 20px;
+      pointer-events: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .header-title-box h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header-title-box h1 span {
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge-f0 {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 6px;
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      margin-left: 8px;
+    }
+    .header-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Control Panel */
+    .controls-panel {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      width: 320px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 10;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .panel-section {
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .btn-group-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    
+    button {
+      background: #334155;
+      color: var(--text);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    button:hover {
+      background: #475569;
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    button.active {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Legend Box */
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* Metric HUD Bottom Left */
+    .hud-box {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      gap: 24px;
+      z-index: 10;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .hud-item { display: flex; flex-direction: column; }
+    .hud-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; }
+    .hud-val { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .hud-val span { font-size: 0.75rem; color: var(--accent); margin-left: 2px; }
+
+    /* Loading Spinner */
+    #loading {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.5s;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #334155;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div style="font-weight:600; color:#cbd5e1;">Đang khởi tạo Mô hình 3D FEM & Giàn Michell...</div>
+  </div>
+
+  <div class="header-bar">
+    <div class="header-title-box">
+      <h1>Mô hình 3D Dầm Hộp Liên tục <span>480 m</span> <span class="badge-f0">F0 IDEA / CAD-BIM</span></h1>
+      <div class="header-desc">Bản bụng Giàn Trực giao Michell (ODC-MWG) + Bản mặt cầu UHPC + Cáp căng kéo CFRP</div>
+    </div>
+  </div>
+
+  <!-- HUD Realtime Parameters -->
+  <div class="hud-box">
+    <div class="hud-item">
+      <div class="hud-label">Sơ đồ nhịp</div>
+      <div class="hud-val">240 + 480 + 240<span>m</span></div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">Chiều cao tại Trụ (h_pier)</div>
+      <div class="hud-val">28.0<span>m</span></div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">Chiều cao Giữa nhịp (h_mid)</div>
+      <div class="hud-val">5.5<span>m</span></div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">Độ dốc Catenary (&alpha;)</div>
+      <div class="hud-val">2.45</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">Tỷ lệ giảm diện tích bản bụng</div>
+      <div class="hud-val" style="color:var(--success);">&minus;60.0<span>%</span></div>
+    </div>
+  </div>
+
+  <!-- Controls Panel -->
+  <div class="controls-panel">
+    <div class="panel-section">
+      <div class="section-title">Góc nhìn Camera (Presets)</div>
+      <div class="btn-group">
+        <button onclick="setCamera('isometric')" class="active" id="btn-iso">Toàn cảnh 3D</button>
+        <button onclick="setCamera('side')" id="btn-side">Mặt bên (2D)</button>
+      </div>
+      <div class="btn-group">
+        <button onclick="setCamera('pier')" id="btn-pier">Đỉnh Trụ (28m)</button>
+        <button onclick="setCamera('midspan')" id="btn-mid">Giữa nhịp (5.5m)</button>
+      </div>
+      <div class="btn-group">
+        <button onclick="setCamera('cutaway')" id="btn-cut">Mặt cắt Box</button>
+        <button onclick="resetCamera()">Reset View</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">Hiển thị Cấu kiện (Layers)</div>
+      <div class="btn-group">
+        <button onclick="toggleDeck()" id="btn-deck" class="active">Bản Deck UHPC</button>
+        <button onclick="toggleBottom()" id="btn-bottom" class="active">Bản Đáy Catenary</button>
+      </div>
+      <div class="btn-group">
+        <button onclick="toggleTruss()" id="btn-truss" class="active">Giàn Michell</button>
+        <button onclick="togglePiers()" id="btn-piers" class="active">Trụ & Mố Cầu</button>
+      </div>
+      <button style="width:100%; margin-top:6px;" onclick="toggleWireframe()" id="btn-wire">Chế độ Khung dây (Wireframe)</button>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">Quỹ đạo Ứng suất & Vật liệu</div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#ef4444;"></div>
+        <div>Thanh kéo CFRP (&sigma;_CFRP allowable)</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#38bdf8;"></div>
+        <div>Thanh nén xiên UHPC (C_strut)</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#94a3b8;"></div>
+        <div>Bản mặt cầu UHPC (B=16.5m)</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#cbd5e1;"></div>
+        <div>Vòm đáy nén Catenary biến thiên</div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">Hoạt ảnh & Tải trọng</div>
+      <button style="width:100%;" onclick="toggleAutoRotate()" id="btn-rotate">Tự động Xoay (Auto-Rotate)</button>
+    </div>
+  </div>
+
+  <canvas id="canvas3d"></canvas>
+
+  <script>
+    // --- THREE.JS 3D SCENE SETUP ---
+    const canvas = document.getElementById('canvas3d');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1120);
+    scene.fog = new THREE.FogExp2(0x0b1120, 0.0015);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 3000);
+    camera.position.set(250, 120, 350);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 + 0.05; // Don't go below ground
+    controls.minDistance = 20;
+    controls.maxDistance = 1200;
+    controls.target.set(0, 0, 0);
+
+    // --- LIGHTING ---
+    const ambientLight = new THREE.AmbientLight(0x334155, 1.2);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xffedd5, 2.0);
+    sunLight.position.set(300, 400, 200);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 10;
+    sunLight.shadow.camera.far = 1200;
+    const d = 500;
+    sunLight.shadow.camera.left = -d;
+    sunLight.shadow.camera.right = d;
+    sunLight.shadow.camera.top = d;
+    sunLight.shadow.camera.bottom = -d;
+    scene.add(sunLight);
+
+    const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
+    fillLight.position.set(-200, 100, -200);
+    scene.add(fillLight);
+
+    // --- MATERIALS ---
+    const deckMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.6, metalness: 0.1 });
+    const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9, metalness: 0.05 });
+    const bottomMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.5, metalness: 0.2 });
+    const cfrpMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3, metalness: 0.7, emissive: 0x7f1d1d, emissiveIntensity: 0.3 });
+    const uhpcMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4, metalness: 0.3, emissive: 0x0369a1, emissiveIntensity: 0.2 });
+    const pierMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7, metalness: 0.1 });
+    const waterMat = new THREE.MeshStandardMaterial({ color: 0x0f2b48, roughness: 0.1, metalness: 0.8, transparent: true, opacity: 0.85 });
+    const nodeMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.2, metalness: 0.8 });
+
+    // --- GROUPS ---
+    const bridgeGroup = new THREE.Group();
+    const deckGroup = new THREE.Group();
+    const bottomGroup = new THREE.Group();
+    const trussGroup = new THREE.Group();
+    const pierGroup = new THREE.Group();
+
+    bridgeGroup.add(deckGroup);
+    bridgeGroup.add(bottomGroup);
+    bridgeGroup.add(trussGroup);
+    bridgeGroup.add(pierGroup);
+    scene.add(bridgeGroup);
+
+    // --- WATER RIVER & ENVIRONMENT ---
+    const waterGeo = new THREE.PlaneGeometry(2400, 1600);
+    const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+    waterMesh.rotation.x = -Math.PI / 2;
+    waterMesh.position.y = -85;
+    scene.add(waterMesh);
+
+    // Grid Floor / Reference
+    const grid = new THREE.GridHelper(1800, 90, 0x1e293b, 0x0f172a);
+    grid.position.y = -84.9;
+    scene.add(grid);
+
+    // --- BRIDGE GEOMETRY PARAMETERS (SCALE: 1 UNIT = 1 METER) ---
+    // Scaled representation: main span = 480m, side spans = 240m each (Total = 960m)
+    // Scale visual: 1 unit = 1m
+    const L_main = 480;
+    const L_side = 240;
+    const L_total = 960;
+    const B_deck = 16.5;
+    const H_pier = 28.0;
+    const H_mid = 5.5;
+    const Pier_X1 = -L_main / 2; // -240
+    const Pier_X2 = L_main / 2;  // +240
+    const Pier_Y_top = 0;        // Deck elevation = 0
+    const Water_Y = -85;
+
+    // 1. TOP ROADWAY DECK
+    const deckSegments = 96;
+    const deckGeo = new THREE.BoxGeometry(L_total, 1.2, B_deck);
+    const deckMesh = new THREE.Mesh(deckGeo, deckMat);
+    deckMesh.position.set(0, 0.6, 0);
+    deckMesh.castShadow = true;
+    deckMesh.receiveShadow = true;
+    deckGroup.add(deckMesh);
+
+    // Asphalt wearing surface
+    const asphaltGeo = new THREE.BoxGeometry(L_total - 2, 0.15, B_deck - 1.6);
+    const asphaltMesh = new THREE.Mesh(asphaltGeo, asphaltMat);
+    asphaltMesh.position.set(0, 1.25, 0);
+    deckGroup.add(asphaltMesh);
+
+    // Guard rails
+    const railGeo = new THREE.BoxGeometry(L_total, 0.8, 0.3);
+    const rail1 = new THREE.Mesh(railGeo, deckMat);
+    rail1.position.set(0, 1.6, B_deck / 2 - 0.2);
+    const rail2 = new THREE.Mesh(railGeo, deckMat);
+    rail2.position.set(0, 1.6, -B_deck / 2 + 0.2);
+    deckGroup.add(rail1, rail2);
+
+    // Function to calculate bottom chord Y at coordinate x
+    function getBottomY(x) {
+      // Main span (-240 to 240)
+      if (Math.abs(x) <= L_main / 2) {
+        const u = x / (L_main / 2); // -1 to +1
+        // Catenary/parabolic profile: at u=0, depth is H_mid; at u=1, depth is H_pier
+        const depth = H_mid + (H_pier - H_mid) * Math.pow(Math.abs(u), 2.2);
+        return -depth;
+      } else {
+        // Side spans (240 to 480 and -480 to -240)
+        const side_u = (Math.abs(x) - L_main / 2) / L_side; // 0 to 1
+        const depth = H_pier * (1 - 0.75 * side_u);
+        return -depth;
+      }
+    }
+
+    // 2. BOTTOM CATENARY FLANGE & BOX BOTTOM
+    const bottomCurvePointsL = [];
+    const bottomCurvePointsR = [];
+    const numPts = 120;
+    const dx = L_total / numPts;
+    const startX = -L_total / 2;
+
+    for (let i = 0; i <= numPts; i++) {
+      const x = startX + i * dx;
+      const y = getBottomY(x);
+      bottomCurvePointsL.push(new THREE.Vector3(x, y, B_deck / 2 - 2.0));
+      bottomCurvePointsR.push(new THREE.Vector3(x, y, -B_deck / 2 + 2.0));
+    }
+
+    const curveL = new THREE.CatmullRomCurve3(bottomCurvePointsL);
+    const curveR = new THREE.CatmullRomCurve3(bottomCurvePointsR);
+    const bottomTubeGeoL = new THREE.TubeGeometry(curveL, 120, 1.0, 8, false);
+    const bottomTubeGeoR = new THREE.TubeGeometry(curveR, 120, 1.0, 8, false);
+    const bottomMeshL = new THREE.Mesh(bottomTubeGeoL, bottomMat);
+    const bottomMeshR = new THREE.Mesh(bottomTubeGeoR, bottomMat);
+    bottomMeshL.castShadow = true;
+    bottomMeshR.castShadow = true;
+    bottomGroup.add(bottomMeshL, bottomMeshR);
+
+    // Cross beams connecting bottom chords
+    for (let i = 0; i <= numPts; i += 4) {
+      const x = startX + i * dx;
+      const y = getBottomY(x);
+      const crossGeo = new THREE.BoxGeometry(1.2, 0.8, B_deck - 4.0);
+      const crossMesh = new THREE.Mesh(crossGeo, bottomMat);
+      crossMesh.position.set(x, y, 0);
+      bottomGroup.add(crossMesh);
+    }
+
+    // 3. ORTHOGONAL MICHELL TRUSS WEB (DIAGONALS & NODES)
+    const numTrussBays = 48;
+    const bayDx = L_total / numTrussBays;
+    const cylRadius = 0.35;
+
+    for (let i = 0; i < numTrussBays; i++) {
+      const x1 = -L_total / 2 + i * bayDx;
+      const x2 = x1 + bayDx;
+      const yBottom1 = getBottomY(x1);
+      const yBottom2 = getBottomY(x2);
+      const yTop = 0;
+
+      // Two web planes (Left and Right)
+      [-B_deck / 2 + 2.0, B_deck / 2 - 2.0].forEach(zPos => {
+        // Node at top & bottom
+        const pTop1 = new THREE.Vector3(x1, yTop, zPos);
+        const pTop2 = new THREE.Vector3(x2, yTop, zPos);
+        const pBot1 = new THREE.Vector3(x1, yBottom1, zPos);
+        const pBot2 = new THREE.Vector3(x2, yBottom2, zPos);
+
+        // Member 1: Top1 -> Bot2 (CFRP Tension or UHPC Strut depending on hogging/sagging)
+        createTrussBar(pTop1, pBot2, (i % 2 === 0 ? cfrpMat : uhpcMat));
+        
+        // Member 2: Bot1 -> Top2 (Orthogonal cross)
+        createTrussBar(pBot1, pTop2, (i % 2 === 1 ? cfrpMat : uhpcMat));
+
+        // Node spheres
+        if (i % 2 === 0) {
+          const nodeGeo = new THREE.SphereGeometry(0.7, 12, 12);
+          const nodeTop = new THREE.Mesh(nodeGeo, nodeMat);
+          nodeTop.position.copy(pTop1);
+          const nodeBot = new THREE.Mesh(nodeGeo, nodeMat);
+          nodeBot.position.copy(pBot1);
+          trussGroup.add(nodeTop, nodeBot);
+        }
+      });
+    }
+
+    function createTrussBar(p1, p2, mat) {
+      const dir = new THREE.Vector3().subVectors(p2, p1);
+      const len = dir.length();
+      const cylGeo = new THREE.CylinderGeometry(cylRadius, cylRadius, len, 8);
+      const cylMesh = new THREE.Mesh(cylGeo, mat);
+      
+      const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+      cylMesh.position.copy(mid);
+      cylMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+      cylMesh.castShadow = true;
+      trussGroup.add(cylMesh);
+    }
+
+    // 4. MAIN PIERS & ABUTMENTS
+    function createMainPier(xPos) {
+      const pierRoot = new THREE.Group();
+      
+      // Pier stem V-shape
+      const hPierBottom = getBottomY(xPos);
+      const pierHeight = Math.abs(Water_Y - hPierBottom);
+
+      // Y-shaped sculptural pier head
+      const vPierGeoL = new THREE.BoxGeometry(6.0, pierHeight * 0.4, 4.0);
+      const vPierL = new THREE.Mesh(vPierGeoL, pierMat);
+      vPierL.position.set(xPos - 5, hPierBottom - pierHeight * 0.2, 0);
+      vPierL.rotation.z = -0.12;
+
+      const vPierR = new THREE.Mesh(vPierGeoL, pierMat);
+      vPierR.position.set(xPos + 5, hPierBottom - pierHeight * 0.2, 0);
+      vPierR.rotation.z = 0.12;
+
+      // Pier main body shaft
+      const shaftGeo = new THREE.BoxGeometry(14.0, pierHeight * 0.7, 18.0);
+      const shaft = new THREE.Mesh(shaftGeo, pierMat);
+      shaft.position.set(xPos, Water_Y + (pierHeight * 0.7) / 2, 0);
+      shaft.castShadow = true;
+
+      // Pile cap foundation
+      const footingGeo = new THREE.BoxGeometry(26.0, 8.0, 28.0);
+      const footing = new THREE.Mesh(footingGeo, pierMat);
+      footing.position.set(xPos, Water_Y + 4.0, 0);
+      footing.castShadow = true;
+
+      pierRoot.add(vPierL, vPierR, shaft, footing);
+      return pierRoot;
+    }
+
+    pierGroup.add(createMainPier(Pier_X1));
+    pierGroup.add(createMainPier(Pier_X2));
+
+    // Abutments at ends
+    function createAbutment(xPos) {
+      const abutGeo = new THREE.BoxGeometry(18.0, 40.0, B_deck + 4.0);
+      const abut = new THREE.Mesh(abutGeo, pierMat);
+      abut.position.set(xPos, -20, 0);
+      abut.castShadow = true;
+      return abut;
+    }
+    pierGroup.add(createAbutment(-L_total / 2));
+    pierGroup.add(createAbutment(L_total / 2));
+
+    // Hide loader
+    setTimeout(() => {
+      const loader = document.getElementById('loading');
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    }, 400);
+
+    // --- INTERACTION FUNCTIONS ---
+    let autoRotate = false;
+
+    function setCamera(view) {
+      document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+      const targetPos = new THREE.Vector3();
+      const targetLook = new THREE.Vector3();
+
+      if (view === 'isometric') {
+        targetPos.set(280, 130, 360);
+        targetLook.set(0, -10, 0);
+        document.getElementById('btn-iso').classList.add('active');
+      } else if (view === 'side') {
+        targetPos.set(0, -10, 520);
+        targetLook.set(0, -10, 0);
+        document.getElementById('btn-side').classList.add('active');
+      } else if (view === 'pier') {
+        targetPos.set(Pier_X1 + 45, 10, 75);
+        targetLook.set(Pier_X1, -15, 0);
+        document.getElementById('btn-pier').classList.add('active');
+      } else if (view === 'midspan') {
+        targetPos.set(0, 15, 60);
+        targetLook.set(0, -5, 0);
+        document.getElementById('btn-mid').classList.add('active');
+      } else if (view === 'cutaway') {
+        targetPos.set(40, -4, 25);
+        targetLook.set(0, -6, 0);
+        document.getElementById('btn-cut').classList.add('active');
+      }
+      
+      animateCamera(targetPos, targetLook);
+    }
+
+    function resetCamera() { setCamera('isometric'); }
+
+    function animateCamera(targetPos, targetLook) {
+      const startPos = camera.position.clone();
+      const startLook = controls.target.clone();
+      let progress = 0;
+
+      function step() {
+        progress += 0.04;
+        if (progress <= 1) {
+          camera.position.lerpVectors(startPos, targetPos, progress);
+          controls.target.lerpVectors(startLook, targetLook, progress);
+          controls.update();
+          requestAnimationFrame(step);
+        }
+      }
+      step();
+    }
+
+    function toggleDeck() {
+      deckGroup.visible = !deckGroup.visible;
+      document.getElementById('btn-deck').classList.toggle('active', deckGroup.visible);
+    }
+    function toggleBottom() {
+      bottomGroup.visible = !bottomGroup.visible;
+      document.getElementById('btn-bottom').classList.toggle('active', bottomGroup.visible);
+    }
+    function toggleTruss() {
+      trussGroup.visible = !trussGroup.visible;
+      document.getElementById('btn-truss').classList.toggle('active', trussGroup.visible);
+    }
+    function togglePiers() {
+      pierGroup.visible = !pierGroup.visible;
+      document.getElementById('btn-piers').classList.toggle('active', pierGroup.visible);
+    }
+
+    let wireframeMode = false;
+    function toggleWireframe() {
+      wireframeMode = !wireframeMode;
+      [deckMat, bottomMat, cfrpMat, uhpcMat, pierMat].forEach(m => m.wireframe = wireframeMode);
+      document.getElementById('btn-wire').classList.toggle('active', wireframeMode);
+    }
+
+    function toggleAutoRotate() {
+      autoRotate = !autoRotate;
+      controls.autoRotate = autoRotate;
+      controls.autoRotateSpeed = 1.0;
+      document.getElementById('btn-rotate').classList.toggle('active', autoRotate);
+    }
+
+    // --- ANIMATION LOOP ---
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

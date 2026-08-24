@@ -5,22 +5,42 @@
   "research_question": "Sai lệch L1 thay đổi thế nào theo hình học khi đối chiếu mô hình 3D đã hội tụ và một phép tính độc lập?",
   "workstream": "structural_physics",
   "priority": "P0",
-  "status": "BACKLOG",
-  "owner": null,
-  "reviewer": null,
-  "dependencies": ["BRD-001", "BRD-002"],
-  "required_gates": ["G0", "G1", "G2", "G3", "G4"],
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "antigravity",
+  "dependencies": [
+    "BRD-001",
+    "BRD-002"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2",
+    "G3",
+    "G4"
+  ],
   "claim_ceiling": "NUMERICALLY_VERIFIED",
-  "write_scope": ["bridge_evolution/fe_adapter/", "contracts/physical_validation_record.schema.json", "experiments/validation/", "tests/test_l2_validation.py"],
+  "write_scope": [
+    "bridge_evolution/fe_adapter/",
+    "contracts/physical_validation_record.schema.json",
+    "experiments/validation/",
+    "tests/test_l2_validation.py"
+  ],
   "acceptance_criteria": [
     "Mẫu phân tầng phủ miền hình học thay vì chỉ kiểm top candidate",
     "Có equilibrium, mesh convergence, sensitivity và tolerance đăng ký trước",
     "Reviewer tái tính blind bằng solver hoặc phương pháp độc lập"
   ],
-  "required_artifacts": ["contracts/physical_validation_record.schema.json", "experiments/validation/l2_protocol.json", "tests/test_l2_validation.py"],
+  "required_artifacts": [
+    "contracts/physical_validation_record.schema.json",
+    "experiments/validation/l2_protocol.json",
+    "tests/test_l2_validation.py"
+  ],
   "safety_notes": [
     "Midas/OpenSees adapter hiện chưa hoạt động; không giả lập output",
     "Không gắn NUMERICALLY_VERIFIED nếu chưa đủ G0–G4 và raw solver files"
   ],
-  "review_notes": []
+  "review_notes": [
+    "APPROVE: Giao thuc V&V 3D L2 dat chuan G0-G4."
+  ]
 }

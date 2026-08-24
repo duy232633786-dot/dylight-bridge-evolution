@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-001",
+  "agent_id": "claude",
+  "role": "orchestrator",
+  "summary": "Khoa baseline capability matrix va knowledge audit phu 20/20 card.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "docs/runtime_capability_matrix.md",
+      "sha256": "08015ae57ac9072ddb8b458595d3662d65cf20836b09822be5d4706432ad57b3",
+      "kind": "report"
+    },
+    {
+      "path": "knowledge/audits/current.json",
+      "sha256": "634fb3e9b9e719360bb399a78cf936997dea32bf3266a94c93f9c72f2452a327",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "next_action": "Independent review"
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-013-005",
+  "task_id": "BRD-013",
+  "detected_at_utc": "2026-08-21T15:27:21.807312Z",
+  "detected_by": "antigravity",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "artifact_path": "tests/test_grammar_ab_confirmatory.py",
+  "recorded_sha256": "4b3b0bf084d20c3b2fe68f88a43ae9aeca8190ea9d854d8a644419838ed9d177",
+  "observed_sha256": "09a1073df491d4df6f2fffcbc7ecea2c483b5001f746d6861da3b2ac5888f02d",
+  "reason": "BRD-015 test suite expansion",
+  "disposition": "CONTROLLED_CORRECTION"
+}

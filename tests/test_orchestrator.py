@@ -2,6 +2,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+from copy import deepcopy
 
 import pytest
 
@@ -11,10 +12,15 @@ from bridge_evolution.collaboration import (
     export_research_to_obsidian,
     orchestration_status,
     plan_research,
+    quarantine_contaminated_attempt,
+    recover_failed_task,
+    repair_orphaned_review,
     run_orchestration,
     validate_lab,
 )
 from bridge_evolution.collaboration import orchestrator as orchestration
+from bridge_evolution.collaboration import lab as collaboration_lab
+from bridge_evolution.collaboration import providers
 from bridge_evolution.collaboration.providers import _command
 
 
@@ -23,8 +29,23 @@ def _lab_copy(tmp_path: Path) -> Path:
     shutil.copytree(REPO_ROOT / "multiagent", target)
     for path in (target / "tasks").glob("RND-*.json"):
         path.unlink()
-    for folder in (target / "intake", target / "runs"):
+    # Orchestrator tests need only seed task contracts. Historical handoffs point
+    # at mutable project artifacts and would make the hermetic copy depend on
+    # unrelated provenance work happening concurrently in the shared workspace.
+    for folder in (
+        target / "intake", target / "runs", target / "handoffs",
+        target / "reviews", target / "incidents", target / "corrections",
+        target / "correction_reviews", target / "quarantine",
+        target / "amendments", target / "task_contract_snapshots",
+    ):
         shutil.rmtree(folder, ignore_errors=True)
+    for path in (target / "tasks").glob("BRD-*.json"):
+        task = json.loads(path.read_text(encoding="utf-8"))
+        if task.get("status") == "ACCEPTED":
+            task["status"] = "READY"
+            task["owner"] = None
+            task["reviewer"] = None
+            orchestration._atomic_json(path, task)
     return target
 
 
@@ -32,6 +53,197 @@ def _hashes(root: Path) -> dict[str, str]:
     return {
         path.name: hashlib.sha256(path.read_bytes()).hexdigest()
         for path in (root / "tasks").glob("BRD-*.json")
+    }
+
+
+def _ready_doctor(*available: str) -> dict:
+    return {
+        provider: {
+            "available": provider in available,
+            "callable": provider in available,
+            "authenticated": provider in available,
+        }
+        for provider in ("codex", "claude", "opencode", "antigravity")
+    }
+
+
+def _failed_run(lab: Path, *, max_retries: int = 0) -> tuple[dict, str, Path]:
+    brief = create_research_brief(
+        "Nghiên cứu recovery orchestration có audit bất biến cho cầu",
+        requested_by="project_owner", max_retries=max_retries, lab_dir=lab,
+    )
+    run = plan_research(brief["brief_id"], lab_dir=lab)
+    task_id = run["task_ids"][0]
+    task_path = lab / "tasks" / f"{task_id}.json"
+    task = json.loads(task_path.read_text(encoding="utf-8"))
+    task["status"] = "BLOCKED"
+    task["owner"] = "opencode"
+    task["preferred_provider"] = "opencode"
+    orchestration._atomic_json(task_path, task)
+
+    run_path = lab / "runs" / run["run_id"] / "run.json"
+    run["status"] = "FAILED"
+    run["attempts"][task_id] = max_retries + 1
+    for number in range(1, run["attempts"][task_id] + 1):
+        orchestration._exclusive_json(
+            orchestration._attempt_path(lab, run["run_id"], task_id, "work", number),
+            {"task_id": task_id, "attempt": number, "success": False},
+        )
+    orchestration._event(
+        run, "RUN_FAILED", f"{task_id} vượt retry budget", task_id=task_id,
+    )
+    orchestration._save_run(lab, run)
+    return run, task_id, run_path
+
+
+def _orphaned_review(lab: Path) -> tuple[dict, str, Path, Path, str]:
+    brief = create_research_brief(
+        "Kiểm tra fail-closed repair cho unauthorized provider handoff",
+        requested_by="project_owner", lab_dir=lab,
+    )
+    run = plan_research(brief["brief_id"], lab_dir=lab)
+    task_id = run["task_ids"][0]
+    task_path = lab / "tasks" / f"{task_id}.json"
+    task = json.loads(task_path.read_text(encoding="utf-8"))
+    task["status"] = "REVIEW"
+    task["owner"] = "antigravity"
+    task["preferred_provider"] = "antigravity"
+    orchestration._atomic_json(task_path, task)
+
+    run_path = lab / "runs" / run["run_id"] / "run.json"
+    run["attempts"][task_id] = 1
+    orchestration._event(
+        run, "TASK_ATTEMPT_FAILED", "attempt 1 thất bại",
+        task_id=task_id, provider="antigravity",
+    )
+    orchestration._save_run(lab, run)
+    orchestration._exclusive_json(
+        orchestration._attempt_path(lab, run["run_id"], task_id, "work", 1),
+        {
+            "schema_version": "1.0", "task_id": task_id, "kind": "WORK",
+            "attempt": 1, "provider_result": {"provider": "antigravity"},
+            "changed_files": [], "out_of_scope": [], "missing_artifacts": [],
+            "tests": [], "success": False,
+        },
+    )
+    quarantine = (
+        lab / "quarantine" / "unauthorized_handoffs"
+        / f"{task_id}.antigravity.r001.unauthorized.json"
+    )
+    orchestration._exclusive_json(quarantine, {
+        "schema_version": "1.0", "task_id": task_id,
+        "agent_id": "antigravity", "claim_level": "IDEA",
+        "artifacts": [{"path": task["required_artifacts"][0], "sha256": "0" * 64}],
+    })
+    quarantine_hash = hashlib.sha256(quarantine.read_bytes()).hexdigest()
+    return run, task_id, run_path, quarantine, quarantine_hash
+
+
+def _contaminated_attempt(tmp_path: Path, monkeypatch):
+    lab = _lab_copy(tmp_path)
+    monkeypatch.setattr(orchestration, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(collaboration_lab, "REPO_ROOT", tmp_path)
+    brief = create_research_brief(
+        "Kiểm tra quarantine attempt ghi canonical state ngoài write scope",
+        requested_by="project_owner", max_retries=1, lab_dir=lab,
+    )
+    run = plan_research(brief["brief_id"], lab_dir=lab)
+    trigger = run["task_ids"][2]
+    downstream = run["task_ids"][3:]
+    task_paths = [lab / "tasks" / f"{task_id}.json" for task_id in [trigger, *downstream]]
+
+    trigger_value = json.loads(task_paths[0].read_text(encoding="utf-8"))
+    trigger_value.update({
+        "status": "BLOCKED", "owner": "codex", "reviewer": "opencode",
+        "review_notes": ["unauthorized accepted review"],
+    })
+    orchestration._atomic_json(task_paths[0], trigger_value)
+    for path, owner, reviewer in zip(task_paths[1:], ["opencode", "claude"], ["claude", "codex"]):
+        value = json.loads(path.read_text(encoding="utf-8"))
+        value.update({
+            "status": "ACCEPTED", "owner": owner, "reviewer": reviewer,
+            "review_notes": ["contaminated"],
+        })
+        orchestration._atomic_json(path, value)
+
+    created: list[Path] = []
+    for task_id, owner, reviewer in [
+        (trigger, "codex", "opencode"),
+        (downstream[0], "opencode", "claude"),
+        (downstream[1], "claude", "codex"),
+    ]:
+        for folder, actor in [("handoffs", owner), ("reviews", reviewer)]:
+            path = lab / folder / f"{task_id}.{actor}.r001.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(f"contaminated {folder} {task_id}\n", encoding="utf-8")
+            created.append(path)
+    artifact_paths = []
+    for task_id in [trigger, *downstream]:
+        task = json.loads((lab / "tasks" / f"{task_id}.json").read_text(encoding="utf-8"))
+        path = tmp_path / Path(task["required_artifacts"][0])
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"contaminated artifact {task_id}\n", encoding="utf-8")
+        artifact_paths.append(path)
+
+    project_relative = [
+        f"multiagent/tasks/{path.name}" for path in task_paths
+    ] + [
+        path.relative_to(tmp_path).as_posix() for path in [*created, *artifact_paths]
+    ]
+    project_relative = sorted(project_relative)
+    attempt_path = orchestration._attempt_path(
+        lab, run["run_id"], trigger, "work", 2
+    )
+    orchestration._exclusive_json(
+        orchestration._attempt_path(lab, run["run_id"], trigger, "work", 1),
+        {
+            "schema_version": "1.0", "task_id": trigger, "kind": "WORK",
+            "attempt": 1, "provider_result": {"provider": "codex"},
+            "changed_files": [], "out_of_scope": [], "missing_artifacts": [],
+            "tests": [], "success": False,
+        },
+    )
+    orchestration._exclusive_json(attempt_path, {
+        "schema_version": "1.0", "task_id": trigger, "kind": "WORK",
+        "attempt": 2, "provider_result": {"provider": "codex"},
+        "changed_files": project_relative,
+        "out_of_scope": project_relative,
+        "missing_artifacts": [], "tests": [], "success": False,
+    })
+    run_path = lab / "runs" / run["run_id"] / "run.json"
+    run["status"] = "FAILED"
+    run["attempts"][trigger] = 2
+    orchestration._event(
+        run, "TASK_ATTEMPT_FAILED", "attempt 2 thất bại",
+        task_id=trigger, provider="codex",
+    )
+    orchestration._event(
+        run, "RUN_FAILED", f"{trigger} vượt retry budget", task_id=trigger,
+    )
+    orchestration._save_run(lab, run)
+
+    manifest = []
+    for relative in project_relative:
+        if relative.startswith("multiagent/tasks/"):
+            target_id = Path(relative).stem
+            disposition = (
+                "RESTORE_TRIGGER_LIFECYCLE" if target_id == trigger
+                else "RESTORE_DOWNSTREAM_LIFECYCLE"
+            )
+            source = lab / "tasks" / Path(relative).name
+        else:
+            disposition = "QUARANTINE_NOT_EVIDENCE"
+            source = tmp_path / Path(relative)
+        manifest.append({
+            "path": relative,
+            "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+            "disposition": disposition,
+        })
+    return {
+        "lab": lab, "run": run, "run_path": run_path, "trigger": trigger,
+        "downstream": downstream, "manifest": manifest,
+        "canonical_paths": [*task_paths, *created, *artifact_paths],
+        "moved_paths": [*created, *artifact_paths],
     }
 
 
@@ -64,6 +276,140 @@ def test_topic_is_stored_as_data_not_placed_in_test_commands(tmp_path):
     prompt = orchestration._task_prompt(brief, task)
     assert "untrusted research data" in prompt
     assert topic in prompt
+
+
+def test_worker_prompt_pins_exact_task_and_tells_opencode_to_write_without_shell(tmp_path):
+    lab = _lab_copy(tmp_path)
+    brief = create_research_brief(
+        "Kiểm tra worker OpenCode ghi đúng artifact đã giao", lab_dir=lab)
+    run = plan_research(brief["brief_id"], lab_dir=lab)
+    task = json.loads(
+        (lab / "tasks" / f"{run['task_ids'][0]}.json").read_text(encoding="utf-8"))
+
+    prompt = orchestration._task_prompt(brief, task, "opencode")
+
+    assert f"one and only assignment is {task['task_id']} as provider opencode" in prompt
+    assert "Do not call any lab CLI/API" in prompt
+    assert "submit, review, recover, or repair" in prompt
+    assert "select/recommend another task" in prompt
+    assert "Use the edit/write file tool directly" in prompt
+    assert "the orchestrator runs tests after you return" in prompt
+
+
+@pytest.mark.parametrize("provider", ["codex", "claude", "opencode", "antigravity"])
+def test_worker_prompt_forbids_nested_agents_lab_and_scope_escape(tmp_path, provider):
+    lab = _lab_copy(tmp_path)
+    brief = create_research_brief(
+        "Kiểm tra worker bị chặn delegation và scope escape", lab_dir=lab)
+    run = plan_research(brief["brief_id"], lab_dir=lab)
+    task = json.loads(
+        (lab / "tasks" / f"{run['task_ids'][0]}.json").read_text(encoding="utf-8"))
+
+    prompt = orchestration._task_prompt(brief, task, provider)
+
+    assert f"one and only assignment is {task['task_id']} as provider {provider}" in prompt
+    assert "Do not spawn, delegate to, message, or manage any subagent" in prompt
+    assert "Do not use collaboration, multi-agent, thread, handoff, or agent" in prompt
+    assert "Do not call any lab CLI/API" in prompt
+    assert "Do not inspect, claim, plan, execute, review, or mutate any task other than" in prompt
+    assert "Those are the exact write boundaries" in prompt
+    assert "Do not create, edit, delete, rename, format, or" in prompt
+    assert "Return ONLY one JSON object as the final response" in prompt
+    assert f'"task_id":"{task["task_id"]}"' in prompt
+
+
+@pytest.mark.parametrize("provider", ["codex", "claude", "opencode", "antigravity"])
+def test_reviewer_prompt_forbids_delegation_lab_calls_and_all_writes(tmp_path, provider):
+    lab = _lab_copy(tmp_path)
+    brief = create_research_brief(
+        "Kiểm tra reviewer độc lập chỉ đọc và không delegation", lab_dir=lab)
+    run = plan_research(brief["brief_id"], lab_dir=lab)
+    task = json.loads(
+        (lab / "tasks" / f"{run['task_ids'][0]}.json").read_text(encoding="utf-8"))
+
+    prompt = orchestration._review_prompt(brief, task, provider)
+
+    assert f"{task['task_id']} as provider\n{provider}" in prompt
+    assert "Do not spawn, delegate to, message, or manage any subagent" in prompt
+    assert "Do not use collaboration, multi-agent, thread, handoff, or agent" in prompt
+    assert "Do not call any lab CLI/API" in prompt
+    assert "Do not write, edit, delete, rename, format, or otherwise mutate" in prompt
+    assert "Do not inspect or review another task" in prompt
+    assert "Return ONLY one JSON object" in prompt
+
+
+def test_failed_worker_attempt_records_out_of_scope_paths_as_semantic_evidence(
+    tmp_path, monkeypatch,
+):
+    task_id = "RND-deadbeef-03"
+    task = {
+        "task_id": task_id,
+        "status": "ACTIVE",
+        "owner": "codex",
+        "preferred_provider": "codex",
+        "preferred_role": "structural_analyst",
+        "write_scope": ["research/allowed.md"],
+        "required_artifacts": [],
+        "test_commands": [],
+        "required_gates": ["G0"],
+        "claim_ceiling": "IDEA",
+    }
+    run = {
+        "run_id": "RUN-deadbeef",
+        "attempts": {task_id: 0},
+        "events": [],
+    }
+    snapshots = iter([
+        {"research/allowed.md": "a"},
+        {
+            "research/allowed.md": "b",
+            "multiagent/handoffs/foreign.json": "c",
+            "research/foreign_task.md": "d",
+        },
+    ])
+    monkeypatch.setattr(orchestration, "_snapshot", lambda: next(snapshots))
+    monkeypatch.setattr(
+        orchestration,
+        "run_provider",
+        lambda *_args, **_kwargs: providers.ProviderResult(
+            provider="codex", command=["codex"], returncode=0,
+            stdout="{}", stderr="", elapsed_seconds=0.1,
+            timed_out=False, output_truncated=False,
+        ),
+    )
+
+    success = orchestration._execute_task(
+        tmp_path / "multiagent", run, {"topic": "bounded"}, task, "codex", 60,
+    )
+
+    attempt = json.loads(
+        orchestration._attempt_path(
+            tmp_path / "multiagent", run["run_id"], task_id, "work", 1,
+        ).read_text(encoding="utf-8")
+    )
+    expected = ["multiagent/handoffs/foreign.json", "research/foreign_task.md"]
+    assert success is False
+    assert attempt["changed_files"] == [
+        "multiagent/handoffs/foreign.json",
+        "research/allowed.md",
+        "research/foreign_task.md",
+    ]
+    assert attempt["out_of_scope"] == expected
+    assert attempt["failure_evidence"] == [{
+        "kind": "OUT_OF_SCOPE_CHANGES",
+        "paths": expected,
+    }]
+    assert "OUT_OF_SCOPE_CHANGES" in run["events"][-1]["message"]
+    assert "multiagent/handoffs/foreign.json" in run["events"][-1]["message"]
+
+
+def test_opencode_worker_adapter_allows_file_write_but_denies_shell():
+    config = json.loads((REPO_ROOT / "opencode.json").read_text(encoding="utf-8"))
+    permission = config["agent"]["dylight-worker"]["permission"]
+    assert permission["*"] == "deny"
+    assert permission["write"] == "allow"
+    assert permission["edit"] == "allow"
+    assert permission["bash"] == "deny"
 
 
 def test_validate_detects_dependency_cycle_for_generated_tasks(tmp_path):
@@ -106,10 +452,561 @@ def test_provider_commands_are_argv_and_use_safe_modes(tmp_path):
     antigravity, _ = _command("antigravity", "agy", tmp_path, "topic; rm", writable=False)
 
     assert codex_stdin == "topic; rm"
-    assert "read-only" in codex and "never" in codex
+    assert "read-only" in codex
+    assert codex[codex.index("--disable") + 1] == "multi_agent"
     assert claude_stdin is None and "dontAsk" in claude
     assert "Read,Glob,Grep,Edit,Write" in claude
+    assert "Agent" not in claude[claude.index("--allowedTools") + 1].split(",")
     assert "--mode=plan" in antigravity and "--sandbox" in antigravity
+    assert antigravity[antigravity.index("--add-dir") + 1] == str(tmp_path)
+    assert "--dangerously-skip-permissions" not in antigravity
+    antigravity_prompt = antigravity[antigravity.index("-p") + 1]
+    assert "workspace file read/search/edit/write tools only" in antigravity_prompt
+    assert "Do not inspect broad drive roots such as C:\\" in antigravity_prompt
+    assert "Do not use shell/terminal commands" in antigravity_prompt
+    assert "Do not place deliverables in Antigravity brain/cache" in antigravity_prompt
+
+
+def _antigravity_result(stdout, stderr="", *, returncode=0, truncated=False):
+    return providers.ProviderResult(
+        provider="antigravity",
+        command=["agy.exe"],
+        returncode=returncode,
+        stdout=stdout,
+        stderr=stderr,
+        elapsed_seconds=0.1,
+        timed_out=False,
+        output_truncated=truncated,
+    )
+
+
+def test_antigravity_result_requires_success_json_and_no_soft_denial():
+    success = _antigravity_result(
+        json.dumps({"status": "SUCCESS", "response": "artifact created"})
+    )
+    status_error = _antigravity_result(
+        json.dumps({"status": "ERROR", "error": "workspace unavailable"})
+    )
+    soft_denial = _antigravity_result(
+        json.dumps({"status": "SUCCESS", "response": "artifact created"}),
+        "write_file requires approval; to allow this tool, update permissions",
+    )
+
+    assert success.successful is True
+    assert status_error.successful is False
+    assert soft_denial.successful is False
+    assert _antigravity_result("not-json").successful is False
+    assert _antigravity_result(success.stdout, truncated=True).successful is False
+
+
+def test_antigravity_discovery_requires_real_agy_cli(tmp_path, monkeypatch):
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.delenv("DYLIGHT_ANTIGRAVITY_CLI", raising=False)
+    monkeypatch.setattr(providers.shutil, "which", lambda _name: None)
+
+    ide = tmp_path / "Programs" / "Antigravity IDE" / "bin"
+    ide.mkdir(parents=True)
+    (ide / "antigravity-ide.cmd").write_text("launcher", encoding="utf-8")
+    assert providers.discover_provider("antigravity") is None
+
+    cli = tmp_path / "agy" / "bin" / "agy.exe"
+    cli.parent.mkdir(parents=True)
+    cli.write_bytes(b"agy")
+    assert providers.discover_provider("antigravity") == str(cli)
+
+
+def test_provider_doctor_uses_antigravity_models_as_auth_probe(monkeypatch):
+    monkeypatch.setattr(
+        providers,
+        "discover_provider",
+        lambda name: "agy.exe" if name == "antigravity" else None,
+    )
+    calls = []
+
+    def fake_probe(_binary, args, timeout=10):
+        calls.append((args, timeout))
+        return {
+            "callable": True,
+            "returncode": 0,
+            "detail": "model list" if args == ["models"] else "agy help",
+            "elapsed_seconds": 0.01,
+        }
+
+    monkeypatch.setattr(providers, "_probe", fake_probe)
+    report = providers.provider_doctor()
+
+    assert report["antigravity"]["callable"] is True
+    assert report["antigravity"]["authenticated"] is True
+    assert (["--help"], 10) in calls
+    assert (["models"], 10) in calls
+
+
+def test_recovery_reassigns_only_failed_blocked_and_preserves_audit(tmp_path, monkeypatch):
+    lab = _lab_copy(tmp_path)
+    run, task_id, run_path = _failed_run(lab)
+    old_events = deepcopy(run["events"])
+    attempt_path = orchestration._attempt_path(lab, run["run_id"], task_id, "work", 1)
+    attempt_hash = hashlib.sha256(attempt_path.read_bytes()).hexdigest()
+    previous_run_hash = hashlib.sha256(run_path.read_bytes()).hexdigest()
+    task_path = lab / "tasks" / f"{task_id}.json"
+    previous_task_hash = hashlib.sha256(task_path.read_bytes()).hexdigest()
+    monkeypatch.setattr(orchestration, "provider_doctor", lambda: _ready_doctor("claude"))
+
+    result = recover_failed_task(
+        run["run_id"], task_id, authorized_by="project_owner",
+        reason="OpenCode không có shell; reassign sang provider callable",
+        provider="claude", lab_dir=lab,
+    )
+
+    task = json.loads((lab / "tasks" / f"{task_id}.json").read_text(encoding="utf-8"))
+    saved_run = json.loads(run_path.read_text(encoding="utf-8"))
+    recovery_path = lab / result["recovery_path"]
+    recovery = json.loads(recovery_path.read_text(encoding="utf-8"))
+    assert task["status"] == "READY" and task["owner"] is None
+    assert task["preferred_provider"] == "claude"
+    assert saved_run["status"] == "PLANNED"
+    assert saved_run["attempts"][task_id] == 1
+    assert saved_run["recovery_grants"][task_id] == 1
+    assert saved_run["events"][:len(old_events)] == old_events
+    assert saved_run["events"][-1]["kind"] == "TASK_RECOVERY_AUTHORIZED"
+    assert hashlib.sha256(attempt_path.read_bytes()).hexdigest() == attempt_hash
+    assert recovery["attempt_records"][0]["sha256"] == attempt_hash
+    assert recovery["previous_run_sha256"] == previous_run_hash
+    assert recovery["previous_task_sha256"] == previous_task_hash
+    assert recovery["previous_provider"] == "opencode"
+    assert recovery["next_provider"] == "claude"
+
+
+def test_recovery_refuses_unauthorized_actor_without_mutation(tmp_path, monkeypatch):
+    lab = _lab_copy(tmp_path)
+    run, task_id, run_path = _failed_run(lab)
+    task_path = lab / "tasks" / f"{task_id}.json"
+    before = (run_path.read_bytes(), task_path.read_bytes())
+    monkeypatch.setattr(orchestration, "provider_doctor", lambda: _ready_doctor("claude"))
+
+    with pytest.raises(PermissionError, match="brief requester"):
+        recover_failed_task(
+            run["run_id"], task_id, authorized_by="untrusted_agent",
+            reason="Unauthorized provider reassignment", provider="claude", lab_dir=lab,
+        )
+
+    assert before == (run_path.read_bytes(), task_path.read_bytes())
+    assert not (run_path.parent / "recoveries").exists()
+
+
+def test_recovery_refuses_wrong_state_foreign_task_and_fake_provider(tmp_path, monkeypatch):
+    lab = _lab_copy(tmp_path)
+    run, task_id, run_path = _failed_run(lab)
+    monkeypatch.setattr(orchestration, "provider_doctor", lambda: _ready_doctor())
+
+    with pytest.raises(ValueError, match="không thuộc run"):
+        recover_failed_task(
+            run["run_id"], "BRD-001", authorized_by="project_owner",
+            reason="Foreign task must be refused", provider="claude", lab_dir=lab,
+        )
+    with pytest.raises(ValueError, match="chưa callable/authenticated"):
+        recover_failed_task(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Unavailable provider must be refused", provider="claude", lab_dir=lab,
+        )
+
+    saved_run = json.loads(run_path.read_text(encoding="utf-8"))
+    saved_run["status"] = "PLANNED"
+    orchestration._save_run(lab, saved_run)
+    monkeypatch.setattr(orchestration, "provider_doctor", lambda: _ready_doctor("claude"))
+    with pytest.raises(ValueError, match="không ở trạng thái FAILED"):
+        recover_failed_task(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Wrong run state must be refused", provider="claude", lab_dir=lab,
+        )
+
+
+def test_recovery_budget_is_bounded_and_existing_record_is_immutable(tmp_path, monkeypatch):
+    lab = _lab_copy(tmp_path)
+    run, task_id, run_path = _failed_run(lab)
+    monkeypatch.setattr(orchestration, "provider_doctor", lambda: _ready_doctor("claude"))
+    first = recover_failed_task(
+        run["run_id"], task_id, authorized_by="project_owner",
+        reason="Grant the full bounded recovery budget", provider="claude",
+        grant_attempts=2, lab_dir=lab,
+    )
+    recovery_path = lab / first["recovery_path"]
+    recovery_hash = hashlib.sha256(recovery_path.read_bytes()).hexdigest()
+
+    saved_run = json.loads(run_path.read_text(encoding="utf-8"))
+    task_path = lab / "tasks" / f"{task_id}.json"
+    task = json.loads(task_path.read_text(encoding="utf-8"))
+    saved_run["status"] = "FAILED"
+    saved_run["attempts"][task_id] = 2
+    task["status"] = "BLOCKED"
+    task["owner"] = "claude"
+    orchestration._exclusive_json(
+        orchestration._attempt_path(lab, run["run_id"], task_id, "work", 2),
+        {"task_id": task_id, "attempt": 2, "success": False},
+    )
+    orchestration._event(
+        saved_run, "RUN_FAILED", "recovery attempt failed", task_id=task_id,
+    )
+    orchestration._atomic_json(task_path, task)
+    orchestration._save_run(lab, saved_run)
+
+    with pytest.raises(ValueError, match="vượt recovery budget"):
+        recover_failed_task(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="A third recovery attempt must be refused", provider="claude",
+            grant_attempts=1, lab_dir=lab,
+        )
+    assert hashlib.sha256(recovery_path.read_bytes()).hexdigest() == recovery_hash
+    assert len(list(recovery_path.parent.glob("*.json"))) == 1
+
+
+def test_orphaned_review_repair_is_fail_closed_and_preserves_evidence(tmp_path):
+    lab = _lab_copy(tmp_path)
+    run, task_id, run_path, quarantine, quarantine_hash = _orphaned_review(lab)
+    task_path = lab / "tasks" / f"{task_id}.json"
+    attempt_path = orchestration._attempt_path(lab, run["run_id"], task_id, "work", 1)
+    old_events = deepcopy(json.loads(run_path.read_text(encoding="utf-8"))["events"])
+    old_task_hash = hashlib.sha256(task_path.read_bytes()).hexdigest()
+    old_run_hash = hashlib.sha256(run_path.read_bytes()).hexdigest()
+    old_attempt_hash = hashlib.sha256(attempt_path.read_bytes()).hexdigest()
+
+    result = repair_orphaned_review(
+        run["run_id"], task_id, authorized_by="project_owner",
+        reason="Provider submit trái phép sau failed attempt; handoff đã quarantine",
+        quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+        quarantine_sha256=quarantine_hash, attempt=1, lab_dir=lab,
+    )
+
+    task = json.loads(task_path.read_text(encoding="utf-8"))
+    saved_run = json.loads(run_path.read_text(encoding="utf-8"))
+    record = json.loads((lab / result["repair_path"]).read_text(encoding="utf-8"))
+    assert task["status"] == "ACTIVE"
+    assert task["owner"] == "antigravity"
+    assert saved_run["attempts"][task_id] == 1
+    assert saved_run["events"][:len(old_events)] == old_events
+    assert saved_run["events"][-1]["kind"] == "ORPHANED_REVIEW_REPAIRED"
+    assert hashlib.sha256(attempt_path.read_bytes()).hexdigest() == old_attempt_hash
+    assert hashlib.sha256(quarantine.read_bytes()).hexdigest() == quarantine_hash
+    assert record["previous_task_sha256"] == old_task_hash
+    assert record["previous_run_sha256"] == old_run_hash
+    assert record["failed_attempt"]["sha256"] == old_attempt_hash
+    assert record["evidence_disposition"] == "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    assert list((lab / "handoffs").glob(f"{task_id}.*.json")) == []
+
+
+def test_orphaned_review_repair_refuses_unauthorized_hash_and_canonical_handoff(tmp_path):
+    lab = _lab_copy(tmp_path)
+    run, task_id, run_path, quarantine, quarantine_hash = _orphaned_review(lab)
+    task_path = lab / "tasks" / f"{task_id}.json"
+    before = (run_path.read_bytes(), task_path.read_bytes())
+
+    with pytest.raises(PermissionError, match="brief requester"):
+        repair_orphaned_review(
+            run["run_id"], task_id, authorized_by="rogue_provider",
+            reason="Unauthorized repair must fail",
+            quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+            quarantine_sha256=quarantine_hash, attempt=1, lab_dir=lab,
+        )
+    with pytest.raises(ValueError, match="hash không khớp"):
+        repair_orphaned_review(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Wrong quarantine hash must fail",
+            quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+            quarantine_sha256="f" * 64, attempt=1, lab_dir=lab,
+        )
+    assert before == (run_path.read_bytes(), task_path.read_bytes())
+
+    canonical = lab / "handoffs" / f"{task_id}.antigravity.r999.json"
+    orchestration._exclusive_json(canonical, {"task_id": task_id})
+    with pytest.raises(ValueError, match="canonical handoff"):
+        repair_orphaned_review(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Canonical handoff means REVIEW is not orphaned",
+            quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+            quarantine_sha256=quarantine_hash, attempt=1, lab_dir=lab,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("task_id", "RND-deadbeef-99", "khớp task_id"),
+        ("agent_id", "opencode", "khớp task owner"),
+    ],
+)
+def test_orphaned_review_repair_requires_quarantine_owner_and_task_match(
+    tmp_path, field, value, message,
+):
+    lab = _lab_copy(tmp_path)
+    run, task_id, _run_path, quarantine, _old_hash = _orphaned_review(lab)
+    quarantined = json.loads(quarantine.read_text(encoding="utf-8"))
+    quarantined[field] = value
+    orchestration._atomic_json(quarantine, quarantined)
+    new_hash = hashlib.sha256(quarantine.read_bytes()).hexdigest()
+
+    with pytest.raises(ValueError, match=message):
+        repair_orphaned_review(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Mismatched quarantined identity must fail",
+            quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+            quarantine_sha256=new_hash, attempt=1, lab_dir=lab,
+        )
+
+
+def test_orphaned_review_repair_requires_failed_latest_attempt_and_review_state(tmp_path):
+    lab = _lab_copy(tmp_path)
+    run, task_id, _run_path, quarantine, quarantine_hash = _orphaned_review(lab)
+    attempt_path = orchestration._attempt_path(lab, run["run_id"], task_id, "work", 1)
+    attempt_value = json.loads(attempt_path.read_text(encoding="utf-8"))
+    attempt_value["success"] = True
+    orchestration._atomic_json(attempt_path, attempt_value)
+
+    with pytest.raises(ValueError, match="failed work attempt"):
+        repair_orphaned_review(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Successful attempt cannot justify orphan repair",
+            quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+            quarantine_sha256=quarantine_hash, attempt=1, lab_dir=lab,
+        )
+
+    task_path = lab / "tasks" / f"{task_id}.json"
+    task = json.loads(task_path.read_text(encoding="utf-8"))
+    task["status"] = "ACTIVE"
+    orchestration._atomic_json(task_path, task)
+    with pytest.raises(ValueError, match="không ở trạng thái REVIEW"):
+        repair_orphaned_review(
+            run["run_id"], task_id, authorized_by="project_owner",
+            reason="Only REVIEW can be repaired",
+            quarantined_handoff=quarantine.relative_to(lab).as_posix(),
+            quarantine_sha256=quarantine_hash, attempt=1, lab_dir=lab,
+        )
+
+
+def test_contaminated_attempt_repair_quarantines_exact_manifest_and_restores_lifecycle(
+    tmp_path, monkeypatch,
+):
+    fixture = _contaminated_attempt(tmp_path, monkeypatch)
+    before_attempt = (
+        fixture["lab"] / "runs" / fixture["run"]["run_id"] / "attempts"
+        / f"{fixture['trigger']}.work.r002.json"
+    ).read_bytes()
+
+    result = quarantine_contaminated_attempt(
+        fixture["run"]["run_id"], fixture["trigger"], attempt=2,
+        authorized_by="project_owner",
+        reason="Failed worker wrote unauthorized downstream canonical evidence",
+        manifest=fixture["manifest"], lab_dir=fixture["lab"],
+    )
+
+    saved_run = json.loads(fixture["run_path"].read_text(encoding="utf-8"))
+    assert saved_run["status"] == "FAILED"
+    assert saved_run["attempts"] == fixture["run"]["attempts"]
+    assert saved_run["knowledge_sync"] == "PENDING"
+    assert saved_run["events"][-1]["kind"] == "CONTAMINATED_ATTEMPT_QUARANTINED"
+    trigger = json.loads(
+        (fixture["lab"] / "tasks" / f"{fixture['trigger']}.json").read_text(encoding="utf-8")
+    )
+    assert (trigger["status"], trigger["owner"], trigger["reviewer"], trigger["review_notes"]) == (
+        "BLOCKED", "codex", None, [],
+    )
+    for task_id in fixture["downstream"]:
+        task = json.loads(
+            (fixture["lab"] / "tasks" / f"{task_id}.json").read_text(encoding="utf-8")
+        )
+        assert (task["status"], task["owner"], task["reviewer"], task["review_notes"]) == (
+            "READY", None, None, [],
+        )
+    record = json.loads((fixture["lab"] / result["repair_path"]).read_text(encoding="utf-8"))
+    assert record["failed_attempt"]["sha256"] == hashlib.sha256(before_attempt).hexdigest()
+    assert record["evidence_disposition"] == "REPAIR_RECORD_NOT_TECHNICAL_EVIDENCE"
+    assert len(record["moved"]) == len(fixture["moved_paths"])
+    trigger_artifact = next(
+        item for item in fixture["manifest"]
+        if item["path"] == json.loads(
+            (fixture["lab"] / "tasks" / f"{fixture['trigger']}.json").read_text(
+                encoding="utf-8"
+            )
+        )["required_artifacts"][0]
+    )
+    assert any(
+        moved["source_path"] == trigger_artifact["path"]
+        and moved["category"] == "ARTIFACT"
+        for moved in record["moved"]
+    )
+    for moved in record["moved"]:
+        assert not orchestration._canonical_source_path(
+            fixture["lab"], moved["source_path"]
+        ).exists()
+        quarantine = fixture["lab"] / moved["quarantine_path"]
+        assert hashlib.sha256(quarantine.read_bytes()).hexdigest() == moved["sha256"]
+    assert validate_lab(fixture["lab"])["valid"] is True
+
+
+def test_contaminated_attempt_repair_rejects_stale_sha_without_mutation(tmp_path, monkeypatch):
+    fixture = _contaminated_attempt(tmp_path, monkeypatch)
+    manifest = deepcopy(fixture["manifest"])
+    manifest[0]["sha256"] = "f" * 64
+    before = {
+        path: path.read_bytes() for path in [fixture["run_path"], *fixture["canonical_paths"]]
+    }
+
+    with pytest.raises(ValueError, match="SHA không khớp"):
+        quarantine_contaminated_attempt(
+            fixture["run"]["run_id"], fixture["trigger"], attempt=2,
+            authorized_by="project_owner", reason="Stale SHA must be refused",
+            manifest=manifest, lab_dir=fixture["lab"],
+        )
+
+    assert all(path.read_bytes() == value for path, value in before.items())
+    assert not (fixture["lab"] / "quarantine" / "contaminated_attempts").exists()
+
+
+def test_contaminated_attempt_repair_rejects_downstream_attempt_history(tmp_path, monkeypatch):
+    fixture = _contaminated_attempt(tmp_path, monkeypatch)
+    run = json.loads(fixture["run_path"].read_text(encoding="utf-8"))
+    run["attempts"][fixture["downstream"][0]] = 1
+    orchestration._save_run(fixture["lab"], run)
+    before = fixture["run_path"].read_bytes()
+
+    with pytest.raises(ValueError, match="attempt > 0"):
+        quarantine_contaminated_attempt(
+            run["run_id"], fixture["trigger"], attempt=2,
+            authorized_by="project_owner",
+            reason="Downstream execution prevents lifecycle rollback",
+            manifest=fixture["manifest"], lab_dir=fixture["lab"],
+        )
+
+    assert fixture["run_path"].read_bytes() == before
+    assert all(path.exists() for path in fixture["moved_paths"])
+
+
+def test_contaminated_attempt_repair_rolls_back_all_files_on_commit_failure(
+    tmp_path, monkeypatch,
+):
+    fixture = _contaminated_attempt(tmp_path, monkeypatch)
+    before = {
+        path: path.read_bytes() for path in [fixture["run_path"], *fixture["canonical_paths"]]
+    }
+    real_exclusive = orchestration._exclusive_json
+
+    def fail_at_record_commit(path, value):
+        if ".contaminated-attempt." in path.name:
+            raise OSError("injected record commit failure")
+        return real_exclusive(path, value)
+
+    # Failure occurs after every quarantine file was staged, canonical sources
+    # were removed, and task/run bytes were changed.  The transaction must put
+    # every exact byte back, not merely handle a pre-commit validation error.
+    monkeypatch.setattr(orchestration, "_exclusive_json", fail_at_record_commit)
+    with pytest.raises(OSError, match="injected record commit failure"):
+        quarantine_contaminated_attempt(
+            fixture["run"]["run_id"], fixture["trigger"], attempt=2,
+            authorized_by="project_owner", reason="Exercise atomic rollback",
+            manifest=fixture["manifest"], lab_dir=fixture["lab"],
+        )
+
+    assert all(path.read_bytes() == value for path, value in before.items())
+    assert not list((fixture["lab"] / "runs" / fixture["run"]["run_id"] / "repairs").glob(
+        "*.contaminated-attempt.*.json"
+    ))
+    assert not list((fixture["lab"] / "quarantine" / "contaminated_attempts").rglob("*.*"))
+
+
+def test_validator_detects_unrepaired_canonical_attempt_contamination(tmp_path, monkeypatch):
+    fixture = _contaminated_attempt(tmp_path, monkeypatch)
+
+    validation = validate_lab(fixture["lab"])
+
+    assert validation["valid"] is False
+    assert any(
+        "canonical contamination chưa có valid repair/quarantine" in error
+        for error in validation["errors"]
+    )
+
+
+def test_obsidian_exports_repair_and_tombstones_stale_managed_evidence(
+    tmp_path, monkeypatch,
+):
+    fixture = _contaminated_attempt(tmp_path, monkeypatch)
+    repaired = quarantine_contaminated_attempt(
+        fixture["run"]["run_id"], fixture["trigger"], attempt=2,
+        authorized_by="project_owner",
+        reason="Quarantine contaminated handoffs reviews and artifacts",
+        manifest=fixture["manifest"], lab_dir=fixture["lab"],
+    )
+    record = repaired["repair"]
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    research = vault / "DYLIGHT Bridge Evolution" / "Research Lab"
+    research.mkdir(parents=True)
+    old_files = {}
+    tombstone_relatives = []
+    for moved in record["moved"]:
+        if moved["category"] not in {"HANDOFF", "REVIEW"}:
+            continue
+        directory = "Handoffs" if moved["category"] == "HANDOFF" else "Reviews"
+        relative = f"{directory}/{Path(moved['source_path']).stem}.md"
+        target = research / Path(relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        original = (
+            f"---\ndylight_kind: research-{moved['category'].lower()}\n---\n"
+            f"# Appears valid: {moved['source_path']}\nAPPROVE SCREENED\n"
+        ).encode("utf-8")
+        target.write_bytes(original)
+        old_files[relative] = hashlib.sha256(original).hexdigest()
+        # Simulate a stale managed note edited after its last export. Safety
+        # tombstoning must override this exact tracked path despite the conflict.
+        target.write_bytes(original + b"manual stale edit\n")
+        tombstone_relatives.append(relative)
+    manifest_path = research / ".dylight-research-manifest.json"
+    manifest_path.write_text(json.dumps({
+        "schema_version": 1,
+        "exporter_version": "research-obsidian/4",
+        "files": old_files,
+    }, indent=2) + "\n", encoding="utf-8")
+    unrelated = research / "Handoffs" / "personal-unrelated.md"
+    unrelated.write_text("personal note must survive\n", encoding="utf-8")
+
+    exported = export_research_to_obsidian(vault, lab_dir=fixture["lab"])
+
+    assert exported["repairs_exported"] == 1
+    assert exported["quarantine_tombstones_exported"] == len(tombstone_relatives) == 6
+    assert not set(tombstone_relatives) & set(exported["conflicts"])
+    for relative in tombstone_relatives:
+        tombstone = (research / Path(relative)).read_text(encoding="utf-8")
+        assert "dylight_kind: \"quarantine-tombstone\"" in tombstone
+        assert "NOT_EVIDENCE" in tombstone
+        assert record["repair_id"] in tombstone
+        assert "APPROVE SCREENED" not in tombstone
+    assert unrelated.read_text(encoding="utf-8") == "personal note must survive\n"
+
+    repair_note = (
+        research / "Repairs" / f"{record['repair_id']}.md"
+    ).read_text(encoding="utf-8")
+    assert "NOT_EVIDENCE" in repair_note
+    assert record["failed_attempt"]["sha256"] in repair_note
+    assert record["manifest_sha256"] in repair_note
+    assert record["reason"] in repair_note
+    for moved in record["moved"]:
+        assert moved["source_path"] in repair_note
+        assert moved["quarantine_path"] in repair_note
+        assert moved["sha256"] in repair_note
+    for task in record["tasks"]:
+        assert task["task_id"] in repair_note
+        assert task["post_task_sha256"] in repair_note
+    link = f"Research Lab/Repairs/{record['repair_id']}"
+    assert link in (research / "00 - Research Lab Dashboard.md").read_text(encoding="utf-8")
+    assert link in (
+        research / "Runs" / f"{record['run_id']}.md"
+    ).read_text(encoding="utf-8")
+    for task in record["tasks"]:
+        assert link in (
+            research / "Tasks" / f"{task['task_id']}.md"
+        ).read_text(encoding="utf-8")
+
+    second = export_research_to_obsidian(vault, lab_dir=fixture["lab"])
+    assert second["written"] == []
+    assert second["conflicts"] == []
 
 
 def test_brief_and_run_are_mirrored_to_obsidian(tmp_path):

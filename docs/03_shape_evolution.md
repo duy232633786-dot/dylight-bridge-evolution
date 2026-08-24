@@ -145,6 +145,107 @@ ghi nhận là **hạng mục nghiên cứu riêng**, không phải một biến
 
 ---
 
+## 5b. Kết quả đợt A/B đầu tiên (BRD-009) — và điều KHÔNG được kết luận từ nó
+
+Thí nghiệm đã chạy: `experiments/run_grammar_ab.py`, pre-registration khóa trước
+tại `experiments/preregistration/grammar_ab_v1_vs_v2.json`, kết quả tại
+`experiments/results/grammar_ab_20260821T061537.020446Z/` (run chính thức, chạy bằng
+runner đã sửa và **khớp run matrix đã đăng ký**).
+Cấu hình: 3 arm × 2 thuật toán (Random Search, NSGA-II) × 3 seed × **600 lần gọi
+solver** mỗi lần chạy, cùng prefilter L0, cùng reference point hypervolume khai
+báo trước trong `experiments/run_baseline.py`.
+
+### 5b.1. Phán quyết theo tiêu chí đã đăng ký: **VÔ HIỆU** (không kết luận được)
+
+Cả hai arm v2 đều nhận phán quyết **VÔ HIỆU**, không phải "kết quả âm". Phân biệt
+này quan trọng: *âm* nghĩa là đã kiểm và bác bỏ; *vô hiệu* nghĩa là **không kiểm
+được theo hướng nào**, và tuyệt đối không được đọc thành kết quả dương.
+
+Lý do: điều kiện vô hiệu `DEGENERATE_FRONT` đã đăng ký trước kích hoạt ở 7/18 lần
+chạy — Pareto front co về 1–2 điểm, trong khi tiêu chí quyết định lại dùng
+hypervolume làm điều kiện phụ. Hypervolume của một front suy biến không mang
+nghĩa đa mục tiêu, nên vế thứ hai của tiêu chí mất hiệu lực.
+
+Ngoài ra, vế thứ nhất (cải thiện ≥ 2% trên **mọi** seed VÀ **mọi** thuật toán)
+cũng không đạt, vì Random Search thua rõ trên không gian v2 — không gian đó lớn
+**41,9 tỷ tổ hợp**, gấp ~126.000 lần không gian v1 (331.776 tổ hợp), nên lấy mẫu
+đều ở ngân sách 600 là quá thưa.
+
+> **Ghi chú lịch sử (bài học quy trình).** Bản runner đầu tiên xuất ra phán quyết
+> "KHÔNG ĐẠT — KẾT QUẢ ÂM" cho chính bộ số liệu này, vì nó **không áp dụng chính
+> các điều kiện vô hiệu mà pre-registration đã khai**. Reviewer đối kháng phát
+> hiện lỗi đó; sau khi sửa, cùng dữ liệu cho phán quyết đúng là VÔ HIỆU. Kết luận
+> chỉ đáng tin khi công cụ sinh ra nó cũng bị kiểm.
+
+Điều kiện "cùng ngân sách solver" đã kiểm chứng được trong artifact: **cả 18 lần
+chạy đều tiêu đúng 600 lần gọi solver**.
+
+### 5b.2. Quan sát phụ, mạnh hơn mức "thắng một lần chạy"
+
+Với NSGA-II, arm **A2** (tham số hóa hình dạng, **cùng dải bê tông C40–C50 như
+v1**) cho chi phí tương đối **2027,90 / 2021,39 / 2008,95** trên ba seed 42/43/44.
+
+Mốc so sánh không phải kết quả của một lần tìm kiếm may mắn, mà là **tối ưu toàn
+cục đã chứng minh bằng vét cạn** toàn bộ không gian v1: **2072,94**
+(`experiments/results/exhaustive_20260820T154139.606695Z/`, 331.776 tổ hợp,
+18.036 hợp lệ L0, 7.572 khả thi). NSGA-II trên arm A1 tái lập đúng con số này ở
+cả ba seed, nên arm đối chứng đã chạm trần thật của nó — công cụ đối chiếu độc
+lập `experiments/compare_to_oracle.py` xác nhận `best_cost_gap = 0,00%` và với
+seed 43/44 còn `exact_oracle_front = True`, `oracle_recall = 1,0` (tái lập ĐÚNG
+toàn bộ Pareto front thật). Trên nền đó, arm A2 cho `gap = −2,17 / −2,49 /
+−3,09%` và `hv_2d_ratio > 1` ở cả ba seed. Chênh lệch: **2,2–3,1%**.
+
+Cơ chế kỹ thuật của phương án tốt nhất (`BT-0d93101c48b28dca`, đã kiểm chứng lại
+độc lập: `feasible=True`, không vi phạm, `max_utilization = 0,894`):
+
+| Đại lượng | AI tự thiết kế | ST-1750 định hình | Chênh |
+|---|---:|---:|---:|
+| Chiều cao | 2,000 m | 1,750 m | **+14,3%** |
+| Diện tích | 0,6930 m² | 0,6490 m² | +6,8% |
+| Mô men quán tính | 0,3683 m⁴ | 0,2260 m⁴ | **+63,0%** |
+| Số tao cáp | PT-34 | PT-42 | **−8 tao** |
+
+Nghĩa là agent mua độ cứng bằng **chiều cao** thay vì bằng **vật liệu**, rồi
+tiêu khoản dư đó vào việc cắt bớt cáp DƯL — cấu phần đắt nhất. Phương án nằm
+**đúng trên biên chế tạo**: sườn 100 mm = ngưỡng FAB-001, cánh trên 90 mm =
+ngưỡng FAB-002. Đây là xác nhận thực nghiệm cho §2.1: tối ưu luôn bị đẩy tới rìa,
+và nhóm FAB-\* chính là thứ giữ nó lại trong vùng sản xuất được.
+
+### 5b.3. Quy tắc quy kết đã đăng ký đã kích hoạt
+
+Arm **A3** (v2 đầy đủ, có thêm C55/C60) **kém hơn A2**. Theo quy tắc khóa trước,
+điều đó loại trừ cách giải thích "cải thiện là nhờ bê tông cường độ cao": phần
+chênh lệch không quy được cho vật liệu.
+
+### 5b.4. Điều KHÔNG được kết luận
+
+1. **Không** được nói "grammar v2 tốt hơn v1" — tiêu chí đăng ký trước phán
+   VÔ HIỆU, và vô hiệu không phải là dương.
+2. **Không** được diễn giải hypervolume hay hình dạng Pareto: cờ
+   `DEGENERATE_FRONT` bật ở 11/18 lần chạy (front co về ≤ 2 điểm), và ba mục tiêu
+   tương quan rất mạnh trên toàn miền v1 (cost–carbon 0,93; mass–carbon 0,86;
+   cost–mass 0,80). Bài toán đang gần đơn mục tiêu.
+3. **Không** được coi 2008,95 là "tiết kiệm 3%" ngoài đời: đơn giá và hệ số
+   carbon trong `catalogs.json` vẫn là placeholder (gate §7 research contract).
+4. **Không** được gọi phương án này là thiết kế. Claim ceiling là **SCREENED**:
+   L0 + L1 line-girder. Tiết diện mảnh sát biên FAB chính là loại phương án mà
+   L1 kém tin cậy nhất (§3.2) — phải qua L2 Midas trước khi bàn tiếp.
+5. Confound còn lại chưa bóc tách: A1 tìm trên `girder_count ∈ {5,6,7,8}` còn
+   A2/A3 chỉ có `{5,6}`; A1 có thêm `DG-END-ONLY`; arm v2 chịu thêm ràng buộc
+   HARD FAB-\*; và ở cùng ngân sách solver, arm v2 phải sàng L0 nhiều hơn hẳn.
+
+### 5b.5. Việc phải làm trước khi kết quả này được trích dẫn
+
+- Chạy lại với **≥ 20 seed** (đợt này mới 3) theo đúng mục 3 của lộ trình.
+- Thêm arm thứ tư: v1 giới hạn `girder_count ∈ {5,6}` để đóng nốt confound.
+- Thiết kế lại tiêu chí đăng ký cho **lần sau**: yêu cầu "mọi thuật toán đều
+  thắng" đang trộn hai câu hỏi khác nhau — *không gian thiết kế có tốt hơn không*
+  và *thuật toán có đủ mạnh để khai thác không gian đó không*. Việc tách hai câu
+  hỏi phải được pre-register **trước** khi chạy, không được sửa tiêu chí của đợt
+  này sau khi đã thấy số liệu.
+
+---
+
 ## 5. Lộ trình kế tiếp
 
 Theo thứ tự ưu tiên; mỗi mục có tiêu chí "xong" kiểm được:
@@ -156,7 +257,8 @@ Theo thứ tự ưu tiên; mỗi mục có tiêu chí "xong" kiểm được:
    miền quá lớn), rồi cập nhật `knowledge/audits/` cho KC-010…KC-016 với
    `evidence_freshness`/`claim_audit` thật. *Xong khi:* không thẻ nào của v2 còn
    ở trạng thái `NOT_TESTED` mà vẫn được dùng để định hướng tìm kiếm.
-3. **Benchmark hai arm cùng ngân sách.** v1 (catalog) so với v2 (tham số hóa),
+3. **Benchmark hai arm cùng ngân sách.** *(đã chạy đợt đầu — xem §5b; còn
+   thiếu số seed và arm khử confound)* v1 (catalog) so với v2 (tham số hóa),
    cùng `solver_calls`, ≥ 20 seed, theo `docs/03_validation_protocol.md`. *Xong
    khi:* báo được tỷ lệ khả thi, best/median cost, hypervolume với reference
    point khóa trước, và số solver call tới feasible đầu tiên cho cả hai arm.

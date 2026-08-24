@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-02",
+  "title": "Antigravity phát sinh hình thái Michell cho giả thuyết dầm 480 m",
+  "research_question": "Những topology Michell/catenary nào tạo load path hợp lý cho vùng mômen âm, mômen dương, lực cắt và xoắn mà không giả định trước các chỉ tiêu 85 phần trăm, giảm 60 phần trăm hay tỷ số 1.8?",
+  "workstream": "geometry",
+  "priority": "P1",
+  "status": "ACCEPTED",
+  "owner": "antigravity",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G1"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-b471879e/02_concept_portfolio.md"
+  ],
+  "acceptance_criteria": [
+    "Tối thiểu ba concept khác topology/cơ chế, không chỉ đổi kích thước; định nghĩa h_pier, h_mid, alpha_catenary, theta_michell, t_deck và t_bottom bằng SI, miền và ràng buộc",
+    "Mỗi concept nêu load path cho sagging, hogging, shear, torsion và reversal; nêu novelty, liên kết, chế tạo, lắp dựng, kiểm tra, sửa chữa và failure hypothesis",
+    "Mỗi concept có geometry lineage/hash hoặc mô tả tham số tái lập; mọi render và diễn giải AI gắn nhãn F0 IDEA",
+    "Không dùng một scalar GA_eq như sự thật; nêu kế hoạch unit-cell/homogenization theo hướng tải, bước ô và độ mềm nút",
+    "Không tuyên bố đạt nhịp 480 m, GA_eq 85 phần trăm, giảm diện tích 60 phần trăm hay M_D/M_L 1.8"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-b471879e/02_concept_portfolio.md"
+  ],
+  "safety_notes": [
+    "Hình đẹp không phải bằng chứng chịu lực; vật liệu mới không vào production catalog",
+    "Antigravity chỉ làm form-inventor F0; analyst độc lập mới được tính và vẫn không phát hành kỹ thuật"
+  ],
+  "review_notes": [
+    "REVISE: giữ ba concept và algebra 5.5→2.2; xóa các dải hiệu năng tự đặt, dùng TBD/UNVERIFIED và chỉ giữ đúng target từ brief. Nêu G1 pending cho tới khi có geometry tái lập và kiểm tra chế tạo.",
+    "APPROVE F0 IDEA artifact only. Ba concept và load-path được lưu để nghiên cứu; không APPROVE G1, physics, 480 m feasibility hoặc các target 85%/60%/1.8. G1 vẫn PENDING và phải có task/model riêng."
+  ],
+  "source_brief_id": "RND-20260821-b471879e",
+  "preferred_provider": "antigravity",
+  "preferred_role": "form_inventor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-013-002",
+  "task_id": "BRD-013",
+  "detected_at_utc": "2026-08-21T09:36:50.843036Z",
+  "detected_by": "provenance_repair_impl",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "artifact_path": "experiments/run_grammar_ab_confirmatory.py",
+  "recorded_sha256": "f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0",
+  "observed_sha256": "cf5c5e96f5dbae21c25191f760394663f393fe117ea7586a606a594493c5ac6d",
+  "reason": "Claude Desktop changed the approved BRD-013 runner under BRD-015 at 2026-08-21T09:33:30Z to fix tuple objective extraction, empty-pair verdicts, and seed-compliance reporting; the mutation occurred after COR-BRD-013-001 approval.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "recovery_id": "REC-3255721e80424ed2",
+  "created_at": "2026-08-21T09:32:21.291441Z",
+  "run_id": "RUN-20260821-b471879e",
+  "task_id": "RND-b471879e-01",
+  "authorized_by": "user-via-codex",
+  "reason": "Antigravity attempt 3 produced an artifact but semantic status ERROR and invented design-basis/material values; authorize one final bounded correction attempt, preserving the failed output and log.",
+  "previous_run_status": "FAILED",
+  "next_run_status": "PLANNED",
+  "previous_task_status": "BLOCKED",
+  "next_task_status": "READY",
+  "previous_owner": "antigravity",
+  "previous_provider": "antigravity",
+  "next_provider": "antigravity",
+  "prior_attempts": 3,
+  "previous_run_sha256": "2a037cfde081d1881f2270020cd1f325e79ab74b3c31121a58d285f02897d0c1",
+  "previous_task_sha256": "0581fb85022d6c2bf44da476fc95d710cd58f91b3ad496bd84822a1a5fc4178e",
+  "attempt_records": [
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-01.work.r001.json",
+      "sha256": "df6f1a6aa52ded875eaaf75726305b6bda093c81c8fc840d66935718beed4a63"
+    },
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-01.work.r002.json",
+      "sha256": "2f004dd9fdddf5958ad1ca76dee53d41adbe4b9b6cc98a38a56cf4035157512d"
+    },
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-01.work.r003.json",
+      "sha256": "80119dd715a08b631be185b325c82d989acf8a77a725286ab299d016a9eff265"
+    }
+  ],
+  "base_retry_budget": 1,
+  "prior_recovery_grants": 1,
+  "granted_attempts": 1,
+  "effective_retry_budget": 3
+}

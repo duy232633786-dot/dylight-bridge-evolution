@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-95e7948b3e774a40",
+  "amendment_sha256": "809806f2e6c8b59395abdbab1101c92acea27eca0b102b8896bb69cd1f7be51e",
+  "created_at": "2026-08-21T09:55:04.211157Z",
+  "task_id": "RND-b471879e-04",
+  "authorized_by": "user-via-codex",
+  "reason": "Fail-closed re-scope: chua co adapter/raw solver L2 nen reproduction chi duoc kiem toan evidence-boundary F0, khong tu khai G0-G4 hoac SCREENED.",
+  "pre_task_sha256": "ce48c11967881b9aee9999e7bc8dd2a4bd22f77f98769232ff4940fa0cc404c1",
+  "post_task_sha256": "be8b10395667dfb8af837e1d77cae2358bcecb95c4388422a5ce188a360720cc",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/ce48c11967881b9aee9999e7bc8dd2a4bd22f77f98769232ff4940fa0cc404c1.json",
+    "sha256": "ce48c11967881b9aee9999e7bc8dd2a4bd22f77f98769232ff4940fa0cc404c1"
+  },
+  "changes": [
+    {
+      "field": "acceptance_criteria",
+      "before": [
+        "Tái tính blind từ input canonical và so tolerance đăng ký trước",
+        "Không lấy trung bình các sai lệch chưa reconcile",
+        "Kiểm solver budget, duplicate/cache, mục tiêu suy biến và provenance",
+        "Nếu có F2: đối chiếu blind Midas L2 với solver/phương pháp khác, kiểm mesh, moving-load envelope, buckling/eigen, torsion/distortion và phản lực",
+        "Nếu chưa có adapter/raw solver L2 thật thì kết luận BLOCKED, không mô phỏng verification bằng văn bản AI"
+      ],
+      "after": [
+        "Tái lập blind từ brief, task amendment và artifacts canonical đã hash; ghi rõ input nào không khả dụng",
+        "Tính độc lập 5.5 x 0.40 và 1.8 / 5.5; so kết quả chính xác và không lấy trung bình sai lệch chưa reconcile",
+        "Audit quy ước kappa, Pi = U - W, đơn vị, capability matrix và mọi STOP rule của RND-03",
+        "Xác nhận solver_status = NOT_RUN và ba concept = NOT_TESTED khi chưa có adapter/raw solver L2 thật",
+        "Ghi mọi confound, thiếu dữ liệu và khác biệt dưới dạng negative result có hash; không phát biểu verification vật lý"
+      ]
+    },
+    {
+      "field": "claim_ceiling",
+      "before": "SCREENED",
+      "after": "IDEA"
+    },
+    {
+      "field": "required_gates",
+      "before": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4"
+      ],
+      "after": []
+    },
+    {
+      "field": "research_question",
+      "before": "Một agent/phương pháp độc lập có tái lập được kết quả và phát hiện confound nào?",
+      "after": "Một agent độc lập có tái lập được hash, đại số, audit thứ nguyên và danh sách điều kiện gỡ STOP của RND-03 mà không giả lập L2 hay tự nâng claim không?"
+    },
+    {
+      "field": "safety_notes",
+      "before": [
+        "Thiếu solver/phương pháp độc lập phải ghi BLOCKED, không fake verification"
+      ],
+      "after": [
+        "Đây là reproduction của evidence boundary F0, không phải L2 verification",
+        "Thiếu solver/phương pháp độc lập phải giữ STOP; không fake verification bằng văn bản AI"
+      ]
+    },
+    {
+      "field": "title",
+      "before": "Tái lập độc lập và audit sai lệch",
+      "after": "Tái lập độc lập báo cáo STOP F0 và audit sai lệch"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "READY",
+  "run_id": "RUN-20260821-b471879e"
+}

@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-013",
+  "created_at_utc": "2026-08-21T09:35:21.132069+00:00",
+  "preregistration_sha256": "16f1b79905298e5b7de8d328e3723b4467900423fb561cdf3f9cd1ce434cfe4d",
+  "n_runs_total": 16,
+  "seeds_registered": 20,
+  "seeds_executed": 2,
+  "seed_compliance": "CHAY LECH GIAO THUC — so seed thuc chay khac so seed da dang ky",
+  "verdict": "KHÔNG KẾT LUẬN ĐƯỢC — chỉ 2 seed ghép cặp, dưới mức tối thiểu 10",
+  "comparison_A2_vs_A4_nsga2": {
+    "n_paired_seeds": 2,
+    "mean_improvement_pct": 0.81,
+    "bootstrap_ci_95_pct": [
+      -1.46,
+      3.09
+    ]
+  },
+  "runs": [
+    {
+      "arm_id": "A1_v1_catalog",
+      "algorithm": "nsga2",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 2089,
+      "feasible_count": 312,
+      "best_cost": 2072.94,
+      "median_cost": 2184.71,
+      "archive_size": 2
+    },
+    {
+      "arm_id": "A1_v1_catalog",
+      "algorithm": "nsga2",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 1086,
+      "feasible_count": 357,
+      "best_cost": 2072.94,
+      "median_cost": 2192.73,
+      "archive_size": 3
+    },
+    {
+      "arm_id": "A1_v1_catalog",
+      "algorithm": "random_search",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 10404,
+      "feasible_count": 264,
+      "best_cost": 2114.57,
+      "median_cost": 2293.9300000000003,
+      "archive_size": 1
+    },
+    {
+      "arm_id": "A1_v1_catalog",
+      "algorithm": "random_search",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 10594,
+      "feasible_count": 254,
+      "best_cost": 2096.38,
+      "median_cost": 2294.385,
+      "archive_size": 3
+    },
+    {
+      "arm_id": "A4_v1_restricted_girders",
+      "algorithm": "nsga2",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 788,
+      "feasible_count": 348,
+      "best_cost": 2072.94,
+      "median_cost": 2169.42,
+      "archive_size": 3
+    },
+    {
+      "arm_id": "A4_v1_restricted_girders",
+      "algorithm": "nsga2",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 820,
+      "feasible_count": 329,
+      "best_cost": 2072.94,
+      "median_cost": 2169.45,
+      "archive_size": 3
+    },
+    {
+      "arm_id": "A4_v1_restricted_girders",
+      "algorithm": "random_search",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 4769,
+      "feasible_count": 260,
+      "best_cost": 2114.57,
+      "median_cost": 2294.4849999999997,
+      "archive_size": 1
+    },
+    {
+      "arm_id": "A4_v1_restricted_girders",
+      "algorithm": "random_search",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 5091,
+      "feasible_count": 259,
+      "best_cost": 2090.17,
+      "median_cost": 2290.98,
+      "archive_size": 3
+    },
+    {
+      "arm_id": "A2_v2_shape_only",
+      "algorithm": "nsga2",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 987,
+      "feasible_count": 314,
+      "best_cost": 2008.95,
+      "median_cost": 2101.29,
+      "archive_size": 2
+    },
+    {
+      "arm_id": "A2_v2_shape_only",
+      "algorithm": "nsga2",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 867,
+      "feasible_count": 374,
+      "best_cost": 2103.26,
+      "median_cost": 2293.1549999999997,
+      "archive_size": 1
+    },
+    {
+      "arm_id": "A2_v2_shape_only",
+      "algorithm": "random_search",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 132549,
+      "feasible_count": 98,
+      "best_cost": 2133.13,
+      "median_cost": 2339.3500000000004,
+      "archive_size": 4
+    },
+    {
+      "arm_id": "A2_v2_shape_only",
+      "algorithm": "random_search",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 140790,
+      "feasible_count": 100,
+      "best_cost": 2092.46,
+      "median_cost": 2312.2799999999997,
+      "archive_size": 1
+    },
+    {
+      "arm_id": "A3_v2_full",
+      "algorithm": "nsga2",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 1433,
+      "feasible_count": 338,
+      "best_cost": 2082.75,
+      "median_cost": 2185.15,
+      "archive_size": 1
+    },
+    {
+      "arm_id": "A3_v2_full",
+      "algorithm": "nsga2",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 2649,
+      "feasible_count": 257,
+      "best_cost": 2057.71,
+      "median_cost": 2262.76,
+      "archive_size": 2
+    },
+    {
+      "arm_id": "A3_v2_full",
+      "algorithm": "random_search",
+      "seed": 42,
+      "solver_calls": 600,
+      "l0_rejected": 132979,
+      "feasible_count": 108,
+      "best_cost": 2133.13,
+      "median_cost": 2420.755,
+      "archive_size": 4
+    },
+    {
+      "arm_id": "A3_v2_full",
+      "algorithm": "random_search",
+      "seed": 43,
+      "solver_calls": 600,
+      "l0_rejected": 140432,
+      "feasible_count": 106,
+      "best_cost": 2098.81,
+      "median_cost": 2378.995,
+      "archive_size": 3
+    }
+  ]
+}

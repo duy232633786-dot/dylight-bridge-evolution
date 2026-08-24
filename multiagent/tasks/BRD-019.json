@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-019",
+  "title": "Test đang bảo vệ chính cái lệch docs–runtime cần đóng",
+  "research_question": "tests/test_obsidian.py khẳng định cứng rằng audit chỉ có KC-001..KC-009 và dashboard phải nêu 'card ngoài snapshot chưa được audit'; sau khi BRD-001 phủ audit đủ 20 card thì hai test này đỏ. Làm sao sửa test để nó kiểm ĐÚNG bất biến (audit phủ đủ card runtime nạp) thay vì khoá cứng một con số?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "owner": "antigravity",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "tests/test_obsidian.py"
+  ],
+  "acceptance_criteria": [
+    "Test khẳng định tập card_id trong audit BẰNG tập card_id mà load_cards() trả về, không hard-code con số",
+    "Thêm card mới vào knowledge/cards/ mà quên cập nhật audit thì test PHẢI đỏ",
+    "Không nới lỏng khẳng định nào khác của test cũ",
+    "Không sửa knowledge/audits/current.json để làm test xanh"
+  ],
+  "required_artifacts": [
+    "tests/test_obsidian.py"
+  ],
+  "safety_notes": [
+    "Nguyên nhân gốc: test khoá cứng số 9 nên nó BẢO VỆ cái lệch thay vì bắt lệch",
+    "Sửa test cho đúng bất biến, KHÔNG sửa dữ liệu cho vừa test"
+  ],
+  "review_notes": [
+    "tests/test_obsidian.py:187 assert set(audit['cards']) == {KC-001..KC-009} dù tên test là test_current_audit_valid_and_has_all_cards",
+    "tests/test_obsidian.py:69 assert dashboard phải chứa 'card ngoài snapshot chưa được audit'",
+    "Runtime hiện nạp 20 card; BRD-001 đã phủ audit đủ 20 với trạng thái thật, 0/20 được nâng lên ENGINEER_APPROVED",
+    "Replace the literal 0/20 assertion with approved-count/total derived from the loaded audit or exported data. The actual set-equality test is the regression guard. Resubmit as a new immutable revision."
+  ],
+  "preferred_provider": "opencode",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_obsidian.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

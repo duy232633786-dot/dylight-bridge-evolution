@@ -88,6 +88,26 @@ def main(argv=None):
     knb.add_argument("--managed-folder", default="DYLIGHT Bridge Evolution")
     knb.add_argument("--dry-run", action="store_true")
 
+    kl = sub.add_parser(
+        "knowledge-import-library",
+        help="nhập thư viện tài liệu kỹ thuật cục bộ (ổ trong máy + USB) vào Obsidian")
+    kl.add_argument("sources", nargs="+",
+                    help="một hoặc nhiều thư mục/ổ đĩa nguồn")
+    kl.add_argument("--vault", default=None,
+                    help="vault; bỏ trống để auto-discover")
+    kl.add_argument("--managed-folder", default="DYLIGHT Bridge Evolution")
+    kl.add_argument("--library-folder", default="Library",
+                    help="thư mục thư viện bên trong vùng được quản lý")
+    kl.add_argument("--include-code", action="store_true",
+                    help="nhập thêm script lsp/vlx/py/json")
+    kl.add_argument("--include-markdown", action="store_true",
+                    help="nhập cả .md; mặc định tắt vì Obsidian sẽ index chúng thành note")
+    kl.add_argument("--collection-depth", type=int, default=2,
+                    help="số cấp thư mục kể từ gốc nguồn dùng làm bộ sưu tập")
+    kl.add_argument("--quiet", action="store_true", help="không in tiến độ")
+    kl.add_argument("--dry-run", action="store_true",
+                    help="chỉ kiểm kê và báo kế hoạch, không ghi file")
+
     kc = sub.add_parser(
         "knowledge-theme",
         help="bật màu Brain 2 trong Obsidian và cấu hình nhóm màu Graph View")
@@ -144,6 +164,48 @@ def main(argv=None):
     lab_resume.add_argument("--execute", action="store_true")
     lab_resume.add_argument("--vault", default=None)
 
+    lab_recover = lab_sub.add_parser(
+        "recover", help="authorize retry/reassign có giới hạn cho FAILED + BLOCKED")
+    lab_recover.add_argument("run_id")
+    lab_recover.add_argument("task_id")
+    lab_recover.add_argument("--authorized-by", required=True,
+                             help="phải khớp requested_by của research brief")
+    lab_recover.add_argument("--reason", required=True)
+    lab_recover.add_argument(
+        "--provider", choices=["codex", "claude", "opencode", "antigravity"],
+        default=None, help="giữ provider hiện tại nếu bỏ trống")
+    lab_recover.add_argument("--grant-attempts", type=int, default=1)
+
+    lab_repair_review = lab_sub.add_parser(
+        "repair-orphaned-review",
+        help="fail-closed REVIEW->ACTIVE khi unauthorized handoff đã quarantine")
+    lab_repair_review.add_argument("run_id")
+    lab_repair_review.add_argument("task_id")
+    lab_repair_review.add_argument("--authorized-by", required=True,
+                                   help="phải khớp requested_by của research brief")
+    lab_repair_review.add_argument("--reason", required=True)
+    lab_repair_review.add_argument("--quarantined-handoff", required=True,
+                                   help="đường dẫn lab-relative trong unauthorized_handoffs")
+    lab_repair_review.add_argument("--quarantine-sha256", required=True)
+    lab_repair_review.add_argument("--attempt", type=int, required=True)
+
+    lab_quarantine_attempt = lab_sub.add_parser(
+        "quarantine-contaminated-attempt",
+        help="fail-closed repair cho failed attempt đã ghi canonical state ngoài scope",
+    )
+    lab_quarantine_attempt.add_argument("run_id")
+    lab_quarantine_attempt.add_argument("task_id")
+    lab_quarantine_attempt.add_argument("--attempt", type=int, required=True)
+    lab_quarantine_attempt.add_argument(
+        "--authorized-by", required=True,
+        help="phải khớp requested_by của research brief",
+    )
+    lab_quarantine_attempt.add_argument("--reason", required=True)
+    lab_quarantine_attempt.add_argument(
+        "--manifest", required=True,
+        help="file JSON array chứa exact {path,sha256,disposition} entries",
+    )
+
     lab_run_status = lab_sub.add_parser("run-status", help="xem trạng thái một orchestration run")
     lab_run_status.add_argument("run_id")
 
@@ -158,6 +220,19 @@ def main(argv=None):
     lab_claim = lab_sub.add_parser("claim", help="nhận độc quyền một task READY")
     lab_claim.add_argument("task_id")
     lab_claim.add_argument("--agent", required=True)
+
+    lab_amend = lab_sub.add_parser(
+        "amend-task",
+        help="re-scope task chưa claim bằng amendment bất biến có pre-hash",
+    )
+    lab_amend.add_argument("task_id")
+    lab_amend.add_argument(
+        "--changes", required=True,
+        help="file JSON object ánh xạ field được phép sang giá trị mới",
+    )
+    lab_amend.add_argument("--reason", required=True)
+    lab_amend.add_argument("--authorized-by", required=True)
+    lab_amend.add_argument("--pre-task-sha256", required=True)
 
     lab_submit = lab_sub.add_parser("submit", help="nộp handoff có hash để review độc lập")
     lab_submit.add_argument("task_id")
@@ -183,6 +258,34 @@ def main(argv=None):
     lab_review.add_argument("--notes", required=True)
     lab_review.add_argument("--vault", default=None,
                             help="vault nhận bản ghi review; mặc định auto-discover")
+
+    lab_correct = lab_sub.add_parser(
+        "correct-provenance",
+        help="ghi incident + snapshot bất biến + correction handoff; vẫn chờ review độc lập")
+    lab_correct.add_argument("task_id")
+    lab_correct.add_argument("--agent", required=True)
+    lab_correct.add_argument("--handoff", required=True,
+                             help="đường dẫn project-relative tới handoff lịch sử")
+    lab_correct.add_argument("--artifact", required=True,
+                             help="artifact project-relative đã drift")
+    lab_correct.add_argument("--snapshot-source", required=True,
+                             help="file chứa đúng bytes tại recorded hash")
+    lab_correct.add_argument("--reason", required=True)
+    lab_correct.add_argument("--summary", required=True)
+    lab_correct.add_argument(
+        "--verification-command", action="append", required=True,
+        help='JSON array argv đã chạy, ví dụ ["python","-m","pytest","tests/x.py","-q"]')
+    lab_correct.add_argument("--assumption", action="append", default=[])
+    lab_correct.add_argument("--risk", action="append", default=[])
+
+    lab_correction_review = lab_sub.add_parser(
+        "review-provenance", help="review độc lập correction handoff bất biến")
+    lab_correction_review.add_argument("correction_id")
+    lab_correction_review.add_argument("--agent", required=True)
+    lab_correction_review.add_argument(
+        "--decision", choices=["APPROVE", "REVISE", "REJECT"], required=True)
+    lab_correction_review.add_argument("--finding", action="append", required=True)
+    lab_correction_review.add_argument("--notes", required=True)
 
     cs = sub.add_parser("compute-section", help="Tính toán đặc trưng hình học tiết diện Super-T tham số")
     cs.add_argument("--depth", type=float, default=1.75, help="Chiều cao dầm (m)")
@@ -293,6 +396,27 @@ def main(argv=None):
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 3 if result["conflicts"] else 0
 
+    if args.cmd == "knowledge-import-library":
+        from .knowledge import import_local_library
+        reporter = None if args.quiet else (
+            lambda message: print(message, file=sys.stderr, flush=True))
+        try:
+            result = import_local_library(
+                args.sources, vault_dir=args.vault,
+                managed_folder=args.managed_folder,
+                library_folder=args.library_folder,
+                include_code=args.include_code,
+                include_markdown=args.include_markdown,
+                collection_depth=args.collection_depth,
+                dry_run=args.dry_run, progress=reporter)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            print(json.dumps({"status": "ERROR", "error": str(exc)},
+                             indent=2, ensure_ascii=False), file=sys.stderr)
+            return 2
+        result["status"] = "CONFLICT" if result["conflicts"] else "SUCCESS"
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 3 if result["conflicts"] else 0
+
     if args.cmd == "knowledge-theme":
         from .knowledge import configure_obsidian_colors
         try:
@@ -307,10 +431,13 @@ def main(argv=None):
 
     if args.cmd == "lab":
         from .collaboration import (
-            build_agent_brief, claim_task, export_research_to_obsidian,
+            amend_task_contract, build_agent_brief, claim_task,
+            export_research_to_obsidian,
             create_research_brief, intake_and_plan, lab_status,
             orchestration_status, plan_research, provider_doctor,
-            review_handoff, run_orchestration, set_knowledge_sync,
+            record_provenance_correction, recover_failed_task,
+            quarantine_contaminated_attempt, repair_orphaned_review, review_handoff,
+            review_provenance_correction, run_orchestration, set_knowledge_sync,
             submit_handoff, validate_lab,
         )
         try:
@@ -377,6 +504,40 @@ def main(argv=None):
                 print(json.dumps({"status": advanced, "obsidian": obsidian},
                                  indent=2, ensure_ascii=False))
                 return 0 if not args.execute or advanced["run"]["status"] == "DIGITAL_COMPLETE" else 4
+            if args.lab_cmd == "recover":
+                result = recover_failed_task(
+                    args.run_id, args.task_id,
+                    authorized_by=args.authorized_by,
+                    reason=args.reason,
+                    provider=args.provider,
+                    grant_attempts=args.grant_attempts,
+                )
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+                return 0
+            if args.lab_cmd == "repair-orphaned-review":
+                result = repair_orphaned_review(
+                    args.run_id, args.task_id,
+                    authorized_by=args.authorized_by,
+                    reason=args.reason,
+                    quarantined_handoff=args.quarantined_handoff,
+                    quarantine_sha256=args.quarantine_sha256,
+                    attempt=args.attempt,
+                )
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+                return 0
+            if args.lab_cmd == "quarantine-contaminated-attempt":
+                manifest = _load_state(args.manifest)
+                if not isinstance(manifest, list):
+                    raise ValueError("--manifest phải chứa một JSON array")
+                result = quarantine_contaminated_attempt(
+                    args.run_id, args.task_id,
+                    attempt=args.attempt,
+                    authorized_by=args.authorized_by,
+                    reason=args.reason,
+                    manifest=manifest,
+                )
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+                return 0
             if args.lab_cmd == "run-status":
                 print(json.dumps(orchestration_status(args.run_id), indent=2,
                                  ensure_ascii=False))
@@ -393,6 +554,19 @@ def main(argv=None):
             if args.lab_cmd == "claim":
                 print(json.dumps(claim_task(args.task_id, args.agent), indent=2,
                                  ensure_ascii=False))
+                return 0
+            if args.lab_cmd == "amend-task":
+                changes = _load_state(args.changes)
+                if not isinstance(changes, dict):
+                    raise ValueError("--changes phải chứa một JSON object")
+                result = amend_task_contract(
+                    args.task_id,
+                    changes,
+                    reason=args.reason,
+                    authorized_by=args.authorized_by,
+                    expected_pre_task_sha256=args.pre_task_sha256,
+                )
+                print(json.dumps(result, indent=2, ensure_ascii=False))
                 return 0
             if args.lab_cmd == "submit":
                 handoff = submit_handoff(
@@ -437,7 +611,30 @@ def main(argv=None):
                                   "obsidian": obsidian}, indent=2,
                                  ensure_ascii=False))
                 return 3 if obsidian["conflicts"] else 0
-        except (FileExistsError, FileNotFoundError, OSError, RuntimeError,
+            if args.lab_cmd == "correct-provenance":
+                commands = []
+                for encoded in args.verification_command:
+                    command = json.loads(encoded)
+                    if not isinstance(command, list) or not all(
+                        isinstance(item, str) and item for item in command
+                    ):
+                        raise ValueError("--verification-command phải là JSON argv array")
+                    commands.append(command)
+                result = record_provenance_correction(
+                    args.task_id, args.agent, args.handoff, args.artifact,
+                    args.snapshot_source, args.reason, args.summary, commands,
+                    assumptions=args.assumption, unresolved_risks=args.risk,
+                )
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+                return 0
+            if args.lab_cmd == "review-provenance":
+                result = review_provenance_correction(
+                    args.correction_id, args.agent, args.decision,
+                    args.finding, args.notes,
+                )
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+                return 0
+        except (FileExistsError, FileNotFoundError, OSError, PermissionError, RuntimeError,
                 KeyError, ValueError) as exc:
             print(json.dumps({"status": "ERROR", "error": str(exc)},
                              indent=2, ensure_ascii=False), file=sys.stderr)

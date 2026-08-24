@@ -13,18 +13,46 @@ from ..geometry import check_geometry
 from ..objectives import compute_objectives, objectives_tuple
 from ..state import input_hash, state_from_gene
 
-# Thứ tự biến cố định cho biểu diễn gene dạng vector chỉ số (EA/RL dùng chung)
+#: Grammar mặc định của mọi API trong module (arm đối chứng v1).
+DEFAULT_GRAMMAR_ID = "super_t_simple_v1"
+
+# Thứ tự biến cố định cho biểu diễn gene dạng vector chỉ số (EA/RL dùng chung).
+# Đây là dãy ĐÓNG BĂNG của grammar v1: nhiều module (rl_env.actions, shield,
+# surrogate, experiments/run_exhaustive.py) và mọi artifact đã sinh đều neo vào
+# nó, nên hằng này không được đổi thứ tự. Với grammar khác v1, dùng
+# ``gene_order(grammar_id)`` — thứ tự lấy trực tiếp từ file grammar.
 GENE_ORDER = [
     "girder_catalog_id", "girder_count", "girder_spacing_mm", "deck_slab_thickness_mm",
     "girder_concrete_id", "deck_concrete_id", "diaphragm_layout_id", "prestress_layout_id",
 ]
 
 
-def gene_domains(grammar_id: str = "super_t_simple_v1") -> dict:
-    g = load_grammar(grammar_id)
-    domains = all_domains(g)
+def gene_order(grammar_id: str = DEFAULT_GRAMMAR_ID) -> list[str]:
+    """Thứ tự biến gene của một grammar = thứ tự khai báo ``design_variables``.
+
+    Lấy thứ tự từ chính file grammar (JSON giữ thứ tự khai báo) thay vì từ một
+    hằng module, nên grammar v2 (14 biến) không còn bị cắt xuống 8 biến v1.
+    Grammar v1 khai báo đúng dãy ``GENE_ORDER`` nên hành vi cũ không đổi —
+    ``tests/test_multigrammar_search.py::test_v1_gene_order_frozen`` khóa điều đó.
+    """
+    return list(load_grammar(grammar_id)["design_variables"])
+
+
+def gene_domains(grammar_id: str = DEFAULT_GRAMMAR_ID) -> dict:
+    """{tên biến: [giá trị hợp lệ]} cho MỌI biến của grammar, theo ``gene_order``.
+
+    Dict giữ insertion order nên thứ tự lặp trùng với ``gene_order(grammar_id)``;
+    thuật toán rút số ngẫu nhiên theo thứ tự này để cùng seed cho cùng lịch sử.
+    """
     # 2 biến vật liệu nằm trong materials của state nhưng là gene của bài toán tối ưu
-    return {name: domains[name] for name in GENE_ORDER}
+    domains = all_domains(load_grammar(grammar_id))
+    return {name: domains[name] for name in gene_order(grammar_id)}
+
+
+def gene_sizes(grammar_id: str = DEFAULT_GRAMMAR_ID) -> list[int]:
+    """Kích thước miền từng biến theo đúng thứ tự ``gene_order`` (tiện cho EA/RL)."""
+    domains = gene_domains(grammar_id)
+    return [len(domains[name]) for name in domains]
 
 
 class BudgetedEvaluator:
@@ -38,7 +66,7 @@ class BudgetedEvaluator:
     """
 
     def __init__(self, budget: int, generation_action: str = "SEARCH", *,
-                 seed: int | None = None, grammar_id: str = "super_t_simple_v1"):
+                 seed: int | None = None, grammar_id: str = DEFAULT_GRAMMAR_ID):
         if budget < 0:
             raise ValueError("budget phải không âm")
         self.budget = budget

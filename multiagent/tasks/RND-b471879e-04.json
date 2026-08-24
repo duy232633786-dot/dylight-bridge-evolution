@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-04",
+  "title": "Tái lập độc lập báo cáo STOP F0 và audit sai lệch",
+  "research_question": "Một agent độc lập có tái lập được hash, đại số, audit thứ nguyên và danh sách điều kiện gỡ STOP của RND-03 mà không giả lập L2 hay tự nâng claim không?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-b471879e-03"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-b471879e/04_independent_reproduction.md"
+  ],
+  "acceptance_criteria": [
+    "Tái lập blind từ brief, task amendment và artifacts canonical đã hash; ghi rõ input nào không khả dụng",
+    "Tính độc lập 5.5 x 0.40 và 1.8 / 5.5; so kết quả chính xác và không lấy trung bình sai lệch chưa reconcile",
+    "Audit quy ước kappa, Pi = U - W, đơn vị, capability matrix và mọi STOP rule của RND-03",
+    "Xác nhận solver_status = NOT_RUN và ba concept = NOT_TESTED khi chưa có adapter/raw solver L2 thật",
+    "Ghi mọi confound, thiếu dữ liệu và khác biệt dưới dạng negative result có hash; không phát biểu verification vật lý"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-b471879e/04_independent_reproduction.md"
+  ],
+  "safety_notes": [
+    "Đây là reproduction của evidence boundary F0, không phải L2 verification",
+    "Thiếu solver/phương pháp độc lập phải giữ STOP; không fake verification bằng văn bản AI"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260821-b471879e",
+  "preferred_provider": "opencode",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

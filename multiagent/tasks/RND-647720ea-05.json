@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-647720ea-05",
+  "title": "Tổng hợp quyết định, lineage và bài học dài hạn",
+  "research_question": "Có thể kết luận điều gì, chưa thể kết luận điều gì và thử nghiệm tiếp theo là gì?",
+  "workstream": "knowledge",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-647720ea-01",
+    "RND-647720ea-02",
+    "RND-647720ea-03",
+    "RND-647720ea-04"
+  ],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-647720ea/05_research_synthesis.md"
+  ],
+  "acceptance_criteria": [
+    "Liên kết mọi kết luận tới artifact/hash và nêu uncertainty",
+    "Giữ kết quả âm, failed hypotheses và next experiment",
+    "Nêu rõ claims allowed/forbidden và human gates còn thiếu"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-647720ea/05_research_synthesis.md"
+  ],
+  "safety_notes": [
+    "Không gọi kết quả SCREENED là thiết kế thực hoặc build-ready"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260821-647720ea",
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

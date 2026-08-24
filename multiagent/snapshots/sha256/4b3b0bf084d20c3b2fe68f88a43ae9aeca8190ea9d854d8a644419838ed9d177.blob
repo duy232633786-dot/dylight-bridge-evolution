@@ -1,0 +1,145 @@
+"""Tests for the confirmatory grammar A/B trial (BRD-013)."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import pytest
+
+from experiments.run_grammar_ab_confirmatory import (
+    DEFAULT_PREREG,
+    bootstrap_ci,
+    run_single_arm,
+)
+
+
+def test_preregistration_file_exists_and_has_required_schema():
+    assert DEFAULT_PREREG.is_file()
+    data = json.loads(DEFAULT_PREREG.read_text(encoding="utf-8"))
+    assert data["task_id"] == "BRD-013"
+    assert data["locked_before_running"] is True
+    assert len(data["arms"]) == 4
+    arm_ids = [a["arm_id"] for a in data["arms"]]
+    assert "A1_v1_catalog" in arm_ids
+    assert "A4_v1_restricted_girders" in arm_ids
+    assert "A2_v2_shape_only" in arm_ids
+    assert "A3_v2_full" in arm_ids
+    assert data["budget"]["solver_calls_per_run"] == 600
+    assert data["budget"]["n_seeds"] >= 20
+
+
+def test_bootstrap_ci_calculation():
+    # Test positive improvement
+    diffs = [2.5, 3.0, 2.8, 3.2, 2.1, 2.9, 3.5, 2.4, 2.7, 3.1]
+    mean, low, high = bootstrap_ci(diffs, n_resamples=500, seed=42)
+    assert 2.0 < mean < 3.5
+    assert low < mean < high
+
+
+def test_single_arm_execution_strictly_respects_budget():
+    arm = {
+        "arm_id": "A4_v1_restricted_girders",
+        "grammar_id": "super_t_simple_v1",
+        "domain_restriction": {"girder_count": [5, 6]},
+        "search_path": "local_restricted_domain_path",
+    }
+    # Test on tiny budget of 10 solver calls
+    res = run_single_arm(arm, "random_search", seed=42, budget=10)
+    assert res["solver_calls"] == 10
+    assert res["arm_id"] == "A4_v1_restricted_girders"
+    assert res["algorithm"] == "random_search"
+
+
+# ====================================================================
+# BRD-015 — chặn CẢ LỚP lỗi "coi objectives là dict".
+#
+# Lỗi gốc: BudgetedEvaluator lưu record["objectives"] là TUPLE theo thứ tự
+# OBJECTIVE_KEYS, nhưng runner viết item["objectives"]["relative_cost"] và gate
+# bằng '"relative_cost" in item["objectives"]'. Điều kiện đó kiểm một CHUỖI có
+# nằm trong tuple các SỐ hay không nên LUÔN False ⇒ mọi run báo feasible_count
+# = 0 ⇒ n_paired_seeds = 0 ⇒ phán quyết "KHÔNG ĐẠT" sinh ra từ dữ liệu rỗng.
+# Cùng lớp lỗi với pymoo_adapter đã vá ở BRD-009.
+# ====================================================================
+import json as _json
+import subprocess as _subprocess
+import sys as _sys
+from pathlib import Path as _Path
+
+_ROOT = _Path(__file__).resolve().parent.parent
+
+
+def test_evaluator_stores_objectives_as_tuple_not_dict():
+    """Neo contract: đọc objectives bằng khóa chuỗi phải hỏng ngay tại đây."""
+    from bridge_evolution.objectives import OBJECTIVE_KEYS
+    from bridge_evolution.optimization import nsga2
+
+    run = nsga2(60, seed=42)
+    feasible = [r for r in run["history"] if r["feasible"]]
+    assert feasible, "cần ít nhất một phương án khả thi để test có nghĩa"
+
+    objectives = feasible[0]["objectives"]
+    assert isinstance(objectives, tuple), (
+        f"objectives phải là tuple theo OBJECTIVE_KEYS, đang là {type(objectives).__name__}")
+    assert len(objectives) == len(OBJECTIVE_KEYS)
+    # Chính điều kiện đã gây ra lỗi: nó phải là False, và code KHÔNG được dựa vào nó.
+    assert ("relative_cost" in objectives) is False
+
+
+def test_summarizer_agrees_with_independent_count():
+    """feasible_count/best_cost của runner phải khớp phép tính độc lập."""
+    from bridge_evolution.objectives import OBJECTIVE_KEYS
+    from bridge_evolution.optimization import nsga2
+
+    import experiments.run_grammar_ab_confirmatory as runner
+
+    run = nsga2(60, seed=42)
+    index = OBJECTIVE_KEYS.index("relative_cost")
+    expected_costs = [r["objectives"][index] for r in run["history"]
+                      if r["feasible"] and r["objectives"] is not None]
+    assert expected_costs, "cần dữ liệu khả thi"
+
+    source = (_ROOT / "experiments" / "run_grammar_ab_confirmatory.py").read_text(encoding="utf-8")
+    # Bỏ dòng chú thích: phần giải thích lỗi có nhắc lại chính đoạn code sai.
+    code_only = chr(10).join(line for line in source.splitlines()
+                            if not line.lstrip().startswith("#"))
+    assert '["objectives"]["relative_cost"]' not in code_only, (
+        "runner lại đọc objectives như dict — đây đúng lỗi BRD-015")
+    assert 'OBJECTIVE_KEYS.index("relative_cost")' in source, (
+        "runner phải lấy chỉ số cột chi phí từ OBJECTIVE_KEYS")
+    assert hasattr(runner, "run_single_arm")
+
+
+def test_no_verdict_is_stated_without_paired_data():
+    """Không có seed ghép cặp thì phải nói CHƯA KIẾM ĐƯỢC, không được nói KHÔNG ĐẠT.
+
+    'KHÔNG ĐẠT' nghĩa là đã kiểm và bác bỏ. Phát biểu nó khi n_paired_seeds = 0
+    biến một pipeline hỏng thành một kết luận khoa học.
+    """
+    source = (_ROOT / "experiments" / "run_grammar_ab_confirmatory.py").read_text(encoding="utf-8")
+    assert "KHÔNG KẾT LUẬN ĐƯỢC" in source
+    assert "len(common_seeds_a2_a4) == 0" in source
+
+
+def test_seed_compliance_is_recorded():
+    """Số seed thực chạy phải được ghi và đối chiếu với pre-registration."""
+    source = (_ROOT / "experiments" / "run_grammar_ab_confirmatory.py").read_text(encoding="utf-8")
+    for field in ("seeds_registered", "seeds_executed", "seed_compliance"):
+        assert field in source, f"summary thiếu {field}"
+
+    prereg = _json.loads(
+        (_ROOT / "experiments" / "preregistration" / "grammar_ab_confirmatory.json")
+        .read_text(encoding="utf-8"))
+    assert prereg["budget"]["n_seeds"] == 20
+
+
+def test_stale_broken_result_is_not_citable():
+    """Kết quả cũ sinh từ pipeline hỏng phải nhận ra được, không được trích dẫn."""
+    stale = _ROOT / "experiments" / "results" / "confirmatory_ab_20260821T081427Z" / "summary.json"
+    if not stale.exists():
+        import pytest
+        pytest.skip("không còn thư mục kết quả cũ")
+    data = _json.loads(stale.read_text(encoding="utf-8"))
+    # Dấu hiệu tự mâu thuẫn: archive khác rỗng nhưng feasible_count = 0.
+    broken = [r for r in data["runs"] if r["archive_size"] > 0 and r["feasible_count"] == 0]
+    assert broken, "nếu file này đã được chạy lại thì cập nhật/xóa test này"
+    assert data["comparison_A2_vs_A4_nsga2"]["n_paired_seeds"] == 0

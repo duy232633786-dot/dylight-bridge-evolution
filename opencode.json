@@ -10,7 +10,8 @@
       "description": "Bounded worker; canonical orchestrator owns tests and task transitions",
       "permission": {
         "*": "deny", "read": "allow", "glob": "allow", "grep": "allow",
-        "list": "allow", "lsp": "allow", "edit": "allow", "bash": "deny"
+        "list": "allow", "lsp": "allow", "edit": "allow", "write": "allow",
+        "bash": "deny"
       }
     },
     "dylight-reviewer": {

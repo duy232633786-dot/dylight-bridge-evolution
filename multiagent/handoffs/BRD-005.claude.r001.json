@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-005",
+  "agent_id": "claude",
+  "role": "materials_researcher",
+  "summary": "Ghi nhan ba claim vat lieu/cong nghe do chu du an dan vao tu mot AI khac (UHPC f'c >= 160 MPa voi 2.5 phan tram soi thep; cap CFRP dao duoi 0.5 phan tram sau 100 nam; lap ghep phan doan sieu nhe 45-60 tan bang keo epoxy va can cau robot). KHONG mot claim nao duoc dua vao evidence_matrix.json, vi schema material_evidence bat buoc source_ref + test_report_id + tested_by, va ba claim nay KHONG co nguon nao. Bia ma bao cao thu nghiem de lach schema la nguy tao du lieu, khong duoc lam. Thay vao do lap so dang ky claim chua kiem chung research/materials/unverified_claims_register.md o muc IDEA, moi muc neu ro vi sao bi chan va can gi de go. KET LUAN TUNG CLAIM: (1) UHPC BI CHAN vi ly do nang hon thieu du lieu - no nam NGOAI mien hieu luc mo hinh: khoi ung suat chu nhat cua TCVN 11823-5 khong phu vung f'c tren khoang 120 MPa, nen them mot dong vao catalog se cho ra so lieu trong hop le nhung vo nghia (MODEL-001); dong gop cua soi thep vao suc khang cat la co che rieng ma STR-002 muc L1 khong mo ta duoc. (2) CFRP BI CHAN theo quy tac nghien cuu so 5 cua PROTOCOL: con so 100 nam phai den tu thi nghiem dao gia toc kem mo hinh ngoai suy co khoang tin cay, khong the den tu suy luan; ngoai ra CFRP pha hoai gion nen no doi ca triet ly an toan chu khong chi doi mot so trong catalog. (3) LAP GHEP PHAN DOAN NGOAI PHAM VI: he hien tai chi co L0 va L1 line-girder, khong co khai niem giai doan thi cong nen khong kiem duoc; ngoai ra so sanh 45-60 tan voi 250 tan la SO SAI DOI TUONG - 250 tan la cau duc hang, con phien Super-T trong dai phuong an dang xet nang khoang 59-65 tan theo the KC-008. RAO CHAN DA THEM vao tests/test_material_evidence.py: catalog san xuat khong duoc chua be tong vuot 120 MPa; moi muc evidence phai neu ai da thu nghiem; so dang ky phai neu blocker cho tung claim; ten vat lieu dang UHPC/CFRP/FRP/GEOPOLYMER khong duoc xuat hien trong catalog san xuat. Toan bo 294 test xanh. LUU Y PHOI HOP: chu du an yeu cau phoi hop antigravity, nhung lab doctor cho thay antigravity binary null va available false - CHUA CAI tren may. Theo PROTOCOL, thieu CLI la WAITING va khong duoc gia danh hang khac, nen task nay do claude thuc hien va de codex review.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/materials/unverified_claims_register.md",
+      "sha256": "e972f2c5576a66ee6e33ee894d0c5f2cfb2b3a75ae6fdb55eee57c04dfc2ccc6",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_material_evidence.py",
+      "sha256": "de69459778f9b171c0edda85a54fabcae802d78e859c5f187e6d49b10f4a798c",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Ba claim duoc doi xu nhu moi claim khac: khong co nguon thi khong co so, bat ke chung do AI hay nguoi phat bieu",
+    "Nguong 120 MPa lay tu docs/03_shape_evolution.md muc 4; day la mien hieu luc cua cong thuc chu khong phai gioi han vat ly cua vat lieu"
+  ],
+  "unresolved_risks": [
+    "So dang ky la van ban; neu ai do van them vat lieu vao catalog thi chi co bon test rao chan chan lai - khong duoc noi long chung",
+    "Entry C50-FLYASH-LOWCARBON co san trong evidence matrix mang ma bao cao TR-MAT-2026-001; owner CHUA xac minh ma nay co that hay la placeholder cua phien truoc"
+  ],
+  "next_action": "Xac minh TR-MAT-2026-001 la bao cao that hay placeholder; neu la placeholder thi phai danh dau ro. Mo task rieng cho cong nghe lap ghep phan doan khi da co mo hinh L3 giai doan thi cong"
+}

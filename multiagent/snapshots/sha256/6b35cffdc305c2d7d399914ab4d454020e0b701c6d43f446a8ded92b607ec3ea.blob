@@ -1,0 +1,365 @@
+# Danh mục hình thái Michell & Catenary cho giả thuyết dầm liên tục 480 m
+## Concept Portfolio & Structural Hypotheses — F0 IDEA
+
+**Mã task:** `RND-b471879e-02` · **Workstream:** `geometry` · **Claim level:** **F0 IDEA** (Chưa đạt `SCREENED`, chưa chứng minh tính khả thi)  
+**Agent thực hiện:** `antigravity` (Vai trò: `form_inventor`) · **Reviewer chỉ định:** `codex` (`structural_analyst`)  
+**Design Basis tham chiếu:** `RND-20260821-b471879e/01_design_basis_and_evidence.md` (UNVERIFIED / TBD)
+
+---
+
+> [!IMPORTANT]
+> **Tuyên bố ranh giới nghiên cứu & Cảnh báo an toàn (PG-1.0 / MARP-1.0):**
+> 1. Toàn bộ các hình thái, sơ đồ kết cấu, thông số hình học và cơ chế truyền lực trong tài liệu này được gắn nhãn **F0 IDEA** — thuần túy là giả thuyết hình thái sơ khởi phục vụ không gian tìm kiếm hình học. Tài liệu **KHÔNG** cấu thành bằng chứng chịu lực, **KHÔNG** đưa ra kết luận PASS/FAIL, và **KHÔNG** tuyên bố bất kỳ phương án nào là khả thi hay sẵn sàng thi công.
+> 2. Các chỉ số kỹ thuật: nhịp dầm $L = 480\text{ m}$, độ cứng cắt tương đương $GA_{eq} / GA_{solid} \ge 85\%$, giảm $60\%$ diện tích bản bụng ($A_{web,eff} / A_{web,solid} \le 0.40$), và giảm tỷ số mômen tĩnh tải / hoạt tải $M_D / M_L$ từ $5.5$ xuống $1.8$ được định vị nghiêm ngặt là **CÁC MỤC TIÊU / NGƯỠNG BÁC BỎ CHƯA KIỂM CHỨNG (UNVERIFIED TARGETS / FALSIFICATION THRESHOLDS)**.
+> 3. Độ cứng cắt $GA_{eq}$ của bản bụng giàn Michell **không thể biểu diễn bằng một đại lượng vô hướng (scalar) duy nhất**. $GA_{eq}$ phụ thuộc vào hướng tải, tỷ lệ ô giàn, hiệu ứng uốn cục bộ của thanh và độ cứng xoay của nút liên kết; bắt buộc phải được xác lập qua quy trình đồng nhất hóa năng lượng biến dạng (directional strain energy homogenization) trên ô cơ sở (unit cell).
+> 4. Ứng suất tính toán của cáp/thanh CFRP $\sigma_{CFRP}$ **phải là ứng suất thiết kế cho phép (design allowable)** có đầy đủ nguồn gốc xuất xứ và dữ liệu thử nghiệm độc lập theo Gate G6 (tính đến dão mỏi dài hạn, suy giảm môi trường, hiệu quả neo), tuyệt đối không được tự ý chọn từ cường độ danh định. Mọi giá trị $\sigma_{CFRP}$ trong giai đoạn F0 này đều ở trạng thái **TBD / UNVERIFIED**.
+> 5. Toàn bộ miền giá trị kích thước hình học được trình bày dưới đây là **MIỀN TÌM KIẾM ĐỀ XUẤT CHO F0 (PROPOSED F0 SEARCH BOUNDS)**, không phải là kích thước kỹ thuật đã được kiểm chứng, và phải chờ phê duyệt tại Gate G0/G1.
+
+---
+
+## 1. Bối cảnh bài toán, Giả thuyết kỹ thuật & Kiểm tra đại số bắt buộc
+
+### 1.1. Bối cảnh & Giả thuyết nghiên cứu
+Nhịp dầm liên tục truyền thống bằng bê tông cốt thép dự ứng lực (BTCT DƯL) đúc hẫng thường gặp giới hạn thực tế xung quanh dải nhịp lớn do quy luật tích lũy tĩnh tải ($M_D \propto L^2$), khiến tỷ số mômen tĩnh tải trên hoạt tải $M_D / M_L$ tăng cao, kéo theo ứng suất nén/cắt tập trung rất lớn tại khu vực đỉnh trụ.
+
+Nhiệm vụ `RND-20260821-b471879e-02` xây dựng danh mục hình thái nhằm trả lời câu hỏi: *Những topology Michell/catenary nào có thể tạo ra đường truyền lực hợp lý cho vùng mômen âm, mômen dương, lực cắt và xoắn để phục vụ việc sàng lọc vật lý ở các bước tiếp theo, mà không mặc định trước tính đúng đắn của các mục tiêu 85%, giảm 60% hay tỷ số 1.8?*
+
+---
+
+### 1.2. Kiểm tra đại số bắt buộc về tỷ số $M_D / M_L$ (Mandatory Algebra Falsification)
+Trước khi phát triển hình thái, quy tắc nghiên cứu yêu cầu thực hiện kiểm tra đại số cơ bản đối với giả thuyết chuyển dịch tỷ số $M_D / M_L$ từ $5.5$ xuống $1.8$:
+
+1. **Giả định đường ảnh hưởng và hoạt tải không đổi:** Nếu mômen hoạt tải thiết kế $M_L$ và đường ảnh hưởng nội lực giữ nguyên:
+   - Một mức giảm **$60\%$ trên tổng mômen tĩnh tải** ($M_D$) sẽ đưa tỷ số tĩnh/hoạt tải về:
+     $$\left(\frac{M_D}{M_L}\right)_{mới} = 5.5 \times (1 - 0.60) = 5.5 \times 0.40 = 2.2 \neq 1.8$$
+   - Để đưa tỷ số $M_D / M_L$ từ $5.5$ xuống chính xác $1.8$, tỷ số mômen tĩnh tải chuẩn hóa bắt buộc phải giảm xuống:
+     $$\frac{M_{D,target}}{M_{D,baseline}} = \frac{1.8}{5.5} \approx 0.32727 \quad (\text{tức tổng tĩnh tải phải giảm } 67.27\%)$$
+
+2. **Đóng góp của bản bụng vào tổng tĩnh tải:**
+   Bản bụng dầm chỉ đóng góp một phần trong tổng diện tích mặt cắt ngang và tự trọng công trình (cùng với bản mặt cầu, bản đáy, gờ lan can, lớp phủ mặt cầu, hệ neo DƯL, gân tăng cường và vách ngăn). Do đó, **việc giảm $60\%$ diện tích bản bụng đơn thuần sẽ chỉ làm giảm tổng mômen tĩnh tải $M_D$ một tỷ lệ nhỏ hơn đáng kể so với $60\%$**.
+
+3. **Ý nghĩa khoa học:**
+   Phép kiểm tra đại số này **chưa chứng minh cũng chưa bác bỏ** tính khả thi của concept. Nó chỉ ra rằng mục tiêu $M_D / M_L = 1.8$ không thể đạt được chỉ bằng việc khoét rỗng bản bụng, mà đòi hỏi phải có sự tham gia của các giải pháp giảm tải đồng bộ trên toàn bộ bảng kiểm kê tải trọng (Full Load Inventory — bản mặt cầu siêu nhẹ, tối ưu bản đáy, giảm lớp phủ) và mô hình hóa giai đoạn thi công ở G0/G2.
+
+---
+
+## 2. Danh mục 3 Concept hình thái Michell / Catenary (F0 IDEA)
+
+```
++----------------------------------------------------------------------------------------------------+
+|                                SƠ ĐỒ SO SÁNH BA TOPOLOGY (F0 IDEA)                                  |
++----------------------------------------------------------------------------------------------------+
+| CONCEPT 1: MẠNG GIÀN TRỰC GIAO MICHELL BIÊN CATENARY (ODC-MWG)                                     |
+|  [Đỉnh trụ: Vòm nén Catenary ngược + Quạt kéo CFRP] ===> [Giữa nhịp: Bản nén đỉnh + Đáy võng CFRP]  |
+|  Cơ chế giả thuyết: Mạng thanh bám theo quỹ đạo ứng suất chính (Principal Stress Trajectories)     |
++----------------------------------------------------------------------------------------------------+
+| CONCEPT 2: LENTICULAR HYBRID VÕNG-VÒM VỚI BẢN BỤNG DIAGRID BIẾN THIÊN (LCA-MD)                     |
+|  [Đỉnh trụ: Vòm yên ngựa nén trên + Dây căng dưới] ===> [Giữa nhịp: Bụng thấu kính Lenticular]     |
+|  Cơ chế giả thuyết: Diagrid hình thoi hỗ trợ cân bằng lực cắt qua thành phần đứng của cáp/vòm      |
++----------------------------------------------------------------------------------------------------+
+| CONCEPT 3: GIÀN PHÂN CẤP FRACTAL MICHELL PHÂN NHÁNH ĐA TẦNG (FH-MWBG)                              |
+|  [Đỉnh trụ: Cụm rễ Macro truyền phản lực] ======> [Bản mặt cầu: Phân nhánh Meso -> Gân Micro]      |
+|  Cơ chế giả thuyết: Cấu trúc phân nhánh đa cấp độ, định hướng giảm gradient ứng suất cắt           |
++----------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### 2.1. Concept 1: Mạng giàn trực giao Michell biên Catenary (ODC-MWG)
+*Orthogonal Dual-Catenary Michell Web Girder* · **Mã định danh:** `F0-MICH-CAT-01`
+
+```
+  Trọng tâm nhịp (Hogging / Đỉnh trụ)                       Giữa nhịp (Sagging)
+  +====================================+--------------------+==================+  <- Bản đỉnh UHPC (t_deck)
+  | \  / \  / \  / \  / \  / \  / \  / |                    |                  |
+  |  \/   \/   \/   \/   \/   \/   \/  |   Michell Grid     |   /\   /\   /\   |
+  |  /\   /\   /\   /\   /\   /\   /\  |  (theta_Michell)   |  /  \ /  \ /  \  |  <- Bản bụng thanh trực giao
+  | /  \ /  \ /  \ /  \ /  \ /  \ /  \ |                    | /    V    \    V |
+  +====================================+--------------------+------------------+  <- Đáy dầm Catenary
+  |<-------- h_pier (24-36m) --------->|                    |<-- h_mid (4.5-7.5m)
+  |
+[Trụ]
+```
+
+#### A. Mô tả Topology & Cơ chế hình học (F0 IDEA)
+Concept 1 đề xuất một cấu trúc dầm hộp thành mỏng với hai vách bản bụng dạng hở, được định hình bởi **mạng lưới thanh trực giao Michell**. Biên dưới của dầm tuân theo đường cong Catenary biến thiên ($\alpha_{catenary}$), tăng chiều cao tại đỉnh trụ ($h_{pier}$) và thon dần về giữa nhịp ($h_{mid}$).
+- Tại vùng mômen âm (đỉnh trụ): Giả thuyết bố trí các thanh kéo dạng quạt tỏa ra từ bản mặt cầu trên, kết hợp với vòm nén cong Catenary ở bản đáy hội tụ về đỉnh gối trụ.
+- Các thanh giàn trong vách bụng được định hướng bám theo các góc trực giao $\theta_{Michell}$ nhằm tối ưu hóa đường truyền lực dọc trục, hướng tới việc giảm thiểu biến dạng uốn trong thanh bụng.
+
+#### B. Miền tìm kiếm tham số hình học đề xuất (PROPOSED F0 SEARCH BOUNDS — UNVERIFIED)
+*Toàn bộ thông số dưới đây chỉ là miền giả định ban đầu cho thuật toán sinh hình học, chưa phải kích thước kỹ thuật:*
+- **Chiều cao dầm tại đỉnh trụ ($h_{pier}$):** `[PROPOSED F0 BOUNDS: 24.0 - 36.0 m]` (Tương đương $L/20 \text{--} L/13.3$). Ràng buộc: phụ thuộc tĩnh không thông thuyền và độ mảnh trụ (G0/G1 TBD).
+- **Chiều cao dầm tại giữa nhịp ($h_{mid}$):** `[PROPOSED F0 BOUNDS: 4.5 - 7.5 m]` (Tương đương $L/107 \text{--} L/64$). Ràng buộc: đảm bảo không gian tiếp cận kiểm tra bên trong (G1 TBD).
+- **Hệ số biên dạng Catenary đáy ($\alpha_{catenary}$):** `[PROPOSED F0 BOUNDS: 1.8 - 3.2]` trong hàm cao trình đáy:
+  $$y_{bottom}(x) = h_{mid} + (h_{pier} - h_{mid}) \cdot \left(\frac{2|x|}{L}\right)^{\alpha_{catenary}}, \quad x \in [-L/2, L/2]$$
+- **Góc nghiêng thanh giàn Michell ($\theta_{Michell}$):** `[PROPOSED F0 BOUNDS: 30.0° - 60.0°]`, bám theo góc định hướng ứng suất chính $\tan(2\theta) = \frac{2\tau_{xy}}{\sigma_x - \sigma_y}$.
+- **Chiều dày bản đỉnh mặt cầu ($t_{deck}$):** `[PROPOSED F0 BOUNDS: 0.25 - 0.45 m]` (Bản UHPC có gân tăng cường).
+- **Chiều dày bản đáy đỉnh trụ ($t_{bottom}$):** `[PROPOSED F0 BOUNDS: 0.30 - 1.20 m]` tại đỉnh trụ, vuốt dần về `0.20 - 0.35 m` tại giữa nhịp.
+- **Bề rộng khoang dầm hộp ($w_{box}$):** `[PROPOSED F0 BOUNDS: 12.0 - 18.0 m]`.
+- **Ứng suất thiết kế cho phép CFRP ($\sigma_{CFRP,allow}$):** `[TBD / UNVERIFIED]` (Phụ thuộc hoàn toàn vào chứng chỉ thử nghiệm và phê duyệt Gate G6; không giả định trước giá trị số).
+
+#### C. Phân tích đường truyền lực giả thuyết (Hypothetical Load Paths)
+- **Mômen dương (Sagging - Giữa nhịp):** Bản nén mặt cầu chịu nén $\rightarrow$ Cáp/thanh kéo bản đáy chịu lực kéo $\rightarrow$ Thanh bụng Michell tham gia truyền lực cắt và duy trì tương thích hình học.
+- **Mômen âm (Hogging - Đỉnh trụ):** Cáp kéo mặt cầu chịu lực kéo dọc $\rightarrow$ Bản đáy cong Catenary chịu nén truyền về gối cầu $\rightarrow$ Các thanh quạt xiên truyền lực giữ giữa bản đỉnh và bản đáy.
+- **Lực cắt (Shear):** Lực cắt thẳng đứng $V(x)$ được giả thuyết phân tách thành lực dọc trục trong các thanh nén xiên và thanh kéo xiên theo cơ chế giàn phẳng.
+- **Mômen xoắn (Torsion):** Mômen xoắn được giả định chuyển hóa thành dòng cắt chu vi thông qua hệ giàn chéo không gian liên kết giữa hai vách giàn và hệ giằng chữ X ở mặt đáy.
+- **Đổi dấu tải trọng (Load Reversal):** Khi hoạt tải lệch hoặc rung động gây đảo dấu ứng suất, thanh kéo CFRP (không chịu nén) cần duy trì trạng thái có ứng suất trước để tránh bị chùng; các thanh nén cần được kiểm soát độ mảnh để chống mất ổn định đàn hồi.
+
+#### D. Nút liên kết, Chế tạo & Lắp dựng giả thuyết
+- **Chi tiết nút liên kết:** Đề xuất nghiên cứu nút giao không gian đúc sẵn bằng UHPC hoặc lõi thép đúc. Neo cáp CFRP định hướng sử dụng đầu neo nêm phi kim loại hoặc ống bọc chịu cắt nhằm tránh ứng suất cục bộ ngang thân cáp.
+- **Chế tạo:** Phân đoạn đúc sẵn dạng khung 3D chiều dài đề xuất $4.0\text{--}6.0\text{ m}$.
+- **Biện pháp lắp dựng:** Giả thuyết lắp hẫng cân bằng đối xứng từ đỉnh trụ bằng thiết bị nâng cẩu gắn trên lưng dầm, kết hợp căng kéo thanh giằng theo từng đốt phân đoạn.
+
+#### E. Kiểm tra, Bảo trì & Khả năng sửa chữa
+- Không gian bên trong dầm hộp được thiết kế dạng thông suốt cho công tác quan trắc và kiểm định.
+- Các thanh kéo CFRP được định hướng cấu tạo dạng bó cáp ngoài (unbonded) để có thể theo dõi biến dạng và cho phép thay thế độc lập khi cần thiết.
+
+#### F. Giả thuyết phá hoại (Failure Hypotheses)
+1. **Hypothesis F1.1 (Phá hoại nén nút gối đỉnh trụ):** Nguy cơ phá hoại do tập trung ứng suất nén 3 trục tại chân vòm Catenary vượt quá khả năng chịu nén của vật liệu.
+2. **Hypothesis F1.2 (Đứt mỏi / Trượt neo CFRP):** Rủi ro trượt tuột hoặc phá hủy mỏi tại đầu neo cáp dưới tác dụng của tải trọng chu kỳ lặp kéo dài.
+3. **Hypothesis F1.3 (Mất ổn định ngoài mặt phẳng):** Nguy cơ mất ổn định uốn-xoắn của vách giàn trong các giai đoạn thi công trước khi hoàn thiện hệ liên kết ngang.
+
+---
+
+### 2.2. Concept 2: Lenticular Hybrid võng-vòm với bản bụng Diagrid biến thiên (LCA-MD)
+*Lenticular Catenary-Arch Michell Hybrid with Variable Diagrid* · **Mã định danh:** `F0-LENT-CAT-02`
+
+```
+  Trọng tâm nhịp (Hogging / Đỉnh trụ)                       Giữa nhịp (Sagging)
+  +=====================\   /===============================+==================+  <- Bản đỉnh / Vòm nén trụ
+  | \      /    \      / \ / \      /    \      /    \      |                  |
+  |  \    /      \    /   X   \    /      \    /      \     |   Diamond Grid   |
+  |   \  /        \  /   / \   \  /        \  /        \    | (theta_Michell)  |  <- Diagrid hình thoi biến thiên
+  |    \/          \/   /   \   \/          \/          \   |                  |
+  +====================+     +==============================+==================+  <- Cáp treo võng Lenticular
+  |<-------- h_pier (20-32m) --------->|                    |<-- h_mid (6-10m)
+  |
+[Trụ]
+```
+
+#### A. Mô tả Topology & Cơ chế hình học (F0 IDEA)
+Concept 2 cấu thành từ hệ kết cấu **thấu kính lai (Lenticular Truss Hybrid)**, tích hợp một đường vòm nén phía trên ở khu vực đỉnh trụ và một đường cáp võng Catenary phía dưới ở khu vực giữa nhịp.
+- Vách đứng dầm là một **mạng lưới Diagrid hình thoi (Diamond Diagrid)** có mật độ và góc nghiêng biến thiên dọc theo nhịp.
+- Cơ chế giả thuyết: Thành phần thẳng đứng của lực dọc trong vòm cong trên đỉnh trụ và cáp võng giữa nhịp hỗ trợ cân bằng một phần lực cắt do ngoại tải, giúp giảm lực cắt phân bố lên mạng Diagrid.
+
+#### B. Miền tìm kiếm tham số hình học đề xuất (PROPOSED F0 SEARCH BOUNDS — UNVERIFIED)
+*Toàn bộ thông số dưới đây chỉ là miền giả định ban đầu cho thuật toán sinh hình học:*
+- **Chiều cao kết cấu tại đỉnh trụ ($h_{pier}$):** `[PROPOSED F0 BOUNDS: 20.0 - 32.0 m]`.
+- **Chiều cao kết cấu tại giữa nhịp ($h_{mid}$):** `[PROPOSED F0 BOUNDS: 6.0 - 10.0 m]`.
+- **Hệ số đường cong Catenary ($\alpha_{catenary}$):** `[PROPOSED F0 BOUNDS: 2.0 - 2.5]`.
+- **Góc nghiêng mắt lưới Diagrid ($\theta_{Michell}$):** `[PROPOSED F0 BOUNDS: 35.0° - 55.0°]`.
+- **Chiều dày bản mặt cầu composite ($t_{deck}$):** `[PROPOSED F0 BOUNDS: 0.22 - 0.38 m]`.
+- **Bề dày dải biên đáy ($t_{bottom}$):** `[PROPOSED F0 BOUNDS: 0.25 - 0.60 m]`.
+- **Kích thước thanh ống Diagrid ($d_{diag}$):** `[PROPOSED F0 BOUNDS: 0.40 - 0.90 m]`.
+- **Bước khoang Diagrid theo phương dọc ($s_{bay}$):** `[PROPOSED F0 BOUNDS: 4.0 - 8.0 m]`.
+- **Ứng suất thiết kế cho phép CFRP ($\sigma_{CFRP,allow}$):** `[TBD / UNVERIFIED]`.
+
+#### C. Phân tích đường truyền lực giả thuyết (Hypothetical Load Paths)
+- **Mômen dương (Sagging):** Cáp võng đáy chịu kéo $\rightarrow$ Mặt cầu chịu nén $\rightarrow$ Mạng Diagrid tham gia giằng giữ ổn định hình thái thấu kính.
+- **Mômen âm (Hogging):** Vòm trên đỉnh trụ chịu nén $\rightarrow$ Dải đáy chịu kéo neo về trụ $\rightarrow$ Diagrid truyền tải phân bố từ mặt cầu vào vòm nén.
+- **Lực cắt (Shear):** Giả thuyết cơ chế phân tách lực cắt: một phần lực cắt đứng được cân bằng bởi độ nghiêng của vòm/cáp biên; phần lực cắt còn lại được truyền qua mạng Diagrid dạng màng.
+- **Mômen xoắn (Torsion):** Không gian Diagrid 3D kín hỗ trợ chống xoắn thông qua các mạch vòng kín đa diện trên các mặt biên.
+- **Đổi dấu tải trọng (Load Reversal):** Các thanh ống thép nhồi bê tông (CFT) được đề xuất để cung cấp khả năng làm việc ổn định dưới cả hai trạng thái kéo và nén.
+
+#### D. Nút liên kết, Chế tạo & Lắp dựng giả thuyết
+- **Chi tiết nút liên kết:** Đề xuất nghiên cứu nút giao Diagrid dạng khối thép đúc/rèn hoặc nút hàn định hình, liên kết với thanh ống bằng bulông cường độ cao hoặc chốt cơ học.
+- **Chế tạo:** Phân đoạn khung Diagrid được module hóa thành các cụm chế tạo trong nhà máy.
+- **Biện pháp lắp dựng:** Nghiên cứu phương án kéo đẩy liên hợp từng phân đoạn kết hợp tháp tạm hoặc cẩu lắp phân đoạn lớn.
+
+#### E. Kiểm tra, Bảo trì & Khả năng sửa chữa
+- Mạng Diagrid thông thoáng hỗ trợ công tác kiểm tra khuyết tật bề mặt và mối nối liên kết.
+- Hệ cáp võng đáy được định hướng bố trí cho phép cân chỉnh lực căng trong quá trình khai thác.
+
+#### F. Giả thuyết phá hoại (Failure Hypotheses)
+1. **Hypothesis F2.1 (Mất ổn định cục bộ ống Diagrid):** Nguy cơ mất ổn định thành ống hoặc phá hủy mối hàn tại nút giao Diagrid dưới tác dụng đồng thời của lực dọc và mômen thứ cấp.
+2. **Hypothesis F2.2 (Mất ổn định vòm nén trên trụ):** Rủi ro mất ổn định uốn ngang của vòm nén đỉnh trụ dưới tác động của tải trọng ngang (gió/động đất).
+3. **Hypothesis F2.3 (Võng tích lũy dài hạn):** Rủi ro suy giảm lực căng hoặc biến dạng dão của hệ cáp võng dẫn đến độ võng giữa nhịp vượt quá giới hạn cho phép.
+
+---
+
+### 2.3. Concept 3: Giàn phân cấp Fractal Michell phân nhánh đa tầng (FH-MWBG)
+*Fractal Hierarchical Michell Web Box Girder* · **Mã định danh:** `F0-FRACT-BIO-03`
+
+```
+  Trọng tâm nhịp (Hogging / Đỉnh trụ)                       Giữa nhịp (Sagging)
+  +===T===T===T===T===T===T===T===T===+---------------------+===T===T===T===T==+  <- Bản mặt cầu (Micro-ribs)
+  |   |/  |/  |/  |/  |/  |/  |/  |/  |                     |  / \ / \ / \ / \ |  <- Cấp 2: Nhánh Meso (2-6m)
+  |   /\  /\  /\  /\  /\  /\  /\  /\  |  Fractal Michell    | /   V   \   V   \|
+  |  /  \/  \/  \/  \/  \/  \/  \/  \ |  Branching Tree     |/             \   |  <- Cấp 1: Nhánh Macro (10-30m)
+  | /    \  /    \  /    \  /    \  / |                     |               \  |
+  +=======V========V========V========V+---------------------+==================+  <- Bản đáy phân nhánh
+  |<-------- h_pier (25-38m) --------->|                    |<-- h_mid (4-7m)
+  |
+[Trụ]
+```
+
+#### A. Mô tả Topology & Cơ chế hình học (F0 IDEA)
+Concept 3 đề xuất áp dụng **nguyên lý phân nhánh đa cấp (Fractal Hierarchy)** lấy cảm hứng từ cấu trúc phân cấp sinh học nhằm phân tán tải trọng từ mặt cầu xuống các điểm tựa chính:
+- Hệ thống được cấu trúc thành 3 cấp độ hình học giả thuyết:
+  1. *Cấp Macro:* Hệ khung giàn chính chịu mômen và lực cắt tổng thể.
+  2. *Cấp Meso:* Các nhánh phân đôi trung gian truyền tải từ mặt cầu vào nút Macro.
+  3. *Cấp Micro:* Hệ gân tăng cứng trực tiếp dưới bản mặt cầu mỏng.
+- Mục tiêu giả thuyết là làm mượt dòng truyền ứng suất từ mặt cầu vào gối trụ và hạn chế các điểm tập trung ứng suất cục bộ.
+
+#### B. Miền tìm kiếm tham số hình học đề xuất (PROPOSED F0 SEARCH BOUNDS — UNVERIFIED)
+*Toàn bộ thông số dưới đây chỉ là miền giả định ban đầu cho thuật toán sinh hình học:*
+- **Chiều cao kết cấu tại đỉnh trụ ($h_{pier}$):** `[PROPOSED F0 BOUNDS: 25.0 - 38.0 m]`.
+- **Chiều cao kết cấu tại giữa nhịp ($h_{mid}$):** `[PROPOSED F0 BOUNDS: 4.0 - 7.0 m]`.
+- **Hệ số đường cong bao Catenary ($\alpha_{catenary}$):** `[PROPOSED F0 BOUNDS: 1.6 - 2.8]`.
+- **Góc phân nhánh Fractal ($\theta_{Michell}$):**
+  - Nhánh cấp 1 (Macro): `[PROPOSED F0 BOUNDS: 30.0° - 45.0°]`.
+  - Nhánh cấp 2 (Meso): `[PROPOSED F0 BOUNDS: 45.0° - 65.0°]`.
+- **Số cấp phân nhánh ($N_{hierarchy}$):** `3 cấp (Macro, Meso, Micro)`.
+- **Tỷ lệ giảm diện tích phân nhánh ($R_{branch}$):** `[PROPOSED F0 BOUNDS: 0.65 - 0.85]`.
+- **Chiều dày bản mặt cầu ($t_{deck}$):** `[PROPOSED F0 BOUNDS: 0.18 - 0.32 m]`.
+- **Chiều dày bản đáy dạng tế bào ($t_{bottom}$):** `[PROPOSED F0 BOUNDS: 0.25 - 0.80 m]`.
+- **Ứng suất thiết kế cho phép CFRP ($\sigma_{CFRP,allow}$):** `[TBD / UNVERIFIED]`.
+
+#### C. Phân tích đường truyền lực giả thuyết (Hypothetical Load Paths)
+- **Mômen dương (Sagging):** Tải trọng mặt cầu $\rightarrow$ Gân Micro $\rightarrow$ Nhánh Meso $\rightarrow$ Khung Macro và cáp chủ đáy dầm.
+- **Mômen âm (Hogging):** Phản lực từ trụ truyền qua các nhánh nén Macro $\rightarrow$ Tỏa nhánh lên nâng đỡ bản đỉnh và phân tán lực kéo dọc.
+- **Lực cắt (Shear):** Lực cắt từ mặt cầu được thu gom đa cấp qua các nhánh chuyển tiếp, hướng tới việc giảm gradient ứng suất cắt $\tau_{xy}$.
+- **Mômen xoắn (Torsion):** Cấu trúc phân nhánh đa khoang tạo ra các mạch vòng truyền lực cắt không gian kín.
+- **Đổi dấu tải trọng (Load Reversal):** Hệ nhánh phân cấp được định hướng liên kết nút có độ cứng uốn để hỗ trợ phân phối lại nội lực khi chịu tải trọng đổi dấu.
+
+#### D. Nút liên kết, Chế tạo & Lắp dựng giả thuyết
+- **Chi tiết nút liên kết:** Đề xuất khảo sát khả năng ứng dụng công nghệ in 3D UHPC hoặc đúc khuôn phức hợp cho các nút phân nhánh không gian 3 chiều.
+- **Chế tạo:** Phân tách thành các cụm nhánh module hóa kết hợp công nghệ vật liệu tính năng cao.
+- **Biện pháp lắp dựng:** Lắp ghép module từng cụm nhánh kết hợp chốt cơ học và kéo cáp DƯL xuyên tâm.
+
+#### E. Kiểm tra, Bảo trì & Khả năng sửa chữa
+- Đề xuất khảo sát tích hợp hệ thống cảm biến đo biến dạng quang học trên các nhánh phân cấp chính để hỗ trợ theo dõi sức khỏe kết cấu (SHM).
+- Không gian bên trong cần bố trí lối tiếp cận cho thiết bị kiểm định chuyên dụng.
+
+#### F. Giả thuyết phá hoại (Failure Hypotheses)
+1. **Hypothesis F3.1 (Mất ổn định nhánh con Meso):** Rủi ro mất ổn định uốn của các nhánh cấp trung gian dưới tác dụng của tải trọng tập trung cục bộ.
+2. **Hypothesis F3.2 (Phá hoại tiếp giáp chế tạo):** Nguy cơ nứt hoặc tách lớp tại bề mặt tiếp giáp giữa các phân đoạn chế tạo/in 3D dưới tác động mỏi.
+3. **Hypothesis F3.3 (Phá hoại dây chuyền):** Sự cố tại một nhánh chính Macro có thể làm tăng đột ngột nội lực trên các nhánh lân cận.
+
+---
+
+## 3. Quy trình tính toán Lineage & Mã băm hình học tái lập (Geometry Lineage & Hash Recipe)
+
+Nhằm đảm bảo khả năng tái lập 100% (Reproducibility) và truy vết số liệu theo `MARP-1.0`, mỗi concept hình thái được mô tả qua một **Vector tham số chuẩn hóa (Standardized Parameter Vector)** và gắn với một mã băm SHA-256 duy nhất.
+
+### 3.1. Cấu trúc Vector tham số hình học $\mathbf{P}$
+$$\mathbf{P} = \Big[ \text{ID}, L, h_{pier}, h_{mid}, \alpha_{cat}, \theta_{Mich}, t_{deck}, t_{bot}, w_{box}, \sigma_{CFRP,status}, \text{Seed} \Big]$$
+
+| Ký hiệu | Đơn vị | Kiểu dữ liệu | Trạng thái kỹ thuật |
+| :--- | :---: | :---: | :--- |
+| `ID` | String | Khóa chuỗi | Mã định danh concept (`F0-MICH-CAT-01`, `F0-LENT-CAT-02`, `F0-FRACT-BIO-03`) |
+| $L$ | $\text{m}$ | Float (SI) | Chiều dài nhịp chính giả thuyết ($480.0\text{ m}$ — UNVERIFIED) |
+| $h_{pier}$ | $\text{m}$ | Float (SI) | Miền tìm kiếm chiều cao đỉnh trụ (PROPOSED F0 BOUNDS) |
+| $h_{mid}$ | $\text{m}$ | Float (SI) | Miền tìm kiếm chiều cao giữa nhịp (PROPOSED F0 BOUNDS) |
+| $\alpha_{cat}$ | $-$ | Float (SI) | Hệ số đường cong Catenary (PROPOSED F0 BOUNDS) |
+| $\theta_{Mich}$ | $\text{deg}$ | Float (SI) | Góc đặc trưng giàn Michell / Diagrid (PROPOSED F0 BOUNDS) |
+| $t_{deck}$ | $\text{m}$ | Float (SI) | Chiều dày danh định bản đỉnh (PROPOSED F0 BOUNDS) |
+| $t_{bot}$ | $\text{m}$ | Float (SI) | Chiều dày danh định bản đáy (PROPOSED F0 BOUNDS) |
+| $w_{box}$ | $\text{m}$ | Float (SI) | Bề rộng khoang dầm (PROPOSED F0 BOUNDS) |
+| $\sigma_{CFRP}$ | $-$ | String | `TBD_G6_REQUIRED` (Chưa có dữ liệu kiểm chứng G6) |
+| $\text{Seed}$ | Integer | Số nguyên | Hạt giống thuật toán sinh hình học |
+
+### 3.2. Công thức mã hóa băm SHA-256 (Canonical Lineage Recipe)
+Chuỗi Canonical JSON được chuẩn hóa không khoảng trắng thừa và tính băm:
+
+$$\text{Lineage\_Hash} = \text{SHA256}\Big(\text{Canonical\_JSON}(\mathbf{P})\Big)$$
+
+```python
+# Ví dụ cấu trúc dữ liệu tạo hash cho F0-MICH-CAT-01
+import hashlib, json
+
+param_dict = {
+    "concept_id": "F0-MICH-CAT-01",
+    "span_m": 480.0,
+    "h_pier_bounds_m": [24.0, 36.0],
+    "h_mid_bounds_m": [4.5, 7.5],
+    "alpha_catenary_bounds": [1.8, 3.2],
+    "theta_michell_deg_bounds": [30.0, 60.0],
+    "t_deck_bounds_m": [0.25, 0.45],
+    "t_bottom_bounds_m": [0.30, 1.20],
+    "w_box_bounds_m": [12.0, 18.0],
+    "sigma_cfrp_status": "TBD_G6_REQUIRED",
+    "solver_seed": 20260821
+}
+canonical_str = json.dumps(param_dict, sort_keys=True, separators=(',', ':'))
+lineage_hash = hashlib.sha256(canonical_str.encode('utf-8')).hexdigest()
+```
+
+---
+
+## 4. Phương pháp luận đồng nhất hóa năng lượng $GA_{eq}$ & Ràng buộc vật liệu
+
+### 4.1. Cơ sở cơ học của độ cứng cắt tương đương $GA_{eq}$
+Độ cứng cắt của mạng giàn rỗng Michell / Diagrid không thể gán bằng một giá trị vô hướng đơn giản:
+1. **Tính dị hướng (Anisotropy):** Khả năng kháng cắt phụ thuộc trực tiếp vào góc nghiêng $\theta$ của các thanh giàn so với trục dầm.
+2. **Hiệu ứng uốn cục bộ của thanh:** Khả năng kháng biến dạng cắt thực tế bao gồm cả năng lượng biến dạng dọc trục của thanh và năng lượng uốn tại các nút cứng.
+3. **Ghép nối uốn - cắt (Bending-Shear Coupling):** Chuyển vị cắt gây xoay nút và làm phát sinh biến dạng uốn trong các thanh biên, đòi hỏi việc mô hình hóa phải tính đến tương tác uốn-cắt trên toàn tiết diện.
+
+### 4.2. Kế hoạch kiểm chứng Unit-Cell Homogenization (Bắt buộc cho các bước tiếp theo)
+Xác định tensor độ cứng tương đương $[\mathbf{C}_{eq}]$ thông qua phân tích năng lượng biến dạng trên ô cơ sở (Representative Volume Element - RVE):
+$$\bar{U}_{strain} = \frac{1}{2 V_{RVE}} \int_{V_{RVE}} \boldsymbol{\sigma} : \boldsymbol{\varepsilon} \, dV = \frac{1}{2} \bar{\boldsymbol{\varepsilon}}^T \mathbf{C}_{eq} \bar{\boldsymbol{\varepsilon}}$$
+- Trích xuất ô cơ sở RVE tại các vùng đặc trưng (đỉnh trụ, $1/4$ nhịp, giữa nhịp).
+- Áp đặt điều kiện biên tuần hoàn (Periodic Boundary Conditions - PBC) cho các trường biến dạng trượt $\bar{\gamma}_{xy}$ và biến dạng dọc trục $\bar{\varepsilon}_{xx}$.
+- Đánh giá độ nhạy của $GA_{eq}$ theo độ cứng xoay của nút liên kết $K_{\theta,joint}$.
+
+### 4.3. Ràng buộc ứng suất thiết kế cáp CFRP ($\sigma_{CFRP}$)
+Theo quy định tại Gate G6 (`PHYSICS_GATES.md`):
+- Ứng suất tính toán của CFRP **bắt buộc phải là ứng suất thiết kế cho phép (design allowable)** được suy dẫn từ dữ liệu thử nghiệm có kiểm chứng độc lập (xét đến giới hạn dão-phá hủy, suy giảm môi trường, hệ số độ tin cậy và hiệu suất của bộ neo).
+- Tuyệt đối không sử dụng cường độ kéo danh định của vật liệu trong các phân tích kết cấu. Tại bước F0 này, thông số $\sigma_{CFRP}$ được đánh dấu là **TBD / UNVERIFIED** và phải chờ kết quả từ Gate G6.
+
+---
+
+## 5. Ma trận so sánh định tính các Concept (Comparison Matrix — F0 IDEA)
+
+| Tiêu chí so sánh | Baseline hình học tham chiếu (Chưa khóa G0 - UNVERIFIED) | Concept 1: ODC-MWG (F0-MICH-CAT-01) | Concept 2: LCA-MD (F0-LENT-CAT-02) | Concept 3: FH-MWBG (F0-FRACT-BIO-03) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Loại hình Topology** | Dầm hộp thành mỏng liên tục | Giàn trực giao Michell Catenary | Thấu kính võng-vòm Diagrid | Giàn phân cấp Fractal sinh học |
+| **Chiều cao tại trụ ($h_{pier}$)** | Tham chiếu theo thiết kế truyền thống | `24.0 - 36.0 m` (F0 Proposed) | `20.0 - 32.0 m` (F0 Proposed) | `25.0 - 38.0 m` (F0 Proposed) |
+| **Chiều cao giữa nhịp ($h_{mid}$)** | Tham chiếu theo thiết kế truyền thống | `4.5 - 7.5 m` (F0 Proposed) | `6.0 - 10.0 m` (F0 Proposed) | `4.0 - 7.0 m` (F0 Proposed) |
+| **Mục tiêu $A_{web} / A_{baseline}$** | $1.0$ (Mức tham chiếu) | Mục tiêu $\le 0.40$ [UNVERIFIED] | Mục tiêu $\le 0.35$ [UNVERIFIED] | Mục tiêu $\le 0.38$ [UNVERIFIED] |
+| **Kỳ vọng $GA_{eq} / GA_{solid}$** | $1.0$ (Mức tham chiếu) | Mục tiêu $\ge 0.85$ [UNVERIFIED] | Mục tiêu $\ge 0.80$ [UNVERIFIED] | Mục tiêu $\ge 0.88$ [UNVERIFIED] |
+| **Mục tiêu $M_D / M_L$** | $5.5\text{--}7.0$ (Mức giả định) | Mục tiêu $1.8\text{--}2.2$ [UNVERIFIED] | Mục tiêu $1.7\text{--}2.0$ [UNVERIFIED] | Mục tiêu $1.8\text{--}2.1$ [UNVERIFIED] |
+| **Đặc điểm Load Path** | Dầm liên tục truyền thống | Định hướng dọc trục trực giao | Phân tách thành phần vòm-cáp | Phân nhánh đa cấp độ |
+| **Kháng xoắn tổng thể** | Dầm hộp kín tiêu chuẩn | Cần bổ sung hệ giằng chéo | Khung Diagrid không gian | Hệ tế bào đa khoang |
+| **Độ phức tạp nút liên kết** | Đúc tại chỗ thông thường | Đòi hỏi nút UHPC/thép đúc | Nút ống liên kết không gian | Nút phân nhánh 3D phức tạp |
+| **Độ phức tạp thi công** | Đúc hẫng tiêu chuẩn | Lắp ghép phân đoạn nhẹ | Lắp ghép kết hợp kéo đẩy | Lắp ghép đa phân cấp |
+| **Khả năng tiếp cận kiểm tra** | Tiêu chuẩn dầm hộp | Khoang trong thông suốt | Thông thoáng, lộ thiên | Nhiều khoang nhánh nhỏ |
+| **Rủi ro kỹ thuật chính** | Tự trọng lớn ở nhịp dài | Tập trung ứng suất nút gối | Mất ổn định vòm nén ngoài MP | Phức tạp chế tạo và liên kết |
+
+---
+
+## 6. Tiêu chí bác bỏ giả thuyết (Falsification Criteria — UNVERIFIED / TBD)
+
+Để đảm bảo tính nghiêm ngặt khoa học, một concept hình thái sẽ bị **BÁC BỎ (FALSIFIED / REJECTED)** nếu vi phạm bất kỳ tiêu chí nào dưới đây trong các bước thẩm định tiếp theo:
+
+1. **Tiêu chí F-01 (Bác bỏ về Diện tích & Trọng lượng):** Nếu sau khi hoàn thiện kích thước mặt cắt chịu lực (bao gồm bản mã, neo, vỏ bọc), tổng diện tích bản bụng hữu hiệu $A_{web,eff} > 0.45 A_{web,solid}$ (không đạt mức giảm tự trọng bản bụng kỳ vọng).
+2. **Tiêu chí F-02 (Bác bỏ về Đồng nhất hóa $GA_{eq}$):** Nếu kết quả phân tích ô cơ sở (RVE Homogenization) cho thấy độ cứng cắt tương đương không đáp ứng ngưỡng yêu cầu được phê duyệt tại Gate G0/G2, hoặc suy giảm nghiêm trọng do độ mềm uốn của nút.
+3. **Tiêu chí F-03 (Bác bỏ về Tỷ số Mômen $M_D / M_L$):** Nếu sau khi lập bảng kiểm kê tĩnh tải đầy đủ (Full Load Inventory), tỷ số $M_D / M_L$ không thể tiệm cận mục tiêu thiết kế đã đăng ký trước (Pre-registered target).
+4. **Tiêu chí F-04 (Bác bỏ về Ổn định & Động học):** Nếu hệ số tải trọng mất ổn định tới hạn $\lambda_{cr}$ hoặc các chỉ số động học khí động không đạt yêu cầu theo tiêu chuẩn thiết kế được phê duyệt tại Gate G0/G3.
+5. **Tiêu chí F-05 (Bác bỏ về Khả năng bảo trì & Thay thế):** Nếu cấu tạo nút không cho phép kiểm tra trực quan và không có phương án khả thi để thay thế độc lập các thanh kéo/cáp trong vòng đời công trình.
+
+---
+
+## 7. Sổ đăng ký dữ liệu chưa xác định (Unresolved Data Register)
+
+Toàn bộ các trường dữ liệu sau đây bắt buộc phải được làm rõ tại Gate G0/G6 trước khi tiến hành tính toán định lượng:
+
+- [ ] **UNRES-01 (Site & Environmental Exposure):** Vị trí xây dựng, vận tốc gió thiết kế, vùng động đất, biên độ nhiệt độ và điều kiện xâm thực môi trường `[TBD — Gate G0]`.
+- [ ] **UNRES-02 (Geotechnical & Pier Boundary Conditions):** Điều kiện địa chất nền móng, độ cứng kháng uốn/xoắn và chuyển vị cho phép của trụ `[TBD — Gate G0]`.
+- [ ] **UNRES-03 (Design Basis & Live Load Model):** Tiêu chuẩn thiết kế áp dụng, mô hình hoạt tải và tổ hợp tải trọng quy định `[TBD — Gate G0]`.
+- [ ] **UNRES-04 (CFRP Design Allowables):** Báo cáo thử nghiệm chứng chỉ vật liệu, giới hạn dão-phá hủy và hệ số an toàn thiết kế của cáp CFRP `[TBD — Gate G6]`.
+- [ ] **UNRES-05 (UHPC Material & Joint Properties):** Dữ liệu đặc trưng vật liệu UHPC, ứng xử kéo sau nứt và độ bền mỏi của mối nối `[TBD — Gate G6]`.
+
+---
+
+## 8. Kế hoạch thử nghiệm vật lý tiếp theo (Next Physics Tests)
+
+Đề xuất các bước nghiên cứu tiếp theo cho Task `RND-b471879e-03` nhằm phục vụ việc sàng lọc vật lý:
+
+1. **Test Gate G1 (Kiểm tra hình học 3D & Không gian nút):** Xây dựng mô hình hình học không gian sơ bộ, kiểm tra khả năng bố trí thực tế của các thanh giàn và neo tại nút đỉnh trụ.
+2. **Test Gate G2-A (Đồng nhất hóa năng lượng Unit-Cell):** Thiết lập mô hình phần tử hữu hạn cho ô cơ sở RVE nhằm đánh giá ma trận độ cứng tương đương $[\mathbf{C}_{eq}]$ dưới các trường biến dạng chuẩn tắc.
+3. **Test Gate G2-B (Lập bảng kiểm kê tải trọng toàn diện - Full Load Inventory):** Tính toán chi tiết các thành phần tĩnh tải (mặt cầu, bản đáy, gờ chắn, lớp phủ, phụ kiện) để đánh giá lại khả năng thay đổi tỷ số $M_D / M_L$.
+4. **Test Gate G2-C (Mô hình hóa dầm Timoshenko & Khung 2D):** Đối chiếu độc lập giữa mô hình dầm có xét độ mềm cắt và mô hình khung giàn dưới các tổ hợp tải trọng được khóa tại G0.
+
+---
+*Báo cáo được khởi tạo bởi Antigravity Form-Inventor. Toàn bộ nội dung ở cấp độ F0 IDEA, tuân thủ nghiêm ngặt MARP-1.0 và Physics Gates PG-1.0. Chờ phê duyệt độc lập từ Structural Analyst và Human Lab Operator.*

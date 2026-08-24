@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-013-001",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-001",
+  "correction_sha256": "39d4567415c0b468acc8eafc0b7345d13a8e0ee4128f83102e934b7b64dab21c",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot r001 SHA-256 0fcadbe7558db4f82ad38870ee0a29dcf4117d5207f6d1210690f8e8641947d6 khớp recorded artifact.",
+    "Incident liên kết đúng original handoff ca0d2211... và current artifact f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0.",
+    "Targeted provenance và confirmatory tests đều pass; pilot 1 seed hoàn thành 4 arm x 2 algorithm, mỗi run 600 solver calls, không còn TypeError API.",
+    "Pilot cho best_cost=None ở cả 8 run; đây là kết quả âm cần giữ và không chứng minh hiệu quả grammar."
+  ],
+  "notes": "APPROVE correction provenance/bugfix only. Không tái xác nhận claim khoa học của BRD-013; full 20-seed run và điều tra zero-feasible vẫn bắt buộc."
+}

@@ -1,5 +1,8 @@
 """Kiểm thử mô-đun tối ưu hóa đa mục tiêu pymoo (pymoo_adapter.py)."""
 import pytest
+
+pytest.importorskip("pymoo")
+
 from bridge_evolution.optimization.common import BudgetedEvaluator
 from bridge_evolution.optimization.pymoo_adapter import BridgePymooProblem, run_pymoo_optimization
 

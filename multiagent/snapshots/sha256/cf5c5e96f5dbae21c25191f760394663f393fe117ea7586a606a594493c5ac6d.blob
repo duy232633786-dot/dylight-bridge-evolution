@@ -1,0 +1,379 @@
+"""Confirmatory A/B experiment for grammar v1 vs v2 with 20 seeds and 4th arm.
+
+Task: BRD-013
+Implements the 4-arm confirmatory trial defined in:
+experiments/preregistration/grammar_ab_confirmatory.json
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import random
+import statistics
+import sys
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from bridge_evolution import __version__
+from bridge_evolution.objectives import OBJECTIVE_KEYS
+from bridge_evolution.optimization import nsga2, random_search
+from bridge_evolution.optimization.common import (
+    BudgetedEvaluator,
+    gene_domains,
+    gene_order,
+)
+from bridge_evolution.optimization.nsga2 import (
+    _crowding,
+    _fast_nondominated_sort,
+)
+from bridge_evolution.pareto import ParetoArchive
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except (AttributeError, ValueError):
+    pass
+
+DEFAULT_PREREG = ROOT / "experiments" / "preregistration" / "grammar_ab_confirmatory.json"
+
+
+def _restricted_domains(grammar_id: str, restriction: dict) -> dict[str, list]:
+    base = gene_domains(grammar_id)
+    out = dict(base)
+    for k, v in restriction.items():
+        if k in out:
+            allowed = set(v)
+            filtered = [x for x in out[k] if x in allowed]
+            if not filtered:
+                raise ValueError(f"Miền bị lọc rỗng cho {k}: {v}")
+            out[k] = filtered
+    return out
+
+
+def _restricted_random_search(
+    budget: int,
+    seed: int,
+    grammar_id: str,
+    domains: dict,
+) -> dict:
+    rng = random.Random(seed)
+    order = list(domains)
+    ev = BudgetedEvaluator(budget, generation_action="RANDOM_SEARCH", seed=seed,
+                           grammar_id=grammar_id)
+    archive = ParetoArchive()
+    max_proposals = max(10_000, budget * 1000)
+
+    while not ev.exhausted and ev.n_proposals < max_proposals:
+        gene = {name: rng.choice(domains[name]) for name in order}
+        rec = ev.evaluate_gene(gene)
+        if rec and rec["feasible"]:
+            archive.add(rec["case_id"], rec["objectives"], {"gene": rec["gene"]})
+
+    config = {**ev.config, "algorithm": "random_search", "max_proposals": max_proposals}
+    return {
+        "algorithm": "random_search", "seed": seed, "grammar_id": grammar_id,
+        "config": config, "counters": ev.counters, "history": ev.history,
+        "proposal_history": ev.proposal_history, "archive": archive,
+        "termination": "budget_exhausted" if ev.exhausted else "proposal_guard"
+    }
+
+
+def _restricted_nsga2(
+    budget: int,
+    seed: int,
+    grammar_id: str,
+    domains: dict,
+    pop_size: int = 40,
+    p_crossover: float = 0.9,
+) -> dict:
+    rng = random.Random(seed)
+    order = list(domains)
+    sizes = [len(domains[k]) for k in order]
+    n_var = len(order)
+    p_mut = 1.0 / n_var
+
+    ev = BudgetedEvaluator(budget, generation_action="NSGA2", seed=seed,
+                           grammar_id=grammar_id)
+    archive = ParetoArchive()
+    max_proposals = max(10_000, budget * 1000)
+
+    def decode(idx_vec):
+        return {k: domains[k][i] for k, i in zip(order, idx_vec)}
+
+    def evaluate(idx_vec):
+        rec = ev.evaluate_gene(decode(idx_vec))
+        if rec is None:
+            return None
+        if rec["feasible"]:
+            archive.add(rec["case_id"], rec["objectives"], {"gene": rec["gene"]})
+        return {**rec, "x": list(idx_vec)}
+
+    def mutate(x):
+        y = list(x)
+        for j in range(n_var):
+            if rng.random() < p_mut:
+                if rng.random() < 0.5:
+                    y[j] = min(sizes[j] - 1, max(0, y[j] + rng.choice((-1, 1))))
+                else:
+                    y[j] = rng.randrange(sizes[j])
+        return y
+
+    def crossover(a, b):
+        if rng.random() > p_crossover:
+            return list(a), list(b)
+        c1, c2 = list(a), list(b)
+        for j in range(n_var):
+            if rng.random() < 0.5:
+                c1[j], c2[j] = c2[j], c1[j]
+        return c1, c2
+
+    pop = []
+    seen = set()
+    while (len(pop) < pop_size and not ev.exhausted and ev.n_proposals < max_proposals):
+        x = [rng.randrange(s) for s in sizes]
+        if tuple(x) in seen:
+            continue
+        seen.add(tuple(x))
+        ind = evaluate(x)
+        if ind:
+            pop.append(ind)
+
+    while not ev.exhausted and pop and ev.n_proposals < max_proposals:
+        fronts = _fast_nondominated_sort(pop)
+        rank = {}
+        crowd = {}
+        for fi, front in enumerate(fronts):
+            cd = _crowding(pop, front)
+            for i in front:
+                rank[i], crowd[i] = fi, cd[i]
+
+        def tournament():
+            i, j = rng.randrange(len(pop)), rng.randrange(len(pop))
+            if rank[i] != rank[j]:
+                return pop[i] if rank[i] < rank[j] else pop[j]
+            return pop[i] if crowd[i] >= crowd[j] else pop[j]
+
+        offspring = []
+        while (len(offspring) < pop_size and not ev.exhausted and ev.n_proposals < max_proposals):
+            c1, c2 = crossover(tournament()["x"], tournament()["x"])
+            for c in (mutate(c1), mutate(c2)):
+                ind = evaluate(c)
+                if ind:
+                    offspring.append(ind)
+                if (len(offspring) >= pop_size or ev.exhausted or ev.n_proposals >= max_proposals):
+                    break
+
+        union = pop + offspring
+        fronts = _fast_nondominated_sort(union)
+        new_pop = []
+        for front in fronts:
+            cd = _crowding(union, front)
+            if len(new_pop) + len(front) <= pop_size:
+                new_pop.extend(union[i] for i in front)
+            else:
+                rest = sorted(front, key=lambda i: cd[i], reverse=True)
+                new_pop.extend(union[i] for i in rest[:pop_size - len(new_pop)])
+                break
+        pop = new_pop
+
+    config = {**ev.config, "algorithm": "nsga2", "pop_size": pop_size, "p_crossover": p_crossover}
+    return {
+        "algorithm": "nsga2", "seed": seed, "grammar_id": grammar_id,
+        "config": config, "counters": ev.counters, "history": ev.history,
+        "proposal_history": ev.proposal_history, "archive": archive,
+        "termination": "budget_exhausted" if ev.exhausted else "proposal_guard"
+    }
+
+
+def run_single_arm(
+    arm: dict,
+    algorithm: str,
+    seed: int,
+    budget: int,
+) -> dict:
+    grammar_id = arm["grammar_id"]
+    restriction = arm.get("domain_restriction", {})
+    search_path = arm.get("search_path", "reference_api")
+
+    if search_path == "local_restricted_domain_path" or restriction:
+        domains = _restricted_domains(grammar_id, restriction)
+        if algorithm == "random_search":
+            res = _restricted_random_search(budget, seed, grammar_id, domains)
+        else:
+            res = _restricted_nsga2(budget, seed, grammar_id, domains)
+    else:
+        if algorithm == "random_search":
+            res = random_search(budget, seed=seed, grammar_id=grammar_id)
+        else:
+            res = nsga2(budget, seed=seed, grammar_id=grammar_id)
+
+    history = res.get("history", [])
+    # BudgetedEvaluator._record_result luu objectives la TUPLE theo dung thu tu
+    # OBJECTIVE_KEYS = (relative_cost, material_mass_t, embodied_carbon_kgCO2e),
+    # KHONG phai dict. Ban truoc viet item["objectives"]["relative_cost"] va gate
+    # bang '"relative_cost" in item["objectives"]' — dieu kien do kiem chuoi co
+    # nam trong mot tuple cac so hay khong, nen LUON False: moi run bao
+    # feasible_count = 0, best_cost = None, va phan quyet duoc sinh ra tu
+    # n_paired_seeds = 0. Cung lop loi voi pymoo_adapter da va o BRD-009.
+    cost_index = OBJECTIVE_KEYS.index("relative_cost")
+    feasible_costs = [
+        float(item["objectives"][cost_index])
+        for item in history
+        if item.get("feasible") and item.get("objectives") is not None
+    ]
+
+    best_cost = min(feasible_costs) if feasible_costs else None
+    median_cost = statistics.median(feasible_costs) if feasible_costs else None
+    counters = res.get("counters", {})
+
+    return {
+        "arm_id": arm["arm_id"],
+        "algorithm": algorithm,
+        "seed": seed,
+        "solver_calls": counters.get("solver_calls", 0),
+        "l0_rejected": counters.get("l0_rejected", 0),
+        "feasible_count": len(feasible_costs),
+        "best_cost": best_cost,
+        "median_cost": median_cost,
+        "archive_size": len(res["archive"].entries) if hasattr(res.get("archive"), "entries") else len(res.get("archive", [])),
+    }
+
+
+def bootstrap_ci(
+    diffs: list[float],
+    n_resamples: int = 10000,
+    alpha: float = 0.05,
+    seed: int = 42,
+) -> tuple[float, float, float]:
+    if not diffs:
+        return 0.0, 0.0, 0.0
+    rng = random.Random(seed)
+    n = len(diffs)
+    means = []
+    for _ in range(n_resamples):
+        sample = [rng.choice(diffs) for _ in range(n)]
+        means.append(statistics.mean(sample))
+    means.sort()
+    low_idx = int(n_resamples * (alpha / 2))
+    high_idx = int(n_resamples * (1 - alpha / 2))
+    return statistics.mean(diffs), means[low_idx], means[high_idx]
+
+
+def execute_confirmatory_experiment(
+    prereg_path: Path = DEFAULT_PREREG,
+    seeds: list[int] | None = None,
+    output_dir: Path | None = None,
+) -> dict:
+    prereg = json.loads(prereg_path.read_text(encoding="utf-8"))
+    arms = prereg["arms"]
+    algorithms = prereg["algorithms"]
+    budget = prereg["budget"]["solver_calls_per_run"]
+    
+    if seeds is None:
+        s_start = prereg["budget"]["seed_start"]
+        s_end = prereg["budget"]["seed_end"]
+        seeds = list(range(s_start, s_end + 1))
+
+    created_at = datetime.now(timezone.utc).isoformat()
+    results = []
+
+    print(f"=== Starting Confirmatory A/B Trial (Task BRD-013) ===")
+    print(f"Arms: {[a['arm_id'] for a in arms]}")
+    print(f"Algorithms: {algorithms} | Seeds: {len(seeds)} (Range {seeds[0]}..{seeds[-1]})")
+    print(f"Budget per run: {budget} solver calls\n")
+
+    for arm in arms:
+        for algo in algorithms:
+            for seed in seeds:
+                res = run_single_arm(arm, algo, seed, budget)
+                results.append(res)
+                print(f"[{arm['arm_id']}] algo={algo} seed={seed:02d} -> best_cost={res['best_cost']} (calls={res['solver_calls']})")
+
+    prereg = json.loads(prereg_path.read_text(encoding="utf-8"))
+    n_seeds_registered = int(prereg.get("budget", {}).get("n_seeds", len(seeds)))
+    if len(seeds) != n_seeds_registered:
+        print(f"*** CANH BAO: chay {len(seeds)} seed nhung pre-registration dang ky "
+              f"{n_seeds_registered} seed — bao cao se bi danh dau CHAY LECH GIAO THUC ***")
+
+    # Statistical comparison (Paired differences on NSGA2)
+    # A2 (v2 shape only) vs A4 (v1 restricted to {5,6})
+    a2_nsga = {r["seed"]: r["best_cost"] for r in results if r["arm_id"] == "A2_v2_shape_only" and r["algorithm"] == "nsga2" and r["best_cost"] is not None}
+    a4_nsga = {r["seed"]: r["best_cost"] for r in results if r["arm_id"] == "A4_v1_restricted_girders" and r["algorithm"] == "nsga2" and r["best_cost"] is not None}
+
+    common_seeds_a2_a4 = sorted(set(a2_nsga.keys()) & set(a4_nsga.keys()))
+    diffs_a2_a4_pct = []
+    for s in common_seeds_a2_a4:
+        c2 = a2_nsga[s]
+        c4 = a4_nsga[s]
+        diffs_a2_a4_pct.append(((c4 - c2) / c4) * 100.0)
+
+    mean_diff, ci_low, ci_high = bootstrap_ci(diffs_a2_a4_pct)
+
+    # Khong duoc phat bieu phan quyet khi khong co du lieu ghep cap. "KHONG DAT"
+    # nghia la DA KIEM va BAC BO; con day la CHUA KIEM DUOC. Nham hai thu nay
+    # bien mot pipeline hong thanh mot ket luan khoa hoc.
+    min_paired = max(3, int(0.5 * n_seeds_registered))
+    if len(common_seeds_a2_a4) == 0:
+        verdict = ("KHÔNG KẾT LUẬN ĐƯỢC — không có seed nào ghép cặp được "
+                   "(A2 hoặc A4 không tìm ra phương án khả thi nào)")
+    elif len(common_seeds_a2_a4) < min_paired:
+        verdict = (f"KHÔNG KẾT LUẬN ĐƯỢC — chỉ {len(common_seeds_a2_a4)} seed ghép cặp, "
+                   f"dưới mức tối thiểu {min_paired}")
+    elif ci_low > 2.0:
+        verdict = "ĐẠT (H1 được chấp nhận: v2 tốt hơn v1 >= 2% có ý nghĩa thống kê)"
+    elif ci_low > 0.0:
+        verdict = "CÓ CẢI THIỆN NHƯNG DƯỚI NGƯỠNG 2% ĐÃ KHÓA"
+    else:
+        verdict = "KHÔNG ĐẠT (H0 giữ vững)"
+
+    summary = {
+        "schema_version": "1.0",
+        "task_id": "BRD-013",
+        "created_at_utc": created_at,
+        "preregistration_sha256": hashlib.sha256(prereg_path.read_bytes()).hexdigest(),
+        "n_runs_total": len(results),
+        "seeds_registered": n_seeds_registered,
+        "seeds_executed": len(seeds),
+        "seed_compliance": ("khop giao thuc" if len(seeds) == n_seeds_registered
+                            else "CHAY LECH GIAO THUC — so seed thuc chay khac so seed da dang ky"),
+        "verdict": verdict,
+        "comparison_A2_vs_A4_nsga2": {
+            "n_paired_seeds": len(common_seeds_a2_a4),
+            "mean_improvement_pct": round(mean_diff, 2),
+            "bootstrap_ci_95_pct": [round(ci_low, 2), round(ci_high, 2)],
+        },
+        "runs": results,
+    }
+
+    if output_dir is None:
+        output_dir = ROOT / "experiments" / "results" / f"confirmatory_ab_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    (output_dir / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    
+    with (output_dir / "summary.csv").open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["arm_id", "algorithm", "seed", "solver_calls", "l0_rejected", "feasible_count", "best_cost", "median_cost", "archive_size"])
+        writer.writeheader()
+        for r in results:
+            writer.writerow(r)
+
+    print(f"\n==================================================")
+    print(f"Confirmatory Trial Complete!")
+    print(f"Verdict: {verdict}")
+    print(f"A2 vs A4 mean improvement: {mean_diff:.2f}% (95% CI: [{ci_low:.2f}%, {ci_high:.2f}%])")
+    print(f"Results saved to: {output_dir}")
+    print(f"==================================================")
+    return summary
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run confirmatory grammar A/B trial")
+    parser.add_argument("--seeds", type=int, default=20, help="Number of seeds to run (default: 20)")
+    args = parser.parse_args()
+    seed_list = list(range(42, 42 + args.seeds))
+    execute_confirmatory_experiment(seeds=seed_list)

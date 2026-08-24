@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-021",
+  "title": "Lập chỉ mục thư viện tài liệu cục bộ vào Obsidian mà không nhân bản dữ liệu",
+  "research_question": "Máy người dùng có khoảng 19.000 tài liệu kỹ thuật trải trên nhiều ổ (1.224 PDF, 15.824 DWG, 535 RVT, 1.216 tài liệu Office). Làm sao đưa toàn bộ vào tầm với của não 2 trong Obsidian mà KHÔNG copy hàng trăm GB và không làm vault quá tải, đồng thời chỉ ra được tài liệu nào có giá trị trực tiếp cho runtime?",
+  "workstream": "knowledge",
+  "priority": "P1",
+  "status": "ACTIVE",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/knowledge/local_library.py",
+    "research/library/",
+    "contracts/local_document_index.schema.json",
+    "tests/test_local_library.py"
+  ],
+  "acceptance_criteria": [
+    "Lập chỉ mục bằng METADATA (đường dẫn, kích thước, sha256, loại, ngày sửa), KHÔNG copy file lớn vào vault",
+    "Phân loại theo mức liên quan tới runtime, nêu rõ tài liệu nào tác động tới rule hay biến nào",
+    "Chỉ mục tái lập được: chạy lại trên cùng dữ liệu cho cùng kết quả, có ghi thời điểm quét",
+    "Bỏ qua có ghi nhận các file cá nhân hoặc không liên quan, kèm lý do bỏ qua",
+    "Không đọc nội dung file được bảo vệ bằng mật khẩu; ghi nhận là không đọc được",
+    "Có ghi chú bản quyền: chỉ mục ghi vị trí và siêu dữ liệu, không sao chép nội dung tài liệu có bản quyền"
+  ],
+  "required_artifacts": [
+    "research/library/index.json",
+    "bridge_evolution/knowledge/local_library.py"
+  ],
+  "safety_notes": [
+    "TUYỆT ĐỐI KHÔNG copy, di chuyển, đổi tên hay xoá bất kỳ file gốc nào của người dùng — chỉ ĐỌC",
+    "Không đưa tài liệu cá nhân (hồ sơ nhân sự, giấy tờ thuế, tài liệu không liên quan) vào chỉ mục dự án",
+    "Chỉ mục là thư viện tham khảo UNVERIFIED; sự tồn tại của một tài liệu KHÔNG phải bằng chứng kỹ thuật",
+    "Không được suy ra số liệu kỹ thuật từ TÊN FILE; muốn dùng số phải mở bản vẽ và có kỹ sư xác nhận"
+  ],
+  "review_notes": [
+    "Quy mô đo được 2026-08-21: ổ D 21 pdf/201 dwg/27 docx/16 xlsx/5 doc/8 rvt; ổ E 564 pdf/11675 dwg/142 docx/319 xlsx/127 doc/367 rvt; ổ G 639 pdf/3948 dwg/231 docx/565 xlsx/184 doc/160 rvt.",
+    "PHÁT HIỆN GIÁ TRỊ NHẤT: /e/BIM  CIM/drive-download-20260307T164604Z-3-001/FLIE CAD-20230216T025818Z-001/FLIE CAD/Section Super T 38.2m.dwg — mặt cắt Super-T 38,2 m, đúng loại dầm mà catalog đang dùng số PLACEHOLDER cho A, I, y_b. Đây là đường gỡ gate engineer_approved PENDING trong docs/01_research_contract.md muc 7.",
+    "Các tài liệu liên quan khác: TIM CAP DUL.dwg (bố trí cáp DƯL), Beam/Section I33m.dwg, hồ sơ TKBVTC cầu Ngô Quyền và Tôn Thất Thuyết, trụ cầu Tân An, Balanced_Cantilever_Construction_Strategy.pdf, 5 chuyên đề BIM, TCVN 4054/5729/7957/4513 cho phần đường.",
+    "TCVN 11823 (12 phần) ĐÃ có trong vault tại Standards/TCVN 11823-2017/PDF/ nên không import lại."
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_local_library.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

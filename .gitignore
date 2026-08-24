@@ -11,12 +11,36 @@ dist/
 tmp/
 Thumbs.db
 .DS_Store
+
+# --------------------------------------------------------------------------
+# Kết quả thí nghiệm
+# --------------------------------------------------------------------------
+# Nguyên tắc (docs/baseline_version_control_plan.md): KHÔNG hash vào handoff một
+# artifact chưa được version-control. Trước đây cả thư mục experiments/results/*/
+# bị loại, nên summary.md và oracle_comparison.md — đúng những file mà handoff
+# BRD-009 đã hash — không thể tái dựng bytes gốc từ Git.
+#
+# Vì vậy: loại file NẶNG (history/proposals/solver_history dạng .jsonl và .csv,
+# tổng ~13 GB), GIỮ LẠI artifact VĂN BẢN NHỎ (summary/manifest/pareto, mỗi file
+# ~1–95 KB) vì đó là thứ được trích dẫn và được hash.
+experiments/results/**
+!experiments/results/
+!experiments/results/.gitkeep
+!experiments/results/*/
+!experiments/results/*/summary.md
+!experiments/results/*/summary.json
+!experiments/results/*/manifest.json
+!experiments/results/*/oracle_comparison.md
+!experiments/results/*/pareto_*.json
+
+# Artifact đánh giá từng phương án: sinh lại được từ state + seed, KHÔNG được
+# hash vào handoff. Muốn trích dẫn thì chép sang đường dẫn có version-control.
 artifacts/*/
-experiments/results/*/
+!artifacts/.gitkeep
+
 multiagent/.locks/*
 multiagent/scratch/*
-CLAUDE.local.md
-!artifacts/.gitkeep
-!experiments/results/.gitkeep
 !multiagent/.locks/.gitkeep
 !multiagent/scratch/.gitkeep
+
+CLAUDE.local.md

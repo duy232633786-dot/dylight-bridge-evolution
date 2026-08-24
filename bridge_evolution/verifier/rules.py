@@ -1,15 +1,48 @@
-"""Independent Verifier — PASS/FAIL theo BRIDGE-RULESET-V1.
+"""Independent Verifier — PASS/FAIL theo rule profile khai trong chính state.
 
 Nguyên tắc: verifier KHÔNG tin solver "tự nhận đạt" — nó nhận số liệu phản ứng
 thô rồi tự áp tiêu chuẩn. Verifier cũng chạy lại toàn bộ kiểm tra hình học L0
 (double-check độc lập với đường sinh phương án).
+
+Nhãn truy vết ruleset phải SUY TỪ ``state["constraints"]["rule_profile_id"]``.
+Một hằng cố định sẽ khiến mọi kết quả chạy dưới BRIDGE-RULESET-V2 (grammar tham
+số hóa, có thêm FAB-001..FAB-007) tự khai nhầm là chạy dưới V1 — phép tính vẫn
+đúng nhưng artifact nói dối về điều kiện sinh ra nó (BRD-010).
 """
 import math
 
 from ..catalogs import load_catalogs
 from ..geometry import check_geometry
 
-RULESET_VERSION = "BRIDGE-RULESET-V1/1.1.0"
+#: Profile mặc định khi state không khai (chỉ dùng cho hằng tương thích ngược).
+DEFAULT_RULE_PROFILE_ID = "BRIDGE-RULESET-V1"
+
+#: Nhãn dùng khi không phân giải được profile — KHÔNG bịa về V1.
+UNRESOLVED_RULESET_VERSION = "UNRESOLVED"
+
+
+def ruleset_label(rule_profile_id: str) -> str:
+    """``<rule_profile_id>/<ruleset_version của chính profile đó>``."""
+    profile = load_catalogs()["rule_profiles"].get(rule_profile_id)
+    if not isinstance(profile, dict):
+        return f"{rule_profile_id}/{UNRESOLVED_RULESET_VERSION}"
+    return f"{rule_profile_id}/{profile.get('ruleset_version', UNRESOLVED_RULESET_VERSION)}"
+
+
+def ruleset_version_for(state) -> str:
+    """Nhãn truy vết của MỘT state cụ thể; không raise với state hỏng."""
+    try:
+        rule_profile_id = state["constraints"]["rule_profile_id"]
+    except (TypeError, KeyError, IndexError):
+        return UNRESOLVED_RULESET_VERSION
+    if not isinstance(rule_profile_id, str):
+        return UNRESOLVED_RULESET_VERSION
+    return ruleset_label(rule_profile_id)
+
+
+#: Hằng tương thích ngược = nhãn của profile mặc định, suy từ catalog nên không
+#: bao giờ lệch khỏi dữ liệu thật. Đường provenance dùng ``ruleset_version_for``.
+RULESET_VERSION = ruleset_label(DEFAULT_RULE_PROFILE_ID)
 
 
 def verify_candidate(state: dict, geom: dict, analysis: dict) -> tuple[list[dict], dict]:

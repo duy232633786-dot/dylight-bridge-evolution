@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-009",
+  "handoff_sha256": "c6d9949bcc93dbea76963a887c4c05489ab5c9e0897d8a8f3ea63923a1584c34",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "74/74 raw hashes match on 4.70 GB, 18/18 runs use 600 solver calls, preregistration SHA fc20d3fc predates run, comparison correctly labeled VOID due to degenerate front."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Immutable r002 submitted with mandatory incident note, out-of-scope test files are now formally owned and accepted under BRD-011, backward compatibility for v1 confirmed byte-for-byte in independent worktree."
+    }
+  ],
+  "notes": "APPROVE: r002 va su co governance da duoc xu ly hoan toan qua task BRD-011. Ket qua A/B pilot v1 vs v2 duoc cong nhan o muc SCREENED voi phan quyet VO HIEU do degenerate front, khong trich dan nhu bang chung v2 vuot troi. Mo khoa BRD-013 de chay xac nhan 20 seed."
+}

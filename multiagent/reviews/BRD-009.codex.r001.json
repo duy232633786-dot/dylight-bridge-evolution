@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-009",
+  "handoff_sha256": "80f88030ae253696e8206fee62efa0b37f61f908d83a82849b00ec3b857eb836",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "Required artifacts exist; final 1.1 preregistration SHA fc20d3fc... predates reviewed run output; 18/18 runs use 600 actual solver calls; FAB constraints remain HARD; report correctly labels the comparison VOID."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Numerical/test evidence is reproducible (74/74 artifact hashes match; full suite passes; v1 regression hash matches baseline), but canonical process is not clean: BRD-009 handoff r001 was edited in place after submission, and tests/test_rl_env.py plus tests/test_surrogate.py were changed outside task write_scope."
+    }
+  ],
+  "notes": "REVISE về governance, không bác kết quả kỹ thuật. Giữ verdict VÔ HIỆU. Phải nộp r002 bất biến kèm incident note về r001 từng bị sửa tại chỗ; hợp thức hóa tests/test_rl_env.py và tests/test_surrogate.py bằng task/write_scope riêng. Bằng chứng đã kiểm: 74/74 hash raw khớp trên 4.70 GB, 18/18 run dùng 600 solver calls, full suite xanh, v1 smoke khớp SHA 64340f... Không được diễn giải 3 seed như bằng chứng v2 tốt hơn; >=20 seed/arm thứ tư và L2 Midas là task kế tiếp."
+}

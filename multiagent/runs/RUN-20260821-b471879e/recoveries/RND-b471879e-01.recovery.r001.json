@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "recovery_id": "REC-c653645c74a24b96",
+  "created_at": "2026-08-21T08:23:47.599146Z",
+  "run_id": "RUN-20260821-b471879e",
+  "task_id": "RND-b471879e-01",
+  "authorized_by": "user-via-codex",
+  "reason": "OpenCode produced no required artifact in two immutable attempts; reassign one bounded recovery attempt to authenticated Antigravity while Codex remains independent reviewer.",
+  "previous_run_status": "FAILED",
+  "next_run_status": "PLANNED",
+  "previous_task_status": "BLOCKED",
+  "next_task_status": "READY",
+  "previous_owner": "opencode",
+  "previous_provider": "opencode",
+  "next_provider": "antigravity",
+  "prior_attempts": 2,
+  "previous_run_sha256": "f823dc32b03fbc5408797007b14d042a550e126915f518419c308a736112398b",
+  "previous_task_sha256": "c1fd7e3df9604ef50af2d7e50cf016804dbe349a2bcdbea7304bca71735401b9",
+  "attempt_records": [
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-01.work.r001.json",
+      "sha256": "df6f1a6aa52ded875eaaf75726305b6bda093c81c8fc840d66935718beed4a63"
+    },
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-01.work.r002.json",
+      "sha256": "2f004dd9fdddf5958ad1ca76dee53d41adbe4b9b6cc98a38a56cf4035157512d"
+    }
+  ],
+  "base_retry_budget": 1,
+  "prior_recovery_grants": 0,
+  "granted_attempts": 1,
+  "effective_retry_budget": 2
+}

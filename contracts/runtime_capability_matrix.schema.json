@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "runtime_capability_matrix.schema.json",
+  "title": "RuntimeCapabilityMatrix",
+  "description": "Khai báo MÁY ĐỌC ĐƯỢC về năng lực runtime. Đây là NGUỒN CHUẨN cho docs/runtime_capability_matrix.md: mọi năng lực PRESENT/PARTIAL phải kiểm được bằng probe chạy thật, mọi năng lực ABSENT phải chứng minh được là không gọi được (hoặc khai báo rõ là KHÔNG chứng minh được bằng máy). Bộ kiểm chạy tại docs/check_runtime_drift.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "matrix_id", "package_version", "claim_ceiling",
+               "claim_ceiling_evidence", "doc_mirror", "runtime_rule_inventory",
+               "capabilities", "known_card_reference_exceptions", "declared_counts",
+               "fabrication_rule_probes", "l0_pipeline_probe"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "matrix_id": { "type": "string", "minLength": 1 },
+    "package_version": { "type": "string", "minLength": 1 },
+    "claim_ceiling": { "enum": ["IDEA", "SCREENED", "NUMERICALLY_VERIFIED", "LAB_VALIDATED", "FIELD_VALIDATED", "ENGINEERING_CANDIDATE"] },
+    "claim_ceiling_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "pointer"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "pointer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "doc_mirror": { "type": "string", "minLength": 1 },
+    "runtime_rule_inventory": {
+      "description": "Tập ĐẦY ĐỦ rule_id mà runtime có thể phát ra, quét từ literal trong bridge_evolution/. Thêm/bớt rule mà quên cập nhật ở đây ⇒ bộ kiểm đỏ.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Z]{3,6}-[0-9]{3}$" }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "state", "evidence", "limits", "probes"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,49}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "state": {
+            "description": "PRESENT = gọi được thật; PARTIAL = gọi được nhưng có giới hạn bắt buộc phải nêu; ABSENT = KHÔNG gọi được.",
+            "enum": ["PRESENT", "PARTIAL", "ABSENT"]
+          },
+          "evidence": {
+            "description": "Đường dẫn file và/hoặc file::hàm. Mỗi chuỗi ở đây PHẢI xuất hiện nguyên văn trong doc_mirror.",
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "limits": {
+            "description": "Giới hạn trung thực. Bắt buộc khác rỗng khi state là PARTIAL hoặc ABSENT.",
+            "type": "string"
+          },
+          "probes": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/probe" }
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "state": { "enum": ["PARTIAL", "ABSENT"] } } },
+            "then": { "properties": { "limits": { "minLength": 1 } } }
+          }
+        ]
+      }
+    },
+    "known_card_reference_exceptions": {
+      "description": "MIỄN TRỪ CÓ THỜI HẠN cho thẻ tri thức trỏ tới grammar/biến/rule không tồn tại. Miễn trừ là để KHÔNG che giấu lỗi: mỗi mục phải nêu lý do và ai gỡ được nó. Bộ kiểm bắt lỗi nếu miễn trừ KHÔNG còn đúng (vấn đề đã được sửa) — miễn trừ không được phép mục ruỗng theo thời gian. Mảng rỗng là trạng thái mong muốn.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["card_id", "kind", "value", "reason", "blocked_by", "must_fix_in"],
+        "properties": {
+          "card_id": { "type": "string", "pattern": "^KC-[0-9]{3}$" },
+          "kind": { "enum": ["family", "variable", "rule"] },
+          "value": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 20 },
+          "blocked_by": { "type": "string", "minLength": 1 },
+          "must_fix_in": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "declared_counts": {
+      "description": "Con số đếm được mà tài liệu tuyên bố. Bộ kiểm đếm lại bằng runtime rồi so với từng doc_claim.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "source", "doc_claims"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,49}$" },
+          "description": { "type": "string", "minLength": 1 },
+          "source": {
+            "description": "Cách runtime đếm lại con số này (bộ kiểm hiện thực từng khóa).",
+            "enum": ["load_cards", "audit_cards", "notebooklm_notebooks",
+                     "notebooklm_declared_sources", "fabrication_rules",
+                     "production_girder_sections", "l0_layout_rules",
+                     "knowledge_card_files"]
+          },
+          "doc_claims": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["file", "pattern"],
+              "properties": {
+                "file": { "type": "string", "minLength": 1 },
+                "pattern": {
+                  "description": "Regex có ĐÚNG một nhóm bắt là con số. Không khớp = tài liệu đã trôi khỏi câu đang được bảo vệ.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "fabrication_rule_probes": {
+      "description": "Mỗi rule FAB phải KÍCH HOẠT ĐƯỢC THẬT bằng một bộ tham số cụ thể — bằng chứng 'FAB rules có chạy', không phải lời khai.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "params", "context"],
+        "properties": {
+          "rule_id": { "type": "string", "pattern": "^FAB-[0-9]{3}$" },
+          "params": { "type": "object" },
+          "context": { "type": "object" }
+        }
+      }
+    },
+    "l0_pipeline_probe": {
+      "description": "Chứng minh FAB-* chạy ở L0 TRONG PIPELINE THẬT (check_geometry), không chỉ trong hàm thuần toán.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grammar_id", "design_variables", "girder_concrete_id",
+                   "deck_concrete_id", "expect_section_source", "expect_rule_ids"],
+      "properties": {
+        "grammar_id": { "type": "string", "minLength": 1 },
+        "design_variables": { "type": "object" },
+        "girder_concrete_id": { "type": "string", "minLength": 1 },
+        "deck_concrete_id": { "type": "string", "minLength": 1 },
+        "expect_section_source": { "type": "string", "minLength": 1 },
+        "expect_rule_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^[A-Z]{3,6}-[0-9]{3}$" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "probe": {
+      "type": "object",
+      "required": ["kind"],
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["kind", "path"],
+          "properties": {
+            "kind": { "const": "file_exists" },
+            "path": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "module", "attr"],
+          "properties": {
+            "kind": { "const": "module_attr" },
+            "module": { "type": "string", "minLength": 1 },
+            "attr": { "type": "string", "minLength": 1 },
+            "callable": { "type": "boolean" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "module", "attr", "args", "exception"],
+          "properties": {
+            "kind": { "const": "raises" },
+            "module": { "type": "string", "minLength": 1 },
+            "attr": { "type": "string", "minLength": 1 },
+            "args": { "type": "array" },
+            "exception": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "module_name"],
+          "properties": {
+            "kind": { "const": "no_package_import" },
+            "module_name": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "path", "pointer", "value"],
+          "properties": {
+            "kind": { "const": "json_value_equals" },
+            "path": { "type": "string", "minLength": 1 },
+            "pointer": { "type": "string", "minLength": 1 },
+            "value": {}
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "status", "expected"],
+          "properties": {
+            "kind": { "const": "card_status_count" },
+            "status": { "enum": ["DRAFT", "ENGINEER_APPROVED", "REJECTED"] },
+            "expected": { "type": "integer", "minimum": 0 }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "rule_id"],
+          "properties": {
+            "kind": { "const": "rule_absent" },
+            "rule_id": { "type": "string", "pattern": "^[A-Z]{3,6}-[0-9]{3}$" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "name", "declared"],
+          "properties": {
+            "kind": { "const": "pyproject_dependency" },
+            "name": { "type": "string", "minLength": 1 },
+            "declared": { "type": "boolean" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["kind", "rationale"],
+          "properties": {
+            "kind": {
+              "description": "KHÔNG kiểm được bằng máy. Bộ kiểm chỉ bắt buộc có rationale và đếm riêng nhóm này — không được im lặng coi như đã chứng minh.",
+              "const": "declared_not_machine_provable"
+            },
+            "rationale": { "type": "string", "minLength": 20 }
+          }
+        }
+      ]
+    }
+  }
+}

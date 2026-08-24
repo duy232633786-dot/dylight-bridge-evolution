@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-c7d67b22cd364d44",
+  "amendment_sha256": "6ac17b3f44a6b4c8071317b288bd0f2be6e5de1f14ab6be63c0c93ff3674edee",
+  "created_at": "2026-08-21T09:54:55.562510Z",
+  "task_id": "RND-b471879e-03",
+  "authorized_by": "user-via-codex",
+  "reason": "Fail-closed re-scope: runtime hien tai ngoai mien ap dung cho dam lien tuc 480 m; ngan auto-orchestrator tu nop SCREENED/G0-G2 khi chi co the tao evidence-boundary F0.",
+  "pre_task_sha256": "0c80982a812b16f81e8cc1b65ed1a732686a2481913877d665aca9890aef1fea",
+  "post_task_sha256": "a3d388cb88354df384ee6cd45f10f242ceeb4936fcffde05b162cbc65876c02f",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/0c80982a812b16f81e8cc1b65ed1a732686a2481913877d665aca9890aef1fea.json",
+    "sha256": "0c80982a812b16f81e8cc1b65ed1a732686a2481913877d665aca9890aef1fea"
+  },
+  "changes": [
+    {
+      "field": "acceptance_criteria",
+      "before": [
+        "Input, units, solver/version, seed và raw output truy vết được; kiểm tra thứ nguyên của từng hạng năng lượng",
+        "Kiểm equilibrium/reactions và báo solver failure như STOP; bổ sung N, torsion/warping, P-Delta, liên kết và construction stage vào danh sách thiếu",
+        "So độc lập Timoshenko với unit-cell/truss-energy homogenization; định nghĩa GA_eq theo hướng và dải tải, không mặc nhiên dùng scalar",
+        "Tách dead-load inventory và tái lập đại số 5.5 xuống 2.2 hoặc giải trình đầy đủ điều kiện để đạt 1.8",
+        "Báo cả phương án bị loại; runtime hiện tại không hỗ trợ geometry 480 m nên kết quả chỉ F0 IDEA nếu chưa có mô hình L2 thật"
+      ],
+      "after": [
+        "Mở đầu STOP / INCONCLUSIVE - F0 IDEA; G0, G1, G2 PENDING và solver_status = NOT_RUN",
+        "Hash brief, task contract và artifacts 01/02; mọi target 85%, 60%, 5.5 và 1.8 đều ghi UNVERIFIED",
+        "Tái lập 5.5 x 0.40 = 2.20 và 1.8 / 5.5 = 0.3272727, tương ứng giảm 67.2727% tổng mômen tĩnh tải nếu hoạt tải và đường ảnh hưởng không đổi",
+        "Audit thứ nguyên năng lượng uốn/cắt, quy ước kappa và tổng thế năng Pi = U - W",
+        "Liệt kê axial, torsion/warping, P-Delta, joint stiffness, construction stages, aeroelastic, fatigue và material durability là cơ học/bằng chứng còn thiếu",
+        "Lập capability matrix và preregistration tương lai cho Timoshenko-RVE/unit-cell với BC, joint, mesh, benchmark, equilibrium, raw output và STOP rules; chưa khóa tolerance khi chưa có basis",
+        "Đánh dấu cả ba concept NOT_TESTED; không PASS, REJECT hay claim GA_eq, MD/ML hoặc feasibility"
+      ]
+    },
+    {
+      "field": "claim_ceiling",
+      "before": "SCREENED",
+      "after": "IDEA"
+    },
+    {
+      "field": "required_gates",
+      "before": [
+        "G0",
+        "G1",
+        "G2"
+      ],
+      "after": []
+    },
+    {
+      "field": "research_question",
+      "before": "Giả thuyết 480 m còn đứng vững sau audit đại số, cân bằng, Timoshenko và đồng nhất hóa năng lượng unit-cell/truss nào, trước khi yêu cầu L2?",
+      "after": "Đại số, thứ nguyên, miền áp dụng và dữ liệu đầu vào nào còn thiếu trước khi giả thuyết Michell/CFRP 480 m có thể bước qua G0 và được phép chạy mô hình vật lý phù hợp?"
+    },
+    {
+      "field": "safety_notes",
+      "before": [
+        "Không ép mô hình super_t_simple_v1 38.3 m hiện có để đại diện dầm liên tục 480 m",
+        "Thiếu design basis hoặc mô hình phù hợp phải ghi STOP/BLOCKED; không gắn SCREENED chỉ vì đã chạy một script"
+      ],
+      "after": [
+        "Không chạy super_t_simple_v1 hoặc solver L1 38.3 m để đại diện dầm liên tục 480 m",
+        "Không bịa input, solver/version, seed, raw output hoặc giá trị vật liệu; thiếu design basis là STOP",
+        "Artifact này chỉ phê duyệt ranh giới bằng chứng và phương pháp tương lai, không phê duyệt bất kỳ physics gate nào"
+      ]
+    },
+    {
+      "field": "title",
+      "before": "Sàng lọc physics-in-the-loop tái lập được",
+      "after": "Audit vật lý F0 và lập điều kiện gỡ STOP cho giả thuyết 480 m"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "READY",
+  "run_id": "RUN-20260821-b471879e"
+}

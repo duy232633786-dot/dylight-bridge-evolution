@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-020",
+  "title": "Mở rộng thư viện tham khảo học thuật cho não 2",
+  "research_question": "Những tài liệu khoa học nào (sức bền vật liệu, bê tông cốt thép, dự ứng lực, phân bố ngang tải trọng, tối ưu kết cấu, vật liệu mới, thi công) là nền tảng cho các mô hình và ngưỡng mà runtime đang dùng, và tài liệu nào chỉ ra chỗ mô hình hiện tại đang sai hoặc thiếu?",
+  "workstream": "knowledge",
+  "priority": "P1",
+  "status": "ACTIVE",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/literature/",
+    "contracts/literature_reference.schema.json",
+    "tests/test_literature_index.py"
+  ],
+  "acceptance_criteria": [
+    "MỌI mục phải có URL đã thật sự truy cập được, không được sinh trích dẫn từ trí nhớ",
+    "Mỗi mục ghi rõ đã xác minh được gì (tiêu đề, tác giả, nơi công bố, DOI) và chưa xác minh được gì",
+    "Phân loại theo chủ đề và nối tới rule/biến/mô hình cụ thể trong runtime mà nó liên quan",
+    "Đánh dấu rõ mục nào MÂU THUẪN với mô hình hiện tại (đó là mục giá trị nhất)",
+    "Toàn bộ ở mức UNVERIFIED theo PROTOCOL rule 6; muốn thành rule phải quay về nguồn gốc, dẫn điều khoản, thêm test và kỹ sư duyệt"
+  ],
+  "required_artifacts": [
+    "research/literature/"
+  ],
+  "safety_notes": [
+    "BỊA TRÍCH DẪN LÀ LỖI NGHIÊM TRỌNG NHẤT của task này: một DOI sai hoặc một tiêu đề không tồn tại làm hỏng toàn bộ giá trị thư viện",
+    "Thư viện tham khảo KHÔNG phải bằng chứng kỹ thuật; không được dùng để nâng cấp claim hay đổi ngưỡng trong catalogs",
+    "Không thêm vật liệu mới vào catalogs dù tài liệu nói hay tới đâu"
+  ],
+  "review_notes": [],
+  "preferred_provider": "claude",
+  "preferred_role": "materials_researcher",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_literature_index.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

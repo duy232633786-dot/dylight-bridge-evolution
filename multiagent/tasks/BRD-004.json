@@ -5,23 +5,40 @@
   "research_question": "Những topology/hình dạng nào tạo xung đột thực giữa vật liệu, carbon, độ cứng, thi công và thẩm mỹ mà vẫn sàng lọc được bằng vật lý?",
   "workstream": "geometry",
   "priority": "P1",
-  "status": "BACKLOG",
-  "owner": null,
+  "status": "REVIEW",
+  "owner": "claude",
   "reviewer": null,
-  "dependencies": ["BRD-001", "BRD-002"],
-  "required_gates": ["G0", "G1", "G2"],
+  "dependencies": [
+    "BRD-001",
+    "BRD-002"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2"
+  ],
   "claim_ceiling": "SCREENED",
-  "write_scope": ["bridge_grammar/experimental/", "bridge_evolution/geometry_experimental/", "experiments/shape_discovery/", "tests/test_shape_grammar_experimental.py"],
+  "write_scope": [
+    "bridge_grammar/experimental/",
+    "bridge_evolution/geometry_experimental/",
+    "experiments/shape_discovery/",
+    "tests/test_shape_grammar_experimental.py"
+  ],
   "acceptance_criteria": [
     "Mỗi family có load-path hypothesis và falsification criterion",
     "Geometry hash và parent lineage tái lập được",
     "L0 kiểm chế tạo, vận chuyển, cẩu lắp và inspection access",
     "Top set giữ đa dạng hình dạng, không chỉ chọn phương án rẻ nhất"
   ],
-  "required_artifacts": ["experiments/shape_discovery/pre_registration.json", "tests/test_shape_grammar_experimental.py"],
+  "required_artifacts": [
+    "experiments/shape_discovery/pre_registration.json",
+    "tests/test_shape_grammar_experimental.py"
+  ],
   "safety_notes": [
     "Sandbox experimental không được nhập thẳng vào production grammar",
     "Render đẹp chỉ mang mức IDEA cho đến khi qua solver/verifier"
   ],
-  "review_notes": []
+  "review_notes": [
+    "Chuyen BACKLOG -> READY ngay 2026-08-22: hai dependency BRD-001 va BRD-002 deu da ACCEPTED. Task duoc kich hoat de nghien cuu mot render cau vom do chu du an dua vao, dua tren thu vien 111 nguon trong research/literature/ va tai lieu da nhap vao Obsidian Library."
+  ]
 }

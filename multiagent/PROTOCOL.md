@@ -35,6 +35,40 @@ thiết bị/hiệu chuẩn.
 - Thay đổi geometry/material/load/design basis làm vô hiệu downstream evidence;
   tạo candidate lineage mới thay vì sửa lịch sử.
 
+### Amendment task contract trước khi claim
+
+Không sửa tay JSON task để re-scope. Chỉ task `BACKLOG`/`READY`, hoặc `BLOCKED`
+chưa từng được claim (không owner/reviewer/handoff), mới được dùng
+`lab amend-task`. Caller phải cung cấp SHA-256 của đúng bytes task đã đọc; stale
+hash, task `ACTIVE`/`REVIEW`/`ACCEPTED`, field ngoài allowlist hoặc status
+transition không hợp lệ đều phải DỪNG mà không mutate task.
+
+Mỗi amendment lưu record bất biến, exact `before`/`after`, pre/post task hash,
+snapshot content-addressed của bytes trước sửa, lý do, người authorize, timestamp,
+amendment ID/self-hash và link tới amendment trước. Nếu task thuộc orchestration
+run, chỉ requester của brief được authorize và run phải có event
+`TASK_CONTRACT_AMENDED`; knowledge sync trở lại `PENDING`. Validator dựng lại
+exact patch, kiểm chain/snapshot/head và phát hiện sửa contract im lặng. Claim,
+submit, review và recovery vẫn được thay đổi các field vòng đời đã định nghĩa;
+chúng không được đổi nội dung contract.
+
+### Sửa provenance sau handoff
+
+Artifact đã hash không được cập nhật hash trong handoff cũ và không được sửa/xóa
+review cũ. Nếu một bugfix hợp lệ làm artifact drift sau handoff, dùng
+`lab correct-provenance` để lưu: incident bất biến, snapshot content-addressed có
+đúng bytes tại recorded SHA-256, correction handoff với old/new hash và lệnh kiểm
+chứng. Validator vẫn DỪNG cho tới khi một agent khác dùng
+`lab review-provenance` phê duyệt correction. Bất kỳ drift tiếp theo hoặc snapshot
+sai bytes đều cần incident/correction mới; lịch sử trước đó được giữ nguyên.
+
+Với vòng lặp bình thường `REVISE`, `lab review` phải chụp từng artifact của
+handoff đang review vào `multiagent/snapshots/sha256/<recorded-sha>.blob` **trước**
+khi trả task về `ACTIVE`. Validator chỉ miễn so hash live cho handoff có quyết
+định mới nhất là `REVISE` và snapshot đúng bytes; revision mới đang `REVIEW` và
+mọi handoff `APPROVE` vẫn phải khớp artifact live (hoặc đi qua correction độc lập
+ở trên). Snapshot trống, thiếu hoặc giả không hợp thức hóa được drift.
+
 ## Orchestration tự động
 
 Đề tài tự do phải đi qua `lab orchestrate`: intake canonical → DAG task → worker

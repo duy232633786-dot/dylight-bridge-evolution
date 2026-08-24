@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-011",
+  "title": "Hợp thức hóa test hồi quy reward hacking và surrogate ranking",
+  "research_question": "Hai bộ test hồi quy khóa lỗi reward hacking và kết quả âm về surrogate ranking đã được viết TRONG BRD-009 nhưng nằm NGOÀI write_scope của task đó (reviewer codex phát hiện, gate G2 FAIL). Task này KHÔNG khai dependency cứng vào BRD-009 vì nó là task khắc phục chạy song song: BRD-009 chỉ sạch quy trình khi hai file test này có chủ sở hữu hợp lệ. Câu hỏi: các test đó có đủ chặt để giữ lại không, và chúng khóa đúng lỗi nào?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "tests/test_rl_env.py",
+    "tests/test_surrogate.py"
+  ],
+  "acceptance_criteria": [
+    "Test phủ MỌI loại chu trình đóng của reward, không chỉ nhánh feasible sang feasible",
+    "Test khóa mặc định ranking của surrogate không được âm thầm quay lại reward",
+    "Không xóa hay nới lỏng khẳng định nào của test cũ",
+    "Nêu rõ trong handoff rằng các test này được viết trong BRD-009 ngoài write_scope và task này nhận trách nhiệm về chúng"
+  ],
+  "required_artifacts": [
+    "tests/test_rl_env.py",
+    "tests/test_surrogate.py"
+  ],
+  "safety_notes": [
+    "Đây là task khắc phục quy trình do reviewer codex yêu cầu ở BRD-009, không phải task tính năng mới",
+    "Test hồi quy là thứ duy nhất chặn lỗi reward hacking tái phát; không được suy yếu để cho code dễ qua"
+  ],
+  "review_notes": [
+    "APPROVE: Hop thuc hoa hoan toan 2 file test_rl_env.py va test_surrogate.py theo dung yeu cau governance cua BRD-009."
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

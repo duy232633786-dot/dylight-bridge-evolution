@@ -1,0 +1,218 @@
+{
+  "preregistration_id": "grammar_ab_v1_vs_v2",
+  "preregistration_version": "1.1.0",
+  "task_id": "BRD-009",
+  "locked_before_running": true,
+
+  "amendments": [
+    {
+      "version": "1.1.0",
+      "supersedes_version": "1.0.0",
+      "date_utc": "2026-08-21",
+      "made_after_seeing_results": true,
+      "reason": "Reviewer đối kháng chỉ ra rằng muc confounds của bản 1.0.0 TỰ NHẬN là liệt kê đầy đủ khác biệt v2 vs v1 nhưng đã BỎ SÓT một khác biệt thật: ở CÙNG ngân sách solver, các arm v2 được sàng L0 MIỄN PHÍ nhiều hơn hẳn arm v1 (không gian lớn hơn, tỷ lệ qua L0 thấp hơn). Bỏ sót này làm điều kiện 'cùng ngân sách' bị hiểu sai thành 'cùng công tìm kiếm'. Đồng thời reviewer chỉ ra runner không đối chiếu solver_calls thực tế với ngân sách đã đăng ký, nên bổ sung điều kiện vô hiệu UNEQUAL_SOLVER_BUDGET, và bổ sung ngưỡng dạng máy đọc được cho mọi invalidation condition để runner không còn hard-code ngưỡng.",
+      "changed_fields": [
+        "preregistration_version: 1.0.0 -> 1.1.0",
+        "amendments: THÊM MỚI (mảng này)",
+        "confounds.statement: ghi rõ bản 1.0.0 tự nhận đầy đủ nhưng đã bỏ sót bất đối xứng sàng L0",
+        "confounds.not_separable_in_this_experiment: THÊM mục 'Bất đối xứng sàng L0 miễn phí'",
+        "confounds.measured_l0_screening_asymmetry: THÊM MỚI (số liệu thực đo)",
+        "invalidation_conditions.conditions: THÊM condition_id UNEQUAL_SOLVER_BUDGET",
+        "invalidation_conditions.conditions[*]: THÊM trường threshold / auto_evaluated_in_runner / evaluation_note (chỉ làm ngưỡng ĐÃ CÓ trở nên máy đọc được, KHÔNG đổi giá trị ngưỡng nào)"
+      ],
+      "explicitly_unchanged": [
+        "decision_rule (toàn bộ, gồm rule, secondary_guard, on_failure, attribution_rule)",
+        "decision_rule.improvement_threshold_relative = 0.02",
+        "seeds = [42, 43, 44]",
+        "budget_per_run = 600",
+        "budget_definition",
+        "hypervolume_protocol (ideal_3d, reference_3d, mc_samples, mc_seed)",
+        "null_hypothesis, alternative_hypothesis, falsification_criterion",
+        "arms (grammar_id, domain_restriction, search_path của cả ba arm)"
+      ],
+      "honesty_note": "Sửa đổi này được thực hiện SAU KHI ĐÃ THẤY KẾT QUẢ của run experiments/results/grammar_ab_20260821T043403.194542Z. Vì vậy nó KHÔNG được coi là khóa trước, và tuyệt đối không được dùng để nới bất kỳ tiêu chí nào theo hướng có lợi cho giả thuyết: nó chỉ BỔ SUNG confound và SIẾT thêm điều kiện vô hiệu."
+    }
+  ],
+  "claim_ceiling": "SCREENED",
+  "claim_ceiling_note": "Toàn bộ số liệu của thí nghiệm này sinh từ L0 (hình học + chế tạo) và L1 line-girder sơ bộ của solver BUILTIN_L1. Đây là SÀNG LỌC, không phải thiết kế: không được gọi bất kỳ phương án nào là thiết kế thật, build-ready, NUMERICALLY_VERIFIED hay ENGINEERING_CANDIDATE. Muốn lên cấp phải có artifact L2/L3 thật (MARP-1.0 muc Cap do claim, PG-1.0 G2-G4).",
+
+  "research_question": "Ở CÙNG một ngân sách solver, việc cho bộ tối ưu TỰ THIẾT KẾ hình dạng mặt cắt dầm (grammar super_t_parametric_v2, 14 biến, trong đó 6 biến hình dạng) có thật sự cho phương án tốt hơn so với chỉ chọn tiết diện Super-T định hình có sẵn (grammar super_t_simple_v1, 8 biến) hay không?",
+  "null_hypothesis": "H0 — Tự do hình dạng KHÔNG cải thiện: ở cùng ngân sách solver, best_relative_cost của các arm grammar v2 không thấp hơn arm v1 quá 2%, hoặc hypervolume của arm v2 không giữ được bằng arm v1.",
+  "alternative_hypothesis": "H1 — Tự do hình dạng cải thiện: trên MỌI seed và MỌI thuật toán đã đăng ký, best_relative_cost của arm v2 thấp hơn arm v1 ít nhất 2% VÀ hypervolume_2d_cost_carbon không nhỏ hơn arm v1.",
+
+  "baseline_arm": "A1_v1_catalog",
+  "arms": [
+    {
+      "arm_id": "A1_v1_catalog",
+      "grammar_id": "super_t_simple_v1",
+      "rule_profile_id": "BRIDGE-RULESET-V1",
+      "n_design_variables": 8,
+      "domain_restriction": {},
+      "search_path": "reference_api",
+      "role": "ĐỐI CHỨNG. Cách làm hiện hành: bộ tối ưu chỉ được CHỌN tiết diện định hình trong {ST-1650, ST-1750, ST-1850}, không được đổi hình dạng.",
+      "rationale": "Đây là arm neo của mọi so sánh trước đây trong repo; miền biến và thứ tự gene của v1 bị đóng băng (tests/test_multigrammar_search.py::test_v1_gene_order_frozen), nên arm này tái lập được nguyên trạng và KHÔNG được sửa miền để tạo lợi thế cho arm khác."
+    },
+    {
+      "arm_id": "A2_v2_shape_only",
+      "grammar_id": "super_t_parametric_v2",
+      "rule_profile_id": "BRIDGE-RULESET-V2",
+      "n_design_variables": 14,
+      "domain_restriction": {
+        "girder_concrete_id": ["C40", "C45", "C50"],
+        "girder_count": [5, 6]
+      },
+      "search_path": "local_restricted_domain_path",
+      "role": "CÔ LẬP HIỆU ỨNG HÌNH DẠNG. Grammar v2 (có 6 biến hình dạng) nhưng miền bê tông dầm bị cắt về đúng tập của v1 {C40, C45, C50}, và girder_count bị cắt về {5, 6}.",
+      "rationale": "Nếu chỉ so A1 với A3 thì mọi chênh lệch có thể do v2 được dùng thêm bê tông cường độ cao C55/C60 chứ không phải do tự do hình dạng. A2 tồn tại để bóc tách đúng confound vật liệu đó: A2 so với A1 là so sánh gần nhất với câu hỏi hình dạng có giúp được gì không.",
+      "restriction_mechanism": "Miền đã lọc được truyền XUỐNG bộ sinh gene TRƯỚC khi đề xuất ứng viên (không phải lọc ở tầng đề xuất sau khi đã tiêu ngân sách). Xem domain_restriction_protocol.",
+      "girder_count_restriction_note": "Miền girder_count của grammar v2 hiện đã là [5, 6], nên ràng buộc này hiện là VÔ TÁC DỤNG (no-op) trên v2. Nó được ghi tường minh để định nghĩa arm vẫn đúng nếu file grammar đổi về sau. NÓ KHÔNG làm A2 khớp miền girder_count của A1 (A1 là [5, 6, 7, 8]) — đó là confound còn lại, xem muc confounds."
+    },
+    {
+      "arm_id": "A3_v2_full",
+      "grammar_id": "super_t_parametric_v2",
+      "rule_profile_id": "BRIDGE-RULESET-V2",
+      "n_design_variables": 14,
+      "domain_restriction": {},
+      "search_path": "reference_api",
+      "role": "GRAMMAR V2 ĐẦY ĐỦ, gồm cả bê tông C55/C60.",
+      "rationale": "Đo mức tốt nhất mà hệ đạt được khi được dùng toàn bộ tự do của v2. Chênh lệch A3 trừ A2 xấp xỉ phần đóng góp của bê tông cường độ cao; chênh lệch A2 trừ A1 xấp xỉ phần đóng góp của tự do hình dạng."
+    }
+  ],
+
+  "confounds": {
+    "statement": "Grammar v2 KHÔNG chỉ khác v1 ở chỗ có thêm 6 biến hình dạng. Liệt kê khác biệt đã biết, và ghi rõ cái nào bóc tách được, cái nào KHÔNG. CẢNH BÁO TRUNG THỰC: bản 1.0.0 tự nhận danh sách này là ĐẦY ĐỦ, nhưng nó đã BỎ SÓT bất đối xứng sàng L0 miễn phí giữa các arm (bổ sung ở 1.1.0 SAU KHI đã thấy kết quả — xem amendments). Vì vậy danh sách này phải được đọc như 'đầy đủ theo hiểu biết hiện tại', không phải 'đã chứng minh là đầy đủ'.",
+    "differences_v2_vs_v1": [
+      "girder_catalog_id: v1 chọn trong {ST-1650, ST-1750, ST-1850}; v2 khóa ở marker ST-PARAM và đặc trưng tiết diện được TÍNH từ 6 biến hình dạng.",
+      "girder_concrete_id: v1 {C40, C45, C50}; v2 {C40, C45, C50, C55, C60} — v2 được thêm bê tông cường độ cao.",
+      "girder_count: v1 {5, 6, 7, 8}; v2 {5, 6}.",
+      "diaphragm_layout_id: v1 {DG-END-ONLY, DG-3, DG-5}; v2 {DG-3, DG-5} — v2 bị bỏ lựa chọn chỉ có dầm ngang đầu nhịp.",
+      "rule_profile_id: v1 dùng BRIDGE-RULESET-V1; v2 dùng BRIDGE-RULESET-V2, BẬT THÊM nhóm hard constraint FAB-001..FAB-007 (chế tạo, vận chuyển, cẩu lắp, bố trí cáp) cùng FAB-000 cho tổ hợp hình dạng phi vật lý.",
+      "Số chiều không gian tìm kiếm: 8 biến so với 14 biến, trong khi ngân sách solver giữ nguyên."
+    ],
+    "controlled_by_A2": [
+      "Confound VẬT LIỆU (C55/C60): bị loại bỏ ở A2 bằng cách cắt miền girder_concrete_id về đúng {C40, C45, C50}."
+    ],
+    "not_separable_in_this_experiment": [
+      "girder_count: A1 tìm trên {5, 6, 7, 8} còn A2/A3 chỉ có {5, 6}. Không bóc tách được vì miền v1 bị đóng băng và miền v2 do file grammar quy định; muốn bóc tách phải có arm thứ tư (v1 giới hạn girder_count {5,6}) — NGOÀI phạm vi thí nghiệm này.",
+      "diaphragm_layout_id: A1 có thêm lựa chọn DG-END-ONLY mà A2/A3 không có.",
+      "Rule profile: V2 áp thêm FAB-001..FAB-007 nên arm v2 chịu ràng buộc HARD chặt hơn arm v1. Đây là confound cố hữu và TUYỆT ĐỐI KHÔNG được nới để arm v2 thắng (AGENTS.md: ràng buộc chế tạo là hard gate).",
+      "Số chiều: cùng ngân sách solver nhưng không gian v2 lớn hơn nhiều bậc, nên một kết quả âm có thể mang nghĩa v2 cần nhiều ngân sách hơn chứ không nhất thiết là tự do hình dạng vô ích. Kết luận phải nêu giới hạn này.",
+      "Marker ST-PARAM: v2 không thể chọn tiết diện định hình, nên A2/A3 không bao trùm (superset) A1 về mặt không gian phương án.",
+      "BẤT ĐỐI XỨNG SÀNG L0 MIỄN PHÍ (bổ sung ở 1.1.0, sau khi thấy kết quả): ngân sách chỉ đếm solver call, nên số lần sàng L0 là MIỄN PHÍ và KHÔNG bị giới hạn. Ở cùng 600 solver call, arm v2 chạy random search phải sàng L0 nhiều gấp ~12,3 lần arm v1 (tỷ lệ qua L0 ~0,44% so với ~5,44%). 'Cùng ngân sách solver' vì thế KHÔNG có nghĩa 'cùng công tìm kiếm': arm v2 được xem nhiều ứng viên hơn hẳn ở tầng hình học/chế tạo trước khi tiêu ngân sách. Không bóc tách được trong thí nghiệm này vì bản thân định nghĩa ngân sách (solver.status != NOT_RUN) đã khóa trước; muốn bóc tách phải có một thí nghiệm thứ hai khóa thêm ngân sách proposal/L0, NGOÀI phạm vi thí nghiệm này. Hệ quả diễn giải: một kết quả DƯƠNG cho v2 có thể một phần đến từ việc v2 được sàng miễn phí nhiều hơn, còn một kết quả ÂM cho v2 thì KHÔNG được giải thích bằng confound này (nó có lợi cho v2, không có hại)."
+    ],
+    "measured_l0_screening_asymmetry": {
+      "added_in_version": "1.1.0",
+      "made_after_seeing_results": true,
+      "source_run": "experiments/results/grammar_ab_20260821T043403.194542Z",
+      "source_fields": "counters.l0_checks / counters.l0_rejected / counters.l0_passed của từng run (manifest.json và run_config trong history_*.jsonl của chính run đó)",
+      "budget_per_run_solver_calls": 600,
+      "note": "l0_passed đúng bằng 600 ở MỌI run (mọi ứng viên qua L0 đều được chạy solver cho tới khi hết ngân sách), nên l0_checks đo đúng số lần sàng miễn phí mà mỗi arm được hưởng.",
+      "per_arm_algorithm": [
+        {"arm_id": "A1_v1_catalog", "algorithm": "rs", "l0_checks_total_3_seeds": 33085, "l0_checks_mean_per_run": 11028.3, "l0_rejected_total_3_seeds": 31285, "l0_pass_rate": 0.054405},
+        {"arm_id": "A2_v2_shape_only", "algorithm": "rs", "l0_checks_total_3_seeds": 406776, "l0_checks_mean_per_run": 135592.0, "l0_rejected_total_3_seeds": 404976, "l0_pass_rate": 0.004425},
+        {"arm_id": "A3_v2_full", "algorithm": "rs", "l0_checks_total_3_seeds": 406371, "l0_checks_mean_per_run": 135457.0, "l0_rejected_total_3_seeds": 404571, "l0_pass_rate": 0.004429},
+        {"arm_id": "A1_v1_catalog", "algorithm": "nsga2", "l0_checks_total_3_seeds": 5738, "l0_checks_mean_per_run": 1912.7, "l0_rejected_total_3_seeds": 3938, "l0_pass_rate": 0.313698},
+        {"arm_id": "A2_v2_shape_only", "algorithm": "nsga2", "l0_checks_total_3_seeds": 4173, "l0_checks_mean_per_run": 1391.0, "l0_rejected_total_3_seeds": 2373, "l0_pass_rate": 0.431344},
+        {"arm_id": "A3_v2_full", "algorithm": "nsga2", "l0_checks_total_3_seeds": 6481, "l0_checks_mean_per_run": 2160.3, "l0_rejected_total_3_seeds": 4681, "l0_pass_rate": 0.277735}
+      ],
+      "l0_checks_ratio_vs_A1": {"rs_A2_over_A1": 12.29, "rs_A3_over_A1": 12.28, "nsga2_A2_over_A1": 0.73, "nsga2_A3_over_A1": 1.13},
+      "honest_reading": "Bất đối xứng này LỚN và một chiều với random search (v2 sàng gấp ~12 lần v1), nhưng KHÔNG hệ thống với NSGA-II (A2 còn sàng ÍT hơn A1: tỷ số 0,73). Không được phát biểu 'v2 luôn được sàng nhiều hơn'; phát biểu đúng là 'ở random search, v2 được sàng nhiều hơn v1 khoảng một bậc; ở NSGA-II, chênh lệch nhỏ và không cùng chiều'. Số liệu trích từ đúng một run đã chạy, chưa có lặp lại độc lập."
+    }
+  },
+
+  "algorithms": [
+    {
+      "algorithm_id": "rs",
+      "name": "random_search",
+      "entry_point": "bridge_evolution.optimization.random_search",
+      "rationale": "Mốc so sánh bắt buộc: đo xem thuật toán có thắng được lấy mẫu đều trên cùng grammar hay không."
+    },
+    {
+      "algorithm_id": "nsga2",
+      "name": "nsga2",
+      "entry_point": "bridge_evolution.optimization.nsga2",
+      "pop_size": 40,
+      "p_crossover": 0.9,
+      "p_mutation": "1/n_var (tự co giãn theo số biến của grammar)",
+      "rationale": "Thuật toán đa mục tiêu có constraint-domination; chạy trên CẢ BA arm để hiệu ứng grammar không lẫn với hiệu ứng thuật toán."
+    }
+  ],
+  "run_matrix": "3 arm x 2 thuật toán x 3 seed = 18 run độc lập; mỗi run có ngân sách solver riêng, bằng nhau.",
+
+  "budget_per_run": 600,
+  "budget_definition": "solver.status != NOT_RUN — một lần gọi solver chỉ được tính khi solver thực sự chạy. Proposal bị L0 loại (hình học/FAB), proposal trả về từ cache, và proposal bị chặn vì hết ngân sách ĐỀU KHÔNG tiêu ngân sách và được đếm riêng trong counters.",
+  "budget_fairness_rule": "Mọi arm và mọi thuật toán dùng CÙNG ngân sách, CÙNG prefilter L0 (BudgetedEvaluator.prescreen_gene), CÙNG fidelity L1_LINE_GIRDER và solver BUILTIN_L1. Không arm nào được cấp ngân sách bù vì miền của nó khó hơn.",
+  "seeds": [42, 43, 44],
+
+  "domain_restriction_protocol": {
+    "mechanism": "domain_restriction là dict {tên biến: [giá trị cho phép]}. Miền đầy đủ của grammar được lọc THEO THỨ TỰ khai báo trong file grammar rồi truyền xuống bộ sinh gene, nên ứng viên ngoài miền KHÔNG BAO GIỜ được sinh ra.",
+    "forbidden_alternative": "CẤM hiện thực A2 bằng cách chạy thuật toán trên grammar v2 đầy đủ rồi loại bỏ ứng viên vi phạm ở tầng đề xuất: cách đó vẫn tiêu ngân sách solver (hoặc làm sai bộ đếm) nên phá vỡ điều kiện cùng ngân sách.",
+    "implementation_note": "API của random_search/nsga2 hiện chỉ nhận grammar_id, KHÔNG nhận miền đã lọc. Vì vậy arm A2 chạy qua một đường tìm kiếm riêng đặt trong experiments/run_grammar_ab.py, dùng trực tiếp BudgetedEvaluator và miền đã lọc (đúng định nghĩa ngân sách). A1 và A3 chạy thẳng qua API tham chiếu.",
+    "equivalence_guard": "Đường tìm kiếm riêng đó là bản sao trung thành của thuật toán tham chiếu (dùng lại nguyên các hàm chọn lọc của nsga2). tests/test_grammar_ab_experiment.py kiểm chứng: khi domain_restriction RỖNG, đường riêng phải sinh lịch sử TRÙNG KHỚP với API tham chiếu ở cùng seed. Nếu test đó đỏ thì A2 không so sánh được với A1/A3 và thí nghiệm phải bị coi là vô hiệu."
+  },
+
+  "objectives": {
+    "order": ["relative_cost", "material_mass_t", "embodied_carbon_kgCO2e"],
+    "sense": "minimize tất cả",
+    "note": "Chi phí, khối lượng và carbon KHÔNG được đánh đổi với ràng buộc an toàn/chế tạo; mọi ràng buộc HARD là cổng cứng."
+  },
+
+  "metrics": [
+    {"metric_id": "best_relative_cost", "definition": "min relative_cost trên các record FEASIBLE có solver thực chạy. Đây là metric quyết định chính."},
+    {"metric_id": "median_feasible_cost", "definition": "trung vị relative_cost trên các record feasible sau solver — đo chất lượng trung bình chứ không chỉ điểm may mắn nhất."},
+    {"metric_id": "solver_conditional_feasible_rate", "definition": "feasible_count / solver_calls — xác suất khả thi CÓ ĐIỀU KIỆN solver đã chạy. Không tính trên proposal, vì L0 reject không tiêu ngân sách."},
+    {"metric_id": "first_feasible_solver_call", "definition": "chỉ số lần gọi solver đầu tiên cho ra phương án khả thi (null nếu không có) — đo chi phí tìm được điểm khả thi đầu tiên."},
+    {"metric_id": "hypervolume_2d_cost_carbon", "definition": "hypervolume chính xác 2 chiều (relative_cost x embodied_carbon_kgCO2e) của Pareto archive, với reference point khóa trước."},
+    {"metric_id": "hypervolume_3d_mc", "definition": "hypervolume 3 chiều xấp xỉ Monte Carlo với số mẫu và seed khóa trước (tái lập được)."},
+    {"metric_id": "archive_size", "definition": "số điểm trên Pareto front cuối cùng — dùng để phát hiện front suy biến."},
+    {"metric_id": "best_material_mass_t", "definition": "min material_mass_t trên các record feasible. LƯU Ý: đây là CỰC TIỂU BIÊN theo từng mục tiêu, KHÔNG phải khối lượng của phương án có chi phí nhỏ nhất."},
+    {"metric_id": "best_embodied_carbon", "definition": "min embodied_carbon_kgCO2e trên các record feasible. Cũng là cực tiểu biên theo mục tiêu, không phải carbon của phương án rẻ nhất."}
+  ],
+
+  "hypervolume_protocol": {
+    "locked_before_experiment": true,
+    "source_of_truth": "experiments/run_baseline.py",
+    "note": "Các hằng số dưới đây được SAO CHÉP nguyên văn từ experiments/run_baseline.py và đã khóa TRƯỚC khi chạy. Tuyệt đối KHÔNG suy reference/ideal point từ front thu được. Nếu có objective rơi ra ngoài miền [ideal, reference) thì thí nghiệm phải DỪNG và sửa protocol trước khi chạy lại, không được nới reference theo kết quả.",
+    "objective_order": ["relative_cost", "material_mass_t", "embodied_carbon_kgCO2e"],
+    "ideal_3d": [0.0, 0.0, 0.0],
+    "reference_3d": [5000.0, 1200.0, 250000.0],
+    "mc_samples": 40000,
+    "mc_seed": 1729
+  },
+
+  "decision_rule": {
+    "primary_metric": "best_relative_cost",
+    "improvement_threshold_relative": 0.02,
+    "secondary_guard": "hypervolume_2d_cost_carbon của arm v2 phải KHÔNG NHỎ HƠN arm A1 ở cùng cặp (thuật toán, seed).",
+    "rule": "Kết luận grammar v2 tốt hơn v1 CHỈ được phát biểu khi, với arm v2 đang xét, trên TẤT CẢ seed đã đăng ký VÀ TẤT CẢ thuật toán đã chạy: (a) (best_cost_A1 - best_cost_v2) / best_cost_A1 >= 0.02, VÀ (b) hypervolume_2d_cost_carbon_v2 >= hypervolume_2d_cost_carbon_A1. Chỉ cần MỘT cặp (thuật toán, seed) không đạt là kết luận bị bác.",
+    "on_failure": "Ghi nhận KẾT QUẢ ÂM một cách tường minh trong summary.md và trong handoff. Không được đổi ngưỡng, không được bỏ seed, không được chọn thuật toán có lợi sau khi đã thấy số liệu.",
+    "attribution_rule": "Nếu A3 đạt tiêu chí mà A2 không đạt thì phần cải thiện được quy cho BÊ TÔNG CƯỜNG ĐỘ CAO (C55/C60), KHÔNG được quy cho tự do hình dạng."
+  },
+
+  "falsification_criterion": {
+    "statement": "H1 bị bác bỏ ngay khi tồn tại ít nhất một cặp (thuật toán, seed) mà arm v2 không đạt đồng thời (a) và (b) của decision_rule.",
+    "prespecified_negative_result_is_publishable": true
+  },
+
+  "invalidation_conditions": {
+    "note": "Nếu bất kỳ điều kiện nào dưới đây xảy ra thì so sánh bị coi là VÔ HIỆU (không kết luận theo hướng nào), và phải báo cáo lý do thay vì diễn giải Pareto. Cặp (arm, thuật toán, seed) dính bất kỳ điều kiện nào — kể cả khi điều kiện kích hoạt ở run ĐỐI CHỨNG của cặp đó — mang trạng thái VÔ HIỆU, và arm còn cặp vô hiệu thì KHÔNG BAO GIỜ được nhận phán quyết ĐẠT.",
+    "threshold_source": "Ngưỡng nằm ở trường threshold của từng điều kiện dưới đây và là NGUỒN SỰ THẬT DUY NHẤT; runner phải đọc từ đây, cấm hard-code. Ngưỡng ở 1.1.0 GIỮ NGUYÊN giá trị của 1.0.0, chỉ chuyển từ văn xuôi sang dạng máy đọc được.",
+    "unevaluated_conditions_must_be_declared": "Điều kiện có auto_evaluated_in_runner = false PHẢI được liệt kê tường minh trong summary.md là 'chưa được đánh giá tự động'; im lặng bỏ qua là vi phạm giao thức báo cáo.",
+    "conditions": [
+      {"condition_id": "DEGENERATE_FRONT", "rule": "archive_size <= 2 ở bất kỳ run nào", "threshold": {"archive_size_at_most": 2}, "auto_evaluated_in_runner": true, "reason": "MARP-1.0 quy tac 2: không diễn giải Pareto khi front suy biến."},
+      {"condition_id": "NO_FEASIBLE", "rule": "feasible_count == 0 ở bất kỳ run nào", "threshold": {"feasible_count_at_most": 0}, "auto_evaluated_in_runner": true, "reason": "Không có điểm khả thi thì best_relative_cost không tồn tại và so sánh vô nghĩa."},
+      {"condition_id": "FEASIBLE_RATE_TOO_LOW", "rule": "solver_conditional_feasible_rate < 0.05 ở bất kỳ run nào", "threshold": {"solver_conditional_feasible_rate_below": 0.05}, "auto_evaluated_in_runner": true, "reason": "Tỷ lệ khả thi quá thấp khiến best_cost chủ yếu phản ánh may rủi lấy mẫu chứ không phải chất lượng thuật toán."},
+      {"condition_id": "OBJECTIVES_COLLINEAR", "rule": "|hệ số tương quan Pearson| >= 0.999 giữa bất kỳ cặp nào trong {relative_cost, material_mass_t, embodied_carbon_kgCO2e} trên các record feasible", "threshold": {"abs_pearson_at_least": 0.999, "min_sample_size": 3}, "auto_evaluated_in_runner": true, "reason": "Mục tiêu suy biến thành một mục tiêu duy nhất; hypervolume và Pareto front mất ý nghĩa đa mục tiêu.", "min_sample_size_note": "min_sample_size = 3 được ghi tường minh ở 1.1.0: với đúng 2 điểm, hệ số Pearson luôn bằng ±1 nên cờ này sẽ bật GIẢ. Dưới 3 mẫu khả thi thì tương quan là 'không đủ mẫu' (null), KHÔNG được coi là suy biến. Đây là làm rõ cách tính, không phải nới ngưỡng 0.999."},
+      {"condition_id": "UNEQUAL_SOLVER_BUDGET", "rule": "counters.solver_calls của bất kỳ run nào KHÁC ngân sách solver đã cấp cho run đó (ví dụ run dừng vì proposal_guard nên tiêu ít solver call hơn)", "threshold": {"solver_calls_must_equal": "budget_per_run_of_this_run"}, "auto_evaluated_in_runner": true, "added_in_version": "1.1.0", "made_after_seeing_results": true, "reason": "MARP-1.0 quy tac 2: tối ưu chỉ được so sánh khi CÙNG ngân sách solver. Một arm dừng sớm vì proposal_guard đã tiêu ít ngân sách hơn nên chênh lệch giữa các arm không quy được cho grammar. Đây là điều kiện SIẾT THÊM, không nới bất kỳ tiêu chí nào."},
+      {"condition_id": "HV_DOMAIN_VIOLATION", "rule": "bất kỳ objective nào nằm ngoài [ideal_3d, reference_3d)", "threshold": {"ideal_3d": [0.0, 0.0, 0.0], "reference_3d": [5000.0, 1200.0, 250000.0]}, "auto_evaluated_in_runner": false, "evaluation_note": "KHÔNG xuất hiện dưới dạng cờ trong summary.md. Điều kiện này được thi hành bằng cách DỪNG chương trình: experiments/run_baseline.py::_assert_hv_domain ném ValueError ngay trong add_hypervolume, nên run vi phạm sẽ không sinh ra báo cáo nào. Một summary.md tồn tại chỉ chứng minh 'không phát hiện vi phạm', không chứng minh gì thêm.", "reason": "Protocol hypervolume khóa trước bị vi phạm; phải dừng và sửa protocol, không được nới reference theo kết quả."},
+      {"condition_id": "EQUIVALENCE_GUARD_FAILED", "rule": "đường tìm kiếm riêng của A2 không tái lập được lịch sử của API tham chiếu khi domain_restriction rỗng", "auto_evaluated_in_runner": false, "evaluation_note": "CHƯA ĐƯỢC ĐÁNH GIÁ TỰ ĐỘNG trong runner. Chỉ được kiểm bởi tests/test_grammar_ab_experiment.py::test_restricted_path_matches_reference_when_unrestricted, chạy TÁCH RỜI khỏi thí nghiệm. Báo cáo của một run KHÔNG chứng minh điều kiện này đã được kiểm cho chính run đó.", "reason": "A2 khi đó khác A1/A3 ở CẢ hiện thực thuật toán, nên chênh lệch không quy được cho grammar."}
+    ]
+  },
+
+  "reporting_commitments": [
+    "Báo cáo mọi run đã chạy, kể cả run cho kết quả âm hoặc bất lợi cho giả thuyết.",
+    "Ghi rõ seed, ngân sách, version phần mềm, hash artifact và cấu hình từng run.",
+    "In hệ số tương quan giữa các mục tiêu để người đọc tự đánh giá mức suy biến.",
+    "Không được sửa pre-registration này sau khi đã thấy kết quả; muốn đổi thì tạo bản version mới và nêu lý do."
+  ]
+}

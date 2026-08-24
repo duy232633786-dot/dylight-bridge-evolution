@@ -1,6 +1,9 @@
 """Q-learning xấp xỉ tuyến tính (semi-gradient) với action mask từ safety shield.
 
-Q(s, a) = W[a] @ x với x = [obs, 1.0] (bias), W shape (17, 16).
+Q(s, a) = W[a] @ x với x = [obs, 1.0] (bias). W có shape
+``(len(actions), obs_dim + 1)`` — co giãn theo grammar:
+  * v1 (8 biến)  → (17, 16);
+  * v2 (14 biến) → (29, 22).
 epsilon-greedy CHỈ trên hành động hợp lệ (cả nhánh greedy lẫn nhánh random);
 target = r + gamma * max_valid Q(s') (bằng r nếu done).
 """
@@ -8,24 +11,29 @@ import random
 
 import numpy as np
 
-from ..optimization.common import BudgetedEvaluator
+from ..optimization.common import DEFAULT_GRAMMAR_ID, BudgetedEvaluator
 from ..pareto import ParetoArchive
-from .actions import ACTIONS
-from .env import BridgeEnv, OBS_DIM
+from .actions import build_actions
+from .env import BridgeEnv
 
 
 def train_qlearning(budget: int, seed: int, max_steps: int = 25, alpha: float = 0.05,
                     gamma: float = 0.95, eps_start: float = 0.5, eps_end: float = 0.05,
-                    eps_decay_episodes: int = 30) -> dict:
+                    eps_decay_episodes: int = 30,
+                    grammar_id: str = DEFAULT_GRAMMAR_ID) -> dict:
     """Huấn luyện Q-learning trên BridgeEnv đến khi cạn ngân sách solver.
 
-    Tái lập: cùng seed → cùng chuỗi episode, cùng lịch sử đánh giá.
+    Tái lập: cùng seed (và cùng grammar_id) → cùng chuỗi episode, cùng lịch sử
+    đánh giá. Với grammar mặc định v1, mọi chiều/thứ tự giữ nguyên như bản cũ.
     """
     rng = random.Random(seed)
-    ev = BudgetedEvaluator(budget, generation_action="QLEARNING", seed=seed)
+    ev = BudgetedEvaluator(budget, generation_action="QLEARNING", seed=seed,
+                           grammar_id=grammar_id)
     archive = ParetoArchive()
-    env = BridgeEnv(ev, seed=seed, max_steps=max_steps, archive=archive)
-    W = np.zeros((len(ACTIONS), OBS_DIM + 1), dtype=np.float64)
+    env = BridgeEnv(ev, seed=seed, max_steps=max_steps, archive=archive,
+                    grammar_id=grammar_id)
+    actions = build_actions(grammar_id)
+    W = np.zeros((len(actions), env.obs_dim + 1), dtype=np.float64)
 
     def features(obs: np.ndarray) -> np.ndarray:
         return np.append(obs, 1.0)
@@ -62,8 +70,10 @@ def train_qlearning(budget: int, seed: int, max_steps: int = 25, alpha: float = 
 
     config = {**ev.config, "algorithm": "qlearning", "max_steps": max_steps,
               "alpha": alpha, "gamma": gamma, "eps_start": eps_start,
-              "eps_end": eps_end, "eps_decay_episodes": eps_decay_episodes}
-    return {"algorithm": "qlearning", "seed": seed, "config": config,
+              "eps_end": eps_end, "eps_decay_episodes": eps_decay_episodes,
+              "n_actions": len(actions), "obs_dim": env.obs_dim}
+    return {"algorithm": "qlearning", "seed": seed, "grammar_id": grammar_id,
+            "config": config,
             "counters": ev.counters, "history": ev.history,
             "proposal_history": ev.proposal_history, "archive": archive,
             "episodes": episodes,

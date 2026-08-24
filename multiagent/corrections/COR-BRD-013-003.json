@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-013-003",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-003",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them 5 test hoi quy chan lop loi coi record objectives la dict. Loi goc lam moi run bao feasible_count 0 va sinh phan quyet KHONG DAT tu n_paired_seeds 0. Snapshot bat bien cua ban da ACCEPTED duoc luu content-addressed truoc khi ghi nhan ban moi.",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/da1f9db9e70247c7fa642c379d1aa02f40ccda283d618078596d93cf410f96bd.blob",
+    "sha256": "da1f9db9e70247c7fa642c379d1aa02f40ccda283d618078596d93cf410f96bd"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_grammar_ab_confirmatory.py",
+    "previous_sha256": "da1f9db9e70247c7fa642c379d1aa02f40ccda283d618078596d93cf410f96bd",
+    "current_sha256": "4b3b0bf084d20c3b2fe68f88a43ae9aeca8190ea9d854d8a644419838ed9d177"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_grammar_ab_confirmatory.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Bytes goc duoc tai dung tu chinh file hien tai bang cach cat khoi test moi va chuan hoa ve LF; hash khop da1f9db9 nen dung la ban da duoc ACCEPTED"
+  ],
+  "unresolved_risks": [
+    "Artifact thu hai cua cung handoff la experiments/run_grammar_ab_confirmatory.py CUNG bi drift nhung bytes goc KHONG tai dung duoc, nen chua the correction"
+  ],
+  "supersedes_correction_sha256": null
+}

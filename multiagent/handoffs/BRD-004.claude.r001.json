@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-004",
+  "agent_id": "claude",
+  "role": "form_inventor",
+  "summary": "Sandbox ho vom chay tren (arch_deck_cfst_skeleton_v1) o muc F0 IDEA: grammar co load-path hypothesis + falsification criterion + truong giai doan S0-S7 va 13 muc constraints_needed; arch_geometry.py dung truc/khoang/suon kem geometry_hash + parent lineage tai lap duoc qua process khac; arch_l0_constructability.py sang L0 THUAN HINH HOC (ARCH-L0-01..07: chieu dai dot, khoi luong dot uoc tinh, so dot chan, so dot moi nua vom, ba khe ho tiep can kiem tra) voi moi nguong do nguoi goi cap kem provenance va fail-closed UNKNOWN_INPUT_MISSING khi thieu; shape_diversity.py chon top set da dang bang Gower + greedy max-min + coverage quota, HOAN TOAN doc lap voi moi ham muc tieu; pre_registration.json khoa truoc bon an so hinh thai H1-H4 va giao thuc sang L0. 133 test trong tests/test_shape_grammar_experimental.py, 520 test toan repo deu xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_grammar/experimental/arch_deck_v1.json",
+      "sha256": "5b89e72a746ac556473dd5890cecae99ebf0f0db05831b532db925830ba4991d",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/geometry_experimental/arch_geometry.py",
+      "sha256": "b5f6ce3ff52b277d1f4d87ad812999aaafed7be14655d6aa4059f5311301d244",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/geometry_experimental/arch_l0_constructability.py",
+      "sha256": "18ab316e5c83cd734abec751af5cd5a1866573393eb77384a67db1d969f36c0b",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/geometry_experimental/shape_diversity.py",
+      "sha256": "92dd8d4119d4466828d691ca02f186172855bf8b41de2a068a3b6ea20dc04632",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/shape_discovery/pre_registration.json",
+      "sha256": "f9e0ed14f9e89f9e61fcad438a9f21a551590fac1b95fb2691784a6945f68df1",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/shape_discovery/arch_render_study.md",
+      "sha256": "0d45068b15f33710dcc1e6d18e962aedc37f13f5021bf3dfc8b721d1d82bbf83",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_shape_grammar_experimental.py",
+      "sha256": "f2334e8bcaba3554f02a547e8d4776fc7b6e10c08cbdcee0024a50393a29326c",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Runtime KHONG co solver cho ho vom (RCM-2.0.0: SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D, STAGED_PRESTRESS_EFFECTS deu ABSENT), nen moi ket qua o day la F0 IDEA; khong con so noi luc/on dinh/chuyen vi nao duoc sinh ra.",
+    "project_inputs cua grammar hien toan null: chua co site, khau do that, cao do hai chan, be rong mat cau. Moi mien so cua design_variables mang nhan PLACEHOLDER_PENDING_DESIGN_BASIS.",
+    "Chieu dai dot trong ARCH-L0-01 lay xap xi bang chieu dai cung TRUNG BINH; dot that dai khac nhau theo do cong nen nguong cua ky su phai chua dung sai.",
+    "Chua co logistics_profile that nao duoc cap, nen sang L0 chay tren du lieu that se tra UNKNOWN_INPUT_MISSING o hau het check; all_known_pass=False la trang thai dung hien nay."
+  ],
+  "unresolved_risks": [
+    "ARCH-NEED-01..13 van ABSENT/PARTIAL: on dinh trong-ngoai mat phang vanh vom, chuoi trang thai thi cong, luc xo len nen va truot nem da, moi nut gian deu chua co phuong tien kiem.",
+    "Cach ly sandbox VAN dua mot phan vao tai nan: load_grammar('experimental/arch_deck_v1') van nap duoc file nay (da tai hien). Hang rao co chu y duy nhat la enum 'family' trong contracts/bridge_design_state.schema.json. Viec siet loader nam ngoai write_scope BRD-004 va da duoc tach thanh BRD-022 (READY).",
+    "Thu vien 111 nguon KHONG co nguon nao ve moi chi tiet THEP, nen ARCH-NEED-08 con TBD tuong minh."
+  ],
+  "next_action": "Review doc lap boi codex hoac antigravity; sau do BRD-022 siet load_grammar() de bien cach ly sandbox thanh bat bien duoc thuc thi"
+}

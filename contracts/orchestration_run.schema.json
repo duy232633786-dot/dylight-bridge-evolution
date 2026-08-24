@@ -29,7 +29,11 @@
     "provider_policy": {"enum": ["STRICT_MULTI_VENDOR", "AVAILABLE_WITH_FALLBACK"]},
     "attempts": {
       "type": "object",
-      "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 4}
+      "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 6}
+    },
+    "recovery_grants": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 2}
     },
     "events": {
       "type": "array",

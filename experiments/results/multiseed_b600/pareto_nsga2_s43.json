@@ -1,0 +1,20 @@
+[
+  {
+    "case_id": "BT-4662ca3d",
+    "objectives": {
+      "relative_cost": 2049.74,
+      "material_mass_t": 525.94,
+      "embodied_carbon_kgCO2e": 87918.4
+    },
+    "gene": {
+      "girder_catalog_id": "ST-1650",
+      "girder_count": 5,
+      "girder_spacing_mm": 2350,
+      "deck_slab_thickness_mm": 180,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C30",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-42"
+    }
+  }
+]

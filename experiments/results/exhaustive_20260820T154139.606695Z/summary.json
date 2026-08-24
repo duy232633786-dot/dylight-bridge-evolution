@@ -1,0 +1,57 @@
+{
+  "complete_oracle": true,
+  "conditional_feasible_rate": 0.4198270126413839,
+  "domain_size": 331776,
+  "elapsed_seconds": 13.823,
+  "feasible": 7572,
+  "hypervolume_protocol": {
+    "ideal_3d": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "mc_samples": 40000,
+    "mc_seed": 1729,
+    "oracle_hv_2d_cost_carbon": 467420162.46,
+    "oracle_hv_3d_mc": 316537500000.0,
+    "reference_3d": [
+      5000.0,
+      1200.0,
+      250000.0
+    ]
+  },
+  "l0_rule_counts": {
+    "CONS-001": 221184,
+    "GEOM-001": 269568,
+    "GEOM-003": 45360
+  },
+  "l0_valid": 18036,
+  "l0_valid_rate": 0.054361979166666664,
+  "objective_correlations": {
+    "cost_carbon": 0.9260490757158809,
+    "cost_mass": 0.7961344183071346,
+    "mass_carbon": 0.8597816090508625
+  },
+  "pareto_size": 3,
+  "scanned": 331776,
+  "solver_calls": 18036,
+  "status_counts": {
+    "SUCCESS": 18036
+  },
+  "versions": {
+    "catalogs": "1.0.0",
+    "dependencies": {
+      "jsonschema": "4.26.0",
+      "numpy": "2.5.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0"
+    },
+    "grammar": "1.0.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.3",
+    "ruleset": "BRIDGE-RULESET-V1/1.1.0",
+    "software": "0.2.0",
+    "solver": "builtin-l1/0.2.0",
+    "source_revision": "unversioned"
+  }
+}

@@ -10,19 +10,21 @@ sàng lọc sơ bộ; hệ thống chưa thay thế kiểm chứng Midas và ph�
 |-----------|----------|-----------|
 | P0 | Research Contract, grammar, catalogs, schemas | ✅ Hoàn thành |
 | P1 | Parametric Generator (`BridgeDesignState` → hình học + L0) | ✅ Hoàn thành |
-| P2 | Physics (L1 line-girder solver) + Independent Verifier | ✅ Hoàn thành (L1) — L2/L3 = **Midas Civil qua MCP** (chờ), OpenSeesPy dự phòng |
+| P2 | Physics (L1 line-girder solver) + Independent Verifier | ✅ Hoàn thành (L1). **L2/L3 CHƯA CÓ**: `MIDAS_CIVIL` và `OPENSEESPY` chỉ là nhánh dispatch ném `SolverError` |
 | P3 | Baseline Optimization (Random Search, NSGA-II, Pareto archive, hypervolume) | ✅ Hoàn thành |
 | P4 | Surrogate model (`surrogate/` — RF sàng lọc, chỉ xếp hạng, không kết luận) | ✅ Hoàn thành |
 | P5 | RL (`rl_env/` — env + safety shield + reward chống hacking + Q-learning tuyến tính) | ✅ Hoàn thành (PPO/torch để sau) |
-| Não 2 | Knowledge layer (`knowledge/`; audit legacy hiện chỉ phủ KC-001…009, card mới cần audit) | 🔶 Cần khép kín audit |
+| Grammar v2 | Tiết diện tham số hoá 6 biến (`super_t_parametric_v2`) + ràng buộc chế tạo `FAB-000…FAB-007` chạy ở L0 | ✅ Có thật trong runtime; ngưỡng FAB vẫn là mặc định repo, chưa gắn nguồn nhà máy |
+| Não 2 | Knowledge layer (`knowledge/` — 20 thẻ tri thức (KC-001…KC-020), audit phủ đủ 20 thẻ với trạng thái thật) | ✅ Audit khép kín; **0/20 thẻ được kỹ sư duyệt**, toàn kho vẫn `DRAFT` |
 | Chẩn đoán | `analysis/` — FAIL → nước sửa trong grammar, gắn card não 2 | ✅ Hoàn thành |
 | P6 | Multi-Agent Bridge Lab (Codex + Claude + OpenCode + Antigravity) | ✅ Protocol/task/handoff/review; CLI ngoài Codex cần đưa vào PATH |
 | Hardening 0.2 | Contract semantic, artifact sandbox, solver-budget công bằng, `MODEL-001`, packaging/CI | ✅ Hoàn thành |
-| Brain 2 / Obsidian 0.3 | Dashboard + 9 card notes, audit oracle, manifest chống ghi đè | ✅ Hoàn thành |
+| Brain 2 / Obsidian 0.3 | Dashboard + card notes (xuất theo đúng số thẻ đang có), audit oracle, manifest chống ghi đè | ✅ Hoàn thành |
 | Standards / Obsidian 0.4 | Import PDF TCVN, mục lục curated, hash và conflict safety | ✅ Hoàn thành |
 | Knowledge graph / Obsidian 0.5 | Standard ↔ rule ↔ card ↔ variable, CSS và màu Graph View | ✅ Hoàn thành |
-| NotebookLM / Obsidian 0.6 | 32 notebook cầu/BIM, 218 nguồn, summary chỉ-đọc và provenance | ✅ Hoàn thành |
+| NotebookLM / Obsidian 0.6 | 32 notebook cầu/BIM, 218 nguồn khai báo, summary chỉ-đọc và provenance | ✅ Hoàn thành |
 | Physics/Reality Lab 0.8 | Intake → DAG → bounded agents → test/review → Obsidian | ✅ Digital auto có cổng dừng; runtime hiện chỉ `SCREENED` |
+| Chống lệch docs–runtime | `docs/runtime_capability_matrix.json` + `docs/check_runtime_drift.py` | ✅ Chạy được; **chưa** nối vào `pytest` (xem bên dưới) |
 
 ## Cài đặt
 
@@ -34,11 +36,24 @@ Môi trường audit chính xác được ghi trong `requirements-dev.lock`. Khi
 wheel, schema/catalog/grammar/knowledge cards được đóng gói cùng package;
 `DYLIGHT_ARTIFACTS_DIR` có thể dùng để chọn thư mục artifact ghi được.
 
+> ⚠ **Lệnh trên CHƯA đủ để chạy toàn bộ test.** Bốn thư viện được import cứng
+> nhưng **không** khai báo trong `pyproject.toml` lẫn `requirements-dev.lock`:
+> `pymoo` (`optimization/pymoo_adapter.py`), `shapely` và `sectionproperties`
+> (`geometry_parametric.py`), `ifcopenshell` (`bim/ifc_bridge_exporter.py`).
+> Trên một máy sạch cài đúng theo lệnh trên, các module đó và test tương ứng sẽ
+> lỗi import — kể cả trong CI (`.github/workflows/tests.yml`). Cho tới khi
+> `pyproject.toml` được sửa, phải cài thêm bằng tay. Trạng thái này được
+> `docs/check_runtime_drift.py` giữ đúng: nếu ai đó khai báo chúng, bộ kiểm sẽ
+> báo đỏ để bắt cập nhật tài liệu.
+
 ## Chạy nhanh
 
 ```bash
 # Toàn bộ test (schema, hình học, solver, verifier, gold cases, Pareto, P4/P5, não 2)
 python -m pytest tests -q
+
+# Kiểm LỆCH giữa tài liệu và runtime (đếm lại mọi con số, gọi thật mọi năng lực)
+python docs/check_runtime_drift.py
 
 # Đánh giá 1 phương án đơn lẻ
 python -m bridge_evolution.cli evaluate gold_cases/cases/GC-01_standard_pass.json
@@ -116,6 +131,36 @@ BridgeDesignState (JSON, schema-validated)
 3. Mọi kết quả phải tái lập được: `input_hash + ruleset_version + solver_version + seed`.
 4. Solver crash / không hội tụ = phương án bị loại, **không** phải đường thoát phạt cho RL.
 5. `case_id` chỉ là ID rút gọn 64-bit; full SHA-256 trong provenance là định danh chuẩn.
+
+## Runtime có gì, không có gì (đọc trước khi trích dẫn bất kỳ số nào)
+
+`docs/runtime_capability_matrix.md` ghi từng năng lực kèm bằng chứng là đường dẫn
+file và tên hàm; nguồn chuẩn máy đọc là `docs/runtime_capability_matrix.json`.
+Tóm tắt phần **KHÔNG có**: L2/L3 (`MIDAS_CIVIL`/`OPENSEESPY` chỉ ném
+`SolverError`), mạng dầm 3D grillage (không module nào import `ospgrillage`),
+hiệu ứng theo giai đoạn (ứng suất lúc truyền lực, mất mát DƯL, co ngót–từ biến),
+thí nghiệm/quan trắc thật, và phê duyệt kỹ sư (0/20 thẻ `ENGINEER_APPROVED`).
+Trần claim toàn dự án là `SCREENED`.
+
+Hai bộ kiểm giữ cho tài liệu không trôi khỏi runtime — chạy chúng sau mỗi thay
+đổi mã hoặc tài liệu:
+
+```bash
+python docs/check_runtime_drift.py        # đếm lại mọi con số, gọi thật mọi năng lực
+python docs/check_handoff_provenance.py   # artifact đã hash có tái dựng được không
+```
+
+Quy tắc version-control cho artifact có hash nằm ở
+`docs/baseline_version_control_plan.md`. Quy tắc cốt lõi: **không hash vào
+handoff một artifact chưa được version-control** — hôm nay 0/15 artifact đã ký
+tái dựng được từ `HEAD`, và kế hoạch đóng khoảng trống đó nằm ở §5 của tài liệu.
+
+> **2 test đang đỏ có chủ đích.** `tests/test_obsidian.py` khoá cứng con số 9
+> thẻ của bản audit cũ (`range(1, 10)` và câu cảnh báo "card ngoài snapshot chưa
+> được audit"). Audit nay phủ đủ 20 thẻ nên hai khẳng định đó sai. Cách sửa
+> chính xác nằm ở `docs/baseline_version_control_plan.md` §5 mục 0; `tests/`
+> nằm ngoài `write_scope` của BRD-001 nên không được sửa trong đợt này. **Không**
+> chỉnh dữ liệu audit cho khớp test — đó đúng là kiểu gian lận mà task cấm.
 
 ## Ghi chú hiệu chỉnh (quan trọng)
 

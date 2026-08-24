@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-013-004",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-004",
+  "agent_id": "antigravity",
+  "role": "evidence_safety_auditor",
+  "summary": "Cap nhat runner theo BRD-015",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/cf5c5e96f5dbae21c25191f760394663f393fe117ea7586a606a594493c5ac6d.blob",
+    "sha256": "cf5c5e96f5dbae21c25191f760394663f393fe117ea7586a606a594493c5ac6d"
+  },
+  "corrected_artifact": {
+    "path": "experiments/run_grammar_ab_confirmatory.py",
+    "previous_sha256": "cf5c5e96f5dbae21c25191f760394663f393fe117ea7586a606a594493c5ac6d",
+    "current_sha256": "ecb5e7c64c2d3b49bbfa77c9a4393e4bfca1962e0ea83cb7feab1ad85c2eb92f"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_grammar_ab_confirmatory.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": "94357e584a11fbd2946ee84d26637f4162370592a1550ecc3a22fe025b934128"
+}

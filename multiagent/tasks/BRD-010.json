@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-010",
+  "title": "Provenance phải ghi đúng rule profile thực sự được áp dụng",
+  "research_question": "Làm sao để mỗi EvaluationResult khai báo đúng rule profile đã thực sự áp dụng, thay vì một hằng số cố định khiến mọi kết quả grammar v2 tự khai nhầm là chạy dưới BRIDGE-RULESET-V1?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/verifier/",
+    "bridge_evolution/evaluate.py",
+    "tests/test_ruleset_provenance.py"
+  ],
+  "acceptance_criteria": [
+    "provenance.ruleset_version phản ánh rule_profile_id thực sự nằm trong state",
+    "State dùng BRIDGE-RULESET-V2 phải khai V2 kèm đúng version của profile đó",
+    "Neo hồi quy grammar v1 không đổi: state v1 vẫn khai BRIDGE-RULESET-V1/1.1.0",
+    "Có test chặn hồi quy cho cả hai profile"
+  ],
+  "required_artifacts": [
+    "tests/test_ruleset_provenance.py"
+  ],
+  "safety_notes": [
+    "Đây là lỗi NHÃN truy vết, không phải lỗi tính toán: rule profile vẫn được áp đúng khi đánh giá",
+    "Mọi artifact thí nghiệm sinh trước bản sửa đều mang nhãn ruleset sai và phải chạy lại trước khi trích dẫn"
+  ],
+  "review_notes": [
+    "APPROVE: nhãn provenance nay phản ánh đúng rule profile thực sự áp dụng. Hash artifact khớp, test targeted và toàn bộ đều xanh; mẫu raw A1/V1 và A2/V2 khai đúng version. Việc rà solver_version/grammar_version là hardening kế tiếp, không chặn acceptance BRD-010."
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

@@ -1,0 +1,88 @@
+{
+  "preregistration_id": "grammar_ab_confirmatory",
+  "preregistration_version": "1.0.0",
+  "task_id": "BRD-013",
+  "locked_before_running": true,
+  "created_at_utc": "2026-08-21T07:44:00Z",
+  "claim_ceiling": "SCREENED",
+  "claim_ceiling_note": "Toàn bộ số liệu sinh từ L0 (hình học/chế tạo) và L1 line-girder của solver BUILTIN_L1. Đạt mức SCREENED, không phải thiết kế thật hay build-ready.",
+  "research_question": "Sau khi bóc tách confound girder_count (bằng arm thứ tư A4) và bỏ tiêu chí Pareto suy biến, grammar v2 có thực sự tăng xác suất tìm nghiệm chi phí thấp hơn v1 trên 20 seed ngẫu nhiên hay không?",
+  "primary_endpoint": {
+    "metric": "best_feasible_relative_cost",
+    "threshold_relative": 0.02,
+    "statistical_test": "paired_wilcoxon_and_bootstrap_ci",
+    "confidence_level": 0.95,
+    "oracle_target_cost": 2072.94
+  },
+  "null_hypothesis": "H0 — Grammar v2 không cải thiện chi phí có ý nghĩa thống kê so với arm A4 (v1 cùng girder_count {5,6}) ở cùng ngân sách 600 solver calls (p >= 0.05 hoặc CI 95% chứa 0).",
+  "alternative_hypothesis": "H1 — Grammar v2 cải thiện chi phí có ý nghĩa thống kê so với arm A4 (p < 0.05 và trung vị cải thiện >= 2.0%).",
+  "baseline_arms": {
+    "unrestricted_baseline": "A1_v1_catalog",
+    "controlled_baseline": "A4_v1_restricted_girders"
+  },
+  "arms": [
+    {
+      "arm_id": "A1_v1_catalog",
+      "grammar_id": "super_t_simple_v1",
+      "rule_profile_id": "BRIDGE-RULESET-V1",
+      "n_design_variables": 8,
+      "domain_restriction": {},
+      "search_path": "reference_api",
+      "role": "Đối chứng chuẩn v1 không giới hạn (girder_count in {5,6,7,8})."
+    },
+    {
+      "arm_id": "A4_v1_restricted_girders",
+      "grammar_id": "super_t_simple_v1",
+      "rule_profile_id": "BRIDGE-RULESET-V1",
+      "n_design_variables": 8,
+      "domain_restriction": {
+        "girder_count": [5, 6]
+      },
+      "search_path": "local_restricted_domain_path",
+      "role": "Đối chứng kiểm soát confound số lượng dầm: v1 giới hạn girder_count đúng {5,6} như v2."
+    },
+    {
+      "arm_id": "A2_v2_shape_only",
+      "grammar_id": "super_t_parametric_v2",
+      "rule_profile_id": "BRIDGE-RULESET-V2",
+      "n_design_variables": 14,
+      "domain_restriction": {
+        "girder_concrete_id": ["C40", "C45", "C50"],
+        "girder_count": [5, 6]
+      },
+      "search_path": "local_restricted_domain_path",
+      "role": "Cô lập hiệu ứng hình dạng của v2 (chỉ dùng C40-C50, girder_count {5,6})."
+    },
+    {
+      "arm_id": "A3_v2_full",
+      "grammar_id": "super_t_parametric_v2",
+      "rule_profile_id": "BRIDGE-RULESET-V2",
+      "n_design_variables": 14,
+      "domain_restriction": {},
+      "search_path": "reference_api",
+      "role": "Grammar v2 đầy đủ bao gồm cả bê tông C55/C60."
+    }
+  ],
+  "algorithms": [
+    "nsga2",
+    "random_search"
+  ],
+  "budget": {
+    "solver_calls_per_run": 600,
+    "n_seeds": 20,
+    "seed_start": 42,
+    "seed_end": 61
+  },
+  "invalidation_conditions": [
+    {
+      "condition_id": "UNEQUAL_SOLVER_BUDGET",
+      "threshold": "n_solver_calls != 600",
+      "action": "INVALIDATE_RUN"
+    },
+    {
+      "condition_id": "SOLVER_CRASH_RATE",
+      "threshold": "crash_rate > 0.05",
+      "action": "INVALIDATE_EXPERIMENT"
+    }
+  ]
+}

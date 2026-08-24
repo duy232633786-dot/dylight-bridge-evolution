@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-016",
+  "title": "Gỡ contamination của RUN-20260821-b471879e đang chặn mirror Obsidian toàn lab",
+  "research_question": "Bản ghi repair/quarantine của RND-b471879e-03 không liên kết đúng trigger attempt và source vẫn còn ở vị trí canonical sau quarantine; phải sửa chuỗi bản ghi thế nào để lab validate xanh trở lại mà KHÔNG xoá dấu vết sự cố?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": ["G2"],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "multiagent/runs/RUN-20260821-b471879e/",
+    "research/orchestration/RND-20260821-b471879e/"
+  ],
+  "acceptance_criteria": [
+    "lab validate trả valid true, không còn lỗi contamination nào",
+    "Bản ghi repair liên kết đúng latest trigger attempt",
+    "Source bị nhiễm không còn nằm ở vị trí canonical sau quarantine",
+    "Dấu vết sự cố được GIỮ LẠI để audit, không được xoá cho gọn",
+    "Nêu rõ trong handoff artifact nào từng bị nhiễm và ai đã dùng nó"
+  ],
+  "required_artifacts": ["multiagent/runs/RUN-20260821-b471879e/"],
+  "safety_notes": [
+    "Đây là bản ghi kiểm toán: sửa để ĐÚNG, không sửa để lab validate xanh cho nhanh",
+    "Không được xoá incident hay attempt cũ; quarantine nghĩa là chuyển chỗ có ghi nhận, không phải xoá",
+    "Nếu một artifact bị nhiễm đã được trích dẫn ở handoff khác, phải nêu tên handoff đó trong risk"
+  ],
+  "review_notes": [],
+  "preferred_provider": "opencode",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "codex",
+  "test_commands": [["python", "-m", "bridge_evolution.cli", "lab", "validate"]],
+  "human_gate": false
+}

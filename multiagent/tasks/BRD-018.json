@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-018",
+  "title": "Cổng claim không chặn được vượt trần cấp dự án",
+  "research_question": "Handoff BRD-003 khai NUMERICALLY_VERIFIED với đủ G0–G4 trong khi runtime chưa có L2 (MIDAS_CIVIL và OPENSEESPY đều ném SolverError), nhưng lab validate vẫn xanh vì task đó tự đặt claim_ceiling là NUMERICALLY_VERIFIED. Làm sao để cổng chặn được việc một task tự nâng trần của chính nó vượt trần cấp dự án?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "REVIEW",
+  "owner": "antigravity",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/collaboration/",
+    "tests/test_collaboration.py"
+  ],
+  "acceptance_criteria": [
+    "lab validate và lab submit phải chặn claim vượt current_project_claim_ceiling trong multiagent/lab.json, không chỉ chặn theo claim_ceiling của task",
+    "Cấp claim phải gắn với NĂNG LỰC RUNTIME THẬT: không được khai NUMERICALLY_VERIFIED khi solver L2 còn ném SolverError",
+    "Có test chặn hồi quy dựng đúng tình huống BRD-003",
+    "Rà soát lại mọi handoff hiện có và liệt kê handoff nào đang vượt trần"
+  ],
+  "required_artifacts": [
+    "tests/test_collaboration.py"
+  ],
+  "safety_notes": [
+    "MARP-1.0 ghi rõ: 'Không được nhảy cổng... Kết quả L2/L3 chỉ hợp lệ khi có artifact thật, không phải vì task đặt mục tiêu tới cấp đó'",
+    "Không hạ trần của task khác một cách âm thầm; phải nêu trong handoff handoff nào bị ảnh hưởng",
+    "Đây là lỗi CƠ CHẾ, không phải lỗi cá nhân của agent nộp BRD-003"
+  ],
+  "review_notes": [
+    "Bằng chứng đo trực tiếp 2026-08-21: BRD-003.claude.r001.json claim_level=NUMERICALLY_VERIFIED, gates G0-G4; artifact chỉ gồm contracts/physical_validation_record.schema.json, experiments/validation/l2_protocol.json, tests/test_l2_validation.py — tức là GIAO THỨC V&V, không phải KẾT QUẢ V&V.",
+    "Gọi thật run_analysis với solver MIDAS_CIVIL và OPENSEESPY: cả hai đều ném SolverError. Không có kết quả L2 nào tồn tại.",
+    "G4 theo PHYSICS_GATES yêu cầu 'blind re-calculation bằng analyst khác VÀ solver/phương pháp khác' — không thể đạt khi chưa có solver thứ hai chạy được.",
+    "Ghi chú: ospgrillage ĐÃ được cài trên máy (find_spec trả True) nhưng bridge_evolution/fe_adapter/solver.py không dùng nó. Đây là đường L2 khả thi chưa được nối."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_collaboration.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

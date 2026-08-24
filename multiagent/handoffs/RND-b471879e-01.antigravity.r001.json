@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-01",
+  "agent_id": "antigravity",
+  "role": "evidence_safety_auditor",
+  "summary": "Bản G0 đã được hiệu chỉnh: xóa site/span/load/material số liệu tự tạo; phân loại KNOWN/UNKNOWN/TBD, khóa phép đại số và metric/falsification ở mức F0 IDEA.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260821-b471879e/01_design_basis_and_evidence.md",
+      "sha256": "f5ac96b888a4693c8117a5895524362ff6a78afc9f7a0d0991d87fde058f1910",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "480 m, 60 phần trăm, GAeq 0.85, baseline 5.5 và target 1.8 đều chỉ là giả thuyết UNVERIFIED từ brief"
+  ],
+  "unresolved_risks": [
+    "G0 vẫn PENDING; chưa biết span arrangement, site, code, loads, materials, stages hoặc solver model",
+    "Provider attempt từng trả ERROR và tự submit trái quyền; handoff đó đã quarantine NOT_EVIDENCE, bản hiện tại được nộp lại sau recovery có audit"
+  ],
+  "next_action": "Codex review F0 boundary; không chạy physics screening trước khi G0 inputs được cung cấp"
+}

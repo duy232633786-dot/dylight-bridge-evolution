@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-013-004",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-004",
+  "correction_sha256": "e9f103365dbad1b0c72292f90278a59d87488feee82520b03879e2f57d151034",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Runner verified against BRD-015 spec"
+  ],
+  "notes": "APPROVE: Runner cap nhat hop le"
+}

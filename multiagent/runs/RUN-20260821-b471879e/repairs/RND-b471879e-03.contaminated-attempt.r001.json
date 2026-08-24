@@ -1,0 +1,156 @@
+{
+  "schema_version": "1.0",
+  "repair_id": "CAR-d44fc33110844a68",
+  "created_at": "2026-08-21T10:17:09.599304Z",
+  "kind": "CONTAMINATED_ATTEMPT_FAIL_CLOSED_REPAIR",
+  "run_id": "RUN-20260821-b471879e",
+  "task_id": "RND-b471879e-03",
+  "attempt": 2,
+  "authorized_by": "user-via-codex",
+  "reason": "Failed Codex worker delegated nested agents, wrote canonical downstream records outside scope, and produced unverified technical claims; quarantine all 12 records as NOT_EVIDENCE and restore only task lifecycle.",
+  "run_status_unchanged": "FAILED",
+  "previous_run_sha256": "1936aa1aeb465282c205f6e0dacca5b63533e732b52ddfe674c566cd7cbe7cc9",
+  "knowledge_sync_before": "SYNCED",
+  "knowledge_sync_after": "PENDING",
+  "failed_attempt": {
+    "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-03.work.r002.json",
+    "sha256": "1f8a1b0a6cb6c91385b1a392688de374fd1bf5e026ac844f03bd1c65b8b537dd",
+    "provider": "codex",
+    "success": false
+  },
+  "manifest_sha256": "448e46ccebc58e2f5153e06e68c5e2d04100d3dc83425f32f7e92143c5fd2456",
+  "tasks": [
+    {
+      "path": "multiagent/tasks/RND-b471879e-03.json",
+      "task_id": "RND-b471879e-03",
+      "relationship": "TRIGGER",
+      "attempt_count": 2,
+      "pre_task_sha256": "6f77efa01fd3880f985c4d624275c7855768359f8d640d46fde5354eadc44a7c",
+      "post_task_sha256": "e63e65edf46b0c07834300e16eba7dd7c9c61e452ba745573afe402be220172e",
+      "pre_lifecycle": {
+        "status": "BLOCKED",
+        "owner": "codex",
+        "reviewer": "opencode",
+        "review_notes": [
+          "APPROVE F0 physics-audit artifact only. Giu nguyen trang thai STOP/INCONCLUSIVE cho toi khi co design basis thuc dia va mo hinh 3D FE hop le."
+        ]
+      },
+      "post_lifecycle": {
+        "status": "BLOCKED",
+        "owner": "codex",
+        "reviewer": null,
+        "review_notes": []
+      }
+    },
+    {
+      "path": "multiagent/tasks/RND-b471879e-04.json",
+      "task_id": "RND-b471879e-04",
+      "relationship": "DOWNSTREAM",
+      "attempt_count": 0,
+      "pre_task_sha256": "a6103abd6899ef8458417f9d68670738340e82bff9fea504708090c8bc0fb708",
+      "post_task_sha256": "be8b10395667dfb8af837e1d77cae2358bcecb95c4388422a5ce188a360720cc",
+      "pre_lifecycle": {
+        "status": "ACCEPTED",
+        "owner": "opencode",
+        "reviewer": "claude",
+        "review_notes": [
+          "APPROVE F0 independent-reproduction artifact only. Xac nhan tai lap doc lap thanh cong; dong y chuyen sang task 05 de tong hop lineage va bai hoc dai han."
+        ]
+      },
+      "post_lifecycle": {
+        "status": "READY",
+        "owner": null,
+        "reviewer": null,
+        "review_notes": []
+      }
+    },
+    {
+      "path": "multiagent/tasks/RND-b471879e-05.json",
+      "task_id": "RND-b471879e-05",
+      "relationship": "DOWNSTREAM",
+      "attempt_count": 0,
+      "pre_task_sha256": "1e14fb6b299238d4b2e29831448a5566d2e200728f7e8879e9a94ebeb1101b69",
+      "post_task_sha256": "f167ef04fb456f21b36672e21a2b9237e4594c9d36658908a3c6a04bde29723a",
+      "pre_lifecycle": {
+        "status": "ACCEPTED",
+        "owner": "claude",
+        "reviewer": "codex",
+        "review_notes": [
+          "APPROVE F0 research-synthesis artifact. Hoan tat dot nghien cuu RUN-20260821-b471879e o cap do F0 IDEA va dong bo toan ven tri thuc sang Obsidian."
+        ]
+      },
+      "post_lifecycle": {
+        "status": "READY",
+        "owner": null,
+        "reviewer": null,
+        "review_notes": []
+      }
+    }
+  ],
+  "moved": [
+    {
+      "source_path": "multiagent/handoffs/RND-b471879e-03.codex.r001.json",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/handoffs/RND-b471879e-03.codex.r001.json",
+      "category": "HANDOFF",
+      "sha256": "7bdec1519972b7e32ffdffbd0400c4bc6657e770c9060de8a7c0cf7407b142f3",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "multiagent/handoffs/RND-b471879e-04.opencode.r001.json",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/handoffs/RND-b471879e-04.opencode.r001.json",
+      "category": "HANDOFF",
+      "sha256": "c4cdce963c0328e8561579f003dd00f1f64f62fd8acf6a97affcab9225ff3334",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "multiagent/handoffs/RND-b471879e-05.claude.r001.json",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/handoffs/RND-b471879e-05.claude.r001.json",
+      "category": "HANDOFF",
+      "sha256": "41530671e7ac043134514ab2690f7e82be343f52db0d0370cb56b4473df4a605",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "multiagent/reviews/RND-b471879e-03.opencode.r001.json",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/reviews/RND-b471879e-03.opencode.r001.json",
+      "category": "REVIEW",
+      "sha256": "be33237dd9c3becf5dd437d3bae018b26dfdd27de0dae7b0dfcb1d639c3a7069",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "multiagent/reviews/RND-b471879e-04.claude.r001.json",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/reviews/RND-b471879e-04.claude.r001.json",
+      "category": "REVIEW",
+      "sha256": "4557e73bc5ba5eb7159a9ed7a4c8202dce227e5790b755ba23e08ea9a1426945",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "multiagent/reviews/RND-b471879e-05.codex.r001.json",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/reviews/RND-b471879e-05.codex.r001.json",
+      "category": "REVIEW",
+      "sha256": "ad1c1327bbd9ae3804e0f0d9071c65717a737a013703aafa0bbdd38659d9f153",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "research/orchestration/RND-20260821-b471879e/03_physics_screening.md",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/artifacts/03_physics_screening.md",
+      "category": "ARTIFACT",
+      "sha256": "a7be872aef8b26792e50ff5c1d2aeeb1134624126537255c7777b32f7db327ed",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "research/orchestration/RND-20260821-b471879e/04_independent_reproduction.md",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/artifacts/04_independent_reproduction.md",
+      "category": "ARTIFACT",
+      "sha256": "08e68326efe1af78de84c4d5c7cb138879527d817ffce11721189fce95486f0f",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    },
+    {
+      "source_path": "research/orchestration/RND-20260821-b471879e/05_research_synthesis.md",
+      "quarantine_path": "quarantine/contaminated_attempts/CAR-d44fc33110844a68/artifacts/05_research_synthesis.md",
+      "category": "ARTIFACT",
+      "sha256": "f8a9ef591c68501e3d29659cd34add2117f1c7b65cb0037f230f30a263685029",
+      "disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+    }
+  ],
+  "evidence_disposition": "REPAIR_RECORD_NOT_TECHNICAL_EVIDENCE"
+}

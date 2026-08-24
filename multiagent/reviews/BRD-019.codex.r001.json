@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-019",
+  "handoff_sha256": "fab022bbbcf2957f4785564941e871ee415619cee8315d642e6c45f82421092a",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Dynamic audit/card set equality is correct and tests pass, but the dashboard assertion still hard-codes 0/20; adding a legitimate audited card would make the test fail although the intended invariant holds."
+    }
+  ],
+  "notes": "Replace the literal 0/20 assertion with approved-count/total derived from the loaded audit or exported data. The actual set-equality test is the regression guard. Resubmit as a new immutable revision."
+}

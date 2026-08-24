@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "orchestration_orphaned_review_repair.schema.json",
+  "title": "BridgeLabOrphanedReviewRepair",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "repair_id", "created_at", "kind", "run_id", "task_id",
+    "authorized_by", "reason", "run_status_unchanged", "previous_run_sha256",
+    "previous_task_sha256", "previous_task_status", "next_task_status",
+    "owner_before", "owner_after", "attempt_count_unchanged",
+    "canonical_handoff_count", "quarantined_handoff", "failed_attempt",
+    "evidence_disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "repair_id": {"type": "string", "pattern": "^ORR-[a-f0-9]{16}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "kind": {"const": "ORPHANED_REVIEW_FAIL_CLOSED_REPAIR"},
+    "run_id": {"type": "string", "pattern": "^RUN-[0-9]{8}-[a-f0-9]{8}$"},
+    "task_id": {"type": "string", "pattern": "^RND-[a-f0-9]{8}-[0-9]{2}$"},
+    "authorized_by": {"type": "string", "minLength": 2, "maxLength": 64},
+    "reason": {"type": "string", "minLength": 5, "maxLength": 1000},
+    "run_status_unchanged": {
+      "enum": [
+        "PLANNED", "RUNNING", "WAITING_FOR_PROVIDER", "WAITING_FOR_REVIEW",
+        "WAITING_FOR_HUMAN", "FAILED"
+      ]
+    },
+    "previous_run_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "previous_task_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "previous_task_status": {"const": "REVIEW"},
+    "next_task_status": {"const": "ACTIVE"},
+    "owner_before": {"enum": ["codex", "claude", "opencode", "antigravity"]},
+    "owner_after": {"enum": ["codex", "claude", "opencode", "antigravity"]},
+    "attempt_count_unchanged": {"type": "integer", "minimum": 1, "maximum": 6},
+    "canonical_handoff_count": {"const": 0},
+    "quarantined_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "task_id", "agent_id"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^quarantine/unauthorized_handoffs/[^/]+\\.unauthorized\\.json$"
+        },
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "task_id": {"type": "string"},
+        "agent_id": {"enum": ["codex", "claude", "opencode", "antigravity"]}
+      }
+    },
+    "failed_attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "attempt", "provider", "success"],
+      "properties": {
+        "path": {"type": "string", "minLength": 5},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "attempt": {"type": "integer", "minimum": 1, "maximum": 6},
+        "provider": {"enum": ["codex", "claude", "opencode", "antigravity"]},
+        "success": {"const": false}
+      }
+    },
+    "evidence_disposition": {"const": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"}
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "repair_id": "ORR-5f01ba90c03341b7",
+  "created_at": "2026-08-21T09:38:51.636798Z",
+  "kind": "ORPHANED_REVIEW_FAIL_CLOSED_REPAIR",
+  "run_id": "RUN-20260821-b471879e",
+  "task_id": "RND-b471879e-01",
+  "authorized_by": "user-via-codex",
+  "reason": "Antigravity gọi lab submit trái phép sau failed attempt 3; exact handoff đã quarantine và không được dùng làm evidence",
+  "run_status_unchanged": "PLANNED",
+  "previous_run_sha256": "4fc0ba7283d240926524038e8d8534e227d1ab4d5381e4cab486413fbd2ffca6",
+  "previous_task_sha256": "9b2763758f2364f008cc4e5c374184fba83f81b34d7e7da22de6809143dca302",
+  "previous_task_status": "REVIEW",
+  "next_task_status": "ACTIVE",
+  "owner_before": "antigravity",
+  "owner_after": "antigravity",
+  "attempt_count_unchanged": 3,
+  "canonical_handoff_count": 0,
+  "quarantined_handoff": {
+    "path": "quarantine/unauthorized_handoffs/RND-b471879e-01.antigravity.r001.unauthorized.json",
+    "sha256": "953bbc5aa0dfbcf51388de22cf14062eaf21804ceff24ec8ebc341a029bef82b",
+    "task_id": "RND-b471879e-01",
+    "agent_id": "antigravity"
+  },
+  "failed_attempt": {
+    "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-01.work.r003.json",
+    "sha256": "80119dd715a08b631be185b325c82d989acf8a77a725286ab299d016a9eff265",
+    "attempt": 3,
+    "provider": "antigravity",
+    "success": false
+  },
+  "evidence_disposition": "QUARANTINED_NOT_CANONICAL_NOT_EVIDENCE"
+}

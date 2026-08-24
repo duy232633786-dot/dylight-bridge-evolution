@@ -16,7 +16,7 @@ from .geometry import check_geometry
 from .objectives import compute_objectives
 from .state import (validate_design_state, validate_evaluation_result,
                     input_hash, make_case_id)
-from .verifier import verify_candidate, RULESET_VERSION
+from .verifier import verify_candidate, RULESET_VERSION, ruleset_version_for
 
 
 def _requested_solver(state) -> str:
@@ -48,7 +48,7 @@ def _provenance(state) -> dict:
     requested_solver = _requested_solver(state)
     return {
         "input_hash": input_hash(state),
-        "ruleset_version": RULESET_VERSION,
+        "ruleset_version": ruleset_version_for(state),
         "solver_version": _solver_provenance_version(requested_solver),
         "catalogs_version": cat["catalogs_version"],
         "grammar_version": grammar_version,

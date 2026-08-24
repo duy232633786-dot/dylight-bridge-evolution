@@ -1,0 +1,191 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260821-b471879e",
+  "brief_id": "RND-20260821-b471879e",
+  "created_at": "2026-08-21T07:16:40.010640Z",
+  "updated_at": "2026-08-21T10:24:36.864255Z",
+  "status": "FAILED",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-b471879e-01",
+    "RND-b471879e-02",
+    "RND-b471879e-03",
+    "RND-b471879e-04",
+    "RND-b471879e-05"
+  ],
+  "provider_policy": "STRICT_MULTI_VENDOR",
+  "attempts": {
+    "RND-b471879e-01": 3,
+    "RND-b471879e-02": 0,
+    "RND-b471879e-03": 3,
+    "RND-b471879e-04": 0,
+    "RND-b471879e-05": 0
+  },
+  "events": [
+    {
+      "at": "2026-08-21T07:16:40.010640Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    },
+    {
+      "at": "2026-08-21T07:16:43.247457Z",
+      "kind": "KNOWLEDGE_SYNC",
+      "message": "Obsidian mirror: SYNCED"
+    },
+    {
+      "at": "2026-08-21T07:57:50.292109Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-08-21T07:59:22.113930Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 1 thất bại",
+      "task_id": "RND-b471879e-01",
+      "provider": "opencode"
+    },
+    {
+      "at": "2026-08-21T08:00:55.943472Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 2 thất bại",
+      "task_id": "RND-b471879e-01",
+      "provider": "opencode"
+    },
+    {
+      "at": "2026-08-21T08:00:55.947315Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-b471879e-01 vượt retry budget",
+      "task_id": "RND-b471879e-01"
+    },
+    {
+      "at": "2026-08-21T08:23:47.601304Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-c653645c74a24b96: +1 attempt; opencode -> antigravity",
+      "task_id": "RND-b471879e-01",
+      "provider": "antigravity"
+    },
+    {
+      "at": "2026-08-21T08:25:22.061300Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-08-21T09:29:16.471899Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-08-21T09:31:52.586263Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 3 thất bại",
+      "task_id": "RND-b471879e-01",
+      "provider": "antigravity"
+    },
+    {
+      "at": "2026-08-21T09:31:52.589679Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-b471879e-01 vượt retry budget",
+      "task_id": "RND-b471879e-01"
+    },
+    {
+      "at": "2026-08-21T09:32:21.293457Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-3255721e80424ed2: +1 attempt; antigravity -> antigravity",
+      "task_id": "RND-b471879e-01",
+      "provider": "antigravity"
+    },
+    {
+      "at": "2026-08-21T09:38:51.638075Z",
+      "kind": "ORPHANED_REVIEW_REPAIRED",
+      "message": "ORR-5f01ba90c03341b7: quarantined unauthorized handoff; REVIEW -> ACTIVE",
+      "task_id": "RND-b471879e-01",
+      "provider": "antigravity"
+    },
+    {
+      "at": "2026-08-21T09:54:55.562510Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-c7d67b22cd364d44 6ac17b3f44a6b4c8071317b288bd0f2be6e5de1f14ab6be63c0c93ff3674edee: acceptance_criteria, claim_ceiling, required_gates, research_question, safety_notes, title",
+      "task_id": "RND-b471879e-03"
+    },
+    {
+      "at": "2026-08-21T09:55:04.211157Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-95e7948b3e774a40 809806f2e6c8b59395abdbab1101c92acea27eca0b102b8896bb69cd1f7be51e: acceptance_criteria, claim_ceiling, required_gates, research_question, safety_notes, title",
+      "task_id": "RND-b471879e-04"
+    },
+    {
+      "at": "2026-08-21T09:55:04.524740Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-de91cf48b8434185 aae408efdc66a42c97e8198a066d56c2829aebaa2778dd83aa3fb8252c6b4d8b: acceptance_criteria, required_gates, research_question, safety_notes, title",
+      "task_id": "RND-b471879e-05"
+    },
+    {
+      "at": "2026-08-21T09:55:33.936492Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-08-21T10:02:08.522938Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 1 thất bại",
+      "task_id": "RND-b471879e-03",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-08-21T10:07:17.593605Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 2 thất bại",
+      "task_id": "RND-b471879e-03",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-08-21T10:07:17.597094Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-b471879e-03 vượt retry budget",
+      "task_id": "RND-b471879e-03"
+    },
+    {
+      "at": "2026-08-21T10:07:17.919361Z",
+      "kind": "KNOWLEDGE_SYNC",
+      "message": "Obsidian mirror: SYNCED"
+    },
+    {
+      "at": "2026-08-21T10:17:09.599304Z",
+      "kind": "CONTAMINATED_ATTEMPT_QUARANTINED",
+      "message": "CAR-d44fc33110844a68: attempt 2 canonical contamination quarantined",
+      "task_id": "RND-b471879e-03",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-08-21T10:18:02.585696Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-659279a97bbf4a86: +1 attempt; codex -> codex",
+      "task_id": "RND-b471879e-03",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-08-21T10:18:13.183033Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-08-21T10:24:36.859232Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 3 thất bại: OUT_OF_SCOPE_CHANGES; out_of_scope=[\"bridge_evolution/collaboration/obsidian.py\", \"contracts/site_hazard_profile.schema.json\", \"docs/design_basis/DB-SUPERT-38M.json\", \"docs/design_basis/SITE-UNSPECIFIED.json\", \"tests/test_orchestrator.py\"]",
+      "task_id": "RND-b471879e-03",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-08-21T10:24:36.864255Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-b471879e-03 vượt retry budget",
+      "task_id": "RND-b471879e-03"
+    }
+  ],
+  "human_gate": "RND-b471879e-03 vượt retry budget",
+  "knowledge_sync": "PENDING",
+  "recovery_grants": {
+    "RND-b471879e-01": 2,
+    "RND-b471879e-03": 1
+  }
+}

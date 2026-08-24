@@ -9,6 +9,7 @@ validated by :mod:`bridge_evolution.collaboration.lab`.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import json
 import os
 from pathlib import Path
 import shutil
@@ -19,6 +20,29 @@ from typing import Callable
 
 PROVIDERS = ("codex", "claude", "opencode", "antigravity")
 MAX_CAPTURE_BYTES = 2 * 1024 * 1024
+ANTIGRAVITY_SOFT_DENIAL_MARKERS = (
+    "soft-denied",
+    "soft denied",
+    "permission denied",
+    "denied by permission",
+    "requires approval",
+    "cannot prompt for approval",
+    "to allow this tool",
+)
+
+
+def _antigravity_output_succeeded(stdout: str, stderr: str) -> bool:
+    """Require a successful JSON envelope and no headless permission denial."""
+    try:
+        envelope = json.loads(stdout.strip())
+    except (json.JSONDecodeError, TypeError):
+        return False
+    if not isinstance(envelope, dict) or envelope.get("status") != "SUCCESS":
+        return False
+    if envelope.get("error"):
+        return False
+    diagnostics = stderr.casefold()
+    return not any(marker in diagnostics for marker in ANTIGRAVITY_SOFT_DENIAL_MARKERS)
 
 
 @dataclass(frozen=True)
@@ -32,6 +56,16 @@ class ProviderResult:
     timed_out: bool
     output_truncated: bool
 
+    @property
+    def successful(self) -> bool:
+        if self.returncode != 0 or self.timed_out:
+            return False
+        if self.provider == "antigravity":
+            return not self.output_truncated and _antigravity_output_succeeded(
+                self.stdout, self.stderr
+            )
+        return True
+
 
 def _latest_claude_code() -> str | None:
     local = os.environ.get("LOCALAPPDATA")
@@ -44,6 +78,20 @@ def _latest_claude_code() -> str | None:
         reverse=True,
     )
     return str(candidates[0]) if candidates else None
+
+
+def _installed_antigravity_cli() -> str | None:
+    """Locate the official Windows CLI without accepting an IDE launcher.
+
+    Antigravity IDE ships ``antigravity-ide.cmd``, but that command only opens
+    the editor's VS Code-style CLI.  It does not implement the headless
+    ``agy -p`` protocol expected by this adapter.
+    """
+    local = os.environ.get("LOCALAPPDATA")
+    if not local:
+        return None
+    candidate = Path(local) / "agy" / "bin" / "agy.exe"
+    return str(candidate) if candidate.is_file() else None
 
 
 def discover_provider(provider: str) -> str | None:
@@ -60,7 +108,7 @@ def discover_provider(provider: str) -> str | None:
         return shutil.which("claude") or _latest_claude_code()
     if provider == "opencode":
         return shutil.which("opencode")
-    return shutil.which("agy")
+    return shutil.which("agy") or _installed_antigravity_cli()
 
 
 def _bounded(value: bytes) -> tuple[str, bool]:
@@ -106,7 +154,7 @@ def provider_doctor() -> dict:
                 "authenticated": None, "detail": "CLI không có trong PATH/cấu hình",
             }
             continue
-        probe = _probe(binary, ["--version"])
+        probe = _probe(binary, ["--help"] if provider == "antigravity" else ["--version"])
         authenticated: bool | None = None
         auth_detail = None
         if provider == "claude" and probe["callable"]:
@@ -115,6 +163,18 @@ def provider_doctor() -> dict:
             auth_detail = auth["detail"]
         elif provider == "codex" and probe["callable"]:
             auth = _probe(binary, ["login", "status"])
+            authenticated = auth["returncode"] == 0
+            auth_detail = auth["detail"]
+        elif provider == "opencode" and probe["callable"]:
+            auth = _probe(binary, ["auth", "list"])
+            normalized = auth["detail"].lower()
+            authenticated = auth["returncode"] == 0 and "0 credentials" not in normalized
+            auth_detail = auth["detail"]
+        elif provider == "antigravity" and probe["callable"]:
+            # Antigravity CLI currently has no non-interactive auth-status
+            # subcommand.  ``models`` is the cheapest authenticated API probe
+            # and does not run an agent or alter workspace state.
+            auth = _probe(binary, ["models"])
             authenticated = auth["returncode"] == 0
             auth_detail = auth["detail"]
         report[provider] = {
@@ -132,10 +192,11 @@ def _command(
     provider: str, binary: str, workspace: Path, prompt: str, *, writable: bool
 ) -> tuple[list[str], str | None]:
     if provider == "codex":
+        sandbox_args = ["--approve-for-me"] if writable else ["--sandbox", "read-only"]
         return ([
             binary, "exec", "--json", "--ephemeral", "--cd", str(workspace),
-            "--sandbox", "workspace-write" if writable else "read-only",
-            "--ask-for-approval", "never", "-",
+            "--disable", "multi_agent",
+            *sandbox_args, "-",
         ], prompt)
     if provider == "claude":
         tools = "Read,Glob,Grep,Edit,Write" if writable else "Read,Glob,Grep"
@@ -152,9 +213,19 @@ def _command(
             "--agent", agent, "--format", "json", prompt,
         ], None)
     mode = "accept-edits" if writable else "plan"
+    access = "write only the assigned repo-relative artifact paths" if writable else "do not write files"
+    bounded_prompt = f"""ANTIGRAVITY WORKSPACE BOUNDARY:
+The only allowed workspace is: {workspace}
+Use built-in workspace file read/search/edit/write tools only; {access}.
+Do not inspect broad drive roots such as C:\\, workspace ancestors/siblings, or user-home paths.
+Do not use shell/terminal commands. Do not place deliverables in Antigravity brain/cache;
+all required artifacts must exist at their assigned paths inside the workspace.
+
+{prompt}
+"""
     return ([
-        binary, "-p", prompt, "--output-format", "json", f"--mode={mode}",
-        "--sandbox", "--print-timeout", "15m",
+        binary, "-p", bounded_prompt, "--output-format", "json", f"--mode={mode}",
+        "--add-dir", str(workspace), "--sandbox", "--print-timeout", "15m",
     ], None)
 
 

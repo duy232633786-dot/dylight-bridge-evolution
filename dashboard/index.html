@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DYLIGHT Bridge Research Lab — Visual Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h16M7 6v12M17 6v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-info">
+        <h1>DYLIGHT Bridge Research Lab</h1>
+        <div class="tagline">Hệ thống Giám sát Nghiên cứu & Thẩm định Đa Tác tử (Multi-Agent Audit Dashboard)</div>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <a href="3d_viewer.html" target="_blank" style="text-decoration:none; display:flex; align-items:center; gap:6px; background:linear-gradient(135deg,#0284c7,#4f46e5); color:#fff; padding:6px 14px; border-radius:8px; font-size:0.82rem; font-weight:700; box-shadow:0 4px 12px rgba(2,132,199,0.35); transition:transform 0.2s;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        MÔ HÌNH 3D INTERACTIVE
+      </a>
+      <div class="live-pill">
+        <div class="pulse-dot"></div>
+        <span>CANONICAL LAB SYNCED</span>
+      </div>
+      <div class="agent-ribbon" id="agent-ribbon">
+        <!-- Injected by app.js -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Top Summary Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Tổng số nhiệm vụ (Tasks)</div>
+        <div class="stat-value" id="stat-total-tasks">29</div>
+        <div class="stat-subtitle">Bao gồm 14 BRD + 15 Run tasks</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">Đang thẩm định độc lập (In Review)</div>
+        <div class="stat-value" id="stat-review-tasks" style="color:var(--warning);">3</div>
+        <div class="stat-subtitle">BRD-005, BRD-009, BRD-011</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">Đã phê duyệt (Accepted)</div>
+        <div class="stat-value" id="stat-accepted-tasks" style="color:var(--success);">1</div>
+        <div class="stat-subtitle">BRD-010 (Ruleset Provenance)</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title">Đang chạy / Sẵn sàng (Active / Ready)</div>
+        <div class="stat-value" id="stat-active-ready" style="color:var(--primary);">0 / 19</div>
+        <div class="stat-subtitle">Giao thức an toàn: SCREENED L1</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-tasks">
+        <span>📋 Quản lý Nhiệm vụ (Task Board)</span>
+        <span class="badge" id="badge-tasks-count">29</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-geometry">
+        <span>📐 Mô phỏng Hình học & Kết cấu Dầm Cầu</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-pareto">
+        <span>📈 Không gian Tối ưu Pareto (A/B Frontier)</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-materials">
+        <span>🧪 Sổ Đăng ký Vật liệu Chưa Kiểm chứng (UCR)</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-audit">
+        <span>📜 Nhật ký Kiểm toán Mật mã (Audit Trail)</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: Task Board -->
+    <div class="tab-panel active" id="tab-tasks">
+      <div class="filter-bar">
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-status="ALL">Tất cả (All)</button>
+          <button class="filter-btn" data-status="REVIEW">Đang Review (3)</button>
+          <button class="filter-btn" data-status="READY">Sẵn sàng (19)</button>
+          <button class="filter-btn" data-status="ACCEPTED">Đã duyệt (1)</button>
+          <button class="filter-btn" data-status="BACKLOG">Backlog (6)</button>
+        </div>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="taskSearch" class="search-input" placeholder="Tìm theo ID, tiêu đề, câu hỏi...">
+        </div>
+      </div>
+
+      <div class="tasks-container" id="tasks-container">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+
+    <!-- TAB 2: Parametric Bridge Geometry -->
+    <div class="tab-panel" id="tab-geometry">
+      <div class="panel-grid">
+        
+        <!-- Left: Interactive Canvas Viewport -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Mặt cắt & Hình học Kết cấu Trực quan</div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="filter-btn girder-type-btn" data-type="v1">Super-T v1</button>
+              <button class="filter-btn girder-type-btn active" data-type="v2">Super-T v2 (AI Custom)</button>
+              <button class="filter-btn girder-type-btn" data-type="michell">Michell 480m</button>
+            </div>
+          </div>
+
+          <div class="canvas-wrapper">
+            <canvas id="bridgeCanvas"></canvas>
+            <div class="canvas-overlay">
+              <div>Phần mềm L1: <strong>Line-Girder Solver</strong></div>
+              <div>Cấp chứng nhận: <span style="color:#22d3ee;">SCREENED</span></div>
+            </div>
+          </div>
+
+          <!-- Section Calculation Metrics -->
+          <div class="calc-metrics">
+            <div class="metric-box">
+              <div class="label">Diện tích mặt cắt (A)</div>
+              <div class="val" id="metric-area">0.820 m²</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Mômen quán tính (Ix)</div>
+              <div class="val" id="metric-ix">0.38 ×10⁹</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Trục trung hòa (y_bar)</div>
+              <div class="val" id="metric-ybar">840 mm</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Khối lượng dầm 38.3m</div>
+              <div class="val" id="metric-weight">78.5 tấn</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Chỉ số Chi phí (Cost)</div>
+              <div class="val" id="metric-cost">$1,731</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Chỉ số Carbon (CO2e)</div>
+              <div class="val" id="metric-carbon">10,580 kg</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Parametric Controls & Sliders -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Tham số Tối ưu Hình học (Genetic Domain Sliders)</div>
+          </div>
+
+          <div class="controls-grid">
+            <div class="control-group">
+              <div class="control-label">
+                <span>Chiều cao dầm (H)</span>
+                <span class="control-value"><span id="val-H">2000</span> mm</span>
+              </div>
+              <input type="range" id="slider-H" class="slider-input" min="1500" max="2400" step="25" value="2000">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <span>Bề rộng cánh trên (B_top)</span>
+                <span class="control-value"><span id="val-B_top">2200</span> mm</span>
+              </div>
+              <input type="range" id="slider-B_top" class="slider-input" min="1800" max="2500" step="50" value="2200">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <span>Bề dày bản bụng (t_web)</span>
+                <span class="control-value"><span id="val-t_web">120</span> mm</span>
+              </div>
+              <input type="range" id="slider-t_web" class="slider-input" min="90" max="200" step="5" value="120">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <span>Bề rộng cánh dưới (B_bot)</span>
+                <span class="control-value"><span id="val-B_bot">800</span> mm</span>
+              </div>
+              <input type="range" id="slider-B_bot" class="slider-input" min="600" max="1100" step="25" value="800">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <span>Chiều cao bầu đáy (H_bulb)</span>
+                <span class="control-value"><span id="val-H_bulb">300</span> mm</span>
+              </div>
+              <input type="range" id="slider-H_bulb" class="slider-input" min="200" max="450" step="10" value="300">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <span>Số tao cáp DUL (Strands)</span>
+                <span class="control-value"><span id="val-strands">34</span> tao</span>
+              </div>
+              <input type="range" id="slider-strands" class="slider-input" min="16" max="52" step="2" value="34">
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem; padding:1rem; background:rgba(6, 182, 212, 0.05); border:1px solid rgba(6, 182, 212, 0.2); border-radius:var(--radius-md);">
+            <strong style="color:var(--primary); font-size:0.9rem;">Ràng buộc chế tạo (Fabrication Gates):</strong>
+            <ul style="padding-left:1.25rem; font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem; line-height:1.5;">
+              <li><strong>FAB-001</strong>: Bề dày bản bụng $t_{web} \ge 90\text{ mm}$ để đảm bảo đổ bê tông và luồn ống cáp.</li>
+              <li><strong>FAB-002</strong>: Góc vát chuyển tiếp $\theta \ge 30^\circ$ tránh nứt do ứng suất cục bộ.</li>
+              <li><strong>FAB-004</strong>: Khoảng cách tịnh giữa các tao cáp $\ge 50\text{ mm}$ cho luồn đầu rung.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: Pareto Chart -->
+    <div class="tab-panel" id="tab-pareto">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Không gian Nghiệm Pareto A/B: Grammar v1 (Định hình) vs Grammar v2 (AI Tự Thiết Kế)</div>
+        </div>
+        <div style="height:440px; background:#04060a; border-radius:var(--radius-md); position:relative; overflow:hidden;">
+          <canvas id="paretoCanvas"></canvas>
+        </div>
+        <div style="margin-top:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.5;">
+          <strong>Nhận xét từ Thí nghiệm Pre-registered BRD-009:</strong>
+          Arm v2 tìm ra tiết diện có chiều cao lớn hơn 14.3%, mômen quán tính tăng 63%, giảm số tao cáp từ 42 xuống 34, giảm chi phí ~2.4% và nằm sát biên chế tạo FAB-001/FAB-002.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Materials & Unverified Claims Register -->
+    <div class="tab-panel" id="tab-materials">
+      <div id="claims-register-container">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+
+    <!-- TAB 5: Audit Log Trail -->
+    <div class="tab-panel" id="tab-audit">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Dòng Chảy Thẩm Định Mật Mã (Cryptographic Review & Handoff Stream)</div>
+        </div>
+        <div class="audit-stream" id="audit-stream">
+          <!-- Rendered by app.js -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Task Detail Inspection Modal -->
+  <div class="modal-backdrop" id="taskModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2 id="modalTaskTitle" style="color:#fff; font-size:1.25rem; margin-bottom:1rem;">Task Details</h2>
+      <div id="modalTaskBody">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

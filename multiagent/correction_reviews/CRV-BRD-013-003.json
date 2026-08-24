@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-013-003",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-003",
+  "correction_sha256": "9302b47259688d98c15438d96a6c3665bf6e193a57eccb6792d6d1f9b1408bec",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Original handoff BRD-013 r001 khop SHA ca0d2211... va snapshot test khop recorded SHA da1f9db9...",
+    "Diff snapshot sang current chi them 95 dong regression tests BRD-015; current SHA khop 4b3b0bf0...",
+    "Targeted tests/test_grammar_ab_confirmatory.py dat 8/8; correction agent claude khac reviewer codex",
+    "Runner drift da co chain doc lap COR-BRD-013-001/002 voi snapshots 0fcadb... va f4948c...; approval nay chi xu ly test artifact"
+  ],
+  "notes": "APPROVE provenance correction only. Khong phe duyet chat luong test, claim SCREENED, handoff BRD-015, hay ket qua 20 seed; full rerun va independent output review van bat buoc."
+}

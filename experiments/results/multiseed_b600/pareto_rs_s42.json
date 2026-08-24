@@ -1,0 +1,56 @@
+[
+  {
+    "case_id": "BT-d20d8ee0",
+    "objectives": {
+      "relative_cost": 2117.98,
+      "material_mass_t": 583.38,
+      "embodied_carbon_kgCO2e": 95136.5
+    },
+    "gene": {
+      "girder_catalog_id": "ST-1750",
+      "girder_count": 5,
+      "girder_spacing_mm": 2350,
+      "deck_slab_thickness_mm": 215,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C30",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-42"
+    }
+  },
+  {
+    "case_id": "BT-95a54773",
+    "objectives": {
+      "relative_cost": 2137.71,
+      "material_mass_t": 581.5,
+      "embodied_carbon_kgCO2e": 97029.8
+    },
+    "gene": {
+      "girder_catalog_id": "ST-1850",
+      "girder_count": 5,
+      "girder_spacing_mm": 2650,
+      "deck_slab_thickness_mm": 195,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C35",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-42"
+    }
+  },
+  {
+    "case_id": "BT-1bb85d51",
+    "objectives": {
+      "relative_cost": 2150.91,
+      "material_mass_t": 555.52,
+      "embodied_carbon_kgCO2e": 95341.6
+    },
+    "gene": {
+      "girder_catalog_id": "ST-1750",
+      "girder_count": 5,
+      "girder_spacing_mm": 2350,
+      "deck_slab_thickness_mm": 190,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C35",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-46"
+    }
+  }
+]

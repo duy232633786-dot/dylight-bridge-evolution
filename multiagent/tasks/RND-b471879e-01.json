@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-01",
+  "title": "Khóa design basis, bằng chứng và tiêu chí bác bỏ",
+  "research_question": "Dữ liệu đầu vào, nguồn gốc và tiêu chí nào phải khóa trước khi nghiên cứu đề tài này?",
+  "workstream": "design_basis",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "antigravity",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260821-b471879e/01_design_basis_and_evidence.md"
+  ],
+  "acceptance_criteria": [
+    "Phân biệt dữ liệu đã biết, chưa biết và giả định; khóa SI, sơ đồ nhịp 480 m, gối, mặt cầu, tải, tổ hợp và giai đoạn thi công",
+    "Định nghĩa baseline/candidate BOM, A_web hay A_total, GA_eq theo năng lượng/hướng tải/dải tải và vị trí-envelope của tỷ số mômen",
+    "Mỗi claim chính có nguồn/citation hoặc ghi UNVERIFIED; sigma_CFRP là design allowable có provenance chứ không phải cường độ tự chọn",
+    "Pre-register mục tiêu A_candidate/A_baseline <= 0.40, GA_eq/GA_baseline >= 0.85 và M_D/M_L = 1.8 cùng tolerance/falsification criterion",
+    "Ghi kiểm tra đại số: nếu M_L và đường ảnh hưởng không đổi, giảm 60 phần trăm chỉ đưa 5.5 xuống 2.2; muốn 1.8 phải giải trình thêm"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260821-b471879e/01_design_basis_and_evidence.md"
+  ],
+  "safety_notes": [
+    "Không tự bịa site, tải, địa chất, thủy văn hay thuộc tính vật liệu",
+    "Các số 85 phần trăm, giảm 60 phần trăm và 5.5 xuống 1.8 là giả thuyết cần bác bỏ, không phải evidence"
+  ],
+  "review_notes": [
+    "APPROVE F0 evidence-boundary artifact only. Không APPROVE G0, sơ đồ 480 m, tải, vật liệu, solver hay tính khả thi. G0 vẫn PENDING; physics screening phải STOP cho tới khi người dùng/kỹ sư cung cấp design basis."
+  ],
+  "source_brief_id": "RND-20260821-b471879e",
+  "preferred_provider": "antigravity",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

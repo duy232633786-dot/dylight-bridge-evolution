@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "design_basis.schema.json",
   "title": "DesignBasis",
-  "description": "Cơ sở thiết kế kỹ thuật cầu máy đọc được cho AI Agent trước khi tối ưu.",
+  "description": "Cơ sở thiết kế kỹ thuật cầu máy đọc được cho AI Agent trước khi tối ưu. Từ schema_version 1.1, mọi đại lượng thực tế phải khai một trong ba trạng thái KNOWN / UNKNOWN / NOT_APPLICABLE qua $defs.evidence_field: KNOWN bắt buộc có source_ref, UNKNOWN bắt buộc có resolution_path, NOT_APPLICABLE bắt buộc có not_applicable_reason. Không được để trống mà không giải thích (Gate G0 — multiagent/PHYSICS_GATES.md).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,7 +18,7 @@
     "materials_policy"
   ],
   "properties": {
-    "schema_version": { "const": "1.0" },
+    "schema_version": { "enum": ["1.0", "1.1"] },
     "project_id": { "type": "string", "minLength": 1 },
     "bridge_name": { "type": "string", "minLength": 1 },
     "governing_standard": {
@@ -28,12 +28,37 @@
       "properties": {
         "code": { "enum": ["TCVN_11823", "AASHTO_LRFD", "EUROCODE_2"] },
         "version": { "type": "string" },
-        "jurisdiction": { "type": "string" }
+        "jurisdiction": { "type": "string" },
+        "parts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Các phần của bộ tiêu chuẩn được viện dẫn. KHÔNG được trộn phiên bản: mọi phần phải cùng version với governing_standard.version."
+        },
+        "source_ref": { "$ref": "#/$defs/source_ref" },
+        "note": { "type": "string" }
       }
     },
-    "design_life_years": { "type": "integer", "minimum": 20, "maximum": 200 },
+    "design_life_years": {
+      "oneOf": [
+        { "type": "integer", "minimum": 20, "maximum": 200 },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "integer", "minimum": 20, "maximum": 200 } } }
+          ]
+        }
+      ]
+    },
     "exposure_class": {
-      "enum": ["INLAND_MILD", "INLAND_AGGRESSIVE", "COASTAL_SPRAY", "MARINE_SUBMERGED", "INDUSTRIAL"]
+      "oneOf": [
+        { "$ref": "#/$defs/exposure_class_enum" },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "$ref": "#/$defs/exposure_class_enum" } } }
+          ]
+        }
+      ]
     },
     "units": {
       "type": "object",
@@ -44,10 +69,197 @@
         "force": { "const": "kN" },
         "stress": { "const": "MPa" },
         "mass": { "const": "tonne" },
-        "temperature": { "const": "celsius" }
+        "temperature": { "const": "celsius" },
+        "angle": { "enum": ["degree", "radian"] },
+        "source_ref": { "$ref": "#/$defs/source_ref" },
+        "note": { "type": "string" }
+      }
+    },
+    "coordinate_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["length_unit", "model_axis_convention", "horizontal_crs", "vertical_datum"],
+      "properties": {
+        "length_unit": { "$ref": "#/$defs/evidence_field" },
+        "model_axis_convention": { "$ref": "#/$defs/evidence_field" },
+        "model_origin": { "$ref": "#/$defs/evidence_field" },
+        "horizontal_crs": { "$ref": "#/$defs/evidence_field" },
+        "vertical_datum": { "$ref": "#/$defs/evidence_field" },
+        "georeferencing": { "$ref": "#/$defs/evidence_field" },
+        "station_reference": { "$ref": "#/$defs/evidence_field" }
       }
     },
     "geometry_constraints": {
+      "oneOf": [
+        { "$ref": "#/$defs/geometry_constraints_legacy" },
+        { "$ref": "#/$defs/geometry_constraints_evidence" }
+      ]
+    },
+    "load_requirements": {
+      "oneOf": [
+        { "$ref": "#/$defs/load_requirements_legacy" },
+        { "$ref": "#/$defs/load_requirements_evidence" }
+      ]
+    },
+    "load_combinations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["combinations", "deflection_limit"],
+      "properties": {
+        "combinations": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            {
+              "properties": {
+                "value": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["name", "factors"],
+                    "properties": {
+                      "name": { "type": "string", "minLength": 1 },
+                      "factors": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "additionalProperties": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "deflection_limit": { "$ref": "#/$defs/evidence_field" },
+        "fatigue_combination": { "$ref": "#/$defs/evidence_field" },
+        "extreme_event_combination": { "$ref": "#/$defs/evidence_field" }
+      }
+    },
+    "materials_policy": {
+      "oneOf": [
+        { "$ref": "#/$defs/materials_policy_legacy" },
+        { "$ref": "#/$defs/materials_policy_evidence" }
+      ]
+    },
+    "runtime_binding": {
+      "type": "object",
+      "description": "Ràng buộc cơ sở thiết kế với runtime thực tế. Nếu grammar/catalog đổi mà khối này không đổi thì tests/test_design_basis.py phải đỏ.",
+      "additionalProperties": false,
+      "required": ["catalogs_version", "grammar_bindings"],
+      "properties": {
+        "catalogs_version": { "type": "string", "minLength": 1 },
+        "catalogs_ref": { "type": "string", "minLength": 1 },
+        "fidelity_available": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "fidelity_note": { "type": "string" },
+        "grammar_bindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["grammar_id", "grammar_ref", "load_profile_id", "rule_profile_id"],
+            "properties": {
+              "grammar_id": { "type": "string", "minLength": 1 },
+              "grammar_version": { "type": "string" },
+              "grammar_ref": { "type": "string", "minLength": 1 },
+              "load_profile_id": { "type": "string", "minLength": 1 },
+              "rule_profile_id": { "type": "string", "minLength": 1 },
+              "prestressing_steel_id": { "type": "string" },
+              "fidelity": { "type": "string" },
+              "solver": { "type": "string" },
+              "role": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "site_hazard_profile_ref": { "type": "string", "minLength": 1 },
+    "g0_gate": { "$ref": "#/$defs/gate_status" },
+    "document_provenance": { "$ref": "#/$defs/document_provenance" }
+  },
+  "allOf": [
+    {
+      "description": "Từ 1.1 trở đi: bắt buộc khóa coordinate system, load combinations, ràng buộc runtime, tham chiếu site profile và trạng thái Gate G0; mọi đại lượng phụ thuộc dữ liệu thực phải ở dạng evidence_field.",
+      "if": {
+        "properties": { "schema_version": { "const": "1.1" } },
+        "required": ["schema_version"]
+      },
+      "then": {
+        "required": [
+          "coordinate_system",
+          "load_combinations",
+          "runtime_binding",
+          "site_hazard_profile_ref",
+          "g0_gate"
+        ],
+        "properties": {
+          "design_life_years": { "$ref": "#/$defs/evidence_field" },
+          "exposure_class": { "$ref": "#/$defs/evidence_field" },
+          "geometry_constraints": { "$ref": "#/$defs/geometry_constraints_evidence" },
+          "load_requirements": { "$ref": "#/$defs/load_requirements_evidence" },
+          "materials_policy": { "$ref": "#/$defs/materials_policy_evidence" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "source_ref": {
+      "description": "Đường dẫn tương đối tới file THẬT trong repo (cho phép hậu tố '#anchor'), hoặc danh sách các đường dẫn như vậy.",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      ]
+    },
+    "evidence_field": {
+      "description": "Một đại lượng thực tế kèm trạng thái bằng chứng. KNOWN phải có value + source_ref; UNKNOWN phải có resolution_path và KHÔNG được có value; NOT_APPLICABLE phải có not_applicable_reason và KHÔNG được có value.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["KNOWN", "UNKNOWN", "NOT_APPLICABLE"] },
+        "value": {},
+        "unit": { "type": "string" },
+        "source_ref": { "$ref": "#/$defs/source_ref" },
+        "resolution_path": { "type": "string", "minLength": 1 },
+        "not_applicable_reason": { "type": "string", "minLength": 1 },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "KNOWN" } }, "required": ["status"] },
+          "then": { "required": ["value", "source_ref"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "UNKNOWN" } }, "required": ["status"] },
+          "then": {
+            "required": ["resolution_path"],
+            "not": { "required": ["value"] }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "NOT_APPLICABLE" } }, "required": ["status"] },
+          "then": {
+            "required": ["not_applicable_reason"],
+            "not": { "required": ["value"] }
+          }
+        }
+      ]
+    },
+    "exposure_class_enum": {
+      "enum": ["INLAND_MILD", "INLAND_AGGRESSIVE", "COASTAL_SPRAY", "MARINE_SUBMERGED", "INDUSTRIAL"]
+    },
+    "live_load_model_enum": { "enum": ["HL-93", "TCVN_HL93", "LM1"] },
+    "geometry_constraints_legacy": {
       "type": "object",
       "additionalProperties": false,
       "required": ["span_length_m", "deck_width_m", "vertical_clearance_m", "skew_angle_deg"],
@@ -58,17 +270,85 @@
         "skew_angle_deg": { "type": "number", "minimum": 0.0, "maximum": 60.0 }
       }
     },
-    "load_requirements": {
+    "geometry_constraints_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["span_length_m", "deck_width_m", "vertical_clearance_m", "skew_angle_deg"],
+      "properties": {
+        "span_length_m": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 5.0, "maximum": 500.0 } } }
+          ]
+        },
+        "deck_width_m": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 3.0, "maximum": 50.0 } } }
+          ]
+        },
+        "vertical_clearance_m": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 0.0 } } }
+          ]
+        },
+        "skew_angle_deg": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 0.0, "maximum": 60.0 } } }
+          ]
+        },
+        "alignment_type": { "$ref": "#/$defs/evidence_field" },
+        "horizontal_clearance_m": { "$ref": "#/$defs/evidence_field" }
+      }
+    },
+    "load_requirements_legacy": {
       "type": "object",
       "additionalProperties": false,
       "required": ["live_load_model", "impact_percentage", "pedestrian_load_kPa"],
       "properties": {
-        "live_load_model": { "enum": ["HL-93", "TCVN_HL93", "LM1"] },
+        "live_load_model": { "$ref": "#/$defs/live_load_model_enum" },
         "impact_percentage": { "type": "number", "minimum": 0.0, "maximum": 100.0 },
         "pedestrian_load_kPa": { "type": "number", "minimum": 0.0 }
       }
     },
-    "materials_policy": {
+    "load_requirements_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["live_load_model", "impact_percentage", "pedestrian_load_kPa"],
+      "properties": {
+        "live_load_model": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "$ref": "#/$defs/live_load_model_enum" } } }
+          ]
+        },
+        "impact_percentage": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 0.0, "maximum": 100.0 } } }
+          ]
+        },
+        "pedestrian_load_kPa": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 0.0 } } }
+          ]
+        },
+        "lane_load_kN_per_m": { "$ref": "#/$defs/evidence_field" },
+        "design_lane_width_m": { "$ref": "#/$defs/evidence_field" },
+        "multiple_presence_factors": { "$ref": "#/$defs/evidence_field" },
+        "wearing_surface_thickness_m": { "$ref": "#/$defs/evidence_field" },
+        "wearing_surface_unit_weight_kN_m3": { "$ref": "#/$defs/evidence_field" },
+        "barrier_line_load_kN_per_m": { "$ref": "#/$defs/evidence_field" },
+        "barrier_count": { "$ref": "#/$defs/evidence_field" },
+        "misc_smeared_dead_load_kN_per_m_per_girder": { "$ref": "#/$defs/evidence_field" },
+        "construction_loads": { "$ref": "#/$defs/evidence_field" },
+        "vehicle_collision_load": { "$ref": "#/$defs/evidence_field" }
+      }
+    },
+    "materials_policy_legacy": {
       "type": "object",
       "additionalProperties": false,
       "required": ["allowed_concrete_grades", "allowed_prestress_types", "max_aggregate_size_mm"],
@@ -84,6 +364,119 @@
           "minItems": 1
         },
         "max_aggregate_size_mm": { "type": "number", "minimum": 5.0, "maximum": 40.0 }
+      }
+    },
+    "materials_policy_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_concrete_grades",
+        "allowed_prestress_types",
+        "max_aggregate_size_mm",
+        "max_concrete_grade_MPa",
+        "blocked_materials"
+      ],
+      "properties": {
+        "allowed_concrete_grades": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            {
+              "properties": {
+                "value": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+              }
+            }
+          ]
+        },
+        "allowed_prestress_types": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            {
+              "properties": {
+                "value": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+              }
+            }
+          ]
+        },
+        "max_aggregate_size_mm": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 5.0, "maximum": 40.0 } } }
+          ]
+        },
+        "max_concrete_grade_MPa": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            { "properties": { "value": { "type": "number", "minimum": 10.0, "maximum": 120.0 } } }
+          ]
+        },
+        "blocked_materials": {
+          "allOf": [
+            { "$ref": "#/$defs/evidence_field" },
+            {
+              "properties": {
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["material_id", "register_ref", "reason"],
+                    "properties": {
+                      "material_id": { "type": "string", "minLength": 1 },
+                      "register_ref": { "type": "string", "minLength": 1 },
+                      "reason": { "type": "string", "minLength": 1 }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "reinforcement_cover_mm": { "$ref": "#/$defs/evidence_field" },
+        "concrete_model_validity": { "$ref": "#/$defs/evidence_field" }
+      }
+    },
+    "gate_status": {
+      "description": "Trạng thái cổng vật lý. PASSED chỉ hợp lệ khi blocking_items rỗng.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate", "status", "assessed_by", "blocking_items"],
+      "properties": {
+        "gate": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["PASSED", "BLOCKED"] },
+        "assessed_by": { "type": "string", "minLength": 1 },
+        "assessed_on": { "type": "string" },
+        "blocking_items": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "blocked_claims": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "BLOCKED" } }, "required": ["status"] },
+          "then": { "properties": { "blocking_items": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "PASSED" } }, "required": ["status"] },
+          "then": { "properties": { "blocking_items": { "maxItems": 0 } } }
+        }
+      ]
+    },
+    "document_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "prepared_by", "review_status"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "prepared_by": { "type": "string", "minLength": 1 },
+        "prepared_on": { "type": "string" },
+        "review_status": { "enum": ["PENDING_HUMAN_REVIEW", "AGENT_REVIEWED", "ENGINEER_APPROVED"] },
+        "claim_ceiling": { "enum": ["IDEA", "SCREENED", "NUMERICALLY_VERIFIED", "ENGINEERING_CANDIDATE"] },
+        "note": { "type": "string" }
       }
     }
   }

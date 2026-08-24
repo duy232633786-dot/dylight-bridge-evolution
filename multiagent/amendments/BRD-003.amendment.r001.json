@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-320f6dc8ca534897",
+  "amendment_sha256": "bde73818e1ee2b2ce38a97e0acb4ac297bab9bc3cbcda7000ebe1f59eed77af5",
+  "created_at": "2026-08-21T16:03:15.000125Z",
+  "task_id": "BRD-003",
+  "authorized_by": "user",
+  "reason": "Dependencies BRD-001 and BRD-002 are ACCEPTED",
+  "pre_task_sha256": "9ec9b356204ec5791525f084466b1dca876244ad8b3adcb8c8272c7c802c3623",
+  "post_task_sha256": "4d020ebea378ae9f668c2d684944829b418170909eee88dcec7ec969d39b9bc6",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/9ec9b356204ec5791525f084466b1dca876244ad8b3adcb8c8272c7c802c3623.json",
+    "sha256": "9ec9b356204ec5791525f084466b1dca876244ad8b3adcb8c8272c7c802c3623"
+  },
+  "changes": [
+    {
+      "field": "status",
+      "before": "BACKLOG",
+      "after": "READY"
+    }
+  ],
+  "previous_status": "BACKLOG",
+  "next_status": "READY"
+}

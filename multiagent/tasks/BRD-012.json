@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-012",
+  "title": "Cho phép test suite chạy khi pymoo là dependency tùy chọn",
+  "research_question": "Làm sao để môi trường không cài pymoo vẫn chạy toàn bộ test lõi mà không che lỗi khi pymoo thực sự được cài?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "ACTIVE",
+  "owner": "antigravity",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "tests/test_pymoo_optimization.py"
+  ],
+  "acceptance_criteria": [
+    "Dùng pytest.importorskip trước mọi import bridge_evolution.optimization.pymoo_adapter",
+    "Môi trường có pymoo vẫn chạy toàn bộ test adapter thay vì skip giả",
+    "Môi trường không có pymoo chỉ skip đúng module tùy chọn"
+  ],
+  "required_artifacts": [
+    "tests/test_pymoo_optimization.py"
+  ],
+  "safety_notes": [
+    "Không catch ImportError rộng làm che lỗi code nội bộ của adapter"
+  ],
+  "review_notes": [
+    "Implementation is correct: pytest.importorskip precedes adapter import and does not catch internal ImportError. Resubmit a new revision with G2 in gates_completed and cite the passing test; this does not by itself declare pymoo as an installed runtime dependency."
+  ],
+  "preferred_provider": "opencode",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_pymoo_optimization.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

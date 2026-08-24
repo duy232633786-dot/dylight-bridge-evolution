@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "preregistration_id": "L2-GRAMMAR-V2-FAB-BOUNDARY",
+  "task_id": "BRD-014",
+  "title": "Pre-registration: Đối chiếu L2 Midas cho tiết diện grammar v2 sát biên FAB",
+  "created_at_utc": "2026-08-21T15:30:00Z",
+  "fidelity_target": "NUMERICALLY_VERIFIED",
+  "research_question": "Sai lệch L1–L2 và failure mode thay đổi thế nào với các tiết diện v2 mạnh nhưng nằm sát biên FAB-001/FAB-002?",
+  "sampling_plan": {
+    "sampling_method": "STRATIFIED",
+    "total_samples": 3,
+    "strata": [
+      {
+        "stratum_id": "FAB_BOUNDARY_OPTIMUM",
+        "description": "Tiết diện v2 tối ưu Pareto có chiều dày bản bụng sát biên FAB-001 (160 mm so với ngưỡng 150 mm)",
+        "candidate_id": "CAND-V2-FAB-NEAR-01",
+        "params": {
+          "span_m": 38.3,
+          "girder_count": 5,
+          "web_thickness_mm": 160.0,
+          "girder_height_mm": 1800.0,
+          "bottom_flange_width_mm": 650.0
+        }
+      },
+      {
+        "stratum_id": "INTERIOR_CONTROL",
+        "description": "Tiết diện v2 nằm sâu trong miền khả thi (web 220 mm, margin an toàn cao)",
+        "candidate_id": "CAND-V2-INTERIOR-01",
+        "params": {
+          "span_m": 38.3,
+          "girder_count": 5,
+          "web_thickness_mm": 220.0,
+          "girder_height_mm": 1750.0,
+          "bottom_flange_width_mm": 700.0
+        }
+      },
+      {
+        "stratum_id": "FAILING_BOUNDARY",
+        "description": "Phương án vi phạm giới hạn độ võng do bản bụng quá mảnh",
+        "candidate_id": "CAND-V2-FAIL-01",
+        "params": {
+          "span_m": 38.3,
+          "girder_count": 5,
+          "web_thickness_mm": 140.0,
+          "girder_height_mm": 1600.0,
+          "bottom_flange_width_mm": 600.0
+        }
+      }
+    ]
+  },
+  "pre_registered_tolerances": {
+    "mesh_convergence_error_max_pct": 1.5,
+    "equilibrium_reaction_residual_max_kN": 0.01,
+    "l1_l2_discrepancy_allowable_pct": 8.0,
+    "independent_check_discrepancy_max_pct": 4.0
+  },
+  "falsification_criteria": [
+    "Nếu sai lệch L1–L2 tại vùng sát biên FAB > 8.0%, giả định L1 line-girder bị bác bỏ cho vùng biên này",
+    "Nếu failure mode chuyển từ uốn (flexure) sang mất ổn định cục bộ bản bụng (web buckling), solver L1 bắt buộc phải bổ sung check FAB tương ứng"
+  ]
+}

@@ -5,9 +5,9 @@
   "research_question": "Cần khóa những dữ liệu vị trí, tải trọng, tiêu chuẩn và tuổi thọ nào trước khi agent được phép tối ưu một cầu thực?",
   "workstream": "design_basis",
   "priority": "P0",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "antigravity",
   "dependencies": [],
   "required_gates": [
     "G0"
@@ -34,6 +34,7 @@
     "Không trộn phiên bản tiêu chuẩn trong cùng design basis"
   ],
   "review_notes": [
-    "Phe duyet Design Basis va Site-Hazard Profile may doc duoc"
+    "Phe duyet Design Basis va Site-Hazard Profile may doc duoc",
+    "APPROVE: Design basis va site-hazard profile hop le."
   ]
 }

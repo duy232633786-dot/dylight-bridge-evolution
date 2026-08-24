@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-02",
+  "agent_id": "antigravity",
+  "role": "form_inventor",
+  "summary": "Revision r002 giữ ba concept Michell/catenary F0, loại bỏ false precision, khóa G1=PENDING và chỉ giữ các target 480 m/60%/0.85/5.5→1.8 là UNVERIFIED.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260821-b471879e/02_concept_portfolio.md",
+      "sha256": "13c0b564f157beba54c15d5d26abee5237adacb8947c51a0228c0ff6de3c12e2",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Các miền hình học chỉ là proposed F0 search bounds cần G0/G1 duyệt"
+  ],
+  "unresolved_risks": [
+    "Không có geometry 3D, clash/tolerance/erection/inspection verification; không có solver hoặc material evidence"
+  ],
+  "next_action": "Review độc lập r002; sau đó task physics chỉ lập preregistration cho tới khi G0 đủ"
+}

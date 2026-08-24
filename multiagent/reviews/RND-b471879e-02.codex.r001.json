@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-02",
+  "handoff_sha256": "893227ac896bdc44ad92757a41355d2cdb5f1f5307984a83ed215203d676312d",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Portfolio đúng mức F0 IDEA và có ba topology/load-path, nhưng chưa có geometry artifact/clash/manufacturing check nên không thể hoàn thành G1. Ma trận vẫn tự đặt các dải GAeq, Aweb và MD/ML riêng cho từng concept (1.7-2.2, 0.80-0.88, 0.35-0.45) không có nguồn, tạo false precision."
+    }
+  ],
+  "notes": "REVISE: giữ ba concept và algebra 5.5→2.2; xóa các dải hiệu năng tự đặt, dùng TBD/UNVERIFIED và chỉ giữ đúng target từ brief. Nêu G1 pending cho tới khi có geometry tái lập và kiểm tra chế tạo."
+}

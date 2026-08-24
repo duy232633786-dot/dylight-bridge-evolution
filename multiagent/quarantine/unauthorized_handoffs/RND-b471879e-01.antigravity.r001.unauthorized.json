@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-b471879e-01",
+  "agent_id": "antigravity",
+  "role": "evidence_safety_auditor",
+  "summary": "Xác lập và khóa cơ sở thiết kế G0, bảng kiểm kê tĩnh tải BOM, phân định A_web vs A_total, công thức đồng nhất hóa năng lượng GA_eq, ràng buộc allowable cáp CFRP và bộ 6 tiêu chí bác bỏ FAL-01..06.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260821-b471879e/01_design_basis_and_evidence.md",
+      "sha256": "ee483b89c0bc1f9b4c56f1c76531c8c648da10075289a2eeaf69e12e5c86d320",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "So do nhip 240+480+240 m lien tuc chiu tai HL-93; cac chi tieu 60%/0.85/1.8 la falsification thresholds."
+  ],
+  "unresolved_risks": [
+    "Chua co du lieu dia chat, gio, dong dat thuc dia; mo hinh L2/L3 va thu nghiem vat ly G6 chua trien khai."
+  ],
+  "next_action": "Review doc lap boi Codex; sau do tien hanh sang loc vat ly G2 tai task 03."
+}

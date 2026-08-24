@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-022",
+  "title": "load_grammar() đi xuyên được vào sandbox; hàng rào duy nhất còn lại là một KeyError tình cờ",
+  "research_question": "bridge_evolution/catalogs.py dựng đường dẫn GRAMMAR_DIR/f\"{grammar_id}.json\" mà không chặn dấu phân cách, nên load_grammar(\"experimental/arch_deck_v1\") NẠP ĐƯỢC grammar thực nghiệm ngoài production; gene_order() và gene_domains() cũng chạy được trên nó và trả về đúng các biến vòm. Đường sinh số chỉ dừng ở BudgetedEvaluator bằng KeyError 'girder_concrete_id' — tức bằng TAI NẠN, không bằng cổng chặn. Làm sao biến cách ly sandbox thành một bất biến được thực thi, thay vì một tính chất tình cờ có thể biến mất khi ai đó thêm một giá trị mặc định?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G1"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/catalogs.py",
+    "tests/test_catalogs.py"
+  ],
+  "acceptance_criteria": [
+    "load_grammar() từ chối mọi grammar_id chứa dấu phân cách đường dẫn ('/', '\\\\'), thành phần '..', hoặc đường dẫn tuyệt đối — bằng một lỗi RIÊNG nói rõ lý do, không phải FileNotFoundError chung chung",
+    "Có test tái hiện lỗ hổng CŨ: load_grammar('experimental/arch_deck_v1') phải raise; test này phải ĐỎ trên bản chưa vá",
+    "Kiểm cả các biến thể Windows: dấu '\\\\', 'experimental\\\\arch_deck_v1', đường dẫn tuyệt đối 'D:\\\\...'",
+    "Không được làm đỏ tests/test_shape_grammar_experimental.py mà KHÔNG cập nhật đồng thời hai chỗ phát biểu cơ chế cách ly: sandbox_policy.isolation_mechanism_measured trong bridge_grammar/experimental/arch_deck_v1.json và mục tương ứng trong experiments/shape_discovery/arch_render_study.md — phát biểu an toàn và cơ chế thật phải luôn khớp nhau",
+    "Toàn bộ pytest tests -q vẫn xanh"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/catalogs.py",
+    "tests/test_catalogs.py"
+  ],
+  "safety_notes": [
+    "Đây KHÔNG phải lỗ hổng bảo mật — không có đầu vào từ người ngoài. Rủi ro thật là TRUY VẾT: một họ kết cấu mà runtime không có solver (vòm) đi lọt vào đường sinh số, rồi con số phát ra bị đọc như thể có hiệu lực. Runtime hiện chỉ có L0 + L1 line-girder cho hệ n dầm Super-T song song.",
+    "Hàng rào có chủ ý DUY NHẤT đang hoạt động là enum 'family' trong contracts/bridge_design_state.schema.json. Phải kiểm xem enum đó có thật sự được validate lúc chạy hay chỉ nằm trong file schema — nếu không ai gọi validate thì nó cũng là hàng rào ảo.",
+    "KHÔNG sửa bridge_grammar/experimental/ để né vấn đề: sandbox nằm đúng chỗ của nó, cái sai nằm ở loader.",
+    "Cấm làm test xanh bằng cách nới lỏng khẳng định trong test_shape_grammar_experimental.py."
+  ],
+  "review_notes": [
+    "Phát hiện trong phản biện BRD-004 (finding major duy nhất), tái hiện độc lập bởi owner BRD-004 trước khi ghi task này",
+    "Đo được: load_grammar('experimental/arch_deck_v1') -> family_id=arch_deck_cfst_skeleton_v1, claim_level=IDEA",
+    "Đo được: gene_order/gene_domains trả về ['arch_axis_type', 'arch_rib_count', 'springing_restraint', 'spandrel_system', 'rib_section_...']",
+    "Đo được: BudgetedEvaluator(grammar_id='experimental/arch_deck_v1').prescreen_gene(...) -> KeyError 'girder_concrete_id'",
+    "Đo được: bridge_evolution/cli.py nhận --grammar dưới dạng chuỗi tự do, không có choices",
+    "Việc sửa nằm NGOÀI write_scope của BRD-004 nên chủ nhiệm BRD-004 cố ý KHÔNG tự sửa; artifact BRD-004 chỉ được sửa cho hết nói quá về cơ chế cách ly"
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "antigravity",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_catalogs.py",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

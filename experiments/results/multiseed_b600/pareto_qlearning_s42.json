@@ -1,0 +1,20 @@
+[
+  {
+    "case_id": "BT-422ce318",
+    "objectives": {
+      "relative_cost": 2080.08,
+      "material_mass_t": 537.43,
+      "embodied_carbon_kgCO2e": 91043.7
+    },
+    "gene": {
+      "girder_catalog_id": "ST-1650",
+      "girder_count": 5,
+      "girder_spacing_mm": 2350,
+      "deck_slab_thickness_mm": 190,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C35",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-42"
+    }
+  }
+]

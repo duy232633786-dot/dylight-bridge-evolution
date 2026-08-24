@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-014",
+  "title": "Đối chiếu L2 Midas cho tiết diện grammar v2 sát biên FAB",
+  "research_question": "Sai lệch L1–L2 và failure mode thay đổi thế nào với các tiết diện v2 mạnh nhưng nằm sát biên FAB-001/FAB-002?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "antigravity",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-003",
+    "BRD-009"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2",
+    "G3",
+    "G4"
+  ],
+  "claim_ceiling": "NUMERICALLY_VERIFIED",
+  "write_scope": [
+    "experiments/validation/grammar_v2_fab_boundary/",
+    "tests/test_l2_grammar_v2_boundary.py"
+  ],
+  "acceptance_criteria": [
+    "Chọn mẫu phân tầng gồm optimum sát FAB, interior control và phương án fail",
+    "Midas model/input/output có version, hash, units, BC, mesh convergence và load traceability",
+    "Có phép tính hoặc solver độc lập blind với tolerance đăng ký trước",
+    "Báo sai lệch L1–L2, failure mode và uncertainty; không chỉ báo top candidate"
+  ],
+  "required_artifacts": [
+    "experiments/validation/grammar_v2_fab_boundary/pre_registration.json",
+    "experiments/validation/grammar_v2_fab_boundary/model_card.json",
+    "experiments/validation/grammar_v2_fab_boundary/independent_check.json",
+    "tests/test_l2_grammar_v2_boundary.py"
+  ],
+  "safety_notes": [
+    "Midas/OpenSees adapter hiện chưa active; không giả lập raw output",
+    "Không nâng NUMERICALLY_VERIFIED nếu thiếu mesh convergence và independent check",
+    "L2 vẫn không thay thế thí nghiệm vật lý hoặc phê duyệt kỹ sư"
+  ],
+  "review_notes": [
+    "APPROVE: Doi chieu L2 Midas cho tiet dien v2 sat bien FAB dat chuan G0-G4."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_l2_grammar_v2_boundary.py",
+      "-q"
+    ]
+  ],
+  "human_gate": true
+}

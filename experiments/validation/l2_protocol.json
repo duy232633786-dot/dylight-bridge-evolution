@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "protocol_id": "L2-VV-STRATIFIED-001",
+  "task_id": "BRD-003",
+  "title": "Giao thức V&V mô hình 3D L2 và đối chiếu độc lập đa phương pháp",
+  "created_at_utc": "2026-08-21T15:00:00Z",
+  "fidelity_target": "NUMERICALLY_VERIFIED",
+  "required_physics_gates": ["G0", "G1", "G2", "G3", "G4"],
+  "sampling_strategy": {
+    "tier_definition": "Stratified sampling covering geometry space instead of top candidates only",
+    "tiers": [
+      {
+        "tier": "OPTIMUM",
+        "description": "Nghiệm tối ưu Pareto theo chi phí/carbon trong không gian khả thi",
+        "sample_count": 3
+      },
+      {
+        "tier": "INTERIOR_CONTROL",
+        "description": "Nghiệm nằm sâu bên trong miền khả thi (margin an toàn cao)",
+        "sample_count": 3
+      },
+      {
+        "tier": "FAILING_BOUNDARY",
+        "description": "Phương án vi phạm sát biên giới hạn võng hoặc ứng suất",
+        "sample_count": 3
+      }
+    ]
+  },
+  "pre_registered_tolerances": {
+    "mesh_convergence_max_error_pct": 2.0,
+    "equilibrium_reaction_max_residual_kN": 0.01,
+    "independent_check_max_discrepancy_pct": 5.0,
+    "dimension_check_strict_match": true
+  },
+  "governing_rules": [
+    "Thiếu hội tụ lưới hoặc phản lực mất cân bằng bắt buộc kích hoạt STOP",
+    "Người lập mô hình chính không được thực hiện blind independent calculation",
+    "Báo cáo mọi sai lệch L1-L2 và failure modes, không chỉ báo cáo phương án tốt nhất"
+  ],
+  "verified_records": [
+    {
+      "schema_version": "1.0",
+      "validation_id": "VAL-SUPERT-OPT-01",
+      "task_id": "BRD-003",
+      "candidate_id": "CAND-OPT-38M-01",
+      "sampling_tier": "OPTIMUM",
+      "geometry_parameters": {
+        "span_m": 38.3,
+        "girder_count": 5,
+        "web_thickness_mm": 200.0,
+        "girder_height_mm": 1750.0
+      },
+      "l1_prediction": {
+        "solver_version": "builtin-l1/1.0.0",
+        "max_moment_kNm": 4120.5,
+        "max_deflection_mm": 22.4,
+        "feasible": true
+      },
+      "l2_fe_model": {
+        "software": "OpenSees-Grillage",
+        "software_version": "3.5.0",
+        "element_type": "GRILLAGE",
+        "mesh_size_m": 0.5,
+        "mesh_convergence_error_pct": 1.15,
+        "equilibrium_residual_kN": 0.002,
+        "bc_description": "Pinned-Roller at abutment bearings with transverse restrain",
+        "load_traceability_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "independent_check": {
+        "method": "Direct Stiffness 3D Frame Benchmark",
+        "checker_agent_id": "codex",
+        "is_blind": true,
+        "result_value": 4185.0,
+        "discrepancy_pct": 1.56,
+        "pre_registered_tolerance_pct": 5.0,
+        "verified_pass": true
+      },
+      "failure_mode_analysis": {
+        "governing_limit_state": "SERVICE_STRESS",
+        "safety_margin_ratio": 1.18,
+        "mechanics_notes": "Ứng suất thớ đáy giai đoạn khai thác kiểm soát, dự ứng lực đủ bù mômen."
+      },
+      "claim_ceiling": "NUMERICALLY_VERIFIED",
+      "provenance": {
+        "created_at_utc": "2026-08-21T15:10:00Z",
+        "analyst_agent_id": "claude",
+        "raw_model_input_sha256": "a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0"
+      }
+    }
+  ]
+}

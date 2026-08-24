@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-013-001",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-001",
+  "agent_id": "provenance_repair_impl",
+  "role": "evidence_safety_auditor",
+  "summary": "Preserve r001 bytes, link the post-handoff API correction to the current artifact hash, and require a new independent review.",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/0fcadbe7558db4f82ad38870ee0a29dcf4117d5207f6d1210690f8e8641947d6.blob",
+    "sha256": "0fcadbe7558db4f82ad38870ee0a29dcf4117d5207f6d1210690f8e8641947d6"
+  },
+  "corrected_artifact": {
+    "path": "experiments/run_grammar_ab_confirmatory.py",
+    "previous_sha256": "0fcadbe7558db4f82ad38870ee0a29dcf4117d5207f6d1210690f8e8641947d6",
+    "current_sha256": "f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_collaboration.py::test_drift_requires_exact_snapshot_incident_correction_and_independent_review",
+      "tests/test_collaboration.py::test_wrong_snapshot_bytes_cannot_authorize_drift",
+      "tests/test_grammar_ab_confirmatory.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction review must be performed by an agent other than provenance_repair_impl before validator accepts the drift."
+  ],
+  "supersedes_correction_sha256": null
+}

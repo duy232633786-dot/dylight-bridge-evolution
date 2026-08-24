@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -9,11 +10,14 @@ from bridge_evolution.collaboration import (
     build_agent_brief,
     claim_task,
     lab_status,
+    record_provenance_correction,
     review_handoff,
+    review_provenance_correction,
     submit_handoff,
     validate_lab,
     export_research_to_obsidian,
 )
+from bridge_evolution.collaboration import lab as lab_module
 
 
 def _lab_copy(tmp_path: Path) -> Path:
@@ -159,3 +163,306 @@ def test_user_edited_research_note_becomes_conflict(tmp_path):
 
     assert result["conflicts"] == ["Tasks/BRD-005.md"]
     assert note.read_text(encoding="utf-8") == edited
+
+
+def _minimal_correction_project(tmp_path: Path, monkeypatch) -> tuple[Path, Path]:
+    project = tmp_path / "project"
+    lab = project / "multiagent"
+    for directory in (
+        "tasks", "handoffs", "reviews", "incidents", "corrections",
+        "correction_reviews", "snapshots/sha256", ".locks",
+    ):
+        (lab / directory).mkdir(parents=True, exist_ok=True)
+    shutil.copy2(REPO_ROOT / "multiagent" / "lab.json", lab / "lab.json")
+    task = {
+        "schema_version": "1.0", "task_id": "BRD-999",
+        "title": "Fixture provenance correction độc lập",
+        "research_question": "Drift sau review có được sửa mà không viết lại lịch sử không?",
+        "workstream": "integration", "priority": "P0", "status": "READY",
+        "owner": None, "reviewer": None, "dependencies": [],
+        "required_gates": ["G0"], "claim_ceiling": "IDEA",
+        "write_scope": ["artifact.txt"],
+        "acceptance_criteria": ["Snapshot và correction review khóa provenance"],
+        "required_artifacts": ["artifact.txt"],
+        "safety_notes": ["Không sửa handoff/review lịch sử"],
+        "review_notes": [],
+    }
+    (lab / "tasks" / "BRD-999.json").write_text(
+        json.dumps(task, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (project / "artifact.txt").write_bytes(b"recorded bytes\n")
+    monkeypatch.setattr(lab_module, "REPO_ROOT", project)
+    return project, lab
+
+
+def test_drift_requires_exact_snapshot_incident_correction_and_independent_review(
+    tmp_path, monkeypatch
+):
+    project, lab = _minimal_correction_project(tmp_path, monkeypatch)
+    claim_task("BRD-999", "codex", lab)
+    submit_handoff(
+        "BRD-999", "codex", "orchestrator",
+        "Ghi handoff ban đầu để kiểm tra provenance bất biến.",
+        "IDEA", [], ["artifact.txt"], lab_dir=lab,
+    )
+    review_handoff(
+        "BRD-999", "claude", "APPROVE",
+        [{"gate": "G0", "status": "PASS", "evidence": "Kiểm tra fixture độc lập"}],
+        "Chấp nhận fixture trước khi xuất hiện drift.", lab,
+    )
+    handoff_path = lab / "handoffs" / "BRD-999.codex.r001.json"
+    review_path = lab / "reviews" / "BRD-999.claude.r001.json"
+    immutable_handoff = handoff_path.read_bytes()
+    immutable_review = review_path.read_bytes()
+    snapshot_source = tmp_path / "recorded-artifact.bin"
+    snapshot_source.write_bytes((project / "artifact.txt").read_bytes())
+    first_corrected_bytes = b"post-handoff bugfix\n"
+    (project / "artifact.txt").write_bytes(first_corrected_bytes)
+
+    result = validate_lab(lab)
+    assert result["valid"] is False
+    assert any("chưa có snapshot/incident/correction review" in item for item in result["errors"])
+
+    correction = record_provenance_correction(
+        "BRD-999", "repair_bot",
+        "multiagent/handoffs/BRD-999.codex.r001.json", "artifact.txt",
+        snapshot_source, "Bugfix được áp dụng sau khi handoff r001 đã được duyệt.",
+        "Giữ r001 và ghi nhận hash hiện tại bằng correction handoff bất biến.",
+        [["python", "-m", "pytest", "tests/test_collaboration.py", "-q"]],
+        lab_dir=lab,
+    )
+    assert correction["review_required"] is True
+    assert validate_lab(lab)["valid"] is False
+    with pytest.raises(ValueError, match="không được tự review"):
+        review_provenance_correction(
+            correction["correction"]["correction_id"], "repair_bot", "APPROVE",
+            ["Snapshot và current hash khớp"], "Tự review bị cấm.", lab,
+        )
+    with pytest.raises(ValueError, match="Original handoff agent"):
+        review_provenance_correction(
+            correction["correction"]["correction_id"], "codex", "APPROVE",
+            ["Snapshot và current hash khớp"], "Original owner review bị cấm.", lab,
+        )
+
+    review_provenance_correction(
+        correction["correction"]["correction_id"], "opencode", "APPROVE",
+        [
+            "Snapshot bytes khớp recorded SHA-256",
+            "Incident liên kết đúng handoff và artifact",
+            "Current artifact hash khớp correction handoff",
+        ],
+        "Đã kiểm tra độc lập và chấp nhận provenance correction.", lab,
+    )
+    assert validate_lab(lab)["valid"] is True
+    assert handoff_path.read_bytes() == immutable_handoff
+    assert review_path.read_bytes() == immutable_review
+
+    first_corrected_snapshot = tmp_path / "first-corrected-artifact.bin"
+    first_corrected_snapshot.write_bytes(first_corrected_bytes)
+    (project / "artifact.txt").write_bytes(b"second unreviewed drift\n")
+    assert validate_lab(lab)["valid"] is False
+
+    second = record_provenance_correction(
+        "BRD-999", "repair_bot",
+        "multiagent/handoffs/BRD-999.codex.r001.json", "artifact.txt",
+        first_corrected_snapshot,
+        "Artifact drift lần hai sau correction đầu tiên đã được duyệt.",
+        "Nối correction thứ hai vào đúng current hash của correction thứ nhất.",
+        [["python", "-m", "pytest", "tests/test_collaboration.py", "-q"]],
+        lab_dir=lab,
+    )
+    assert (
+        second["correction"]["supersedes_correction_sha256"]
+        == correction["correction_sha256"]
+    )
+    assert (
+        second["correction"]["corrected_artifact"]["previous_sha256"]
+        == hashlib.sha256(first_corrected_bytes).hexdigest()
+    )
+    assert validate_lab(lab)["valid"] is False
+    review_provenance_correction(
+        second["correction"]["correction_id"], "claude", "APPROVE",
+        [
+            "Intermediate snapshot khớp current hash correction thứ nhất",
+            "Supersedes linkage không đứt old/new hash",
+            "Current artifact khớp correction thứ hai",
+        ],
+        "Đã kiểm tra độc lập correction chain hai bước.", lab,
+    )
+    assert validate_lab(lab)["valid"] is True
+    intermediate = (
+        lab / "snapshots" / "sha256"
+        / f"{hashlib.sha256(first_corrected_bytes).hexdigest()}.blob"
+    )
+    intermediate.unlink()
+    assert validate_lab(lab)["valid"] is False
+    intermediate.write_bytes(first_corrected_bytes)
+    assert validate_lab(lab)["valid"] is True
+
+
+def test_wrong_snapshot_bytes_cannot_authorize_drift(tmp_path, monkeypatch):
+    project, lab = _minimal_correction_project(tmp_path, monkeypatch)
+    claim_task("BRD-999", "codex", lab)
+    submit_handoff(
+        "BRD-999", "codex", "orchestrator",
+        "Ghi handoff fixture để từ chối snapshot không đúng bytes.",
+        "IDEA", [], ["artifact.txt"], lab_dir=lab,
+    )
+    review_handoff(
+        "BRD-999", "claude", "APPROVE",
+        [{"gate": "G0", "status": "PASS", "evidence": "Fixture ban đầu hợp lệ"}],
+        "Duyệt fixture ban đầu.", lab,
+    )
+    (project / "artifact.txt").write_bytes(b"post-review drift\n")
+    wrong = tmp_path / "wrong.bin"
+    wrong.write_bytes(b"not the recorded bytes\n")
+
+    with pytest.raises(ValueError, match="snapshot bytes không khớp"):
+        record_provenance_correction(
+            "BRD-999", "repair_bot",
+            "multiagent/handoffs/BRD-999.codex.r001.json", "artifact.txt", wrong,
+            "Drift fixture cần bị từ chối nếu snapshot sai.",
+            "Không được tạo correction từ snapshot không đúng recorded hash.",
+            [["python", "-m", "pytest", "tests/test_collaboration.py", "-q"]],
+            lab_dir=lab,
+        )
+
+
+def test_revise_snapshots_historical_bytes_but_latest_handoff_stays_strict(
+    tmp_path, monkeypatch
+):
+    project, lab = _minimal_correction_project(tmp_path, monkeypatch)
+    claim_task("BRD-999", "codex", lab)
+    submit_handoff(
+        "BRD-999", "codex", "orchestrator",
+        "Revision r001 sẽ được snapshot trước khi trả về ACTIVE.",
+        "IDEA", [], ["artifact.txt"], lab_dir=lab,
+    )
+    review_handoff(
+        "BRD-999", "claude", "REVISE",
+        [{"gate": "G0", "status": "FAIL", "evidence": "Cần sửa artifact"}],
+        "REVISE để kiểm tra vòng lặp lịch sử bất biến.", lab,
+    )
+    recorded = b"recorded bytes\n"
+    recorded_sha256 = hashlib.sha256(recorded).hexdigest()
+    snapshot = lab / "snapshots" / "sha256" / f"{recorded_sha256}.blob"
+    assert snapshot.read_bytes() == recorded
+
+    revised = b"revision two bytes\n"
+    (project / "artifact.txt").write_bytes(revised)
+    assert validate_lab(lab)["valid"] is True
+
+    submit_handoff(
+        "BRD-999", "codex", "orchestrator",
+        "Revision r002 phải tiếp tục khớp artifact live trong lúc REVIEW.",
+        "IDEA", [], ["artifact.txt"], lab_dir=lab,
+    )
+    assert validate_lab(lab)["valid"] is True
+    (project / "artifact.txt").write_bytes(b"unreviewed drift after r002\n")
+    result = validate_lab(lab)
+    assert result["valid"] is False
+    assert any("BRD-999.codex.r002.json" in item for item in result["errors"])
+
+    (project / "artifact.txt").write_bytes(revised)
+    review_handoff(
+        "BRD-999", "opencode", "APPROVE",
+        [{"gate": "G0", "status": "PASS", "evidence": "r002 live hash khớp"}],
+        "APPROVE revision hiện hành sau khi kiểm tra độc lập.", lab,
+    )
+    assert validate_lab(lab)["valid"] is True
+
+
+def test_revise_snapshot_must_exist_and_match_exact_bytes(tmp_path, monkeypatch):
+    project, lab = _minimal_correction_project(tmp_path, monkeypatch)
+    claim_task("BRD-999", "codex", lab)
+    submit_handoff(
+        "BRD-999", "codex", "orchestrator",
+        "Tạo r001 để kiểm tra snapshot missing và snapshot giả.",
+        "IDEA", [], ["artifact.txt"], lab_dir=lab,
+    )
+    review_handoff(
+        "BRD-999", "claude", "REVISE",
+        [{"gate": "G0", "status": "FAIL", "evidence": "Cần revision"}],
+        "Tạo historical revision có snapshot.", lab,
+    )
+    recorded = b"recorded bytes\n"
+    recorded_sha256 = hashlib.sha256(recorded).hexdigest()
+    snapshot = lab / "snapshots" / "sha256" / f"{recorded_sha256}.blob"
+    (project / "artifact.txt").write_bytes(b"revised live bytes\n")
+    assert validate_lab(lab)["valid"] is True
+
+    snapshot.unlink()
+    assert validate_lab(lab)["valid"] is False
+    snapshot.write_bytes(b"fake historical bytes\n")
+    assert validate_lab(lab)["valid"] is False
+    snapshot.write_bytes(recorded)
+    assert validate_lab(lab)["valid"] is True
+
+
+def test_approved_handoff_cannot_use_bare_snapshot_to_hide_drift(tmp_path, monkeypatch):
+    project, lab = _minimal_correction_project(tmp_path, monkeypatch)
+    claim_task("BRD-999", "codex", lab)
+    submit_handoff(
+        "BRD-999", "codex", "orchestrator",
+        "APPROVE hiện hành không được lách bằng bare snapshot.",
+        "IDEA", [], ["artifact.txt"], lab_dir=lab,
+    )
+    original = (project / "artifact.txt").read_bytes()
+    original_sha256 = hashlib.sha256(original).hexdigest()
+    snapshot = lab / "snapshots" / "sha256" / f"{original_sha256}.blob"
+    snapshot.write_bytes(original)
+    (project / "artifact.txt").write_bytes(b"drift before approve\n")
+    with pytest.raises(ValueError, match="handoff đã drift"):
+        review_handoff(
+            "BRD-999", "claude", "APPROVE",
+            [{"gate": "G0", "status": "PASS", "evidence": "Không hợp lệ"}],
+            "Không được duyệt artifact đã drift.", lab,
+        )
+
+    (project / "artifact.txt").write_bytes(original)
+    review_handoff(
+        "BRD-999", "claude", "APPROVE",
+        [{"gate": "G0", "status": "PASS", "evidence": "Live hash khớp"}],
+        "Duyệt artifact còn nguyên vẹn.", lab,
+    )
+    (project / "artifact.txt").write_bytes(b"drift after approve\n")
+    assert validate_lab(lab)["valid"] is False
+
+
+def test_submit_handoff_blocks_claim_exceeding_project_claim_ceiling(tmp_path):
+    lab = _lab_copy(tmp_path)
+    path = lab / "tasks" / "BRD-999.json"
+    task = json.loads(path.read_text(encoding="utf-8"))
+    task["claim_ceiling"] = "NUMERICALLY_VERIFIED"
+    task["required_gates"] = ["G0", "G1", "G2", "G3", "G4"]
+    path.write_text(json.dumps(task, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    claim_task("BRD-999", "codex", lab)
+    with pytest.raises(ValueError, match="vượt trần cấp dự án"):
+        submit_handoff(
+            "BRD-999", "codex", "structural_analyst",
+            "Tự nâng trần lên NUMERICALLY_VERIFIED khi dự án chỉ đạt SCREENED.",
+            "NUMERICALLY_VERIFIED", ["G0", "G1", "G2", "G3", "G4"], ["README.md"],
+            lab_dir=lab,
+        )
+
+
+def test_validate_lab_catches_handoff_exceeding_project_ceiling(tmp_path):
+    lab = _lab_copy(tmp_path)
+    handoff_path = lab / "handoffs" / "BRD-999.codex.r001.json"
+    handoff = {
+        "schema_version": "1.0",
+        "task_id": "BRD-999",
+        "agent_id": "codex",
+        "role": "structural_analyst",
+        "summary": "Handoff khai khống trần claim.",
+        "claim_level": "NUMERICALLY_VERIFIED",
+        "gates_completed": ["G0", "G1", "G2", "G3", "G4"],
+        "artifacts": [{"path": "README.md", "sha256": hashlib.sha256((REPO_ROOT / "README.md").read_bytes()).hexdigest(), "kind": "report"}],
+        "assumptions": [],
+        "unresolved_risks": [],
+        "next_action": "Independent review",
+    }
+    handoff_path.write_text(json.dumps(handoff, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    validation = validate_lab(lab)
+    assert validation["valid"] is False
+    assert any("vượt trần cấp dự án (SCREENED)" in err for err in validation["errors"])
+

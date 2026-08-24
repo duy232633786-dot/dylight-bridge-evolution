@@ -1,0 +1,26 @@
+[
+  {
+    "case_id": "BT-3153c9d8804c5c19",
+    "objectives": {
+      "relative_cost": 2082.75,
+      "material_mass_t": 550.12,
+      "embodied_carbon_kgCO2e": 91313.5
+    },
+    "gene": {
+      "girder_catalog_id": "ST-PARAM",
+      "girder_count": 5,
+      "girder_spacing_mm": 2350,
+      "deck_slab_thickness_mm": 180,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C30",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-42",
+      "girder_depth_mm": 1600,
+      "top_flange_width_mm": 2050,
+      "top_flange_thickness_mm": 90,
+      "web_thickness_mm": 100,
+      "bottom_bulb_width_mm": 400,
+      "bottom_bulb_height_mm": 300
+    }
+  }
+]

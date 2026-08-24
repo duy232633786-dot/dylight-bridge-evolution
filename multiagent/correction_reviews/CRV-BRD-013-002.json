@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-013-002",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-002",
+  "correction_sha256": "94357e584a11fbd2946ee84d26637f4162370592a1550ecc3a22fe025b934128",
+  "reviewer_id": "correction_chain_review",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Original handoff r001 vẫn đúng SHA-256 ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c; COR-BRD-013-001 vẫn đúng hash 39d4567415c0b468acc8eafc0b7345d13a8e0ee4128f83102e934b7b64dab21c và có independent APPROVE.",
+    "Snapshot trung gian f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0 chứa đúng bytes/hash; supersedes trỏ COR-001 và old/new nối liên tục 0fcadbe→f4948c→cf5c5e.",
+    "INC-BRD-013-002 liên kết đúng task, handoff, artifact, recorded f4948c và observed/current cf5c5e; diff snapshot→current chỉ gồm sửa BRD-015 đã khai báo.",
+    "Targeted tests pass: 8/8 grammar confirmatory và 2/2 provenance; mtime runner 09:33:30Z có trước snapshot/incident/correction nên thao tác correction không sửa runner.",
+    "Drift tests/test_grammar_ab_confirmatory.py (r001 da1f9d… → current 4b3b0b…) vẫn là blocker provenance riêng; COR-002 không che và validator phải tiếp tục từ chối cho tới resolution độc lập."
+  ],
+  "notes": "APPROVE riêng correction chain của runner. Không phê duyệt claim khoa học BRD-013/BRD-015, không hợp thức hóa test artifact drift, và không thay thế full 20-seed rerun cùng independent review."
+}

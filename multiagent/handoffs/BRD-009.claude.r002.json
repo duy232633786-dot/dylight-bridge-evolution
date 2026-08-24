@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-009",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "r002 BAT BIEN, thay the r001 theo yeu cau REVISE cua reviewer codex (gate G2 FAIL ve quy trinh, KHONG bac ket qua ky thuat). INCIDENT NOTE BAT BUOC: handoff r001 cua task nay tung bi SUA TAI CHO SAU KHI DA NOP. Dien bien that: mot lenh chan doan cua chinh owner - dang thu tim nguyen nhan loi submit, nguyen nhan that la artifact_kind experiment_report khong nam trong enum cho phep - da nop that mot handoff voi summary gia; owner sau do ghi de noi dung dung len chinh file r001 thay vi nop mot ban moi. Do la sai quy trinh: handoff la artifact bat bien, sua sai phai nop revision moi. r002 nay la ban chinh thuc; r001 giu nguyen tren dia lam vet tich su co. KHAC PHUC PHAM VI: reviewer chi ra tests/test_rl_env.py va tests/test_surrogate.py bi sua NGOAI write_scope cua BRD-009; hai file do nay da co task so huu hop le rieng la BRD-011 (da nop handoff, dang cho review). KET QUA KY THUAT GIU NGUYEN. (1) Loi da grammar: gene_order/gene_domains suy tu file grammar thay cho hang GENE_ORDER 8 bien v1; random_search/nsga2/pymoo/surrogate/rl_env deu nhan grammar_id. Tuong thich nguoc v1 xac nhan trung tung byte qua hai duong doc lap, va reviewer codex tai lap doc lap trong worktree tach roi. (2) Thi nghiem A/B: 3 arm x 2 thuat toan x 3 seed x 600 solver call, khop run matrix da dang ky, ca 18 run tieu dung 600 solver call. Phan quyet la VO HIEU - khong ket luan duoc theo huong nao - vi dieu kien DEGENERATE_FRONT da dang ky kich hoat o 7/18 run. VO HIEU KHONG phai ket qua duong va khong duoc trich dan nhu bang chung v2 tot hon. (3) Quan sat phu chua duoc kiem chung: NSGA-II tren arm A1 tai lap dung toi uu toan cuc vet can 2072.94 voi seed 43/44 dat exact_oracle_front va recall 1.0; arm A2 cho gap -2.17/-2.49/-3.09 phan tram; arm A3 them C55/C60 KEM HON A2 nen cai thien khong quy duoc cho be tong cuong do cao. Tiet dien AI tu thiet ke cao hon 14.3 phan tram, dien tich hon 6.8 phan tram, mo men quan tinh hon 63 phan tram, giam tu 42 xuong 34 tao cap, nam dung tren bien che tao FAB-001 va FAB-002. (4) Ket qua am ve surrogate: sau khi sua tap fit, xep hang bang P(kha thi) van te hon ban bo han surrogate; nguyen nhan la phuong an toi uu nam dung tren bien kha thi noi P(kha thi) thap nhat. Mac dinh ranking doi ve none. (5) Da sua 12 finding CONFIRMED gom 2 CRITICAL: reward hacking qua chu trinh infeasible-feasible tren gene da cache, va pymoo_adapter doc objective qua nhanh chet nen F luon 1e6. Toan bo 290 test xanh.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "experiments/results/grammar_ab_20260821T061537.020446Z/summary.md",
+      "sha256": "b959c2a5e37dfa225c869a4b703f83925ca299bc77872c8917719b490d765635",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/results/grammar_ab_20260821T061537.020446Z/oracle_comparison.md",
+      "sha256": "3964ae6a7c1145077621406685276808b6401fd926429129293c4e6701dd03c4",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/preregistration/grammar_ab_v1_vs_v2.json",
+      "sha256": "fc20d3fc519a8224980a0a00e0174e43b3945d6080310e8ab881bb0724b0769d",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Don gia va he so carbon trong catalogs.json van la placeholder nen moi con so tiet kiem chi tuong doi trong cung mot run",
+    "Oracle vet can tinh voi catalogs 1.0.0; catalogs 1.1.0 chi THEM entry nen ket qua v1 khong doi - xac nhan bang viec A1 nsga2 tim dung 2072.94",
+    "Ba muc tieu tuong quan rat manh nen bai toan gan don muc tieu; moi nhan dinh dua vao best cost chu khong dua vao hinh dang Pareto"
+  ],
+  "unresolved_risks": [
+    "VO HIEU nghia la CHUA KIEM DUOC; can >=20 seed va arm thu tu v1 gioi han girder_count 5-6, pre-register tieu chi moi TRUOC khi chay",
+    "Ket qua L1 kem tin cay nhat DUNG voi tiet dien manh sat bien FAB - dung loai phuong an ma A2 tim ra; bat buoc doi chieu L2 Midas",
+    "Handoff BRD-011 chi dinh kem hash cua tests/test_rl_env.py, thieu tests/test_surrogate.py do owner truyen thieu co --artifact; owner KHONG sua tai cho nua ma de reviewer quyet dinh REVISE neu can",
+    "tests/test_pymoo_optimization.py import pymoo o cap module nen lam DUNG ca bo test neu moi truong khong co pymoo; ngoai write_scope, can task moi"
+  ],
+  "next_action": "Reviewer khac claude xac nhan r002 va BRD-011; sau do chay A/B >=20 seed voi arm thu tu, va doi chieu L2 Midas cho nhom phuong an sat bien FAB"
+}

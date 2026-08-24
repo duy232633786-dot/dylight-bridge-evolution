@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "orchestration_recovery.schema.json",
+  "title": "BridgeLabOrchestrationRecoveryAuthorization",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "recovery_id", "created_at", "run_id", "task_id",
+    "authorized_by", "reason", "previous_run_status", "next_run_status",
+    "previous_task_status", "next_task_status", "previous_owner",
+    "previous_provider", "next_provider", "prior_attempts",
+    "previous_run_sha256", "previous_task_sha256", "attempt_records",
+    "base_retry_budget", "prior_recovery_grants", "granted_attempts"
+  ],
+  "properties": {
+    "schema_version": {"enum": ["1.0", "1.1"]},
+    "recovery_id": {"type": "string", "pattern": "^REC-[a-f0-9]{16}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "run_id": {"type": "string", "pattern": "^RUN-[0-9]{8}-[a-f0-9]{8}$"},
+    "task_id": {"type": "string", "pattern": "^RND-[a-f0-9]{8}-[0-9]{2}$"},
+    "authorized_by": {"type": "string", "minLength": 2, "maxLength": 64},
+    "reason": {"type": "string", "minLength": 5, "maxLength": 1000},
+    "previous_run_status": {"const": "FAILED"},
+    "next_run_status": {"const": "PLANNED"},
+    "previous_task_status": {"const": "BLOCKED"},
+    "next_task_status": {"const": "READY"},
+    "previous_owner": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$"},
+    "previous_provider": {"enum": ["codex", "claude", "opencode", "antigravity"]},
+    "next_provider": {"enum": ["codex", "claude", "opencode", "antigravity"]},
+    "prior_attempts": {"type": "integer", "minimum": 1, "maximum": 6},
+    "previous_run_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "previous_task_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "attempt_records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 5},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "base_retry_budget": {"type": "integer", "minimum": 0, "maximum": 3},
+    "base_attempt_budget": {"type": "integer", "minimum": 1, "maximum": 4},
+    "prior_recovery_grants": {"type": "integer", "minimum": 0, "maximum": 2},
+    "granted_attempts": {"type": "integer", "minimum": 1, "maximum": 2},
+    "effective_retry_budget": {"type": "integer", "minimum": 1, "maximum": 5},
+    "effective_attempt_budget_before_grant": {
+      "type": "integer", "minimum": 1, "maximum": 6
+    },
+    "effective_attempt_budget_after_grant": {
+      "type": "integer", "minimum": 2, "maximum": 6
+    },
+    "remaining_attempts_before_grant": {
+      "type": "integer", "minimum": 0, "maximum": 6
+    },
+    "remaining_attempts_after_grant": {
+      "type": "integer", "minimum": 1, "maximum": 6
+    },
+    "authorized_new_attempts": {"type": "integer", "minimum": 1, "maximum": 2}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"schema_version": {"const": "1.0"}}},
+      "then": {"required": ["effective_retry_budget"]}
+    },
+    {
+      "if": {"properties": {"schema_version": {"const": "1.1"}}},
+      "then": {
+        "required": [
+          "base_attempt_budget", "effective_attempt_budget_before_grant",
+          "effective_attempt_budget_after_grant", "remaining_attempts_before_grant",
+          "remaining_attempts_after_grant", "authorized_new_attempts"
+        ]
+      }
+    }
+  ]
+}

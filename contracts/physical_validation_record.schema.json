@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "physical_validation_record.schema.json",
+  "title": "PhysicalValidationRecord",
+  "description": "Bản ghi kiểm chứng L2/L3 3D FE và đối chiếu độc lập theo Physics Gates G0–G4.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "validation_id",
+    "task_id",
+    "candidate_id",
+    "sampling_tier",
+    "geometry_parameters",
+    "l1_prediction",
+    "l2_fe_model",
+    "independent_check",
+    "failure_mode_analysis",
+    "claim_ceiling",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "validation_id": { "type": "string", "pattern": "^VAL-[A-Za-z0-9_-]+$" },
+    "task_id": { "type": "string", "pattern": "^(BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})$" },
+    "candidate_id": { "type": "string", "minLength": 1 },
+    "sampling_tier": {
+      "enum": ["OPTIMUM", "INTERIOR_CONTROL", "FAILING_BOUNDARY", "FAB_BOUNDARY"]
+    },
+    "geometry_parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["span_m", "girder_count", "web_thickness_mm", "girder_height_mm"],
+      "properties": {
+        "span_m": { "type": "number", "minimum": 10.0, "maximum": 500.0 },
+        "girder_count": { "type": "integer", "minimum": 2, "maximum": 12 },
+        "web_thickness_mm": { "type": "number", "minimum": 100.0, "maximum": 1000.0 },
+        "girder_height_mm": { "type": "number", "minimum": 500.0, "maximum": 10000.0 }
+      }
+    },
+    "l1_prediction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["solver_version", "max_moment_kNm", "max_deflection_mm", "feasible"],
+      "properties": {
+        "solver_version": { "type": "string", "minLength": 1 },
+        "max_moment_kNm": { "type": "number" },
+        "max_deflection_mm": { "type": "number" },
+        "feasible": { "type": "boolean" }
+      }
+    },
+    "l2_fe_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "software",
+        "software_version",
+        "element_type",
+        "mesh_size_m",
+        "mesh_convergence_error_pct",
+        "equilibrium_residual_kN",
+        "bc_description",
+        "load_traceability_hash"
+      ],
+      "properties": {
+        "software": { "type": "string", "minLength": 1 },
+        "software_version": { "type": "string", "minLength": 1 },
+        "element_type": { "enum": ["BEAM", "GRILLAGE", "SHELL", "SOLID", "MIXED"] },
+        "mesh_size_m": { "type": "number", "minimum": 0.01, "maximum": 5.0 },
+        "mesh_convergence_error_pct": { "type": "number", "minimum": 0.0, "maximum": 100.0 },
+        "equilibrium_residual_kN": { "type": "number", "minimum": 0.0 },
+        "bc_description": { "type": "string", "minLength": 3 },
+        "load_traceability_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "independent_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "checker_agent_id",
+        "is_blind",
+        "result_value",
+        "discrepancy_pct",
+        "pre_registered_tolerance_pct",
+        "verified_pass"
+      ],
+      "properties": {
+        "method": { "type": "string", "minLength": 3 },
+        "checker_agent_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$" },
+        "is_blind": { "type": "boolean" },
+        "result_value": { "type": "number" },
+        "discrepancy_pct": { "type": "number", "minimum": 0.0 },
+        "pre_registered_tolerance_pct": { "type": "number", "minimum": 0.1, "maximum": 50.0 },
+        "verified_pass": { "type": "boolean" }
+      }
+    },
+    "failure_mode_analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["governing_limit_state", "safety_margin_ratio", "mechanics_notes"],
+      "properties": {
+        "governing_limit_state": { "enum": ["STRENGTH_FLEXURE", "STRENGTH_SHEAR", "SERVICE_STRESS", "DEFLECTION", "STABILITY_BUCKLING", "FATIGUE"] },
+        "safety_margin_ratio": { "type": "number", "minimum": 0.0 },
+        "mechanics_notes": { "type": "string", "minLength": 5 }
+      }
+    },
+    "claim_ceiling": {
+      "enum": ["IDEA", "SCREENED", "NUMERICALLY_VERIFIED", "LAB_VALIDATED", "PILOT_VALIDATED", "ENGINEERING_CANDIDATE"]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_at_utc", "analyst_agent_id", "raw_model_input_sha256"],
+      "properties": {
+        "created_at_utc": { "type": "string", "format": "date-time" },
+        "analyst_agent_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$" },
+        "raw_model_input_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

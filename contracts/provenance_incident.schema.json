@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "provenance_incident.schema.json",
+  "title": "BridgeLabProvenanceIncident",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "incident_id", "task_id", "detected_at_utc", "detected_by",
+    "original_handoff_path", "original_handoff_sha256", "artifact_path",
+    "recorded_sha256", "observed_sha256", "reason", "disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "incident_id": {"type": "string", "pattern": "^INC-(?:BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})-[0-9]{3}$"},
+    "task_id": {"type": "string", "pattern": "^(?:BRD-[0-9]{3}|RND-[a-f0-9]{8}-[0-9]{2})$"},
+    "detected_at_utc": {"type": "string", "minLength": 20},
+    "detected_by": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,31}$"},
+    "original_handoff_path": {"type": "string", "pattern": "^multiagent/handoffs/.+\\.json$"},
+    "original_handoff_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "artifact_path": {"type": "string", "minLength": 1},
+    "recorded_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "observed_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "reason": {"type": "string", "minLength": 10},
+    "disposition": {"const": "CONTROLLED_CORRECTION"}
+  }
+}

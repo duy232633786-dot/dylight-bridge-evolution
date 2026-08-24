@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-012",
+  "agent_id": "antigravity",
+  "role": "independent_reproducer",
+  "summary": "Them pytest.importorskip('pymoo') truoc khi import pymoo_adapter de test suite tu dong bo qua module tuy chon khi thieu pymoo ma khong che loi code.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "tests/test_pymoo_optimization.py",
+      "sha256": "def686337c9c3e82d0d29ac44aa81c4d1c6a267b058370d614fbaa5307aa1edc",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "next_action": "Independent review"
+}

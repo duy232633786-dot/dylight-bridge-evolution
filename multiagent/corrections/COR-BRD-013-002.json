@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-013-002",
+  "task_id": "BRD-013",
+  "incident_id": "INC-BRD-013-002",
+  "agent_id": "provenance_repair_impl",
+  "role": "evidence_safety_auditor",
+  "summary": "Preserve exact f4948c intermediate bytes and record the BRD-015 runner change cf5c5e as a second immutable correction chained to COR-BRD-013-001.",
+  "original_handoff_path": "multiagent/handoffs/BRD-013.claude.r001.json",
+  "original_handoff_sha256": "ca0d2211d8d2719693c516a9a92adbb4f6bb179c4eb2724afb32d6fa8036af8c",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0.blob",
+    "sha256": "f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0"
+  },
+  "corrected_artifact": {
+    "path": "experiments/run_grammar_ab_confirmatory.py",
+    "previous_sha256": "f4948c2e64621a597c4fe75e77b8cf5698500ae83fa2d311f7f31c6820e89bd0",
+    "current_sha256": "cf5c5e96f5dbae21c25191f760394663f393fe117ea7586a606a594493c5ac6d"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_grammar_ab_confirmatory.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_collaboration.py::test_drift_requires_exact_snapshot_incident_correction_and_independent_review",
+      "tests/test_collaboration.py::test_wrong_snapshot_bytes_cannot_authorize_drift",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "BRD-015 is still ACTIVE and its full 20-seed confirmatory rerun has not been independently reviewed.",
+    "tests/test_grammar_ab_confirmatory.py also drifted from BRD-013 r001 and requires separate governed resolution."
+  ],
+  "supersedes_correction_sha256": "39d4567415c0b468acc8eafc0b7345d13a8e0ee4128f83102e934b7b64dab21c"
+}

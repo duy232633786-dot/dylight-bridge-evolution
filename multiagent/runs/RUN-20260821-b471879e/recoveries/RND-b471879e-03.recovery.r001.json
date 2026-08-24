@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "recovery_id": "REC-659279a97bbf4a86",
+  "created_at": "2026-08-21T10:18:02.584651Z",
+  "run_id": "RUN-20260821-b471879e",
+  "task_id": "RND-b471879e-03",
+  "authorized_by": "user-via-codex",
+  "reason": "User instructed all agents to continue. Canonical contamination is quarantined, validator is green, and provider prompts now forbid delegation, lab APIs, and writes outside the exact task scope.",
+  "previous_run_status": "FAILED",
+  "next_run_status": "PLANNED",
+  "previous_task_status": "BLOCKED",
+  "next_task_status": "READY",
+  "previous_owner": "codex",
+  "previous_provider": "codex",
+  "next_provider": "codex",
+  "prior_attempts": 2,
+  "previous_run_sha256": "e0fb4f609b95a62d8b3343c2cb82f70ac557e7bc3340db8f7d50d55014003eee",
+  "previous_task_sha256": "e63e65edf46b0c07834300e16eba7dd7c9c61e452ba745573afe402be220172e",
+  "attempt_records": [
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-03.work.r001.json",
+      "sha256": "eb0a9f14ccc31deae2680505cd73b6e1f6f37e123829cc32a3e916ecca588392"
+    },
+    {
+      "path": "runs/RUN-20260821-b471879e/attempts/RND-b471879e-03.work.r002.json",
+      "sha256": "1f8a1b0a6cb6c91385b1a392688de374fd1bf5e026ac844f03bd1c65b8b537dd"
+    }
+  ],
+  "base_retry_budget": 1,
+  "prior_recovery_grants": 0,
+  "granted_attempts": 1,
+  "effective_retry_budget": 2
+}

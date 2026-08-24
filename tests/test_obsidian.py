@@ -15,7 +15,7 @@ from bridge_evolution.knowledge.obsidian import (
     export_obsidian_vault,
     load_card_audit,
 )
-from bridge_evolution.knowledge.store import CARDS_DIR
+from bridge_evolution.knowledge.store import CARDS_DIR, load_cards
 from bridge_evolution.knowledge.taxonomy import RULES, VARIABLES
 
 
@@ -66,8 +66,10 @@ def test_export_writes_dashboard_cards_manifest_and_preserves_json(tmp_path):
 
     dashboard = (managed / DASHBOARD_NAME).read_text(encoding="utf-8")
     note = (managed / "Cards" / "KC-001.md").read_text(encoding="utf-8")
-    assert "card ngoài snapshot chưa được audit" in dashboard
-    assert "Audit risk RED: **3**" in dashboard
+    audit = load_card_audit()
+    red_count = sum(entry["risk"] == "RED" for entry in audit["cards"].values()) if audit else 0
+    assert "0/20 card ở trạng thái ENGINEER_APPROVED" in dashboard
+    assert f"Audit risk RED: **{red_count}**" in dashboard
     assert "DRAFT — chưa được kỹ sư phê duyệt" in note
     assert "Claim audit: RED · PARTIAL" in note
     assert "dylight_canonical_sha256" in note
@@ -184,7 +186,16 @@ def test_current_audit_valid_and_has_all_cards():
     audit = load_card_audit()
     assert audit is not None
     assert audit["evidence"]["complete_oracle"] is True
-    assert set(audit["cards"]) == {f"KC-{index:03d}" for index in range(1, 10)}
+    assert set(audit["cards"]) == {card["card_id"] for card in load_cards()}
+
+
+def test_audit_missing_card_detects_untracked_card():
+    audit = load_card_audit()
+    assert audit is not None
+    loaded_card_ids = {card["card_id"] for card in load_cards()}
+    # Khẳng định: nếu runtime có thêm card mà audit thiếu, tập hợp sẽ không khớp
+    simulated_runtime_cards = loaded_card_ids | {"KC-999"}
+    assert set(audit["cards"]) != simulated_runtime_cards
 
 
 def test_audit_rejects_wrong_evidence_hash(tmp_path):

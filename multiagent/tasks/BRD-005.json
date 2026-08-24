@@ -5,9 +5,9 @@
   "research_question": "Vật liệu/hệ vật liệu nào có thể giảm lifecycle cost và carbon cho exposure cụ thể mà không vượt miền hiệu lực tiêu chuẩn?",
   "workstream": "materials",
   "priority": "P0",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "codex",
   "dependencies": [],
   "required_gates": [
     "G0",
@@ -37,6 +37,7 @@
     "Không suy extrapolation tuổi thọ nếu chưa có degradation model được kiểm chứng"
   ],
   "review_notes": [
-    "Phe duyet Material Evidence Matrix va Test Plan Template"
+    "Phe duyet Material Evidence Matrix va Test Plan Template",
+    "APPROVE: Danh gia phe duyet so dang ky claim chua kiem chung va bo test bao ve catalog san xuat. Claim ceiling giu dung o muc IDEA."
   ]
 }

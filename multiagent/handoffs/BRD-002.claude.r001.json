@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-002",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Khoa design basis G0 tu nguon CO THAT trong repo, va ghi nhan trung thuc rang du an CHUA CO VI TRI XAY DUNG. Hai instance: docs/design_basis/DB-SUPERT-38M.json (39 truong co trang thai: 24 KNOWN, 14 UNKNOWN, 1 NOT_APPLICABLE) va docs/design_basis/SITE-UNSPECIFIED.json (31/31 truong deu UNKNOWN, KHONG mot truong KNOWN nao - khong bia toa do, dong dat, gio hay dia chat). Moi truong KNOWN deu tro toi file nguon that: da kiem 7 duong dan duoc trich, 0 duong dan khong ton tai. Gia tri then chot doi chieu truc tiep voi runtime: span 38.3 m va deck width 12.0 m khop bridge_grammar/super_t_simple_v1.json. Schema duoc mo rong de PHAN BIET ba trang thai KNOWN/UNKNOWN/NOT_APPLICABLE va BAT BUOC resolution_path khi UNKNOWN, not_applicable_reason khi NOT_APPLICABLE - schema tu chan viec de trong ma khong giai thich. PHAT HIEN QUAN TRONG NHAT: vi site profile toan bo UNKNOWN nen moi claim phu thuoc vi tri (dong dat, gio, xoi, an mon, tuoi tho theo moi truong) deu BI CHAN; va khi noi duoc L2 Midas thi no chi kiem chung duoc MO HINH va CAU KIEN, KHONG kiem chung duoc mot cay cau tai mot vi tri. 24 test xanh, gom test buoc tai lieu phai KHOP gia tri runtime dang dung.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "docs/design_basis/DB-SUPERT-38M.json",
+      "sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25",
+      "kind": "input"
+    },
+    {
+      "path": "docs/design_basis/SITE-UNSPECIFIED.json",
+      "sha256": "a9209baf2a7e75175cad44e0213926600f9eb30afd779b99ca5c4c05624dd0b0",
+      "kind": "input"
+    },
+    {
+      "path": "tests/test_design_basis.py",
+      "sha256": "197c7aadf4a26d989a20d267ac9a7b9c60454590bc23c834dc0708e144e727f7",
+      "kind": "input"
+    }
+  ],
+  "assumptions": [
+    "Cac gia tri KNOWN chi phan anh dieu repo dang thuc su dung, khong phai dieu mot du an thuc te se yeu cau",
+    "SITE-UNSPECIFIED la ho so RONG CO CHU DICH, khong phai mot vi tri that bi thieu du lieu"
+  ],
+  "unresolved_risks": [
+    "Chua co vi tri xay dung nen KHONG the danh gia dong dat, gio, xoi, dia chat hay an mon; moi ket qua L2 sau nay chi la kiem chung mo hinh/cau kien",
+    "Don gia va he so carbon trong catalogs van la placeholder, chua duoc khoa trong design basis nay",
+    "Ban review doc lap cua task nay bi mat khi tien trinh nen thoat; owner tu kiem chung nguon va so lieu nen can reviewer khac soi lai phan co bia du lieu khong"
+  ],
+  "next_action": "Reviewer khac claude kiem co truong KNOWN nao khong co nguon that khong; BRD-001 xong thi mo BRD-003 (L2 V&V) roi toi BRD-014 doi chieu Midas"
+}

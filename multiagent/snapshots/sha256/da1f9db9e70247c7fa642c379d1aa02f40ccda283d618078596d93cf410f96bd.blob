@@ -1,0 +1,50 @@
+"""Tests for the confirmatory grammar A/B trial (BRD-013)."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import pytest
+
+from experiments.run_grammar_ab_confirmatory import (
+    DEFAULT_PREREG,
+    bootstrap_ci,
+    run_single_arm,
+)
+
+
+def test_preregistration_file_exists_and_has_required_schema():
+    assert DEFAULT_PREREG.is_file()
+    data = json.loads(DEFAULT_PREREG.read_text(encoding="utf-8"))
+    assert data["task_id"] == "BRD-013"
+    assert data["locked_before_running"] is True
+    assert len(data["arms"]) == 4
+    arm_ids = [a["arm_id"] for a in data["arms"]]
+    assert "A1_v1_catalog" in arm_ids
+    assert "A4_v1_restricted_girders" in arm_ids
+    assert "A2_v2_shape_only" in arm_ids
+    assert "A3_v2_full" in arm_ids
+    assert data["budget"]["solver_calls_per_run"] == 600
+    assert data["budget"]["n_seeds"] >= 20
+
+
+def test_bootstrap_ci_calculation():
+    # Test positive improvement
+    diffs = [2.5, 3.0, 2.8, 3.2, 2.1, 2.9, 3.5, 2.4, 2.7, 3.1]
+    mean, low, high = bootstrap_ci(diffs, n_resamples=500, seed=42)
+    assert 2.0 < mean < 3.5
+    assert low < mean < high
+
+
+def test_single_arm_execution_strictly_respects_budget():
+    arm = {
+        "arm_id": "A4_v1_restricted_girders",
+        "grammar_id": "super_t_simple_v1",
+        "domain_restriction": {"girder_count": [5, 6]},
+        "search_path": "local_restricted_domain_path",
+    }
+    # Test on tiny budget of 10 solver calls
+    res = run_single_arm(arm, "random_search", seed=42, budget=10)
+    assert res["solver_calls"] == 10
+    assert res["arm_id"] == "A4_v1_restricted_girders"
+    assert res["algorithm"] == "random_search"

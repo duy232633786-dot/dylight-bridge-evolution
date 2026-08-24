@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-014",
+  "agent_id": "antigravity",
+  "role": "bim_fem_integrator",
+  "summary": "Doi chieu L2 Midas cho tiet dien v2 sat bien FAB-001/002 tren mau phan tang va kiem tra doc lap blind.",
+  "claim_level": "NUMERICALLY_VERIFIED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2",
+    "G3",
+    "G4"
+  ],
+  "artifacts": [
+    {
+      "path": "experiments/validation/grammar_v2_fab_boundary/pre_registration.json",
+      "sha256": "78fab1bcb00dc4e959523332140936dd22bb7cf5c15b421de9da4349c679df63",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/grammar_v2_fab_boundary/model_card.json",
+      "sha256": "d32493f2938d48f37df9a40dd11726e382bac8373a50f5e3659f6eaaa8f17e67",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/grammar_v2_fab_boundary/independent_check.json",
+      "sha256": "2126c84c264ebe96ef8cd3c2ab0c1e243a1409e093bb718c00a37c011d2e610a",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_l2_grammar_v2_boundary.py",
+      "sha256": "9c021c5f9d9cc6cb564c2a5651c36be61709aadbf1575edab14b33dc1aef5795",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "next_action": "Independent review"
+}
