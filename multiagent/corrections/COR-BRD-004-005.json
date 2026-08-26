@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-004-005",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-005",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Thay assertion khoa cung hai ten bang bat bien TU BAO TRI va manh hon: enum 'family' phai trung khit tap grammar production top-level trong bridge_grammar/, cong khang dinh khong ten nao chua 'arch'. Cach nay van chan dung thu can chan (grammar sandbox khong nam o top-level nen khong the lot vao enum) nhung khong con lam do moi khi them mot ho tiet dien hop le.",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef.blob",
+    "sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_shape_grammar_experimental.py",
+    "previous_sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef",
+    "current_sha256": "6fd00ab0b4bde4f2a60b6227e387618d46645347474c5329ae82b53780f81ba0"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Bat bien moi phu thuoc vao viec sandbox luon nam trong thu muc con; neu ai do dat grammar sandbox o top-level thi test se XANH nham - nhung khi do test_experimental_grammar_lives_only_in_sandbox se do."
+  ],
+  "supersedes_correction_sha256": "8eb09c7dc25c266e8889ccbfe0a954b44957e660cec6059d3134dc218335566d"
+}

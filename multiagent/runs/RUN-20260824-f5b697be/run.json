@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260824-f5b697be",
+  "brief_id": "RND-20260824-f5b697be",
+  "created_at": "2026-08-24T12:37:07.097438Z",
+  "updated_at": "2026-08-24T13:02:15.552256Z",
+  "status": "WAITING_FOR_PROVIDER",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-f5b697be-01",
+    "RND-f5b697be-02",
+    "RND-f5b697be-03",
+    "RND-f5b697be-04"
+  ],
+  "provider_policy": "AVAILABLE_WITH_FALLBACK",
+  "attempts": {
+    "RND-f5b697be-01": 0,
+    "RND-f5b697be-02": 0,
+    "RND-f5b697be-03": 0,
+    "RND-f5b697be-04": 0
+  },
+  "recovery_grants": {
+    "RND-f5b697be-01": 0,
+    "RND-f5b697be-02": 0,
+    "RND-f5b697be-03": 0,
+    "RND-f5b697be-04": 0
+  },
+  "events": [
+    {
+      "at": "2026-08-24T12:37:07.097438Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    },
+    {
+      "at": "2026-08-24T13:02:15.541412Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-08-24T13:02:15.552256Z",
+      "kind": "WAITING_FOR_PROVIDER",
+      "message": "Provider claude chưa callable/authenticated",
+      "task_id": "RND-f5b697be-01"
+    }
+  ],
+  "human_gate": "Provider claude chưa callable/authenticated",
+  "knowledge_sync": "PENDING"
+}

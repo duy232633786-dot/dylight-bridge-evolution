@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-032",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Ban r002 - sua dung lo hong codex tim ra o r001. Codex chi ra: bang correction_decision cua toi dung dict comprehension, tuc LAY CAI GHI SAU CUNG khi mot correction co nhieu review. review_provenance_correction khong cho ghi review thu hai, NHUNG mot file chep tay thi co - va chi can dat mot review APPROVE canh mot review REVISE la hop thuc hoa duoc drift ma khong ai duyet that. SUA FAIL-CLOSED o HAI cho: (1) bang correction_decision nay gom tap phan quyet cho tung correction; nhieu phan quyet KHAC nhau thi coi nhu CHUA co phan quyet va bao loi ro rang thay vi im lang chon mot cai; (2) quan trong khong kem - vong lap them vao approved_corrections cung phai kiem dieu kien do, vi neu thieu thi review APPROVE gia van tu minh dua correction vao tap da duyet. Da tai hien lo hong bang test that: chep tay mot review APPROVE thu hai cho cung correction, lab validate phai bao 'phan quyet xung dot'. tests/test_correction_chain.py: 9/9 xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/lab.py",
+      "sha256": "73e56145e626de653a2017f753d32c4ff5736a52aef81a4bc2ec4c37b35535de",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_correction_chain.py",
+      "sha256": "ddf0417556394565bb725563716ddbe5689ea6fe9c5673352db3f2be5bb53f72",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Bang phan quyet chi lay tu valid_correction_reviews, tuc review da qua kiem schema. File rac khong dung schema khong vao duoc bang."
+  ],
+  "unresolved_risks": [
+    "Day la lan sua thu ba trong phien vao bo may chong sua lich su, va lan nao review doc lap cung tim ra mot thu toi khong tu thay. Nen coi do la bang chung rang khu vuc nay can review doi khang bat buoc, khong phai tuy chon."
+  ],
+  "next_action": "Re-review r002 by codex"
+}

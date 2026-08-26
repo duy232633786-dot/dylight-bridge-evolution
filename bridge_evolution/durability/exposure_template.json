@@ -1,0 +1,14 @@
+{
+  "_huong_dan": "Xoa _huong_dan, dien gia tri DO DAC that, luu UTF-8 khong BOM. Moi truong khoa deu tuy chon nhung phai co it nhat 1 gia tri; 'source' bat buoc.",
+  "source": "VI DU - thay bang: Tram QN + mau bot cot P3, ky 2024, phuong phap XRD/phenolphtalein",
+  "measured": {
+    "rh_percent": 78.0,
+    "carbonation_k_mm_sqrt_year": 3.2,
+    "chloride": {
+      "cs_percent": 2.1,
+      "d_ref_m2s": 8.0e-12,
+      "m": 0.38,
+      "ccrit_percent": 0.5
+    }
+  }
+}

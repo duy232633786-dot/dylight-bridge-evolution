@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-031",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "N2 SiteSpec: mo hinh du lieu site va cong SITE-001 khoa G0. (1) contracts/site_hazard_profile.schema.json len 1.2 voi khoi geotechnical_investigation: ho khoan co toa do, do sau, dia tang tung lop, SPT-N theo do sau, muc nuoc ngam - dung thu ma G0 doi ma SITE-UNSPECIFIED.json de trong co chu dich. Giu nguyen tuong thich 1.0/1.1: ho so placeholder hien co van validate khong loi. (2) bridge_evolution/site/spec.py: bang RULE_INPUT_REQUIREMENTS khai TUNG NHOM RULE HA NGUON CAN TRUONG SITE NAO (HYDRO/SEIS/WIND/GEO/DUR) - day la hop dong, them mot rule hazard moi ma khong khai o day thi no se chay tren du lieu trong ma khong ai biet. check_site_readiness() phat SITE-001 HARD va NEU DICH DANH tung truong thieu kem trang thai, khong bao chung chung. (3) Phan biet ba trang thai khac nhau ma truoc day de bi gop: KNOWN (co bang chung), UNKNOWN (da khai la chua biet), MISSING (chua khai gi) - gop lai la mat thong tin. (4) n60(): hieu chinh SPT ve nang luong 60% theo CE/CR/CB/CS, ghi ro trong docstring rang day KHONG phai hieu chinh ung suat phu (N1)60. 19 test moi, gom test chan bia: ho so UNSPECIFIED_PLACEHOLDER khong duoc khai da khoan, va khong ham nao duoc dien gia tri mac dinh cho truong UNKNOWN.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/site/spec.py",
+      "sha256": "164db158d5fc18391731baedd9470a9c9214948e577ad4957f2ef7af2cccbfc6",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/site/__init__.py",
+      "sha256": "f5f8cf0e69a759baba8e5c0634b3e4fb33ba187573a132434521c81598e366c6",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/site_hazard_profile.schema.json",
+      "sha256": "87523a4587aaa3dfa408586fa7456ea92e5000d4af8750d92c484c65fc68e154",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_site_spec.py",
+      "sha256": "67606b195416ab0b0a14e9837544680c0717accb51523e23a00fa658c9724e23",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Module nay KHONG tinh hazard va KHONG duoc wire vao evaluate.py trong task nay - evaluate.py thuoc write_scope cua BRD-028. SITE-001 vi vay hien la mot ham co the goi duoc chu chua phai mot cong dang chan trong pipeline.",
+    "He so CE/CR/CB/CS cua n60 theo thuc hanh pho bien (Skempton 1986, FHWA GEC-5). Chua doi chieu voi mot vi du so cong bo cu the nao ngoai truong hop hien nhien energy_ratio=0.60."
+  ],
+  "unresolved_risks": [
+    "bridge_evolution.site chua duoc them vao pyproject.toml packages nen chua vao wheel - cung loai loi dong goi nhu durability truoc day. Khong sua trong task nay vi pyproject.toml la artifact dang cho review cua BRD-029; can lam ngay sau khi BRD-029 dong.",
+    "RULE_INPUT_REQUIREMENTS hien do NGUOI khai bang tay. Neu ai do them rule HYDRO-002 can them mot truong site ma quen cap nhat bang nay thi rule do se chay tren du lieu thieu - can mot test doi chieu khi cac nhom rule hazard duoc viet that o N4."
+  ],
+  "next_action": "Cross-provider review by codex"
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-029-001",
+  "task_id": "BRD-029",
+  "incident_id": "INC-BRD-029-001",
+  "correction_sha256": "6dfb5c3968a089c34a44a5c315714a979d959652c0114e1227a75c4dab32a7a0",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "PASS: snapshot SHA-256 a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047 equals corrected_artifact.previous_sha256 and the BRD-029 handoff artifact hash.",
+    "PASS: live diff is limited to role cleaned to SECTION_FAMILY_ARM plus typed claim_ceiling and claim_note_vi fields; no binding or KNOWN/UNKNOWN field changed."
+  ],
+  "notes": "Cross-provider review (work by Claude, review by Codex)."
+}

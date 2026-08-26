@@ -1,0 +1,218 @@
+"""Neo tính toàn vẹn của thư viện tham khảo (BRD-020).
+
+Thư viện này là UNVERIFIED theo PROTOCOL quy tắc 6 — test ở đây KHÔNG kiểm chất
+lượng học thuật của nguồn. Nó chỉ chặn bốn kiểu hỏng đã biết:
+
+1. Bịa trích dẫn: mọi mục trong danh mục phải khai đã xác minh được, và mục
+   xác minh gián tiếp qua DOI phải nói rõ giới hạn đó.
+2. Trùng lặp: một URL chỉ được có một ID.
+3. Lệch số: `counts` phải khớp dữ liệu thật, không phải con số chép tay.
+4. Im lặng bỏ nguồn hỏng: nguồn không xác minh được phải nằm ở
+   `not_indexed_unverified`, không được biến mất.
+"""
+import json
+import re
+from pathlib import Path
+
+import jsonschema
+
+ROOT = Path(__file__).resolve().parent.parent
+INDEX_PATH = ROOT / "research" / "literature" / "index.json"
+SCHEMA_PATH = ROOT / "contracts" / "literature_reference.schema.json"
+
+
+def load(path):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+INDEX = load(INDEX_PATH)
+SCHEMA = load(SCHEMA_PATH)
+REFS = INDEX["references"]
+
+# Sàn số nguồn: NÂNG lên sau mỗi đợt quét hoàn tất. HẠ xuống thì phải nói rõ
+# nguồn nào bị gỡ và vì sao — thư viện chỉ được co lại một cách có chủ đích.
+# Đợt 1: 55 · đợt 2: 111 · đợt 3: 234.
+LIBRARY_FLOOR = 234
+
+# Mỗi đợt quét để lại một mỏ neo. Xoá nguồn rồi đánh số lại vẫn bị bắt ở đây.
+SWEEP_ANCHORS = {
+    "LIT-001": "The Modified Compression-Field Theory",
+    "LIT-055": None,
+    "LIT-111": None,
+    "LIT-189": None,
+    "LIT-234": None,
+}
+
+
+def url_key(url):
+    return re.sub(r"^https?://(www\.)?", "", url.rstrip("/")).lower()
+
+
+def test_index_matches_schema():
+    jsonschema.validate(INDEX, SCHEMA)
+
+
+def test_reference_ids_are_unique_and_gapless():
+    numbers = [int(r["reference_id"].split("-")[1]) for r in REFS]
+    assert len(set(numbers)) == len(numbers)
+    assert numbers == list(range(1, len(numbers) + 1))
+
+
+def test_no_undeclared_duplicate_urls():
+    """Trùng URL chỉ được phép khi đã khai trong `duplicate_reference_ids`."""
+    by_url = {}
+    for r in REFS:
+        by_url.setdefault(url_key(r["url"]), []).append(r["reference_id"])
+    found = {tuple(sorted(ids)) for ids in by_url.values() if len(ids) > 1}
+    declared = {
+        tuple(sorted((d["reference_id"], d["duplicate_of"])))
+        for d in INDEX.get("duplicate_reference_ids", [])
+    }
+    # `declared` rộng hơn: nó còn chứa cặp cùng tài liệu mà KHÁC URL (xem
+    # test_same_document_at_two_urls_is_declared). Ở đây chỉ đòi mọi trùng URL
+    # phải được khai.
+    assert found <= declared, f"Trùng URL chưa khai: {sorted(found - declared)}"
+
+
+def test_counts_match_reality():
+    counts = INDEX["counts"]
+    assert counts["total_indexed"] == len(REFS)
+    assert counts["not_found"] == len(INDEX["not_found"])
+    assert counts["not_indexed_unverified"] == len(INDEX["not_indexed_unverified"])
+    contradicting = sum(
+        1
+        for r in REFS
+        if r["contradicts_current_model"]
+        and not r["contradicts_current_model"].lstrip().upper().startswith("KHÔNG")
+    )
+    assert counts["contradicting_current_model"] == contradicting
+
+
+def test_doi_only_verification_declares_its_limit():
+    """Mục xác minh gián tiếp phải có DOI và phải tự khai giới hạn đó."""
+    for r in REFS:
+        if r["evidence_status"] == "VERIFIED_DOI_METADATA":
+            assert r["doi"], r["reference_id"]
+            assert any("403" in f or "Crossref" in f or "DataCite" in f
+                       for f in r["unverified_fields"]), r["reference_id"]
+
+
+def test_unverified_sources_stay_out_of_the_catalogue():
+    indexed = {url_key(r["url"]) for r in REFS}
+    for item in INDEX["not_indexed_unverified"]:
+        assert url_key(item["url"]) not in indexed, item["url"]
+
+
+def test_cross_topic_references_point_at_real_entries():
+    by_id = {r["reference_id"]: r for r in REFS}
+    for cross in INDEX.get("cross_topic_references", []):
+        ref = by_id.get(cross["reference_id"])
+        assert ref is not None, cross["reference_id"]
+        assert cross["primary_topic"] == ref["topic"]
+        assert cross["also_relevant_to"] != ref["topic"]
+
+
+def test_claim_ceiling_never_rises_above_idea():
+    assert INDEX["claim_ceiling"] == "IDEA"
+
+
+def test_same_document_at_two_urls_is_declared():
+    """Khử trùng theo URL không bắt được cùng một tài liệu ở hai trang mirror.
+
+    Reviewer độc lập của đợt quét 3 tìm ra hai cặp như vậy (LIT-018/LIT-117 trên
+    hai URL pci.org, LIT-074/LIT-205 trên hai mirror TCVN). Test này chặn kiểu
+    trùng đó tái diễn mà không khai.
+    """
+    def norm_title(title):
+        return re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
+
+    by_title = {}
+    for r in REFS:
+        by_title.setdefault(norm_title(r["title"]), []).append(r["reference_id"])
+    found = {tuple(sorted(ids)) for ids in by_title.values() if len(ids) > 1}
+    declared = {
+        tuple(sorted((d["reference_id"], d["duplicate_of"])))
+        for d in INDEX.get("duplicate_reference_ids", [])
+    }
+    assert found <= declared, f"Trùng tài liệu chưa khai: {sorted(found - declared)}"
+
+
+def test_unique_document_count_is_honest():
+    """Bắt buộc phải có `unique_documents` — xoá key đi không được coi là hợp lệ."""
+    counts = INDEX["counts"]
+    assert "unique_documents" in counts
+    declared = len(INDEX.get("duplicate_reference_ids", []))
+    assert counts["unique_documents"] == len(REFS) - declared
+
+
+TEXT_FIELDS = (
+    "key_content",
+    "relevance_to_runtime",
+    "contradicts_current_model",
+    "authors",
+    "venue",
+    "unverified_fields",
+)
+
+
+def _cited_ids(record):
+    """Mọi reference_id được nhắc trong phần văn bản của một bản ghi."""
+    token = re.compile(r"\bLIT-\d{3}\b")
+    for field in TEXT_FIELDS:
+        value = record.get(field)
+        chunks = value if isinstance(value, list) else [value or ""]
+        for chunk in chunks:
+            for tok in token.findall(chunk or ""):
+                yield field, tok
+
+
+def test_internal_lit_references_point_at_the_right_document():
+    """Trích dẫn nội bộ phải trỏ đúng tài liệu, không chỉ trỏ vào ID có tồn tại.
+
+    Báo cáo của agent tự đánh số cục bộ (LIT-001, LIT-002…, có agent dùng
+    LIT-101…). Chép nguyên vào index thì mỗi chuỗi đó vẫn là **ID hợp lệ** nhưng
+    âm thầm trỏ sang một tài liệu khác — nên phép kiểm "ID có tồn tại không"
+    KHÔNG phát hiện được (đã thử: nó xanh trên chính bản index bị lỗi).
+
+    Bất biến thật: một bản ghi chỉ nhắc tới nguồn **cùng chủ đề**; nhắc chéo chủ
+    đề thì cặp đó phải được khai trong `cross_topic_references`.
+    """
+    by_id = {r["reference_id"]: r for r in REFS}
+    cross = {
+        (c["reference_id"], c["also_relevant_to"])
+        for c in INDEX.get("cross_topic_references", [])
+    }
+    bad = []
+    for r in REFS:
+        for field, tok in _cited_ids(r):
+            target = by_id.get(tok)
+            if target is None:
+                bad.append((r["reference_id"], field, tok, "ID không tồn tại"))
+            elif target["topic"] != r["topic"] and (tok, r["topic"]) not in cross:
+                bad.append((r["reference_id"], field, tok,
+                            f"trỏ sang chủ đề {target['topic']} mà không khai chéo"))
+    for item in INDEX["not_found"]:
+        for tok in re.findall(r"\bLIT-\d{3}\b", item["item"]):
+            target = by_id.get(tok)
+            if target is None:
+                bad.append(("not_found", item["topic"], tok, "ID không tồn tại"))
+            elif target["topic"] != item["topic"] and (tok, item["topic"]) not in cross:
+                bad.append(("not_found", item["topic"], tok,
+                            f"trỏ sang chủ đề {target['topic']} mà không khai chéo"))
+    assert bad == []
+
+
+def test_library_never_shrinks_silently():
+    """`counts` tự nhất quán vẫn cho phép xoá nguồn rồi đánh số lại — sàn này chặn việc đó."""
+    assert len(REFS) >= LIBRARY_FLOOR
+
+
+def test_every_sweep_still_has_its_anchor():
+    by_id = {r["reference_id"]: r for r in REFS}
+    for ref_id, title_fragment in SWEEP_ANCHORS.items():
+        assert ref_id in by_id, f"{ref_id} biến mất khỏi thư viện"
+        if title_fragment:
+            assert title_fragment.lower() in by_id[ref_id]["title"].lower(), (
+                f"{ref_id} vẫn tồn tại nhưng đã bị gán cho tài liệu khác"
+            )

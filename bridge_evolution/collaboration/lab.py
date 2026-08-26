@@ -997,6 +997,30 @@ def validate_lab(lab_dir: str | Path | None = None) -> dict:
         _sha256(path): (path, correction)
         for path, correction in valid_corrections.values()
     }
+    # Phán quyết của từng correction, tiền tính TRƯỚC vòng lặp dưới. Vòng kiểm
+    # review chạy sau vòng kiểm correction, nên không được tra ngược
+    # ``approved_corrections`` ở đây — sẽ phụ thuộc thứ tự lặp.
+    #
+    # FAIL-CLOSED với review trùng: ``review_provenance_correction`` không cho
+    # ghi review thứ hai, nhưng một file chép tay thì có thể. Nếu một correction
+    # có nhiều phán quyết KHÁC nhau thì không được lấy cái ghi sau cùng — đó là
+    # đường để đầu độc bảng này. Xung đột ⇒ coi như KHÔNG có phán quyết hợp lệ,
+    # và báo lỗi để người ta nhìn thấy.
+    _decisions_by_correction: dict[str, set[str]] = {}
+    for _path, _review in valid_correction_reviews.values():
+        _decisions_by_correction.setdefault(
+            _review["correction_sha256"], set()).add(_review["decision"])
+    correction_decision: dict[str, str] = {}
+    for _sha, _decisions in _decisions_by_correction.items():
+        if len(_decisions) == 1:
+            correction_decision[_sha] = next(iter(_decisions))
+        else:
+            errors.append(
+                f"correction {_sha[:12]}: có {len(_decisions)} phán quyết xung đột "
+                f"({sorted(_decisions)}); review của correction là bất biến nên đây là "
+                "dấu hiệu bản ghi bị sửa tay — coi như chưa có phán quyết"
+            )
+
     correction_link_valid: dict[str, bool] = {}
     for correction_id, (path, correction) in valid_corrections.items():
         link_errors: list[str] = []
@@ -1063,7 +1087,15 @@ def validate_lab(lab_dir: str | Path | None = None) -> dict:
                     or previous_artifact["path"] != current_artifact["path"]
                 ):
                     link_errors.append("supersedes correction khác lineage/artifact")
-                if previous_artifact["current_sha256"] != current_artifact["previous_sha256"]:
+                # Cùng MỘT quy tắc với correction_chain_is_approved: mắt xích
+                # trước được APPROVE thì bước này nối vào kết quả của nó; mắt
+                # xích trước bị REVISE/REJECT là VÔ HIỆU nên bước này phải xuất
+                # phát lại từ đúng mốc mà nó xuất phát.
+                if correction_decision.get(supersedes) == "APPROVE":
+                    expected_link = previous_artifact["current_sha256"]
+                else:
+                    expected_link = previous_artifact["previous_sha256"]
+                if expected_link != current_artifact["previous_sha256"]:
                     link_errors.append("correction chain bị đứt old/new hash")
         for message in link_errors:
             errors.append(f"{path.name}: {message}")
@@ -1099,6 +1131,10 @@ def validate_lab(lab_dir: str | Path | None = None) -> dict:
             not link_errors
             and review["decision"] == "APPROVE"
             and correction_link_valid.get(review["correction_sha256"], False)
+            # Xung đột phán quyết ⇒ không có phán quyết. Nếu thiếu điều kiện này
+            # thì chỉ cần chép thêm một file review APPROVE bên cạnh một REVISE
+            # là hợp thức hoá được drift.
+            and correction_decision.get(review["correction_sha256"]) == "APPROVE"
         ):
             approved_corrections.add(review["correction_sha256"])
 
@@ -1108,15 +1144,19 @@ def validate_lab(lab_dir: str | Path | None = None) -> dict:
         """Require an unbroken, independently approved chain back to handoff bytes."""
         visited: set[str] = set()
         current_sha256 = correction_sha256
+        is_head = True
         while current_sha256:
             if current_sha256 in visited:
                 return False
             visited.add(current_sha256)
             entry = correction_by_sha.get(current_sha256)
-            if not entry or not (
-                correction_link_valid.get(current_sha256, False)
-                and current_sha256 in approved_corrections
-            ):
+            if not entry or not correction_link_valid.get(current_sha256, False):
+                return False
+            # Mắt xích ĐANG XÉT phải được review độc lập APPROVE. Mắt xích cũ hơn
+            # có thể là bản VÔ HIỆU (bị REVISE/REJECT) đã bị thay thế — đi xuyên
+            # qua nó KHÔNG nới lỏng gì, vì bản thay thế vẫn phải được duyệt và
+            # snapshot của nó vẫn phải khớp đúng mốc mà bản vô hiệu xuất phát.
+            if is_head and current_sha256 not in approved_corrections:
                 return False
             correction = entry[1]
             supersedes = correction.get("supersedes_correction_sha256")
@@ -1125,6 +1165,19 @@ def validate_lab(lab_dir: str | Path | None = None) -> dict:
                     correction["corrected_artifact"]["previous_sha256"]
                     == original_artifact_sha256
                 )
+            previous_entry = correction_by_sha.get(supersedes)
+            if not previous_entry or not correction_link_valid.get(supersedes, False):
+                return False
+            previous_correction = previous_entry[1]
+            if supersedes in approved_corrections:
+                # Bản trước ĐÃ được chấp nhận: bước này phải nối vào kết quả của nó.
+                expected = previous_correction["corrected_artifact"]["current_sha256"]
+            else:
+                # Bản trước VÔ HIỆU: bước này phải xuất phát từ đúng mốc của nó.
+                expected = previous_correction["corrected_artifact"]["previous_sha256"]
+            if correction["corrected_artifact"]["previous_sha256"] != expected:
+                return False
+            is_head = False
             current_sha256 = supersedes
         return False
 
@@ -1708,17 +1761,29 @@ def record_provenance_correction(
         if previous_entries:
             previous_path, previous_correction = previous_entries[-1]
             supersedes = _sha256(previous_path)
-            approved = any(
-                review.get("correction_sha256") == supersedes
-                and review.get("decision") == "APPROVE"
+            decisions = [
+                review.get("decision")
                 for review in (
                     _load_json(path)
                     for path in (root / "correction_reviews").glob("*.json")
                 )
-            )
-            if not approved:
-                raise ValueError("Previous correction chưa được independent review APPROVE")
-            recorded_sha256 = previous_correction["corrected_artifact"]["current_sha256"]
+                if review.get("correction_sha256") == supersedes
+            ]
+            if not decisions:
+                raise ValueError(
+                    "Previous correction chưa được independent review — không được "
+                    "chồng correction mới lên một correction chưa ai xem"
+                )
+            if "APPROVE" in decisions:
+                # Bản trước đã được chấp nhận: correction mới nối tiếp kết quả của nó.
+                recorded_sha256 = previous_correction["corrected_artifact"]["current_sha256"]
+            else:
+                # Bản trước bị REVISE/REJECT nên VÔ HIỆU. Trước đây chỗ này chặn
+                # cứng, khiến một correction bị REVISE khoá chết artifact: không sửa
+                # tiếp được mà cũng không review lại được (review là bất biến). Bản
+                # thay thế phải xuất phát lại từ đúng mốc cũ và vẫn phải được review
+                # độc lập APPROVE thì drift mới được coi là đã xử lý.
+                recorded_sha256 = previous_correction["corrected_artifact"]["previous_sha256"]
         else:
             recorded_sha256 = matching[0]["sha256"]
         source = Path(snapshot_source).resolve()

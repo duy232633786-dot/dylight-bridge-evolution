@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-031",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Ban r002 - sua hai diem codex neu. (1) bridge_evolution.site nay da co trong [tool.setuptools] packages cua pyproject.toml, kem test test_the_site_package_is_actually_shipped - dung loi dong goi ma durability tung mac va khong ai thay cho toi khi doc capability matrix. (2) Bang RULE_INPUT_REQUIREMENTS khai tay nay co test doi chieu: test_every_declared_rule_input_exists_in_the_site_schema kiem tung con tro co thuc su ton tai trong site_hazard_profile.schema.json, di xuyen qua ca $ref/oneOf/anyOf/allOf vi schema nay dung ca bon. Ly do can test: mot con tro go sai KHONG lam rule chay bua (no luon tra MISSING nen van chan) ma lam rule bi chan VINH VIEN vi ly do sai, con nguoi doc log thi di tim du lieu ma ho so da co. 21/21 test xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/site/spec.py",
+      "sha256": "164db158d5fc18391731baedd9470a9c9214948e577ad4957f2ef7af2cccbfc6",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/site/__init__.py",
+      "sha256": "f5f8cf0e69a759baba8e5c0634b3e4fb33ba187573a132434521c81598e366c6",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/site_hazard_profile.schema.json",
+      "sha256": "87523a4587aaa3dfa408586fa7456ea92e5000d4af8750d92c484c65fc68e154",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_site_spec.py",
+      "sha256": "5491bda0e989c9162e97aa192b700de7db9a99bdfe9bff1dfd4831c0852f2af9",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "pyproject.toml nam trong write_scope cua BRD-029 (toi so huu, dang REVIEW) chu khong phai BRD-031; thay doi mot dong do se duoc khai trong handoff r002 cua BRD-029."
+  ],
+  "unresolved_risks": [
+    "check_site_readiness van chua duoc wire vao evaluate.py nen SITE-001 hien la ham goi duoc chu chua phai cong dang chan trong pipeline - viec do thuoc BRD-028."
+  ],
+  "next_action": "Re-review r002 by codex"
+}

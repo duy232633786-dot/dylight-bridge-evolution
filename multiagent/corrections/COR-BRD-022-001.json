@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-022-001",
+  "task_id": "BRD-022",
+  "incident_id": "INC-BRD-022-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Xem COR-BRD-004-005: thay assertion khoa cung set(enum) == {super_t_simple_v1, super_t_parametric_v2} bang bat bien tu bao tri 'enum phai trung khit tap grammar production top-level'. Hai test ve cach ly sandbox ma BRD-022 tao ra KHONG bi dong den.",
+  "original_handoff_path": "multiagent/handoffs/BRD-022.claude.r002.json",
+  "original_handoff_sha256": "2d32204f468c888908ddd146ce71b78d75d98846557650cdcf36ca3423da1fbc",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef.blob",
+    "sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_shape_grammar_experimental.py",
+    "previous_sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef",
+    "current_sha256": "6fd00ab0b4bde4f2a60b6227e387618d46645347474c5329ae82b53780f81ba0"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_catalogs.py",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": null
+}

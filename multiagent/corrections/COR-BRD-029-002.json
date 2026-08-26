@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-029-002",
+  "task_id": "BRD-029",
+  "incident_id": "INC-BRD-029-002",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them mot dong 'bridge_evolution.site' vao [tool.setuptools] packages. Khong doi dependency, version hay cau hinh pytest.",
+  "original_handoff_path": "multiagent/handoffs/BRD-029.claude.r001.json",
+  "original_handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0.blob",
+    "sha256": "89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0"
+  },
+  "corrected_artifact": {
+    "path": "pyproject.toml",
+    "previous_sha256": "89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0",
+    "current_sha256": "40f46ff2dd2cae18fddef8b67fa5d37c776af1b5581de60fe4d0854e10164e2d"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_site_spec.py",
+      "tests/test_packaging_dependencies.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": null
+}

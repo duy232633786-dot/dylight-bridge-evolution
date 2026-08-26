@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-004-001",
+  "task_id": "BRD-004",
+  "detected_at_utc": "2026-08-25T17:29:42.483364Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "artifact_path": "tests/test_shape_grammar_experimental.py",
+  "recorded_sha256": "f2334e8bcaba3554f02a547e8d4776fc7b6e10c08cbdcee0024a50393a29326c",
+  "observed_sha256": "734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657",
+  "reason": "Dot quet 3 cua thu vien (BRD-020) nang index.json tu 111 len 234 nguon, lam test_literature_index_is_readable trong file nay do vi no khoa cung len(literature_ids) == 111. Da doi thanh >= 111 kem docstring giai thich, giu nguyen assert LIT-055 va toan bo cac test chong bia nguon khac.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "agent_id": "opencode",
+  "role": "structural_analyst",
+  "summary": "BRD-026 r002 - xu ly REVISE cua codex ve G6: them exposure_data.py (loader fail-closed tu choi khoa la/thieu provenance) + exposure_template.json + measured overrides cho carbonation_initiation_years/service_life_years/remaining_service_life - khi co du lieu do dac thi data_provenance=MEASURED thay SCREENING_DEFAULT. Day la con duong hoan tat G6: mo hinh san loc chay truoc, du lieu do dac G6 nap sau qua schema co kiem tra. Them 4 test exposure (30/30 xanh toan bo 2 module: 16 section + 14 durability). Dan nguon giu nguyen r001: fib Bulletin 34, DuraCrete, EN 1993-1-9.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/durability/__init__.py",
+      "sha256": "1885b7256957219a97d663a76d631a1a0dbef7c075e85a5c36ff2d062b8f729d",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/carbonation.py",
+      "sha256": "b4534ae4873a6f2f0d11a598ad65995c6a4edfe5dfff08242a477c83baac31de",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/chloride.py",
+      "sha256": "df673c698882f71ccf43294c62c644f0f632d7065d9c8536bd48f133164330ed",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/fatigue.py",
+      "sha256": "b82fc50539f98135a72a8dc3de99033d7893afc8c1a8edc47e5843aec4d0ef94",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/service_life.py",
+      "sha256": "90bf1b2860fa57f076c0208f049a4924290be3ee43383dc932888b5661ee1aec",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/maintenance.py",
+      "sha256": "3c2613e079963abea76d3bbead97fa8508cb0d58aa19b5c2fa70cfacc1e84b9f",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/exposure_data.py",
+      "sha256": "e0a91d5d05b8ca70303c1fc4aebadfcd12f61d13d06cb5afd2dfcf0351e8cdb1",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/exposure_template.json",
+      "sha256": "198cd6e9d2e2d9177b9d1744add1471a49ac0922a9596f409cc6cca84629de2d",
+      "kind": "test"
+    },
+    {
+      "path": "tests/test_durability.py",
+      "sha256": "fca69e9f6e122ce35b5dd254703ffec27ddf3f8554cecf337fa05793842c9d86",
+      "kind": "test"
+    }
+  ],
+  "assumptions": [
+    "Tri sang loc (k_ref 4mm/sqrt(nam), m=0.30, propagation 8/4 nam) - G6 hoan tat khi nap du lieu do dac qua exposure_data"
+  ],
+  "unresolved_risks": [
+    "Chua co du lieu phoi that - moi output van SCREENING_DEFAULT provenance"
+  ],
+  "next_action": "Cho review r002; BRD-027 gan durability vao asset registry"
+}

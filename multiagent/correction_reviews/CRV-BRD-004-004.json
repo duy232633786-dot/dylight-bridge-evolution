@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-004-004",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-004",
+  "correction_sha256": "8eb09c7dc25c266e8889ccbfe0a954b44957e660cec6059d3134dc218335566d",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Second-drift snapshot hash matched exactly and its previous hash matches COR-BRD-004-001 current hash, preserving the correction chain.",
+    "Rewritten tests assert GrammarIdError and add runtime checks; they are stronger than the replaced unsafe-behaviour assertions, not weakened."
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. Targeted suite measured 1 expected BRD-025 failure; no assertion weakening found."
+}

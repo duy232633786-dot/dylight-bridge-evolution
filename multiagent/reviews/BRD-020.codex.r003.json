@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-020",
+  "handoff_sha256": "62158ed03c398962dfae11e7b494f0e55f28feec2ae6b42f69f652f1e351c52c",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Cross-provider review: Claude work reviewed by Codex; hashes 4/4; index 234 contiguous; old snapshot check 0, new check 90 including authors; literature tests 13 passed; sample 7 reachable and 1 HTTP 403; claim ceiling IDEA."
+    }
+  ],
+  "notes": "APPROVE. This IS an independent cross-provider review: work by Claude, review by Codex, unlike the three earlier Claude-on-Claude rounds. Residual risk: cross_topic_references is an escape hatch without substantive-legitimacy validation. Two full-suite failures are unrelated BRD-025 grammar files (40.0 m versus 38.3 m and sandbox isolation)."
+}

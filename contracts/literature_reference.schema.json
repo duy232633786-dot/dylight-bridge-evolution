@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dylight.local/contracts/literature_reference.schema.json",
+  "title": "LiteratureReferenceIndex",
+  "description": "Chỉ mục thư viện tham khảo học thuật (BRD-020). Đây là THƯ VIỆN UNVERIFIED theo multiagent/PROTOCOL.md quy tắc 6: sự tồn tại của một tài liệu KHÔNG phải bằng chứng kỹ thuật. Schema này chỉ ràng buộc HÌNH DẠNG dữ liệu và bắt buộc mỗi mục phải khai trạng thái xác minh; nó không nâng bất kỳ claim kỹ thuật nào.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "task_id",
+    "sweep",
+    "claim_ceiling",
+    "evidence_policy",
+    "counts",
+    "references",
+    "not_indexed_unverified",
+    "not_found"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"enum": ["1.0", "1.1"]},
+    "task_id": {"type": "string", "pattern": "^BRD-[0-9]{3}$"},
+    "sweep": {"type": "integer", "minimum": 1},
+    "claim_ceiling": {
+      "const": "IDEA",
+      "description": "Thư viện tham khảo không bao giờ vượt IDEA. Muốn thành rule runtime phải quay về nguồn gốc, dẫn điều khoản, thêm test và kỹ sư duyệt."
+    },
+    "evidence_policy": {"type": "string", "minLength": 40},
+    "counts": {
+      "type": "object",
+      "required": [
+        "total_indexed",
+        "contradicting_current_model",
+        "not_indexed_unverified",
+        "not_found"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "total_indexed": {"type": "integer", "minimum": 0},
+        "contradicting_current_model": {"type": "integer", "minimum": 0},
+        "not_indexed_unverified": {"type": "integer", "minimum": 0},
+        "not_found": {"type": "integer", "minimum": 0},
+        "cross_topic_references": {"type": "integer", "minimum": 0},
+        "unique_documents": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "total_indexed trừ đi số bản ghi trùng tài liệu đã khai. Cùng một tài liệu ở hai URL khác nhau vẫn là một tài liệu."
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/reference"}
+    },
+    "cross_topic_references": {
+      "type": "array",
+      "description": "Nguồn đã có ID từ đợt quét trước nhưng cũng liên quan tới một chủ đề mới. Giữ một bản ghi duy nhất cho mỗi URL; không cấp ID trùng.",
+      "items": {
+        "type": "object",
+        "required": ["reference_id", "primary_topic", "also_relevant_to", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "reference_id": {"$ref": "#/$defs/reference_id"},
+          "primary_topic": {"$ref": "#/$defs/topic"},
+          "also_relevant_to": {"$ref": "#/$defs/topic"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "duplicate_reference_ids": {
+      "type": "array",
+      "description": "Khuyết tật lịch sử được khai báo tường minh: cùng một URL đã bị cấp hai ID ở đợt quét trước. Không xoá ID cũ (note trong vault và handoff đã trỏ tới), nhưng phải khai ra để test chặn mọi trùng lặp MỚI.",
+      "items": {
+        "type": "object",
+        "required": ["reference_id", "duplicate_of", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "reference_id": {"$ref": "#/$defs/reference_id"},
+          "duplicate_of": {"$ref": "#/$defs/reference_id"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "not_indexed_unverified": {
+      "type": "array",
+      "description": "Tìm được nhưng KHÔNG xác minh được, nên KHÔNG vào danh mục. Ghi lại thẳng thắn thay vì im lặng bỏ đi.",
+      "items": {
+        "type": "object",
+        "required": ["title", "url", "topic", "why"],
+        "additionalProperties": false,
+        "properties": {
+          "title": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "format": "uri"},
+          "topic": {"$ref": "#/$defs/topic"},
+          "why": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "not_found": {
+      "type": "array",
+      "description": "Chủ đề đã tìm mà không ra nguồn đủ tốt. Sự vắng mặt cũng là kết quả nghiên cứu.",
+      "items": {
+        "type": "object",
+        "required": ["topic", "item"],
+        "additionalProperties": false,
+        "properties": {
+          "topic": {"$ref": "#/$defs/topic"},
+          "item": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "reference_id": {"type": "string", "pattern": "^LIT-[0-9]{3}$"},
+    "topic": {
+      "description": "12 chủ đề đợt quét 1-2, cộng 12 chủ đề đợt quét 3 (nâng cấp đa loại cầu và vòng đời).",
+      "enum": [
+        "MATERIAL_MECHANICS_RC",
+        "PRESTRESS_LOSSES_TIME_EFFECTS",
+        "LOAD_DISTRIBUTION_LINE_GIRDER",
+        "OPTIMIZATION_ML",
+        "ADVANCED_MATERIALS_UHPC_FRP",
+        "CONSTRUCTION_FABRICATION_ARCH",
+        "DECK_DIAPHRAGM",
+        "FOUNDATION_SSI",
+        "FATIGUE_DURABILITY",
+        "DYNAMICS_WIND_SEISMIC",
+        "BIM_IFC",
+        "LCA_CARBON",
+        "GEOMETRY_ALIGNMENT",
+        "BRIDGE_TYPE_SELECTION",
+        "DURABILITY_SERVICE_LIFE",
+        "INSPECTION_MAINTENANCE_BMS",
+        "SHM_DIGITAL_TWIN",
+        "GEOTECHNICAL_INVESTIGATION",
+        "HYDROLOGY_SCOUR_WIND",
+        "DATASETS_PLATFORMS",
+        "CONSTRUCTION_ERECTION",
+        "VN_STANDARDS_AASHTO",
+        "AESTHETICS_PRECEDENT_MODELS",
+        "SURVEY_LIDAR_UAV"
+      ]
+    },
+    "reference": {
+      "type": "object",
+      "required": [
+        "reference_id",
+        "topic",
+        "title",
+        "authors",
+        "year",
+        "venue",
+        "doi",
+        "url",
+        "verified_by_fetch",
+        "evidence_status",
+        "key_content",
+        "relevance_to_runtime",
+        "contradicts_current_model",
+        "unverified_fields"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/reference_id"},
+        "topic": {"$ref": "#/$defs/topic"},
+        "title": {"type": "string", "minLength": 1},
+        "authors": {
+          "type": ["string", "null"],
+          "description": "null = không xác minh được tác giả trên trang. Không được suy đoán."
+        },
+        "year": {"type": ["integer", "null"], "minimum": 1800, "maximum": 2100},
+        "venue": {"type": ["string", "null"]},
+        "doi": {"type": ["string", "null"], "pattern": "^10\\.[0-9]{4,9}/.+$"},
+        "url": {"type": "string", "pattern": "^https?://"},
+        "verified_by_fetch": {
+          "const": true,
+          "description": "Mục chưa xác minh được KHÔNG được nằm trong references; nó thuộc not_indexed_unverified."
+        },
+        "evidence_status": {
+          "enum": ["VERIFIED_URL", "VERIFIED_DOI_METADATA"],
+          "description": "VERIFIED_URL: mở lại được chính URL đó. VERIFIED_DOI_METADATA: trang chặn truy cập tự động (HTTP 403), metadata xác minh qua DOI trên Crossref/DataCite — phải ghi rõ giới hạn này trong unverified_fields."
+        },
+        "key_content": {"type": "string", "minLength": 1},
+        "relevance_to_runtime": {"type": "string", "minLength": 1},
+        "contradicts_current_model": {
+          "type": ["string", "null"],
+          "description": "null hoặc chuỗi rỗng = nguồn này không mâu thuẫn với mô hình hiện tại. Đợt quét 1-2 dùng null; đợt 3 ghi thẳng lý do bằng văn xuôi."
+        },
+        "unverified_fields": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

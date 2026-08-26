@@ -1,0 +1,707 @@
+# Thư viện tham khảo học thuật cho não 2
+
+> ⚠ **ĐÂY LÀ THƯ VIỆN THAM KHẢO UNVERIFIED.** Theo `multiagent/PROTOCOL.md` quy tắc 6,
+> Obsidian và tài liệu tham khảo là thư viện `UNVERIFIED`. **Sự tồn tại của một tài liệu
+> KHÔNG phải bằng chứng kỹ thuật.** Muốn biến một điều trong đây thành rule của runtime
+> thì phải quay về nguồn gốc, dẫn đúng điều khoản, thêm test và có kỹ sư duyệt.
+
+> [!note] File này được SINH RA từ `index.json`
+> `research/literature/index.json` là nguồn canonical duy nhất. README này là bản
+> điều hướng sinh lại được, không phải nơi nhập liệu — README bản trước chép tay số
+> liệu đợt quét 1 nên đã lệch (55 vs 111 thực tế). Nội dung đầy đủ của từng nguồn
+> (`key_content`, `relevance_to_runtime`, `contradicts_current_model`) nằm trong
+> `index.json` và bản render Obsidian tại `Literature/`.
+
+Đợt quét **3** · task **BRD-020** · claim ceiling **IDEA**
+
+| Chỉ số | Giá trị |
+|---|---:|
+| Bản ghi trong danh mục (đã xác minh) | 234 |
+| Trong đó **tài liệu duy nhất** (trừ bản ghi trùng đã khai) | 231 |
+| Trong đó **chỉ ra mô hình hiện tại sai hoặc thiếu** | 213 |
+| Xác minh bằng cách mở lại URL | 224 |
+| Xác minh gián tiếp qua DOI (trang chặn bot) | 10 |
+| Tìm được nhưng KHÔNG xác minh được → không đưa vào danh mục | 1 |
+| Chủ đề tìm mà không ra nguồn đủ tốt | 194 |
+| Nguồn dùng chung cho nhiều chủ đề (tham chiếu chéo) | 9 |
+
+## Cách thư viện này được lập
+
+Mỗi nguồn được tìm bằng web search rồi **mở lại để xác minh** tiêu đề, tác giả, nơi
+công bố và DOI. **Chỉ nguồn xác minh được mới vào danh mục** — nguồn không mở được bị
+đẩy xuống `not_indexed_unverified`, không lẫn vào đây. Trường nào không thấy trên trang
+thì để `null` và ghi vào `unverified_fields`, không suy đoán.
+
+Đợt quét 3 bổ sung một vòng kiểm máy móc trên toàn bộ nguồn mới: gọi HTTP thật từng URL,
+và đối chiếu mọi DOI với **Crossref**/**DataCite** để bắt DOI bịa. Nguồn nào nhà xuất bản
+chặn truy cập tự động (HTTP 403) mà DOI phân giải đúng tiêu đề thì được giữ lại với
+`evidence_status = VERIFIED_DOI_METADATA` và **ghi rõ giới hạn đó** trong `unverified_fields`.
+
+Tính toàn vẹn của file này được neo bằng `tests/test_literature_index.py`
+(schema `contracts/literature_reference.schema.json`, ID liên tục, không trùng URL,
+`counts` khớp dữ liệu thật).
+
+## Lịch sử các đợt quét
+
+| Đợt | Phạm vi | Kết quả |
+|---|---|---|
+| 1 | 6 chủ đề nền tảng (sức bền, DƯL, phân bố ngang, tối ưu, vật liệu, thi công) | 55 nguồn |
+| 2 | mở rộng 12 chủ đề (thêm bản mặt cầu, móng, mỏi, động lực học, BIM, vòng đời) | 111 nguồn |
+| 3 | 12 chủ đề cho lộ trình đa loại cầu & vòng đời (13–24): hình học tuyến, chọn loại cầu, độ bền, bảo trì, SHM, địa chất, thuỷ văn–gió, dataset, thi công, tiêu chuẩn VN, thẩm mỹ, trắc địa | 234 nguồn |
+
+## Danh mục theo chủ đề
+
+Nội dung đầy đủ xem `index.json` hoặc note tương ứng trong vault Obsidian.
+
+### Sức bền vật liệu & bê tông cốt thép (9 nguồn — LIT-001…LIT-009)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-001 | [The Modified Compression-Field Theory for Reinforced Concrete Elements Subjected to Shear](https://www.concrete.org/publications/internationalconcreteabstractsportal.aspx?m=details&ID=10416) | 1986 | URL |
+| LIT-002 | [Simplified Modified Compression Field Theory for Calculating Shear Strength of Reinforced Concrete Elements](https://vectoranalysisgroup.com/journal_publications/jp58.pdf) | 2006 | URL |
+| LIT-003 | [NCHRP Report 549: Simplified Shear Design of Structural Concrete Members](https://onlinepubs.trb.org/onlinepubs/nchrp/nchrp_rpt_549.pdf) | 2005 | URL |
+| LIT-004 | [Simplified shear provisions of the AASHTO LRFD Bridge Design Specifications](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2008/May_and_June_2008/Simplified%20shear%20provisions%20of%20the%20AASHTO%20LRFD%20Bridge%20Design%20Specifications.pdf) | 2008 | URL |
+| LIT-005 | [Rectangular Stress Block for High-Strength Concrete](https://www.concrete.org/publications/internationalconcreteabstractsportal.aspx?m=details&ID=13333) | 2004 | URL |
+| LIT-006 | [ACI 441.1R-18: Report on Equivalent Rectangular Concrete Stress Block and Transverse Reinforcement for High-St](https://www.concrete.org/Portals/0/Files/PDF/Previews/441.1R-18_preview.pdf) | 2018 | URL |
+| LIT-007 | [ATTACHMENT 1 — Service III, Tension in Prestressed Components, Agenda Item From the 2015 SCOBS Annual Meeting ](https://shrp2.transportation.org/documents/Service_III_Tension_in_Prestressed_Components.pdf) | 2015 | URL |
+| LIT-008 | [Calibration of AASHTO LRFD Concrete Bridge Design Specifications for Serviceability (NCHRP Web-Only Document 2](https://www.nationalacademies.org/read/22407/chapter/3) | 2014 | URL |
+| LIT-009 | [The Modified Compression Field Theory: Then and Now](http://vectoranalysisgroup.com/journal_publications/jp113.pdf) | 2018 | URL |
+
+### Dự ứng lực: mất mát, co ngót, từ biến (9 nguồn — LIT-010…LIT-018)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-010 | [Proposed lump-sum formulas for long-term prestress losses](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2022/September-October/20-0022_Al-Omaishi_SO22.pdf) | 2022 | URL |
+| LIT-011 | [Estimating prestress loss in pretensioned, high-strength concrete members](https://engineering.tcnj.edu/wp-content/uploads/sites/194/2011/03/Alomaishi-Pretentioned-Concrete.pdf) | 2009 | URL |
+| LIT-012 | [NCHRP Report 496: Prestress Losses in Pretensioned High-Strength Concrete Bridge Girders](https://trb.org/publications/nchrp/nchrp_rpt_496.pdf) | 2003 | URL |
+| LIT-013 | [AASHTO LRFD Bridge Design Specifications provisions for loss of prestress](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2012/Fall/AASHTO%20LRFD%20Bridge%20Design%20Specifications%20provisions%20for%20loss%20of%20prestress.pdf) | 2012 | URL |
+| LIT-014 | [Statistical Comparisons of Creep and Shrinkage Prediction Models Using RILEM and NU-ITI Databases](https://sjsu.edu/people/akthem.al-manaseer/publications/13-147.pdf) | 2015 | URL |
+| LIT-015 | [Allowable Design Release Stresses for Pretensioned Concrete Beams](https://library.ctr.utexas.edu/ctr-publications/0-4086-2.pdf) | 2004 | URL |
+| LIT-016 | [Lateral stability and concrete strength requirements for precast, prestressed concrete components](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2020/March-April/19-0005_Seguirant_MA20.pdf) | 2020 | URL |
+| LIT-017 | [TCVN 11823-5:2017 — Thiết kế cầu đường bộ, Phần 5: Kết cấu bê tông (Highway Bridge Design Specification – Part](https://cokhicongtrinh.com.vn/upload/files/TCVN%2011823_Phan%205_Ket-cau-be-tong.pdf) | 2017 | URL |
+| LIT-018 | [Precast, prestressed girder camber variability](https://www.pci.org/PCI_Docs/Design_Resources/Guides_and_manuals/references/bridge_design_manual/JL-11-Winter_Precast_Prestressed_Girder_Camber_Variability.pdf) | 2011 | URL |
+
+### Phân bố ngang tải trọng & giới hạn line-girder (9 nguồn — LIT-019…LIT-027)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-019 | [NCHRP Project 12-26(2) — Distribution of Wheel Loads on Highway Bridges (project record)](https://apps.trb.org/cmsfeed/TRBNetProjectDisplay.asp?ProjectID=297) | — | URL |
+| LIT-020 | [Simplified Live Load Distribution Factor Equations — NCHRP Project 12-62 Draft Final Report](https://onlinepubs.trb.org/onlinepubs/archive/notesdocs/12-62_fr.pdf) | 2006 | URL |
+| LIT-021 | [Simplified Live Load Distribution Factor Equations (NCHRP Report 592, published version)](https://www.nationalacademies.org/read/23159/chapter/5) | 2007 | URL |
+| LIT-022 | [Live-Load Distribution Factors in Prestressed Concrete Girder Bridges](https://faculty.washington.edu/eberhard/publications/barr-eberhard-stanton_asce_bridge_sep01.pdf) | 2001 | URL |
+| LIT-023 | [AASHTO-LRFD Live Load Distribution for Beam-and-Slab Bridges: Limitations and Applicability](https://doi.org/10.1061/(ASCE)1084-0702(2007)12:6(765)) | 2007 | URL |
+| LIT-024 | [LRFD Live Load Distribution Using Refined Analysis](https://www.pci.org/PCI_Docs/Papers/2003/Lrfd-Live-Load-Distribution-Using-Refined-Analysis.pdf) | 2003 | URL |
+| LIT-025 | [Incorporating Grillage Model Derived Load Distribution Factors Into Ratings of Prestressed Concrete Bridges](https://shareok.org/items/43e54272-82d2-40ca-b69c-96e5e2c2a6dd) | 2018 | URL |
+| LIT-026 | [Comprehensive Design Example for Prestressed Concrete (PSC) Girder Superstructure Bridge — LRFD](https://www.fhwa.dot.gov/bridge/lrfd/pscus051.cfm) | — | URL |
+| LIT-027 | [Load distribution factors for quick design and assessment in typical Australian bridges](https://doi.org/10.1080/13287982.2023.2255457) | 2023 | URL |
+
+### Tối ưu đa mục tiêu & học máy (9 nguồn — LIT-028…LIT-036)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-028 | [Boundary Exploration for Bayesian Optimization With Unknown Physical Constraints](https://arxiv.org/abs/2402.07692) | 2024 | URL |
+| LIT-029 | [Multi-objective design of post-tensioned concrete road bridges using artificial neural networks](https://doi.org/10.1007/s00158-017-1653-0) | 2017 | URL |
+| LIT-030 | [Infeasibility Driven Evolutionary Algorithm for Constrained Optimization](https://doi.org/10.1007/978-3-642-00619-7_7) | 2009 | URL |
+| LIT-031 | [Efficient multi-objective constrained Bayesian optimization of bridge girder](https://arxiv.org/abs/2509.20161) | 2025 | URL |
+| LIT-032 | [Thiết kế tối ưu dầm thép tổ hợp chữ I trong kết cấu cầu liên hợp nhịp đơn giản theo TCVN 11823:2017](https://stce.huce.edu.vn/index.php/vn/article/view/1974) | 2021 | URL |
+| LIT-033 | [Multi-Objective Optimization Design of PCS Box Girder Bridges with Small and Medium Spans Using Genetic Algori](https://www.mdpi.com/2075-5309/15/3/361) | 2025 | URL |
+| LIT-034 | [Optimum topology and shape design of prestressed concrete bridge girders using a genetic algorithm](https://doi.org/10.1007/s00158-009-0404-2) | 2009 | URL |
+| LIT-035 | [Intelligent low carbon reinforced concrete beam design optimization via deep reinforcement learning](https://www.nature.com/articles/s41598-025-18543-4) | 2025 | URL |
+| LIT-036 | [Surrogate-assisted reliability-based design optimization: a survey and a new general framework](https://arxiv.org/abs/1901.03311) | 2019 | URL |
+
+### Vật liệu tiên tiến: UHPC & FRP (10 nguồn — LIT-037…LIT-046)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-037 | [Structural Design with UHPC Workshop Manual](https://www.fhwa.dot.gov/resourcecenter/teams/structures-geotechnical-hydraulics/Structural_Design_UHPC_Workshop_Manual.pdf) | 2024 | URL |
+| LIT-038 | [Guide Specifications for Structural Design with Ultra-High Performance Concrete](https://trid.trb.org/View/2359113) | 2024 | URL |
+| LIT-039 | [Structural Design with Ultra-High-Performance Concrete](https://www.aspirebridge.com/magazine/2025Spring/FHWA-StructuralDesignWithUltra-High-PerformanceConcrete.pdf) | 2025 | URL |
+| LIT-040 | [Shear Strength of Ultra-High-Performance Concrete (UHPC) Beams without Transverse Reinforcement: Prediction Mo](https://pmc.ncbi.nlm.nih.gov/articles/PMC9317477/) | 2022 | URL |
+| LIT-041 | [Evaluation of AASHTO T 397, Standard Method of Test for Uniaxial Tensile Response of Ultra-High Performance Co](https://www.intrans.iastate.edu/wp-content/uploads/2024/06/evaluation_of_AASHTO_T_397_t2.pdf) | 2024 | URL |
+| LIT-042 | [AASHTO CFRP — Prestressed Concrete Design Training Course (Module 2: Prestressing CFRP; Module 3: Flexural Des](https://fdotwww.blob.core.windows.net/sitefinity/docs/default-source/structures/innovation/fdot-2020-cfrp-pc-design-training/2-prestressing-cfrp.pdf) | 2020 | URL |
+| LIT-043 | [Design of Concrete Bridge Beams Prestressed with CFRP Systems](https://trid.trb.org/View/1659619) | 2019 | URL |
+| LIT-044 | [Prediction of the Long-Term Performance and Durability of GFRP Bars under the Combined Effect of a Sustained L](https://pmc.ncbi.nlm.nih.gov/articles/PMC7287940/) | 2020 | URL |
+| LIT-045 | [Fire Performance of FRP-Composites and Strengthened Concrete Structures: A State-of-the-Art Review](https://pmc.ncbi.nlm.nih.gov/articles/PMC12846274/) | 2026 | URL |
+| LIT-046 | [Nghiên cứu lớp phủ bê tông siêu tính năng (UHPC) liên hợp bản mặt thép để sửa chữa mặt cầu Thăng Long](https://ibst.vn/upload/documents/file_upload/169847414511.-Tran-Ba-Viet.pdf) | 2023 | URL |
+
+### Thi công, chế tạo & cầu vòm (9 nguồn — LIT-047…LIT-055)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-047 | [B0200 – Super T Girder (bộ bản vẽ tiêu chuẩn đầy đủ B0201–B0217), gồm tờ B0201 "Standard Sizes – Super T Girde](https://standards.transport.nsw.gov.au/_entity/annotation/7c98e08d-b135-ed11-9db2-000d3ae019e0) | 2018 | URL |
+| LIT-048 | [Handling and Shipping of Prestressed Concrete Girders (Design Memorandum — Bridge Design Manual Revisions)](https://www.wsdot.wa.gov/publications/fulltext/Bridge/designmemos/03-2017.pdf) | 2017 | URL |
+| LIT-049 | [Lateral stability and concrete strength requirements for precast, prestressed concrete components](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2020/March-April/19-0005_Seguirant_MA20.pdf) | 2020 | URL |
+| LIT-050 | [Recommended Practice for Lateral Stability of Precast, Prestressed Concrete Bridge Girders (CB-02-16)](https://www.pci.org/ItemDetail?iProductCode=CB-02-16) | 2016 | URL |
+| LIT-051 | [Distribution Factors for Construction Loads and Girder Capacity Equations (Final Report)](https://fdotwww.blob.core.windows.net/sitefinity/docs/default-source/content/structures/structuresresearchcenter/final-reports/2017/fdot-bdv31-977-46-rpt.pdf?sfvrsn=4fd1810_0) | 2017 | URL |
+| LIT-052 | [Design and construction of high skew Super-T bridges](https://trid.trb.org/view/1138117) | 2011 | URL |
+| LIT-053 | [Shear behavior and construction method of steel shear keyed joints in precast segmental beams](https://pmc.ncbi.nlm.nih.gov/articles/PMC10333386/) | 2023 | URL |
+| LIT-054 | [Technical Advances of Temporary Facilities for the Failure Prevention of Large-Span Cantilever Casting Constru](https://doi.org/10.1155/2020/6412613) | 2020 | URL |
+| LIT-055 | [Concrete-Filled Steel Tube Arch Bridges in China](https://doi.org/10.1016/j.eng.2017.12.003) | 2018 | URL |
+
+### Bản mặt cầu & dầm ngang (10 nguồn — LIT-056…LIT-065)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-056 | [TCVN 11823-9:2017 — Thiết kế cầu đường bộ, Phần 9: Mặt cầu và hệ mặt cầu (Highway Bridge Design Specification ](https://cokhicongtrinh.com.vn/upload/files/TCVN%2011823_Phan%209_Mat-cau-va-he-mat-cau.pdf) | 2017 | URL |
+| LIT-057 | [Bridge Design Specifications, Section 8 — Reinforced Concrete (September 2003), Table 8.9.2 'Recommended Minim](https://files.mtc.ca.gov/A354_report/A354/Appendix_F_Design_Criteria_and_Specifications/F6%20Bridge%20Design%20Specifications%20Section%208-Reinforced%20Concrete%20rec%205-16%20source%20ct.pdf) | 2003 | URL |
+| LIT-058 | [Comprehensive Design Example for Prestressed Concrete (PSC) Girder Superstructure Bridge — LRFD (bước thiết kế](https://www.fhwa.dot.gov/bridge/lrfd/pscus04.cfm) | — | URL |
+| LIT-059 | [NYSDOT Bridge Manual (4th Edition), Section 5 — Bridge Decks](https://www.dot.ny.gov/divisions/engineering/structures/repository/manuals/brman_4th_edition/Section_5_M_2008_add_1.pdf) | 2008 | URL |
+| LIT-060 | [Punching Shear in Prestressed Concrete Deck Slabs: A Comprehensive Study](https://pure.tudelft.nl/ws/portalfiles/portal/154898505/SP357_09.pdf) | 2023 | URL |
+| LIT-061 | [Steel Diaphragms in Prestressed Concrete Girder Bridges — Final Report, Iowa DOT Project TR-424 (CTRE Project ](https://www.intrans.iastate.edu/wp-content/uploads/2018/03/tr424steel.pdf) | 2004 | URL |
+| LIT-062 | [Effect of Intermediate Diaphragms to Prestressed Concrete Bridge Girders in Over-Height Truck Impacts (Report ](https://www.wsdot.wa.gov/research/reports/fullreports/696.1.pdf) | 2008 | URL |
+| LIT-063 | [Development of Guidelines for the Use of Intermediate Diaphragms on Precast Concrete Beam Superstructures (Rep](https://engineering.wayne.edu/pdfs/eamon_spr_1702.pdf) | 2021 | URL |
+| LIT-064 | [Quantification of intermediate diaphragm effects on load distributions of prestressed concrete girder bridges](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2009/Spring/Quantification%20of%20intermediate%20diaphragm%20effects%20on%20load%20distributions%20of%20prestressed%20concrete%20girder%20bridges.pdf) | 2009 | URL |
+| LIT-065 | [WSDOT Bridge Design Manual M 23-50.24, Chapter 5 — Concrete Structures (Table 5.6.2-1 và §5.6.4.C Diaphragm Re](https://wsdot.wa.gov/publications/manuals/fulltext/m23-50/chapter5.pdf) | 2025 | URL |
+
+### Nền móng cọc & tương tác đất–kết cấu (9 nguồn — LIT-066…LIT-074)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-066 | [Drilled Shafts Construction Procedures and LRFD Design Methods - Volume I and II (FHWA-NHI-10-016, Geotechnica](https://www.fhwa.dot.gov/engineering/geotech/foundations/100521.cfm) | 2010 | URL |
+| LIT-067 | [Geotechnical Engineering Circular No. 12 – Volume I: Design and Construction of Driven Pile Foundations](https://trid.trb.org/View/1434992) | 2016 | URL |
+| LIT-068 | [Geotechnical Site Characterization — Geotechnical Engineering Circular No. 5 (FHWA NHI-16-072)](https://trid.trb.org/View/1494146) | 2016 | URL |
+| LIT-069 | [NCHRP Report 461: Static and Dynamic Lateral Loading of Pile Groups](https://onlinepubs.trb.org/onlinepubs/nchrp/nchrp_rpt_461.pdf) | 2001 | URL |
+| LIT-070 | [Incorporation of Foundation Movements in AASHTO LRFD Bridge Design Process, Second Edition](https://shrp2.transportation.org/Documents/Renewal/R19B_Incorporation%20of%20Foundation%20Movements%20in%20AASHTO%20LRFD%20Bridge%20Design%20Process%20V2.pdf) | 2018 | URL |
+| LIT-071 | [NCHRP 12-116: Proposed AASHTO Specifications for Design of Piles for Downdrag (Interim Report, Task 1 Literatu](https://onlinepubs.trb.org/Onlinepubs/NCHRP/docs/NCHRP12-116-IR-Ver1.pdf) | 2019 | URL |
+| LIT-072 | [TCVN 10304:2014 — Móng cọc – Tiêu chuẩn thiết kế (Pile Foundation – Design Standard)](https://www.phanvu.vn/Data/Sites/1/media/tieu-chuan/tcvn-10304.2014-tieu-chuan-thiet-ke-mong-coc.pdf) | 2014 | URL |
+| LIT-073 | [TCVN 10304:2025 — Thiết kế móng cọc](https://luatvietnam.vn/xay-dung/tieu-chuan-quoc-gia-tcvn-10304-2025-thiet-ke-mong-coc-406493-d3.html) | 2025 | URL |
+| LIT-074 | [TCVN 11823-10:2017 — Thiết kế cầu đường bộ, Phần 10: Nền móng](https://luatvietnam.vn/xay-dung/tieu-chuan-tcvn-11823-10-2017-thiet-ke-nen-mong-cau-duong-bo-164168-d3.html) | 2017 | URL |
+
+### Mỏi & độ bền lâu (9 nguồn — LIT-075…LIT-083)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-075 | [Comprehensive Design Example for Prestressed Concrete (PSC) Girder Superstructure Bridge - LRFD — Design Step ](https://www.fhwa.dot.gov/bridge/lrfd/pscus056.cfm) | — | URL |
+| LIT-076 | [Appendix L Proposed Changes to Section 5 of the AASHTO LRFD Specification (NCHRP Report 679)](https://onlinepubs.trb.org/onlinepubs/nchrp/nchrp_rpt_679AppendixL.pdf) | — | URL |
+| LIT-077 | [SECTION 5: CONCRETE STRUCTURES — California Amendments to AASHTO LRFD Bridge Design Specifications, Sixth Edit](https://dot.ca.gov/-/media/dot-media/programs/engineering/documents/memotodesigner/f0007568-section-5-a11y.pdf) | 2014 | URL |
+| LIT-078 | [Implementing Service Life Design Using the fib Bulletin 34 Methodology](https://shrp2.transportation.org/documents/ODOT_fib_bulletin_34.pdf) | 2018 | URL |
+| LIT-079 | [Influence of Crack Width on Chloride Penetration in Concrete Subjected to Alternating Wetting–Drying Cycles](https://pmc.ncbi.nlm.nih.gov/articles/PMC7503623/) | 2020 | URL |
+| LIT-080 | [Effect of Cracking on Corrosion of Steel in Concrete](https://link.springer.com/article/10.1186/s40069-018-0234-y) | 2018 | URL |
+| LIT-081 | [Service Life Prediction of Reinforced Concrete Coastal Structures in Vietnam Subjected to Chloride Ingress](https://link.springer.com/chapter/10.1007/978-981-19-3303-5_40) | 2023 | URL |
+| LIT-082 | [Fatigue Behavior of Heavy-Haul Railway Prestressed Concrete Beams Based on Vehicle-Bridge Coupling Vibration](https://pmc.ncbi.nlm.nih.gov/articles/PMC9032961/) | 2022 | URL |
+| LIT-083 | [Natural carbonation of concrete: An Initiation model for service life prediction](https://www.sbt-durabi.org/articles/pdf/zo2W/durabi-2024-015-02-4.pdf) | 2024 | URL |
+
+### Động lực học, gió & động đất (9 nguồn — LIT-084…LIT-092)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-084 | [Natural Frequencies of Concrete Bridges in the Pacific Northwest](https://onlinepubs.trb.org/Onlinepubs/trr/1993/1393/1393-015.pdf) | 1993 | URL |
+| LIT-085 | [LRFD Guide Specifications for the Design of Pedestrian Bridges (NCHRP 20-07 Task 244, Final Draft — Attachment](https://wsdot.wa.gov/eesc/bridge/designmemos/11-2009.pdf) | 2009 | URL |
+| LIT-086 | [AASHTO LRFD (chuyên mục) — The HL-93 Live Load Model: Dynamic Load Allowance](https://www.aspirebridge.com/magazine/2010Fall/AASHTO_Fall10.pdf) | 2010 | URL |
+| LIT-087 | [Improved Live Load Deflection Criteria for Steel Bridges — NCHRP Web Document 46 (Project 20-7[133]), Contract](https://trb.org/publications/nchrp/nchrp_w46.pdf) | 2002 | URL |
+| LIT-088 | [Proposed AASHTO Guide Specifications for LRFD Seismic Bridge Design (Attachment B — 2007 Agenda Item 7, T-3)](http://www.ce.memphis.edu/7137/PDFs/AASHTO/T-3_report.pdf) | 2007 | URL |
+| LIT-089 | [Updating the AASHTO LRFD Wind Load Provisions — NCHRP Project 20-07, Task 325, Final Report](https://onlinepubs.trb.org/onlinepubs/nchrp/docs/NCHRP20-07(325)_FR.pdf) | 2014 | URL |
+| LIT-090 | [Comparison of Dynamic Amplification Factor of Deflection and Bending Moment of Highway Continuous Box-Girder B](https://pmc.ncbi.nlm.nih.gov/articles/PMC10935429/) | 2024 | URL |
+| LIT-091 | [An Open-Source Framework for Coupled Vehicle-Bridge Interaction Analysis Using OpenSees](https://arxiv.org/abs/2605.09175) | 2026 | URL |
+| LIT-092 | [New Contents in the Draft Version of TCVN 9386:2023](https://ibst.vn/upload/documents/file_upload/16855053637.-Do-Tien-Thinh.pdf) | 2023 | URL |
+
+### BIM & IFC cho cầu (9 nguồn — LIT-093…LIT-101)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-093 | [5.4.3.7 IfcBridge — IFC 4.3.2 Documentation](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcBridge.htm) | — | URL |
+| LIT-094 | [5.4.3.8 IfcBridgePart — IFC 4.3.2 Documentation](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcBridgePart.htm) | — | URL |
+| LIT-095 | [6.1.2.1 IfcBeamTypeEnum — IFC 4.3.2 Documentation](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcBeamTypeEnum.htm) | — | URL |
+| LIT-096 | [5.4.3.1 IfcAlignment — IFC 4.3.2 Documentation](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcAlignment.htm) | — | URL |
+| LIT-097 | [8.18.3.6 IfcMapConversion — IFC 4.3.2 Documentation](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/lexical/IfcMapConversion.htm) | — | URL |
+| LIT-098 | [Introduction — IFC 4.3.2 Documentation](https://ifc43-docs.standards.buildingsmart.org/IFC/RELEASE/IFC4x3/HTML/content/introduction.htm) | — | URL |
+| LIT-099 | [Nível de interoperabilidade para análise estrutural de pontes a partir da interpretação de dados IFC (Interope](https://www.revistas.usp.br/gestaodeprojetos/article/view/227401) | 2024 | URL |
+| LIT-100 | [IfcBridge — IFC4.3 Validation (MINnD Saison 2, GT1.1)](https://minnd.fr/wp-content/uploads/2023/07/MINnDs2_GT1.1_ifc-bridge_ifc4.3_validation_002_2023_eng.pdf) | 2023 | URL |
+| LIT-101 | [buildingSMART/IDS — Information Delivery Specification (GitHub repository)](https://github.com/buildingSMART/IDS) | — | URL |
+
+### Vòng đời & carbon hàm chứa (10 nguồn — LIT-102…LIT-111)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-102 | [Embodied carbon of concrete in buildings, Part 1: analysis of published EPD](https://journal-buildingscities.org/articles/10.5334/bc.59) | 2020 | URL |
+| LIT-103 | [Embodied carbon of concrete in buildings, Part 2: are the messages accurate?](https://journal-buildingscities.org/articles/10.5334/bc.199) | 2022 | URL |
+| LIT-104 | [Environmental Product Declaration as per ISO 14025 and EN 15804+A1 — PC Strand, Construction steel products (E](https://www.kiwa.com/globalassets/germany/veroffentlichte-epds/epd_-slm_pc_strand---final.pdf/) | 2020 | URL |
+| LIT-105 | [Ready-mixed concrete C28/35 CIIIB+SR Sector EPD from Mineral Products Association (MPA) UK (S-P-11236)](https://api.environdec.com/api/v1/EPDLibrary/Files/43d98e55-9bfd-4948-986f-08dc3c72202b/Data) | 2024 | URL |
+| LIT-106 | [Hollowcore slabs Sector EPD (EPD-IES-0022253:002) — MPA Precast, UK](https://www.sustainableconcrete.org.uk/Sustainable/media/Sustainable/Publications/EPD-document-EPD-IES-0022253_003-en-(1).pdf) | 2025 | URL |
+| LIT-107 | [Comparative Life Cycle Analysis of Concrete and Composite Bridges Varying Steel Recycling Ratio](https://pmc.ncbi.nlm.nih.gov/articles/PMC8347549/) | 2021 | URL |
+| LIT-108 | [Evaluation of Carbon Emission Reduction in Concrete Using Fly Ash and Slag: Case Studies from Vietnam](https://jstt.vn/index.php/en/article/download/347/359) | 2025 | URL |
+| LIT-109 | [Strength development of GGBS and fly ash concretes and applicability of fib model code's maturity function – A](https://pureadmin.qub.ac.uk/ws/files/139140883/JCBM_FIB_MC_strength_development_Accepted_manuscript.pdf) | 2018 | URL |
+| LIT-110 | [A Briefing on Life-Cycle Cost Analysis of New Bridge Design Alternatives (SHRP2 Solution R19A, Service Life De](https://shrp2.transportation.org/documents/SHRP2_R19A_LCCA_Final_2-6-2019.pdf) | 2019 | URL |
+| LIT-111 | [NCHRP Report 483: Bridge Life-Cycle Cost Analysis](https://onlinepubs.trb.org/onlinepubs/nchrp/nchrp_rpt_483.pdf) | 2003 | URL |
+
+### Hình học tuyến & tham số hoá (9 nguồn — LIT-112…LIT-120)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-112 | [Bridge Geometry Manual (FHWA-HIF-22-034)](https://www.fhwa.dot.gov/bridge/pubs/hif22034.pdf) | 2022 | URL |
+| LIT-113 | [Bridge Geometry Manual (PCI, CB-02-20)](https://www.pci.org/PCI/PCI/Bookstore/Item_Detail.aspx?iProductCode=CB-02-20&Category=FREE) | 2020 | URL |
+| LIT-114 | [A Policy on Geometric Design of Highways and Streets, 7th Edition ("Green Book")](https://store.transportation.org/Item/PublicationDetail?ID=4127) | 2018 | URL |
+| LIT-115 | [Guidelines for Analysis Methods and Construction Engineering of Curved and Skewed Steel Girder Bridges (NCHRP ](https://www.nationalacademies.org/read/22729/chapter/2) | 2012 | URL |
+| LIT-116 | [Live Load Distribution Factors for Skew Stringer Bridges with High-Performance-Steel Girders under Truck Loads](https://www.mdpi.com/2076-3417/8/10/1717) | 2018 | DOI |
+| LIT-117 | [Precast, prestressed girder camber variability](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2011/Winter/Precast%20prestressed%20girder%20camber%20variability.pdf) | 2011 | URL |
+| LIT-118 | [The IFC-Bridge project – Extending the IFC standard to enable high-quality exchange of bridge information mode](https://ec-3.org/publications/conference/paper/?id=EC32019_193) | 2019 | URL |
+| LIT-119 | [Optimization of geometric parameters of arch bridges using visual programming FEM components and genetic algor](https://www.sciencedirect.com/science/article/pii/S0141029621006155) | 2021 | DOI |
+| LIT-120 | [Review on parametric building information modelling and forward design approaches for sustainable bridge engin](https://link.springer.com/article/10.1007/s42452-025-06543-y) | 2025 | URL |
+
+### Lựa chọn loại cầu & phân tích phương án (10 nguồn — LIT-121…LIT-130)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-121 | [Steel Bridge Design Handbook — Chapter 5: Selecting the Right Bridge Type](https://www.aisc.org/media/m3xg11pc/b905_sbdh_chapter5.pdf) | 2022 | URL |
+| LIT-122 | [Comparative Bridge Costs](https://dot.ca.gov/-/media/dot-media/programs/local-assistance/documents/hbp/2024/comp-br-costs-2022.pdf) | 2023 | URL |
+| LIT-123 | [Extradosed Bridges — IABSE Structural Engineering Documents 17 (SED 17)](https://concrete.ethz.ch/assets/sed17.pdf) | 2019 | URL |
+| LIT-124 | [Ranking of Bridge Design Alternatives: A TOPSIS-FADR Method](https://bjrbe-journals.rtu.lv/bjrbe/article/view/bjrbe.2018-13.413) | 2018 | URL |
+| LIT-125 | [Life cycle sustainability assessment for multi-criteria decision making in bridge design: a review](https://journals.vilniustech.lt/index.php/JCEM/article/view/13599) | 2020 | URL |
+| LIT-126 | [Multi-criteria decision support system for bridge construction system selection utilizing value engineering an](https://link.springer.com/article/10.1007/s41062-023-01267-7) | 2023 | URL |
+| LIT-127 | [An attempt to generate new bridge types from latent space of variational autoencoder](https://arxiv.org/abs/2311.03380) | 2023 | URL |
+| LIT-128 | [Design Space Exploration and Explanation via Conditional Variational Autoencoders in Meta-model-based Conceptu](https://arxiv.org/abs/2211.16406) | 2022 | URL |
+| LIT-129 | [Comprehensive Design Example for Prestressed Concrete (PSC) Girder Superstructure Bridge With Commentary](https://www.fhwa.dot.gov/bridge/lrfd/pscustoc.cfm) | 2003 | URL |
+| LIT-130 | [PCI Bridge Design Manual (MNL-133-11), Chapter 6: Preliminary Design + Preliminary Design Charts](https://www.pci.org/PCI_Docs/Design_Resources/Transportation_Resources/BDM_Design_Charts.pdf) | 2011 | URL |
+
+### Độ bền & tuổi thọ kết cấu (8 nguồn — LIT-131…LIT-138)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-131 | [fib Bulletin 34: Model Code for Service Life Design](https://shop.fib-international.org/publications/fib-bulletins/930-model-code-for-service-life-design) | 2006 | URL |
+| LIT-132 | [ISO 16204:2012 — Durability — Service life design of concrete structures](https://www.sis.se/en/produkter/construction-materials-and-building/structures-of-buildings/concrete-structures/ssiso162042012/) | 2012 | URL |
+| LIT-133 | [Life-365 Service Life Prediction Model, Version 2.2.3 — User's Manual](https://life-365.org/wp-content/uploads/2024/11/Life-365_v2.2.3_Users_Manual.pdf) | 2020 | URL |
+| LIT-134 | [DuraCrete: Service Life Design for Concrete Structures](https://www.irbnet.de/daten/iconda/CIB2068.pdf) | 1999 | URL |
+| LIT-135 | [Corrosion of steel in concrete](https://portal.research.lu.se/en/publications/corrosion-of-steel-in-concrete/) | 1982 | URL |
+| LIT-136 | [Chloride Distribution and Steel Corrosion in a Concrete Bridge after Long-Term Exposure to Natural Marine Envi](https://pmc.ncbi.nlm.nih.gov/articles/PMC7503823/) | 2020 | URL |
+| LIT-137 | [A Combined Experimental-Numerical Framework for Assessing the Load-Bearing Capacity of Existing PC Bridge Deck](https://pmc.ncbi.nlm.nih.gov/articles/PMC8434466/) | 2021 | URL |
+| LIT-138 | [Comparative Analysis of Engineering Carbonation Model Extensions to Account for Pre-Existing Cracks](https://pmc.ncbi.nlm.nih.gov/articles/PMC10532492/) | 2023 | URL |
+
+### Kiểm định, bảo trì & hệ quản lý cầu (11 nguồn — LIT-139…LIT-149)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-139 | [Overview of the National Bridge Inspection Standards (NBIS) Final Rule](https://www.fhwa.dot.gov/bridge/pubs/P1-NBIS-SNBI-Final-Rule-Overview_toHPA_V2_508v2.pdf) | 2022 | URL |
+| LIT-140 | [AASHTO Manual for Bridge Element Inspection, 2nd Edition](https://aashtojournal.transportation.org/aashto-publishes-new-manual-for-bridge-element-inspection/) | 2019 | URL |
+| LIT-141 | [Pontis Version 3: Reaching Out to the Bridge Management Community](https://onlinepubs.trb.org/Onlinepubs/conf/1995/cp7/cp7v1-022.pdf) | 1995 | URL |
+| LIT-142 | [Development of Age and State Dependent Stochastic Model for Improved Bridge Deterioration Prediction](https://www.ugpti.org/resources/reports/downloads/mpc24-560.pdf) | 2024 | URL |
+| LIT-143 | [A Markov chain-based model for structural vulnerability assessment of corrosion-damaged reinforced concrete br](https://pmc.ncbi.nlm.nih.gov/articles/PMC8215375/) | 2021 | URL |
+| LIT-144 | [Deep reinforcement learning driven inspection and maintenance planning under incomplete information and constr](https://arxiv.org/abs/2007.01380) | 2020 | URL |
+| LIT-145 | [Bridge Preservation Guide — Maintaining a Resilient Infrastructure to Preserve Mobility](https://www.fhwa.dot.gov/bridge/preservation/guide/guide.pdf) | 2018 | URL |
+| LIT-146 | [FHWA Nondestructive Evaluation Program Strategic Plan for FY 2019–2022](https://www.fhwa.dot.gov/publications/research/infrastructure/structures/bridge/20045/20045.pdf) | 2020 | URL |
+| LIT-147 | [Historical Life Cycle Costs of Steel & Concrete Girder Bridges](https://www.shortspansteelbridges.org/wp-content/uploads/2022/09/Economy-and-Life-Cycle-Costs.pdf) | 2022 | URL |
+| LIT-148 | [Nghị định số 06/2021/NĐ-CP — Quy định chi tiết một số nội dung về quản lý chất lượng, thi công xây dựng và bảo](https://vanban.chinhphu.vn/?pageid=27160&docid=202585) | 2021 | URL |
+| LIT-149 | [Thông tư số 41/2024/TT-BGTVT — Quy định về quản lý, vận hành, khai thác và bảo trì kết cấu hạ tầng đường bộ](https://congbao.chinhphu.vn/van-ban/thong-tu-so-41-2024-tt-bgtvt-43379.htm) | 2024 | URL |
+
+### SHM, digital twin & BIM vận hành (10 nguồn — LIT-150…LIT-159)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-150 | [Approach Towards the Development of Digital Twin for Structural Health Monitoring of Civil Infrastructure: A C](https://pmc.ncbi.nlm.nih.gov/articles/PMC11723349/) | 2024 | URL |
+| LIT-151 | [University of New Hampshire Living Bridge Project](https://tethys.pnnl.gov/project-sites/university-new-hampshire-living-bridge-project) | 2014 | URL |
+| LIT-152 | [Integration of Railway Bridge Structural Health Monitoring into the Internet of Things with a Digital Twin: A ](https://pmc.ncbi.nlm.nih.gov/articles/PMC11013990/) | 2024 | URL |
+| LIT-153 | [A Concise Review of State-of-the-Art Sensing Technologies for Bridge Structural Health Monitoring](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12431295/) | 2025 | URL |
+| LIT-154 | [Bridge Digital Twinning Using an Output-Only Bayesian Model Updating Method and Recorded Seismic Measurements](https://pmc.ncbi.nlm.nih.gov/articles/PMC8838164/) | 2022 | URL |
+| LIT-155 | [Development of a BIM-based bridge maintenance system (BMS) for managing defect data](https://www.nature.com/articles/s41598-023-27924-6) | 2023 | URL |
+| LIT-156 | [Building Information Modeling (BIM) for Bridges and Structures](https://www.fhwa.dot.gov/bridge/bim) | 2024 | URL |
+| LIT-157 | [IFC 4.3.2 Documentation — buildingSMART International](https://ifc43-docs.standards.buildingsmart.org/) | 2024 | URL |
+| LIT-158 | [Structural Performance Monitoring Using a Dynamic Data-Driven BIM Environment](https://pureportal.bcu.ac.uk/en/publications/structural-performance-monitoring-using-a-dynamic-data-driven-bim/) | 2018 | URL |
+| LIT-159 | [Review of anomaly detection in large span bridges: available methods, recent advancements and future trends](https://aben.springeropen.com/articles/10.1186/s43251-024-00113-9) | 2024 | URL |
+
+### Địa chất & khảo sát địa kỹ thuật (10 nguồn — LIT-160…LIT-169)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-160 | [Geotechnical Site Characterization — Geotechnical Engineering Circular No. 5 (GEC-5)](https://www.fhwa.dot.gov/engineering/geotech/pubs/nhi16072.pdf) | 2017 | URL |
+| LIT-161 | [22 TCN 263:2000 — Quy trình khảo sát đường ô tô](https://dulieuphapluat.vn/van-ban/tai-nguyen-moi-truong-van-ban/tieu-chuan-nganh-22-tcn-2632000-ve-quy-trinh-khao-sat-duong-o-to-do-bo-giao-thong-van-tai-ban-hanh-643481.html) | 2000 | URL |
+| LIT-162 | [Manual on Estimating Soil Properties for Foundation Design (EPRI EL-6800)](https://www.scribd.com/document/358480491/EL-6800-Mayne-Kulhawy-Manual-on-Estimating-Soil-Properties-for-Foundation-Design) | 1990 | URL |
+| LIT-163 | [Cone Penetration Testing (NCHRP Synthesis 368)](https://nap.nationalacademies.org/catalog/23143/cone-penetrating-testing) | 2007 | URL |
+| LIT-164 | [Characterization of geotechnical variability](https://cdnsciencepub.com/doi/10.1139/t99-038) | 1999 | DOI |
+| LIT-165 | [Load and Resistance Factor Design (LRFD) for Deep Foundations (NCHRP Report 507)](https://trid.trb.org/view/749134) | 2004 | URL |
+| LIT-166 | [Implementation and Transition of Data Interchange for Geotechnical and Geoenvironmental Specialists (DIGGS v2.](https://trid.trb.org/view/1455468) | 2017 | URL |
+| LIT-167 | [OGC Geotech Interoperability Experiment Engineering Report](https://arxiv.org/abs/2512.10678) | 2025 | URL |
+| LIT-168 | [An integrated geotechnical–geophysical investigation of soft clay at a coastal site in the Mekong Delta for oi](https://cdnsciencepub.com/doi/10.1139/T08-077) | 2008 | DOI |
+| LIT-169 | [Towards reliable and effective site investigations](https://www.icevirtuallibrary.com/doi/10.1680/geot.2005.55.2.109) | 2005 | DOI |
+
+### Thuỷ văn, thuỷ lực, xói & gió công trình (9 nguồn — LIT-170…LIT-178)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-170 | [Evaluating Scour at Bridges, Fifth Edition (HEC-18)](https://www.fhwa.dot.gov/engineering/hydraulics/pubs/hif12003.pdf) | 2012 | URL |
+| LIT-171 | [HEC-RAS Hydraulic Reference Manual — Modeling Bridges](https://www.hec.usace.army.mil/confluence/rasdocs/ras1dtechref/latest/modeling-bridges) | — | URL |
+| LIT-172 | [Hydraulic Design of Safe Bridges (HDS-7)](https://www.fhwa.dot.gov/engineering/hydraulics/pubs/hif12018.pdf) | 2012 | URL |
+| LIT-173 | [Analysis of Recent Bridge Failures in the United States](https://trid.trb.org/View/663056) | 2003 | URL |
+| LIT-174 | [Bridge Scour and Stream Instability Countermeasures: Experience, Selection, and Design Guidance, Third Edition](https://www.fhwa.dot.gov/engineering/hydraulics/pubs/09111/09111.pdf) | 2009 | URL |
+| LIT-175 | [Risk of compound flooding substantially increases in the future Mekong River delta](https://nhess.copernicus.org/articles/24/3627/2024/) | 2024 | URL |
+| LIT-176 | [Guide Specifications for Wind Loads on Bridges During Construction](https://trid.trb.org/view/1455396) | 2017 | URL |
+| LIT-177 | [Typhoon track simulations in the North West Pacific: Informing a new wind map for Vietnam](https://www.sciencedirect.com/science/article/abs/pii/S0167610520303512) | 2021 | DOI |
+| LIT-178 | [Effects of surrounding interference on the wind field in the driving space of bridge deck](https://link.springer.com/article/10.1186/s43251-025-00191-3) | 2025 | URL |
+
+### Dữ liệu khảo sát số & dataset mở (11 nguồn — LIT-179…LIT-189)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-179 | [National Bridge Inventory (NBI) — FHWA](https://www.fhwa.dot.gov/bridge/nbi.cfm) | 2025 | URL |
+| LIT-180 | [LTBP InfoBridge — FHWA](https://infobridge.fhwa.dot.gov/Data) | — | URL |
+| LIT-181 | [SDNET2018: An annotated image dataset for non-contact concrete crack detection using deep convolutional neural](https://pmc.ncbi.nlm.nih.gov/articles/PMC6247444/) | 2018 | URL |
+| LIT-182 | [CODEBRIM: COncrete DEfect BRidge IMage Dataset](https://zenodo.org/records/2620293) | 2019 | URL |
+| LIT-183 | [Detection of Structural Components in Point Clouds of Existing RC Bridges — dataset 10 cầu](https://zenodo.org/records/1240534) | 2018 | URL |
+| LIT-184 | [UAV-Based Infrastructure Inspections: A Literature Review and Proposed Framework for AEC+FM](https://arxiv.org/abs/2601.11665) | 2026 | URL |
+| LIT-185 | [Algorithms and Techniques for the Structural Health Monitoring of Bridges: Systematic Literature Review](https://pmc.ncbi.nlm.nih.gov/articles/PMC10181214/) | 2023 | URL |
+| LIT-186 | [Pynite — A 3D structural engineering finite element library for Python](https://github.com/JWock82/Pynite) | — | URL |
+| LIT-187 | [anaStruct — 2D structural analysis in Python](https://github.com/anastruct/anaStruct) | — | URL |
+| LIT-188 | [IFC-Bridge sample files — ifcinfra.de (buildingSMART Germany)](https://ifcinfra.de/ifc-bridge/bridge-abschluss/) | 2019 | URL |
+| LIT-189 | [Speckle Server — AEC data hub mã nguồn mở](https://github.com/specklesystems/speckle-server) | — | URL |
+
+### Thi công, lắp dựng & tải trọng thi công (11 nguồn — LIT-190…LIT-200)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-190 | [EN 1991 – Eurocode 1: Actions on structures, Part 1-6 General actions – Actions during execution](https://eurocodes.jrc.ec.europa.eu/sites/default/files/2022-06/EN1991_6_Formichi.pdf) | 2008 | URL |
+| LIT-191 | [Caltrans Falsework Manual, Chapter 3: Loads](https://dot.ca.gov/-/media/dot-media/programs/engineering/documents/structureconstruction/falsework/fw-chpt03-a11y.pdf) | 2022 | URL |
+| LIT-192 | [Guide Design Specification for Bridge Temporary Works](https://store.transportation.org/Common/DownloadContentFiles?id=929) | 1995 | URL |
+| LIT-193 | [Reliability Analysis of the Main Pier during the Construction Period of HLCR Bridges](https://doi.org/10.3390/app12125936) | 2022 | DOI |
+| LIT-194 | [Means and Methods Analysis of a Cast-In-Place Balanced Cantilever Segmental Bridge: The Wilson Creek Bridge Ca](https://vtechworks.lib.vt.edu/items/7b392989-2969-4d64-923e-710634b1adb9) | 1999 | URL |
+| LIT-195 | [Bridge Construction Practices Using Incremental Launching](https://onlinepubs.trb.org/onlinepubs/archive/notesdocs/20-07(229)_fr.pdf) | 2007 | URL |
+| LIT-196 | [Lateral-torsional-roll response of long precast concrete girders: Uncracked buckling load](https://doi.org/10.15554/pcij69.3-01) | 2024 | URL |
+| LIT-197 | [Guidance for Erection and Construction of Curved I-Girder Bridges (FHWA/TX-10/0-5574-1)](https://library.ctr.utexas.edu/ctr-publications/0-5574-1.pdf) | 2010 | URL |
+| LIT-198 | [Evaluation of crack control methods for end zone cracking in prestressed concrete bridge girders](https://www.pci.org/PCI_Docs/Publications/PCI%20Journal/2013/Spring/Evaluation%20of%20crack%20control%20methods%20for%20end%20zone%20cracking%20in%20prestressed%20concrete%20bridge%20girders.pdf) | 2013 | URL |
+| LIT-199 | [Continuous Prestressed Concrete Girder Bridges, Volume 1: Literature Review and Preliminary Designs (FHWA/TX-1](https://static.tti.tamu.edu/tti.tamu.edu/documents/0-6651-1.pdf) | 2012 | URL |
+| LIT-200 | [SCOSS Alert: Lessons Learned from the 2018 Florida Bridge Collapse During Construction](https://www.cross-safety.org/sites/default/files/2020-12/lessons-learned-2018-florida-bridge-collapse.pdf) | 2020 | URL |
+
+### Tiêu chuẩn Việt Nam & đối chiếu AASHTO (13 nguồn — LIT-201…LIT-213)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-201 | [TCVN 11823-1:2017 — Thiết kế cầu đường bộ – Phần 1: Yêu cầu chung](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-11823-12017-ve-thiet-ke-cau-duong-bo-phan-1-yeu-cau-chung/) | 2017 | URL |
+| LIT-202 | [TCVN 11823-2:2017 — Thiết kế cầu đường bộ – Phần 2: Tổng thể và đặc điểm vị trí](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-11823-22017-ve-thiet-ke-cau-duong-bo-phan-2-tong-the-va-dac-diem-vi-tri/) | 2017 | URL |
+| LIT-203 | [TCVN 11823-3:2017 — Thiết kế cầu đường bộ – Phần 3: Tải trọng và hệ số tải trọng](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-11823-32017-ve-thiet-ke-cau-duong-bo-phan-3-tai-trong-va-he-so-tai-trong/) | 2017 | URL |
+| LIT-204 | [TCVN 11823-5:2017 — Thiết kế cầu đường bộ – Phần 5: Kết cấu bê tông](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-11823-52017-ve-thiet-ke-cau-duong-bo-phan-5-ket-cau-be-tong/) | 2017 | URL |
+| LIT-205 | [TCVN 11823-10:2017 — Thiết kế cầu đường bộ – Phần 10: Nền móng](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-11823-102017-ve-thiet-ke-cau-duong-bo-phan-10-nen-mong/) | 2017 | URL |
+| LIT-206 | [TCVN 10304:2014 — Móng cọc – Tiêu chuẩn thiết kế](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-103042014-ve-mong-coc-tieu-chuan-thiet-ke/) | 2014 | URL |
+| LIT-207 | [TCVN 2737:2023 — Tải trọng và tác động](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-27372023-ve-tai-trong-va-tac-dong/) | 2023 | URL |
+| LIT-208 | [TCVN 9386:2012 — Thiết kế công trình chịu động đất (Phần 1: Quy định chung, tác động động đất và quy định đối ](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-93862012-ve-thiet-ke-cong-trinh-chiu-dong-dat/) | 2012 | URL |
+| LIT-209 | [TCVN 9346:2012 — Kết cấu bê tông và bê tông cốt thép – Yêu cầu bảo vệ chống ăn mòn trong môi trường biển](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-93462012-ve-ket-cau-be-tong-va-be-tong-cot-thep-yeu-cau-bao-ve-chong-an-mon-trong-moi-truong-bien/) | 2012 | URL |
+| LIT-210 | [TCVN 12041:2017 — Kết cấu bê tông và bê tông cốt thép – Yêu cầu chung về thiết kế độ bền lâu và tuổi thọ trong](https://dulieuphaply.vn/vbpl/tieu-chuan-quoc-gia-tcvn-120412017-ve-ket-cau-be-tong-va-be-tong-cot-thep-yeu-cau-chung-ve-thiet-ke-do-ben-lau-va-tuoi-tho-trong-moi-truong-xam-thuc/) | 2017 | URL |
+| LIT-211 | [AASHTO LRFD Bridge Design Specifications, 10th Edition](https://store.transportation.org/Item/PublicationDetail?ID=5377) | 2024 | URL |
+| LIT-212 | [Comparative Analysis Between the Bridge Standards of USA, EU, Canada, and Vietnam in the Preliminary Design of](https://link.springer.com/chapter/10.1007/978-981-97-1972-3_25) | 2024 | URL |
+| LIT-213 | [Ban hành tiêu chuẩn Quốc gia TCVN 11823:2017 về thiết kế cầu đường bộ Việt Nam](https://xaydung.donga.edu.vn/thong-tin-bai-viet/ban-hanh-tieu-chuan-quoc-gia-tcvn-118232017-ve-thiet-ke-cau-duong-bo-viet-nam-13662) | 2018 | URL |
+
+### Thẩm mỹ, precedent & mô hình ảnh 3D (10 nguồn — LIT-214…LIT-223)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-214 | [Brücken = Bridges: Aesthetics and Design (Ästhetik und Gestaltung)](https://openlibrary.org/isbn/0262121050.json) | 1984 | URL |
+| LIT-215 | [Bridge Aesthetics Sourcebook: Practical Ideas for Short- and Medium-Span Bridges](https://trid.trb.org/View/1086566) | 2010 | URL |
+| LIT-216 | [Delaware DOT Bridge Design Manual, Chapter 103 — Bridge Geometry and Structure Type Selection](https://bridgedesignmanual.deldot.gov/index.php/103_-_Bridge_Geometry_and_Structure_Type_Selection) | — | URL |
+| LIT-217 | [Empirical aesthetics of bridges](https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0338493) | 2025 | URL |
+| LIT-218 | [Performance-based generative design of network tied-arch bridges](https://concrete.ethz.ch/blog/performance-based-generative-design-of-network-tied-arch-bridges/) | 2021 | URL |
+| LIT-219 | [IABSE Outstanding Structure Award (OStrA)](https://iabse.org/OSTRA) | 1998 | URL |
+| LIT-220 | [HighestBridges.com — cơ sở dữ liệu cầu cao nhất thế giới](https://www.highestbridges.com/wiki/index.php?title=Main_Page) | — | URL |
+| LIT-221 | [SOFiSTiK Bridge + Infrastructure Modeler — Online Library](https://www.sofistik.com/en/products/bim-cad/sofistik-bridge-infrastructure-modeler-online-library) | — | URL |
+| LIT-222 | [Bridge Design and Aesthetics (BDA): a foundational dataset for the empirical aesthetics of bridge design](https://osf.io/wf5qg/) | 2024 | URL |
+| LIT-223 | [Wikimedia Commons — Category:Bridges](https://commons.wikimedia.org/wiki/Category:Bridges) | — | URL |
+
+### Trắc địa, LiDAR-UAV & số liệu khảo sát (11 nguồn — LIT-224…LIT-234)
+
+| ID | Tiêu đề | Năm | Xác minh |
+|---|---|---:|---|
+| LIT-224 | [Quyết định số 83/2000/QĐ-TTg ngày 12/07/2000 của Thủ tướng Chính phủ về sử dụng Hệ quy chiếu và Hệ toạ độ quốc](https://caselaw.vn/van-ban-phap-luat/238543-quyet-dinh-so-83-2000-qd-ttg-ngay-12-07-2000-cua-thu-tuong-chinh-phu-ve-su-dung-he-quy-che-va-he-toa-do-quoc-gia-viet-nam-tinh-trang-hieu-luc-khong-xac-dinh) | 2000 | URL |
+| LIT-225 | [Thông tư 68/2015/TT-BTNMT quy định kỹ thuật đo đạc trực tiếp địa hình phục vụ thành lập bản đồ địa hình và cơ ](https://hethongphapluat.com/thong-tu-68-2015-tt-btnmt-quy-dinh-ky-thuat-do-dac-truc-tiep-dia-hinh-phuc-vu-thanh-lap-ban-do-dia-hinh-va-co-so-du-lieu-nen-dia-ly-ty-le-1-500-1-1000-1-2000-1-5000-do-bo-truong-bo-tai-nguyen-va-moi-truong-ban-hanh/dieu-12) | 2015 | URL |
+| LIT-226 | [WYDOT Survey Manual, Section V — Control Surveys](https://www.dot.state.wy.us/files/live/sites/wydot/files/shared/Highway_Development/Surveys/Survey%20Manual/Section%20V%20-%20Control%20Surveys.pdf) | 2025 | URL |
+| LIT-227 | [NCHRP Report 748: Guidelines for the Use of Mobile LIDAR in Transportation Applications](https://onlinepubs.trb.org/onlinepubs/nchrp/nchrp_rpt_748.pdf) | 2013 | URL |
+| LIT-228 | [A Decade of Modern Bridge Monitoring Using Terrestrial Laser Scanning: Review and Future Directions](https://www.mdpi.com/2072-4292/12/22/3796) | 2020 | DOI |
+| LIT-229 | [Railway Bridge Geometry Assessment Supported by Cutting-Edge Reality Capture Technologies and 3D As-Designed M](https://doi.org/10.3390/infrastructures8070114) | 2023 | DOI |
+| LIT-230 | [Collection of Data with Unmanned Aerial Systems (UAS) for Bridge Inspection and Construction Inspection](https://www.fhwa.dot.gov/publications/research/infrastructure/structures/bridge/21086/21086.pdf) | 2021 | URL |
+| LIT-231 | [Accuracy Comparison of Aerial Lidar, Mobile-Terrestrial Lidar, and UAV Photogrammetric Capture Data Elevations](https://doi.org/10.3390/INFRASTRUCTURES5080065) | 2020 | DOI |
+| LIT-232 | [Semi-automated creation of IFC bridge models from point clouds for maintenance applications](https://www.frontiersin.org/journals/built-environment/articles/10.3389/fbuil.2024.1375873/full) | 2024 | URL |
+| LIT-233 | [Copernicus DEM — Global and European Digital Elevation Model](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM) | 2026 | URL |
+| LIT-234 | [ALOS Global Digital Surface Model (DSM) "ALOS World 3D-30m" (AW3D30) Version 4.1 — Product Description, Editio](https://www.eorc.jaxa.jp/ALOS/en/dataset/aw3d30/data/aw3d30v4.1_product_e_1.0.pdf) | 2024 | URL |
+
+## Nguồn dùng chung cho nhiều chủ đề
+
+Một URL chỉ có một ID. Khi đợt quét sau tìm lại đúng nguồn cũ, ghi tham chiếu
+chéo thay vì cấp ID mới.
+
+| ID | Chủ đề chính | Cũng liên quan |
+|---|---|---|
+| LIT-096 | BIM & IFC cho cầu | Hình học tuyến & tham số hoá |
+| LIT-080 | Mỏi & độ bền lâu | Độ bền & tuổi thọ kết cấu |
+| LIT-081 | Mỏi & độ bền lâu | Độ bền & tuổi thọ kết cấu |
+| LIT-111 | Vòng đời & carbon hàm chứa | Kiểm định, bảo trì & hệ quản lý cầu |
+| LIT-089 | Động lực học, gió & động đất | Thuỷ văn, thuỷ lực, xói & gió công trình |
+| LIT-049 | Thi công, chế tạo & cầu vòm | Thi công, lắp dựng & tải trọng thi công |
+| LIT-128 | Lựa chọn loại cầu & phân tích phương án | Thẩm mỹ, precedent & mô hình ảnh 3D |
+| LIT-188 | Dữ liệu khảo sát số & dataset mở | Thẩm mỹ, precedent & mô hình ảnh 3D |
+| LIT-096 | BIM & IFC cho cầu | Trắc địa, LiDAR-UAV & số liệu khảo sát |
+
+## Khuyết tật đã biết: ID trùng từ đợt quét trước
+
+- **LIT-049** trùng URL với **LIT-016** — Cùng một bài PCI Journal (Seguirant, lateral stability) bị cấp hai ID ở đợt quét 1-2 vì rơi vào hai chủ đề. Giữ nguyên cả hai để không phá liên kết đã có; đợt quét 3 trở đi dùng cross_topic_references thay vì cấp ID mới.
+- **LIT-117** trùng URL với **LIT-018** — Cùng bài PCI Journal Winter 2011 (Tadros/Fawzy/Hanna, camber variability) ở hai URL pci.org khác nhau, nên khử trùng theo URL không bắt được. Reviewer độc lập CRV/BRD-020 phát hiện; giữ cả hai ID để không phá liên kết đã sinh, khai tường minh tại đây.
+- **LIT-205** trùng URL với **LIT-074** — Cùng TCVN 11823-10:2017 ở hai trang mirror khác nhau (luatvietnam.vn và dulieuphaply.vn). Reviewer độc lập phát hiện. LIT-205 xác minh được toàn văn nên vẫn có giá trị riêng, nhưng phải khai là cùng tài liệu.
+
+## Tìm được nhưng KHÔNG xác minh được
+
+Các mục này **không** nằm trong danh mục.
+
+- [Structural Design with Ultra-High Performance Concrete (FHWA-HRT-23-077)](https://highways.dot.gov/research/publications/infrastructure/FHWA-HRT-23-077) — *Vật liệu tiên tiến: UHPC & FRP* — verified_by_fetch = false
+
+## Chủ đề tìm mà không ra nguồn đủ tốt
+
+Sự vắng mặt cũng là kết quả nghiên cứu. Ghi lại thẳng thắn thay vì lấp bằng nguồn kém.
+
+**Sức bền vật liệu & bê tông cốt thép** (4)
+
+- Bản dịch/nguyên văn TCVN 11823-5:2017 để đối chiếu điều khoản: đã fetch https://thuviennhadat.vn/van-ban-phap-luat-viet-nam/tcvn-11823-5-2017-thiet-ke-cau-duong-bo-phan-5-ket-cau-be-tong-916999.html và XÁC NHẬN ĐƯỢC danh tính tiêu chuẩn (Tiêu chuẩn quốc gia TCVN 11823-5:2017 về Thiết kế cầu đường bộ - Phần 5: Kết cấu bê tông, năm 2017), nhưng trang chỉ hiện mục lục và lời nói đầu; toàn văn nằm sau đăng nhập TVPL Pro. KHÔNG xác minh được bất kỳ điều khoản nào về β, θ, khối ứng suất chữ nhật hay giới hạn kéo Sử dụng III. Vì vậy không đưa vào entries — không có nội dung kỹ thuật nào để trích.
+- Tài liệu chuyên về tension stiffening / ứng xử kéo sau nứt của BTCT THƯỜNG: Bentz, 'Explaining the Riddle of Tension Stiffening Models for Shear Panel Experiments', Journal of Structural Engineering V.131 No.9 — trang ASCE (https://ascelibrary.org/doi/abs/10.1061/(ASCE)0733-9445(2005)131:9(1422)) trả về HTTP 403, không fetch được nên KHÔNG ghi vào entries dù kết quả tìm kiếm có hiện thông tin thư mục. Thử nguồn thay thế http://vectoranalysisgroup.com/journal_publications/jp46.pdf: tải được nhưng là PDF ảnh không có lớp text; đã render trang 1 ra ảnh và đọc trực tiếp — hoá ra là Sato & Vecchio, 'Tension Stiffening and Crack Formation in Reinforced Concrete Members with Fiber-Reinforced Polymer Sheets', JSE V.129 No.6, 6/2003, tr. 717–724, DOI 10.1061/(ASCE)0733-9445(2003)129:6(717) — đúng chủ đề tension stiffening nhưng về cấu kiện gia cường FRP, lệch khỏi bài toán dầm Super-T DƯL nên chủ động BỎ.
+- NCHRP Report 595 'Application of the LRFD Bridge Design Specifications to High-Strength Structural Concrete: Flexure and Compression Provisions' (khuyến nghị sửa α1 cho bê tông cường độ cao — đúng trọng tâm câu hỏi miền hiệu lực khối ứng suất): PDF toàn văn trên onlinepubs.trb.org redirect về trang blurb; trang NAP https://www.nationalacademies.org/publications/23269 chỉ trả về danh sách xuất bản phẩm chung, không có nội dung báo cáo. Nội dung về α1/β1 mà kết quả tìm kiếm nêu KHÔNG được xác minh bằng fetch nên không ghi thành entry.
+- NCHRP Report 549 chương 3 'Proposed Changes to LRFD Bridge Design Specifications' bản HTML trên NAP (https://www.nationalacademies.org/read/13884/chapter/5): trang chỉ trả ảnh placeholder rỗng, không đọc được text. Đã lấy nội dung tương đương từ bản PDF chính thức của TRB (đã ghi trong entry NCHRP 549).
+
+**Dự ứng lực: mất mát, co ngót, từ biến** (6)
+
+- Bản gốc fib Model Code 2010 (mục 5.1.9 về co ngót–từ biến) và EN 1992-1-1 Phụ lục B: không tìm được bản truy cập mở đáng tin để fetch và xác minh; chỉ xác minh được gián tiếp qua bài đánh giá thống kê của Al-Manaseer & Prado 2015. Không ghi vào thư viện để tránh trích dẫn theo trí nhớ.
+- ACI 209R-92 / ACI 209.2R-08 nguyên bản: chỉ thấy được viện dẫn trong bài Al-Manaseer & Prado; không fetch được bản gốc (ACI bán bản quyền).
+- Nghiên cứu chuyên biệt về mất mát dự ứng lực của dầm Super-T (nhất là ở Việt Nam hoặc Úc, nơi tiết diện này phổ biến): tìm nhiều truy vấn nhưng không ra nguồn học thuật nào đủ tin cậy để xác minh. Toàn bộ dữ liệu đo đạc tìm được đều trên bulb-tee, I-girder, box beam và inverted-tee của Hoa Kỳ. Đây là một KHOẢNG TRỐNG THẬT của thư viện: mọi con số định lượng ở trên đều là ngoại suy từ tiết diện khác sang Super-T.
+- Nghiên cứu độ nhạy định lượng kiểu 'sai bao nhiêu phần trăm mất mát thì ứng suất kéo thớ dưới Sử dụng III vượt giới hạn' cho dầm nhịp 35–40 m: không tìm được nghiên cứu chuyên đề; hiện chỉ suy luận được gián tiếp từ dải thực đo 12,5%–21,5% của Al-Omaishi và cs. 2009.
+- NCHRP Report 496 phần so sánh trực tiếp sai số của phương pháp lump-sum kiểu 'một hệ số' so với thực đo: đã fetch và xác minh được báo cáo nhưng chưa đọc tới bảng so sánh cụ thể trong phiên này; con số định lượng tương đương lấy từ bài PCI Journal 2009 của cùng nhóm tác giả.
+- TCVN 11823-5:2017 Bảng 9 (giới hạn ứng suất KÉO ở trạng thái giới hạn sử dụng sau mất mát, tức nguồn gốc trực tiếp của ngưỡng 0,5·√f'c trong SERV-001): đã fetch được tiêu chuẩn và đọc tới Điều 9.4.2.1 cùng Bảng 8 (nén 0,45f'c), nhưng chưa trích xuất và đối chiếu chính Bảng 9 trong phiên này. Không khẳng định giá trị Bảng 9 để tránh bịa.
+
+**Phân bố ngang tải trọng & giới hạn line-girder** (5)
+
+- Toàn văn TCVN 11823-4:2017 (điều 4.6.2.2.2, Bảng 4.6.2.2.2b-1 và điều 4.6.2.2.2d về dầm biên) — thuvienphapluat.vn trả HTTP 403, tieuchuan.vsqi.gov.vn lỗi chứng chỉ SSL, hethongphapluat.vn chuyển hướng về trang chủ. KHÔNG xác minh được cách đánh số điều/bảng và các giới hạn phạm vi áp dụng bằng tiếng Việt, nên không đưa vào thư viện.
+- Giá trị SỐ chính xác của phạm vi áp dụng Bảng 4.6.2.2.2b-1 cho mặt cắt loại k (S 1100–4900 mm, ts 110–300 mm, L 6000–73000 mm, Nb ≥ 4, Kg 4×10⁹–3×10¹² mm⁴) từ nguồn sơ cấp/chính thức. AASHTO LRFD là tài liệu có phí; PDF sổ tay của INDOT (in.gov) từ chối kết nối (ECONNREFUSED); ví dụ FHWA có nhắc tới phạm vi áp dụng nhưng KHÔNG liệt kê các con số. Tôi chỉ xác minh được điều kiện định tính 'Nb không nhỏ hơn bốn' qua bài Kanneganti & Zokaie 2003. Không ghi các con số trên vì chưa tự đọc thấy chúng ở đâu.
+- Nghiên cứu chuyên biệt định lượng chênh lệch hệ số phân bố ngang giữa mô hình line-girder và mô hình 3D cho riêng dầm SUPER-T ở nhịp ~38 m: bài Austroads ABC2025 'Using 3D Solid Element and Grillage Model for Bridge Superstructure' (austroads.gov.au/publications/bridges/abc2025-170-25) trả HTTP 403 nên không xác minh được tác giả/năm/nội dung; PDF của QUT eprints 105840 trả HTTP 404.
+- Nghiên cứu định lượng ảnh hưởng ĐỘ CỨNG của gờ lan can/lan can tới hệ số phân bố dầm biên: bài trên Advances in Civil Engineering (Wiley, doi 10.1155/2021/8471801) trả HTTP 403, không xác minh được tiêu đề/tác giả nên loại bỏ dù chủ đề rất hợp (runtime chỉ tính gờ lan can như tải trọng barrier_line_load_kN_per_m).
+- Nguồn học thuật riêng về hệ số phân bố ĐỘ VÕNG (g_deflection = mp·n_lanes/n) dùng cho SERV-002: chỉ tìm được tài liệu phần mềm PGSuper của WSDOT nêu 'Live load reactions, deflections, and rotations are distributed uniformly to all girders in a span; LLDF = (MPF)(Number of Lanes)/(Number of Girders)' — đúng khớp công thức runtime nhưng là tài liệu phần mềm, không phải nguồn nghiên cứu, nên không đưa vào thư viện.
+
+**Tối ưu đa mục tiêu & học máy** (5)
+
+- Nghiên cứu công bố về tối ưu đa mục tiêu (chi phí–carbon–khối lượng) dành RIÊNG cho dầm SUPER-T theo TCVN 11823 / HL-93: tìm bằng cả tiếng Anh và tiếng Việt, KHÔNG tìm ra. Nguồn tiếng Việt gần nhất xác minh được là bài dầm thép tổ hợp chữ I liên hợp theo TCVN 11823:2017 của ĐHXDHN (đã đưa vào danh sách).
+- Bằng chứng ĐỊNH LƯỢNG, trong bối cảnh cầu cụ thể, cho thấy xếp hạng theo xác suất khả thi làm kết quả tệ hơn: không tìm ra. Bằng chứng hiện chỉ ở mức thuật toán tổng quát (BE-CBO, ICML 2024). Đây vẫn là khoảng trống — có thể chính runtime này là nơi ghi nhận nó cho bài toán cầu.
+- Hệ số phát thải CO2 cho vật liệu bê tông/thép DƯL trong điều kiện Việt Nam (để dựng trục carbon cho hàm mục tiêu): không tìm ra nguồn xác minh được.
+- Toàn văn/abstract của ba nguồn sau bị nhà xuất bản chặn nên tôi chỉ xác minh được thư mục, KHÔNG ghi lại nội dung: Ray et al. 2009 (Springer, DOI 10.1007/978-3-642-00619-7_7); Aydın & Ayvaz 2009 (Springer, DOI 10.1007/s00158-009-0404-2); và Meng, Kong, Yi & Peng 2024, 'Optimum-pursuing method for constrained optimization and reliability-based design optimization problems using Kriging model', Computer Methods in Applied Mechanics and Engineering 420:116704, DOI 10.1016/j.cma.2023.116704 (Elsevier chặn; tôi ĐÃ xác minh thư mục qua Crossref và OpenAlex nhưng KHÔNG đọc được abstract, nên KHÔNG đưa vào danh sách chính — tiêu đề rất đúng chủ đề biên ràng buộc, đáng lấy bản có quyền truy cập để đọc).
+- Không tìm được nguồn xác minh nào bàn riêng về mô hình cắt đơn giản hoá β=2 trong tối ưu (liên quan STR-002) — mảng này có thể thuộc phạm vi của agent khác.
+
+**Vật liệu tiên tiến: UHPC & FRP** (10)
+
+- Toàn văn FHWA-HRT-23-077 'Structural Design with Ultra-High Performance Concrete' — highways.dot.gov, rosap.ntl.bts.gov và bản PDF trực tiếp đều trả HTTP 403 trong phiên này; web.archive.org bị chặn ở môi trường này. Thông tin thư mục lấy gián tiếp từ danh mục tham khảo in trong bài ASPIRE đã fetch.
+- AFGC / AFGC-SETRA 'Recommendations for Ultra High Performance Fibre-Reinforced Concretes' (bản 2013 và bản interim 2002) — chỉ tìm thấy các nguồn thứ cấp nhắc lại (dải 150–250 MPa, cường độ kéo ≥ 8 MPa). Không mở được tài liệu gốc hay một trang xuất bản chính thức nào, nên KHÔNG ghi thành mục.
+- JSCE 'Recommendations for Design and Construction of High Performance Fiber Reinforced Cement Composites' — không tìm được nguồn sơ cấp truy cập được; chỉ thấy nhắc trong nguồn thứ cấp.
+- TCVN 13737:2023 (được các bản tin tiếng Việt mô tả là tiêu chuẩn THIẾT KẾ kết cấu UHPC). KHÔNG xác minh được: cổng tiêu chuẩn chính thức tieuchuan.vsqi.gov.vn lỗi chứng chỉ SSL, thuvienphapluat.vn/luatvietnam.vn không trả về bản ghi cho số hiệu này, và tài liệu IBST đã fetch chỉ dẫn TCVN 13735:2023 và 13736:2023. Coi như CHƯA XÁC NHẬN tồn tại.
+- Hai bài gốc của El-Helou & Graybeal trên ASCE Journal of Structural Engineering — DOI 10.1061/(ASCE)ST.1943-541X.0003246 (uốn, JSE 148(4), 2022) và DOI 10.1061/JSENDH.STENG-11065 (cắt, JSE 149(2), 2023). Hai DOI này tôi ĐỌC ĐƯỢC trong danh mục tham khảo của bài ASPIRE đã fetch, nhưng ascelibrary.org trả HTTP 403 nên KHÔNG mở được để xác nhận tiêu đề/nội dung. Không ghi thành mục riêng.
+- Dữ liệu dão đứt (creep rupture) của CÁP CFRP DƯL theo thời gian thực dài hạn, kèm mô hình ngoại suy tới mốc 100 năm VÀ khoảng tin cậy công bố — đúng thứ UCR-002 điểm 1 đòi. Không tìm thấy. Thứ tìm được chỉ là quy tắc trần ứng suất (0,70/0,65·fpu và 0,65/0,60·fpu) trong AASHTO CFRP-1, và dữ liệu gia tốc của GFRP (không suy sang CFRP được).
+- Dữ liệu ăn mòn điện hoá / galvanic tại vùng neo của hệ CFRP (UCR-002 điểm 2) — không tìm thấy nguồn nào đủ tin cậy để ghi.
+- Bộ hệ số co ngót – từ biến riêng cho UHPC theo AASHTO Guide Spec (chỉ xác nhận được là 'phương trình khác', chưa lấy được công thức và hệ số).
+- Dữ liệu chống cháy / bong tách bề mặt (spalling) của UHPC — chưa tìm trong phiên này.
+- Nguồn cung và báo giá UHPC / cáp CFRP tại Việt Nam, EPD — chưa tìm; đây vẫn là khoảng trống G6 của cả UCR-001 và UCR-002.
+
+**Thi công, chế tạo & cầu vòm** (8)
+
+- Cơ sở tài liệu cho FAB-006 (min_draft_ratio = 1/25): KHÔNG tìm được tiêu chuẩn, chỉ dẫn hay bản vẽ nào quy định độ vát tối thiểu của sườn để rút được ván khuôn ngoài dầm bê tông đúc sẵn. Bản vẽ RMS B0201 cho thấy sườn Super-T có vát thật (tiết diện máng hình thang) nhưng KHÔNG ghi tỷ lệ vát tối thiểu nào, và tôi không đo được tỷ lệ đó từ bản vẽ một cách đáng tin. Ngưỡng 1/25 hiện tại nên coi là quy ước nội bộ chưa có nguồn.
+- Cơ sở cho FAB-004 lift_capacity_t = 80,0 t: không có tiêu chuẩn nào ấn định con số này — nó là năng lực thiết bị của xưởng/công trường cụ thể. Cần lấy từ hồ sơ nhà thầu chứ không từ tài liệu học thuật.
+- Cơ sở cho FAB-005 transport_height_mm = 2200: chưa xác minh được quy định khổ giới hạn/tĩnh không đường bộ Việt Nam (thông tư của Bộ GTVT) qua nguồn mở đáng tin nào. Lưu ý ngưỡng này đang áp cho CHIỀU CAO TIẾT DIỆN, trong khi giới hạn thực tế áp cho tổng chiều cao xe cộng hàng — hai đại lượng khác nhau.
+- Bảng nhịp lớn nhất theo loại dầm T1–T5 trong TfNSW TS 02023 "Provisions for the Design of Super-T Girder Bridges": tài liệu này TỒN TẠI (đã xác minh trong TfNSW Bridge Technical Direction Manual TS 01954, hiệu lực 04/02/2025, ghi TS 02023 phiên bản 0, duyệt ngày 24/9/2019) NHƯNG bản thân TS 02023 bị hạn chế truy cập — trang portal ghi chỉ cấp theo yêu cầu qua email cho dự án của TfNSW. Con số "nhịp tối đa T5 = 37 m với hoạt tải SM1600" CHỈ xuất hiện trong đoạn trích kết quả tìm kiếm và tôi KHÔNG fetch xác minh được, nên không đưa vào danh sách. Nếu đúng thì nhịp 38,3 m của dự án vượt nhịp T5 tiêu chuẩn — đây là điều đáng kiểm tra tiếp nhưng hiện chưa có bằng chứng.
+- TCVN 11823 phần liên quan tới thi công/chế tạo dầm Super-T: không tìm được bản chính thức truy cập mở đáng tin. Các kết quả tìm được là trang tổng hợp văn bản pháp luật, tài liệu sinh viên và blog nhà thầu — đã loại theo nguyên tắc tránh nguồn tổng hợp không nguồn gốc.
+- Báo cáo GDOT 05-15 "Stability of Precast Prestressed Concrete Bridge Girders Considering...": tên miền dot.ga.gov không phân giải được DNS từ môi trường này, không xác minh được tiêu đề đầy đủ nên bỏ.
+- Yuan, Yang, Wang, Chen, Lu (2019), "Shear Behavior of Epoxy Resin Joints in Precast Concrete Segmental Bridges", Journal of Bridge Engineering 24(4), DOI 10.1061/(ASCE)BE.1943-5592.0001362: metadata xác minh được qua Crossref, nhưng bài đóng phí, Semantic Scholar báo trạng thái CLOSED và không có tóm tắt, nên tôi KHÔNG có nội dung thật để mô tả. Đã loại thay vì viết mô tả suy đoán.
+- Nguồn cho ràng buộc chế tạo dầm Super-T riêng của Việt Nam (bãi đúc, bệ căng, năng lực cẩu tại VN): không tìm được nguồn học thuật hoặc tiêu chuẩn nào truy cập mở.
+
+**Bản mặt cầu & dầm ngang** (7)
+
+- Bản gốc AASHTO LRFD Table 2.5.2.6.3-1 hệ SI (chứa đúng chuỗi '(S+3000)/30' và định nghĩa S) từ nguồn AASHTO chính thức — link store.transportation.org yêu cầu tải/đăng nhập, WebFetch không mở được. Tôi chỉ xác minh được bản hệ Anh tương đương (S+10)/30 qua Caltrans BDS 2003, và suy ra tương đương đơn vị; KHÔNG suy diễn thêm.
+- TCVN 11823-5:2017 (Kết cấu bê tông) — điều về dầm ngang/vách ngăn, tương đương AASHTO LRFD 5.13.2.2 (nay 5.12.4). Các trang luatvietnam.vn, caselaw.vn, vanbanphapluat.co, studocu.vn đều trả 403, lỗi chứng chỉ SSL hoặc chặn nội dung. Không xác minh được nên KHÔNG ghi thành mục.
+- TCVN 11823-2:2017 — bảng chiều cao tối thiểu kết cấu phần trên (bản Việt của Table 2.5.2.6.3-1), để xác nhận trực tiếp bằng tiếng Việt rằng S trong (S+3000)/30 là CHIỀU DÀI NHỊP. Trang vanbanphapluat.co lỗi chứng chỉ; các bản Studocu cần đăng nhập.
+- KHÔNG TÌM RA bất kỳ nguồn nào biện minh cho đúng cặp số của CONS-001: 'nhịp > 30 m ⇒ ≥ 3 hàng dầm ngang' và 'khoảng cách ≤ 10 m'. Các con số gần nhất tôi xác minh được là: WSDOT BDM 2025 ≤ 50 ft (15,24 m) và kích hoạt theo tĩnh không chứ không theo nhịp; WSU/WSDOT WA-RD 696.1 khuyến nghị 20–40 ft (6,1–12,2 m) nhưng chỉ cho kịch bản va chạm xe quá khổ; AASHTO Standard Spec cũ đặt ngưỡng 40 ft (12,2 m) chứ không phải 30 m. Kết luận trung thực: ngưỡng 30 m và 10 m trong catalogs.json hiện KHÔNG có nguồn chống lưng.
+- Báo cáo gốc Ontario thập niên 1970 làm cơ sở phương pháp thiết kế bản theo kinh nghiệm (Csagoly/Holowka/Dorton 'The True Behavior of Thin Concrete Bridge Slabs'; Batchelor/Hewitt/Csagoly). Chỉ thấy trích dẫn thứ cấp trong kết quả tìm kiếm; không mở được toàn văn nên KHÔNG ghi thành mục.
+- Nghiên cứu riêng về dầm ngang trung gian cho dầm SUPER-T (cánh rộng, khe cánh hẹp, tiết diện hở chữ U) — không tìm được nguồn đáng tin. Toàn bộ bằng chứng ở trên là cho dầm I / bulb-tee / dầm hộp AASHTO. Đây là giới hạn ngoại suy cần ghi rõ khi dùng.
+- Các nguồn 403/redirect không truy cập được (nên KHÔNG được trích): AISC/NSBA Steel Bridge Design Handbook Chapter 17 'Bridge Deck Design' (2 URL đều 403); ADOT Bridge Design Guidelines Section 9 Decks; Iowa DOT LRFD Bridge Design Manual 5.2 Deck / 5.6 Concrete Slabs; Idaho ITD Bridge Manual Art. 5.12.4 Diaphragms; các trang landing ROSAP (rosap.ntl.bts.gov/view/dot/60909); ASCE Library (Abendroth/Klaiber/Shafer 1995 'Diaphragm Effectiveness in Prestressed-Concrete Girder Bridges' và Cai 2007 'Diaphragm Effects... Review and Discussion'); Ohio DOT LRFD training slides; MDOT 'Performance Evaluation of Isotropic Bridge Decks'.
+
+**Nền móng cọc & tương tác đất–kết cấu** (7)
+
+- Nguồn định lượng trực tiếp quan hệ 'giảm X% tĩnh tải nhịp → giảm Y% chiều dài/số lượng cọc hoặc chi phí móng' cho cầu dầm giản đơn nhịp ~38 m trên nền yếu. Đã thử nhiều truy vấn; các kết quả hứa hẹn nhất nằm trên ScienceDirect, ResearchGate và MDPI và đều trả HTTP 403 khi WebFetch. Không có nguồn nào được xác minh nên KHÔNG ghi mục nào cho chủ đề này.
+- NCHRP Report 697 'Design Guidelines for Increasing the Lateral Resistance of Highway-Bridge Pile Foundations by Improving Weak Soils'. Cả nap.nationalacademies.org/catalog/14574, www.nationalacademies.org/publications/14574 và trb.org/Publications/Blurbs/165939.aspx đều redirect vòng hoặc trả trang danh mục chung; không xác minh được siêu dữ liệu nên bỏ.
+- Nguồn định lượng sai lệch giữa tần số cơ bản f1 ĐO ĐƯỢC ngoài hiện trường và f1 tính theo công thức dầm giản đơn gối cứng, có xét độ mềm gối cao su + móng cọc — tức bằng chứng số cho SERV-003. Ứng viên tốt nhất là bài MDPI Infrastructures 2025 (doi.org/10.3390/infrastructures10100272) nhưng MDPI trả HTTP 403. Chỉ có phát biểu ĐỊNH TÍNH đã xác minh trong NCHRP Report 461 (tần số riêng của hệ 'kết cấu trên–móng' bị ảnh hưởng bởi độ cứng cọc), đã ghi trong mục đó.
+- Nghiên cứu về ma sát âm / cọc khoan nhồi đường kính lớn ở Đồng bằng sông Cửu Long: ScienceDirect (S2214391225000261) và HBRC Journal trên Taylor & Francis đều trả HTTP 403; ResearchGate không truy cập được. Không có bản mở nào được xác minh.
+- Toàn văn FHWA GEC 12 Volume I (nhi16009_v1.pdf) — file vượt giới hạn 10 MB của WebFetch; chỉ xác minh được qua bản ghi TRID.
+- Toàn văn TCVN 11823-10:2017 và TCVN 10304:2025 (đều sau tường phí). Cổng tiêu chuẩn chính thức tieuchuan.vsqi.gov.vn lỗi chứng chỉ SSL; thuvienphapluat.vn và caselaw.vn trả 403 hoặc không có nội dung.
+- Hệ số carbon hàm chứa (EPD) cho cọc khoan nhồi / bê tông móng, để đối chiếu với các hệ số PLACEHOLDER trong catalogs/catalogs.json. Ngoài phạm vi mảng được giao nên không tìm sâu, ghi lại để đợt quét sau xử lý.
+
+**Mỏi & độ bền lâu** (7)
+
+- Giá trị cụ thể của Điều AASHTO LRFD 5.5.3.3 (biên độ ứng suất mỏi cho tao cáp DƯL — thường trích là 18 ksi cho bán kính uốn > 30 ft và 10 ksi cho bán kính < 12 ft): tất cả các nguồn mở tôi truy cập được trong phiên chỉ VIỆN DẪN điều 5.5.3.3 (NCHRP 679 Appendix L, Caltrans amendments) chứ không tái hiện bảng giá trị. Tôi cố ý KHÔNG ghi các con số này vì chưa nhìn thấy chúng trên trang nào đã mở.
+- Mỏi vùng neo / mỏi do fretting của cáp tại điểm uốn xiên (harped/deviator) cho dầm kéo trước: không tìm được nguồn mở đáng tin cậy mở được trong phiên. fib Bulletin 30 (Acceptance of post-tensioning systems) không truy cập tự do.
+- Toàn văn TCVN 12041:2017 (Kết cấu bê tông và bê tông cốt thép — Yêu cầu chung về thiết kế độ bền lâu và tuổi thọ trong môi trường xâm thực): tìm thấy nhiều bản đăng lại (vanbanphapluat.co, tcvn.info, caselaw.vn, dulieuphaply.vn) nhưng WebFetch thất bại với lỗi chứng chỉ SSL ('unable to get local issuer certificate') trên các trang này. Tôi KHÔNG ghi bất kỳ điều khoản nào của TCVN 12041 vì chưa mở được trang.
+- Toàn văn TCVN 11823-5:2017 (bản Việt hoá phần Kết cấu bê tông) để đối chiếu trực tiếp điều 5.5.3 và Bảng giới hạn ứng suất kéo phiên bản tiếng Việt: không truy cập được nguồn chính thống mở trong phiên.
+- Nghiên cứu thực nghiệm mỏi trên dầm Super-T / dầm I DƯL nhịp 30–40 m dưới tải HL-93 cụ thể: không tìm được. Nguồn định lượng tốt nhất tìm được (Song et al. 2022) là dầm DƯL đường sắt tải nặng — cơ chế chuyển giao được nhưng con số không áp trực tiếp.
+- Bài MDPI Buildings 15(5):655 về mỏi của dầm hộp DƯL có cáp bị ăn mòn (thí nghiệm 4 dầm hộp dài 12,4 m): xuất hiện trong kết quả tìm kiếm nhưng cả URL MDPI lẫn DOI đều trả HTTP 403, không mở được nên KHÔNG đưa vào danh sách.
+- Các bài ScienceDirect liên quan (dự báo tuổi thọ mỏi dầm DƯL trong quá trình ăn mòn; carbonat hoá đa vùng dưới biến đổi khí hậu): ScienceDirect trả HTTP 403 cho WebFetch, không xác minh được.
+
+**Động lực học, gió & động đất** (10)
+
+- Toàn văn TCVN 11823-3:2017 (Tải trọng và hệ số tải trọng) — đã thử 4 nguồn: vanbanphapluat.co (lỗi chứng chỉ SSL), caselaw.vn (nội dung sau đăng nhập), hethongphapluat.com (chỉ hiện MỤC LỤC: xác nhận có điều '6.2 TỶ LỆ GIA TĂNG LỰC DO XUNG KÍCH: IM' và điều '8 TẢI TRỌNG GIÓ: WL VÀ WS', phần thân trả phí), luatvietnam.vn (trả phí). KHÔNG xác minh được bảng giá trị IM 75%/33%/15% hay tốc độ gió giật 3 giây chu kỳ 100 năm bằng nguyên văn tiếng Việt. Hai chi tiết mục lục nêu trên là thứ duy nhất xác minh được, chưa đủ để lập một mục trích dẫn.
+- NCHRP Report 368 'Calibration of LRFD Bridge Design Code' (Nowak) — nguồn gốc định lượng của mô hình tải trọng động (hệ số động lực trung bình, hệ số biến thiên, mô hình độ nhám mặt đường). File PDF chính thức tại onlinepubs.trb.org vượt giới hạn 10 MB của công cụ WebFetch. Đây là nguồn cấp một cho IM; hiện chỉ có được lời giải thích thứ cấp qua bài của Mertz (ASPIRE 2010).
+- Hwang, E.S. & Nowak, A.S., 'Simulation of Dynamic Load for Bridges', Journal of Structural Engineering (ASCE) — ascelibrary.org chặn truy cập. Chỉ thấy tiêu đề và trang thư mục qua WebSearch, KHÔNG mở được trang xuất bản để xác minh tập/số/trang, nên không lập mục.
+- Paultre, Chaallal & Proulx, 'Bridge dynamics and dynamic amplification factors — a review of analytical and experimental findings', Canadian Journal of Civil Engineering (DOI 10.1139/l92-032) — cdnsciencepub.com trả HTTP 403. Đây đúng là bài tổng quan kinh điển cần cho phần VBI nhưng không xác minh được.
+- Deng, Yu, Zou & Cai, 'State-of-the-Art Review of Dynamic Impact Factors of Highway Bridges', Journal of Bridge Engineering 20(5) — ascelibrary.org không mở được, không xác minh.
+- Nghiên cứu về hệ số xung kích cho mặt đường xấu (Engineering Structures / Journal of Sound and Vibration qua ScienceDirect) — các trang abstract đều bị chặn; chỉ có tóm tắt gián tiếp từ kết quả tìm kiếm, KHÔNG đủ tiêu chuẩn để trích.
+- MDPI Applied Sciences 12(3):1765 'Bridge Natural Frequencies, Numerical Solution versus Experiment' — cả /htm và trang chính đều trả HTTP 403. Đây là nguồn lý tưởng để định lượng sai số giữa công thức dầm và mô hình 3D nhưng không mở được.
+- Bình luận (Commentary) chính thức của CAN/CSA-S6 về biểu đồ 'tần số uốn thứ nhất vs võng tĩnh' và nguồn gốc nghiên cứu Wright & Walker (1971) — file tải về từ một trang bên thứ ba là bản quét ảnh không có lớp văn bản, không xác minh được nội dung; ngoài ra là tiêu chuẩn có bản quyền trên host không chính thức nên không đưa vào chỉ mục. (Nội dung tương đương đã được lấy gián tiếp và có kiểm chứng qua NCHRP Web Document 46, mục 2.4.1 và 2.4.3.)
+- FHWA-NHI-15-004 'LRFD Seismic Analysis and Design of Bridges Reference Manual' — bản PDF tại fhwa.dot.gov vượt giới hạn 10 MB; trang mục lục rosap.ntl.bts.gov trả HTTP 403. Đã thay bằng bản đề xuất Guide Specifications của Imbsen (2007) vốn chứa đúng các điều khoản cần thiết.
+- Nguồn Việt Nam bình duyệt về dao động / hệ số xung kích riêng cho cầu dầm Super-T nhịp 38–40 m — tìm bằng tiếng Việt chỉ ra ResearchGate (không phải nguồn gốc, tránh theo chính sách) và tài liệu giảng dạy không có số hiệu xuất bản. Không lập mục nào.
+
+**BIM & IFC cho cầu** (7)
+
+- Danh sách phần mềm triển khai IFC4.3 của buildingSMART (https://technical.buildingsmart.org/ifc-4-3-software-implementations/) — cần để xác minh hoặc bác bỏ vế 'được hỗ trợ đồng bộ trên cả Autodesk Revit, Civil 3D, Bentley OpenBridge, Midas Civil và BlenderBIM' trong KC-019. Toàn bộ host technical.buildingsmart.org và www.buildingsmart.org trả HTTP 403 với WebFetch, KHÔNG lấy được nội dung. Vì vậy KHÔNG có mục nào trong danh sách trên xác nhận hay bác bỏ được vế 'duy nhất / đồng bộ' này — cần người dùng mở tay để kiểm.
+- Văn bản chính sách MVD của buildingSMART cho IFC4.x (20210425_MVD-policy_IFC4.x.pdf) — HTTP 403.
+- Bài 'Architectural and Structural Interoperability in the BIM Design Workflow' (mdpi.com/2075-5309/15/24/4540) — toàn bộ host mdpi.com trả HTTP 403; không xác minh được tiêu đề, tác giả, năm, DOI nên KHÔNG đưa vào danh sách.
+- Bài về LOIN/EN 17412 cho cầu bê tông cốt thép hiện hữu ở Ý (nghi là 10.3390/su141811767) — cũng thuộc MDPI, HTTP 403, không xác minh được.
+- Toàn văn tiêu chuẩn EN 17412-1:2020 (Level of Information Need) và ISO 19650 — trả phí, không truy cập được. Khái niệm LOIN chỉ được xác minh gián tiếp qua tài liệu MINnD (đã fetch).
+- Toàn văn Quyết định 258/QĐ-TTg ngày 17/3/2023 về lộ trình áp dụng BIM tại Việt Nam: chỉ xác minh được SIÊU DỮ LIỆU trên tulieuvankien.dangcongsan.vn (số hiệu 258/QĐ-TTg, Thủ tướng Chính phủ, ngày 17/3/2023, người ký Trần Hồng Hà); phần nội dung lộ trình và yêu cầu định dạng KHÔNG hiển thị trên trang, và thuvienphapluat.vn trả HTTP 403. Do không xác minh được nội dung nên không lập thành mục.
+- Không tìm được nghiên cứu đã kiểm chứng nào về việc xuất IFC 4.3 từ hệ sinh phương án tự động / generative design cho cầu (đúng kịch bản của repo) — khoảng trống nghiên cứu này bản thân nó là thông tin đáng ghi nhận.
+
+**Vòng đời & carbon hàm chứa** (6)
+
+- Không tìm được EPD hay LCA công bố nào dành riêng cho DẦM SUPER-T, hoặc cho dầm cầu bê tông đúc sẵn dự ứng lực sản xuất tại Việt Nam. Nguồn gần nhất tìm được là EPD ngành bản rỗng lõi (hollowcore) của MPA Precast UK — cùng họ công nghệ (đúc sẵn, căng trước, cường độ trên 50 MPa) nhưng khác cấu kiện và đơn vị công bố là m2 chứ không phải m3.
+- Không tìm được một bộ EPD/LCA nhất quán cho CẢ THANG CẤP bê tông C30 → C60 từ cùng một nhà sản xuất hoặc cùng một chương trình EPD. Đây chính là thứ cần để hiệu chuẩn HÌNH DẠNG của đường cong cấp bê tông → carbon trong catalogs.json (chứ không chỉ hiệu chuẩn một điểm). Anderson & Moncaster có phân bố theo cường độ nhưng ở dạng biểu đồ tổng hợp nhiều nước, không phải bảng số theo cấp.
+- Không lấy được các giá trị lập bảng của ICE database (Inventory of Carbon and Energy). Bản v4.1 nằm sau đăng ký tại Circular Ecology; bản v2.0 Summary Tables (Craig Jones, 2011) tôi có tải được PDF nhưng trích xuất văn bản không tách được số ra khỏi nhãn hàng/cột một cách tin cậy, nên tôi CHỦ Ý KHÔNG trích dẫn bất kỳ con số ICE nào thay vì mạo hiểm ghi sai. Nếu cần, đây là việc nên làm lại bằng cách tải file Excel gốc.
+- Không tìm được EPD cho cáp dự ứng lực (PC strand) sản xuất tại Việt Nam hoặc Đông Nam Á. Điểm dữ liệu duy nhất xác minh được là EPD-SLM-081-EN của Siderurgica Latina Martin (Ý, EcoInvent 3.4, dữ liệu 2018, đã hết hiệu lực 05/2025).
+- Không tìm được hướng dẫn LCCA hay kiểm kê carbon vòng đời cấp quốc gia cho công trình cầu tại Việt Nam (TCVN, thông tư Bộ GTVT, hay định mức tương đương). Toàn bộ nguồn LCCA xác minh được đều là Hoa Kỳ (NCHRP 483, SHRP2 R19A).
+- Không tìm được nghiên cứu định lượng nào tính TRỰC TIẾP sai số phát sinh khi dùng một hệ số carbon duy nhất cho mỗi cấp bê tông (kiểu 'dùng giá trị trung bình gây sai lệch X% ở mức phương án'). Bằng chứng gần nhất là gián tiếp: Anderson & Moncaster cho thấy trong cùng cấp ~30 MPa không rút ra được kết luận nào, và biên độ do chất kết dính (EPD MPA 145 so với PLACEHOLDER 320; nguồn JSTT Việt Nam 32,16% ở cùng ~50 MPa) lớn hơn biên độ giữa các cấp.
+
+**Hình học tuyến & tham số hoá** (6)
+
+- AASHTO/NSBA G13.1-2019 "Guidelines for Steel Girder Bridge Analysis"** — nguồn rất phù hợp cho mảng cầu chéo/cong (mức phân tích theo độ phức tạp hình học, kế thừa NCHRP 725), từng phát miễn phí qua AISC, nhưng aisc.org trả 403 với trang giới thiệu và 404 với cả hai link PDF chính thức (bản 2019 và bản lưu trữ) → LOẠI khỏi danh mục. Nội dung tương đương đã được phủ bởi NCHRP Report 725.
+- FHWA Steel Bridge Design Handbook, Design Example 3 (Three-Span Continuous Horizontally Curved Composite Steel I-Girder Bridge, FHWA-HIF-16-002)** — tìm thấy record trên ROSA P nhưng chưa xác minh toàn văn (trang record ROSA P trả 403), chưa đưa vào danh mục.
+- Trang record ROSA P của FHWA-HIF-22-034** (rosap.ntl.bts.gov/view/dot/62673) trả 403 — không ảnh hưởng vì PDF gốc trên fhwa.dot.gov tải và đọc được trực tiếp.
+- MDPI và DOAJ chặn truy cập tự động (403)** — bài Mohseni et al. 2018 vẫn được giữ vì xác minh đầy đủ qua Semantic Scholar API; các bài MDPI khác về skew (vd. ambient vibration LLDF cho PSC I-girder, Appl. Sci. 11(22):11010) không xác minh thêm được nên không đưa vào.
+- Nguồn chuyên biệt về screed elevation / vuốt siêu cao trên cầu dạng báo khoa học** — không tìm được bài báo tạp chí riêng đủ chất lượng; chủ đề này hiện chỉ được phủ tốt trong FHWA-HIF-22-034 (chương 4, 6, 9) và các state DOT bridge geometry manual (CoDOT 2024 — tồn tại nhưng không xác minh chi tiết nên không lập mục riêng).
+- Ji, Borrmann et al. "Exchange of Parametric Bridge Models Using a Neutral Data Format" (J. Comput. Civ. Eng. 27(6), 2013)** — nguồn tốt cho parametric bridge exchange nhưng chỉ tìm thấy qua ResearchGate/TU-Eindhoven record, không mở được bản chính thức ASCE để xác minh → không lập mục riêng (chủ đề đã được phủ bởi bài EC³ 2019).
+
+**Lựa chọn loại cầu & phân tích phương án** (6)
+
+- MDPI Sustainability 18(8):4013 (2026) — "Sustainable Bridge Construction Decisions Using Fuzzy MCDM: A Comprehensive Comparison of AHP–VIKOR, BWM–VIKOR, and TOPSIS"**: mdpi.com trả 403 Forbidden cho mọi cách truy cập (trang bài, thử lại nhiều lần, cả tải trực tiếp). Ứng viên rất tốt cho mảng MCDM (mới, OA) nhưng KHÔNG xác minh được tiêu đề/tác giả/DOI từ trang gốc → loại theo quy trình. Nên thử lại thủ công từ trình duyệt.
+- Alberta Transportation — "Bridge Conceptual Design Guidelines"** (open.alberta.ca): server trả 403/trang HTML chặn bot. Là guideline chính phủ hiếm hoi chuyên về quy trình conceptual design cầu — đáng tải thủ công.
+- ROSAP/NTL (rosap.ntl.bts.gov)**: toàn bộ kho (bản FHWA-HIF-16-002 của "Selecting the Right Bridge Type", các volume SBDH gốc) chặn 403 — đã thay bằng bản AISC 2022 xác minh được toàn văn (LIT-121).
+- Nguồn cost-per-m² phủ ĐỦ các loại cầu nhịp lớn (dàn/vòm/extradosed/dây văng/dây võng)**: không tìm được nguồn mở nào có bảng đơn giá thống nhất theo loại cho nhịp lớn; Caltrans (LIT-122) chỉ phủ đến nhịp ~300 ft, SED 17 (LIT-123) chỉ cho tỉ lệ khối lượng vật liệu chứ không cho đơn giá. Hàm chi phí nhịp lớn của hệ sẽ phải tự tổng hợp từ tỉ lệ vật liệu + đơn giá địa phương.
+- Báo khoa học dùng ML để CHỌN LOẠI cầu trực tiếp (classification "span/site → bridge type")**: tìm nhiều truy vấn nhưng kết quả chủ yếu là ML cho condition rating/SHM, không phải type selection; hai nguồn generative (LIT-127, LIT-128) là gần nhất xác minh được. Khoảng trống này có thể chính là đóng góp của đề tài.
+- Lưu ý: trích dẫn nguyên văn trong danh mục lấy từ bản toàn văn đã mở được; các trường ghi "Chưa xác minh được" cần bổ sung khi truy cập thủ công.
+
+**Độ bền & tuổi thọ kết cấu** (7)
+
+- DuraCrete báo cáo gốc BE95-1347/R17** ("General Guidelines for Durability Design and Redesign", 5/2000): không có bản phân phối chính thức mở — chỉ thấy scan trên Scribd (không dẫn vì không xác minh được tính toàn vẹn). Đã thay bằng bài tổng kết dự án của chính hai tác giả chủ chốt (LIT-134). Bản tóm tắt của Lindvall tại `fib.bme.hu/proceedings/lindvall.pdf` bị LOẠI do lỗi chứng chỉ TLS khi truy cập.
+- ISO 16204 trang gốc iso.org và ANSI webstore**: trả 403 với truy cập tự động — xác minh thay bằng trang SIS (bản chấp nhận nguyên văn của Thuỵ Điển, LIT-132).
+- MDPI truy cập trực tiếp (mdpi.com)** trả 403; các bài MDPI trong danh mục đều xác minh qua bản mirror chính thức trên PubMed Central.
+- "Chloride ingress in concrete... tropical marine environment" (field exposure, atmospheric/tidal/submerged)**: chỉ tìm thấy trên ResearchGate (không xác minh được nơi công bố gốc từ trang mở) — LOẠI; vai trò "hiện trường nhiệt đới" được LIT-136 (Thâm Quyến) và LIT-081 (Việt Nam) gánh thay.
+- Kanavaris et al. 2023, "A review on the effects of cracking and crack width on corrosion of reinforcement in concrete" (Structural Concrete, Wiley)**: ứng viên tốt cho mục 4 nhưng chưa xác minh được trạng thái truy cập mở trong phiên này — nếu cần review mới hơn LIT-080 thì kiểm tra sau qua DOI 10.1002/suco.202300227 (DOI theo trang tìm kiếm, chưa tự xác minh).
+- SHRP2 R19A "Design Guide for Bridges for Service Life" toàn văn**: bản chính thống trên trb.org không fetch được trong phiên; vai trò được thay bằng FHWA-HIF-22-052 (LIT — mục FHWA trong danh mục, đã xác minh toàn văn 100 trang) vốn tổng hợp cả SHRP2 R19A lẫn AASHTO Guide Specification. LƯU Ý: FHWA HIF-22-052 đã xác minh đầy đủ (Hopper, Langlois, Murphy — COWI North America & Modjeski and Masters, 11/2022, toàn văn mở tại `https://www.fhwa.dot.gov/bridge/preservation/docs/hif22052.pdf`) — nếu thư viện muốn 11 mục thì đây là mục sẵn sàng thêm: nó định nghĩa Normal/Enhanced/Maximum service life = 75/100/150 năm và trình bày cả 4 chiến lược verification, rất hợp làm "bản đồ đường đi" cho Gate G6.
+- Không tìm được nguồn tiếng Việt (tạp chí trong nước) đủ "xác minh nổi" về phân vùng xâm thực TCVN 9346/TCVN 12041 trong phạm vi phiên này — đề xuất tra trực tiếp kho tiêu chuẩn TCVN cho vòng bổ sung sau.
+
+**Kiểm định, bảo trì & hệ quản lý cầu** (6)
+
+- 22 TCN 243-98 — Quy trình kiểm định cầu trên đường ô tô** (tiêu chuẩn kiểm định cầu VN, đích danh mục 5): tồn tại chắc chắn (nhiều nguồn thứ cấp mô tả: kiểm định hiện trạng + xác định khả năng chịu tải kết cấu nhịp thép/BTCT/DUL và mố trụ, dùng kèm 22 TCN 170-87 thử tải), nhưng KHÔNG mở được URL toàn văn nào: `vanbanphapluat.co` lỗi kết nối (domain trỏ về localhost), `caselaw.vn` trả về trang chủ thay vì văn bản, `thuvienphapluat.vn` chặn 403. Đề xuất: tự tải thủ công qua trình duyệt rồi lưu vào kho UNVERIFIED→VERIFIED.
+- Cesare, Santamarina, Turkstra, Vanmarcke (1992) "Modeling Bridge Deterioration with Markov Chains"**, J. Transportation Engineering 118(6):820 — bài gốc kinh điển của dòng Markov (dữ liệu 850 cầu New York): `ascelibrary.org` chặn 403. Tương tự **Kong & Frangopol (2003)** J. Structural Engineering 129(6):818 (tối ưu chi phí bảo trì theo độ tin cậy vòng đời) — ASCE chặn toàn bộ. Đã thay bằng MPC 24-560 (mở) và arXiv Andriotis (mở).
+- Federal Register / eCFR bản gốc NBIS 2022** (87 FR 27396; 23 CFR 650 Subpart C): cả hai site redirect sang trang unblock chống bot — thay bằng bản overview chính thức của FHWA (LIT-139, đã xác minh toàn văn).
+- Review "Deterioration models for prediction of remaining useful life of timber and concrete bridges"** (J. Traffic & Transportation Engineering, ScienceDirect) và **MDPI Applied Sciences 14(4):1444** (Elman NN + Markov): 403.
+- Số liệu "chi phí bảo trì cầu 0,5–2%/năm chi phí ban đầu"** lan truyền trên các trang cost-guide thương mại: không tìm được nguồn học thuật/chính phủ xác minh được đứng sau con số này — KHÔNG đưa vào; số liệu tỷ lệ đáng tin nhất hiện có là ví dụ PennDOT trong LIT-147 (~12% chi phí ban đầu, hiện giá, cho cả chu kỳ 70 năm).
+- Đã xác minh nhưng để ngoài danh sách chính** (vượt trọng tâm 6 nhóm): Mia & Kameshwar (2023) "Machine learning approach for predicting bridge components' condition ratings", Frontiers in Built Environment 9, DOI 10.3389/fbuil.2023.1254269 — RUSBoost Random Forest trên NBI Louisiana 1992–2019, độ chính xác >93%; hữu ích nếu sau này muốn thay Markov bằng mô hình data-driven.
+
+**SHM, digital twin & BIM vận hành** (6)
+
+- Costin, Adibfar & Bridge — "Digital Twin Framework for Bridge Structural Health Monitoring Utilizing Existing Technologies: New Paradigm for Enhanced Management, Operation, and Maintenance" (Transportation Research Record, 2023, DOI 10.1177/03611981231208908):** trang SAGE không mở được bằng WebFetch (lỗi liên tục); metadata + abstract đã xác minh qua Semantic Scholar API nhưng KHÔNG có toàn văn mở, và không xác minh được bài có dùng case study Memorial Bridge hay không (dù xuất hiện trong kết quả tìm kiếm về Memorial Bridge). Loại khỏi danh sách chính, nhưng đáng mua/xin toàn văn vì đúng chủ đề "DT tận dụng công nghệ sẵn có cho O&M cầu".
+- Bài báo bình duyệt của nhóm UNH về SHM/model updating cho chính Memorial Bridge** (nhóm Santini-Bell/Mashayekhi): tìm kiếm không trả về bản toàn văn mở xác minh được; đành dùng trang dự án Tethys (LIT-151) làm nguồn case study. Con số "40 cảm biến" chỉ có trong tin tức (StateScoop, Phys.org), chưa đối chiếu được với tài liệu dự án.
+- MDPI (mdpi.com) chặn WebFetch (HTTP 403)** với mọi URL thử: các bài Sensors/Buildings phải xác minh qua bản PMC hoặc Semantic Scholar API. Riêng bài Gao et al. "Bridge Digital Twin for Practical Bridge Operation and Maintenance by Integrating GIS and BIM" (Buildings 14(12):3731, 2024, CC BY) đã xác minh đủ metadata + abstract qua API nhưng không đọc được toàn văn nên không viết thành mục đầy đủ — là ứng viên tốt nếu truy cập thủ công.
+- buildingsmart.org** (bài "IFC 4.3 – A Major Milestone") và **technical.buildingsmart.org** đều trả 403; thay bằng site tài liệu đặc tả chính thức ifc43-docs.standards.buildingsmart.org (LIT-157).
+- Tài liệu chuyên về COBie cho cầu / ISO 19650-3 (operational phase) dạng toàn văn mở:** không tìm được nguồn học thuật mở chuyên biệt "COBie cho cầu"; ISO 19650-3 là tiêu chuẩn thu phí nên không xác minh nội dung được — hiện chỉ có mô tả gián tiếp qua trang FHWA (LIT-156) và các trang tổng quan thương mại (không đủ chuẩn đưa vào thư viện).
+- ScienceDirect** (các bài "Digital twinning of a steel composite bridge using semantic data structures", "An intelligent BIM-enabled digital twin framework…"): phần lớn paywalled/chặn bot, không xác minh được — bỏ qua thay vì trích không kiểm chứng.
+
+**Địa chất & khảo sát địa kỹ thuật** (6)
+
+- AASHTO Manual on Subsurface Investigations, 2nd Edition (MSI-2, 2021)** — nguồn quy hoạch khảo sát quan trọng ngang GEC-5, nhưng trang AASHTO Store trả về template rỗng khi fetch (không xác minh được năm/ISBN/mô tả trên trang mở được) và toàn văn bán bản quyền → LOẠI khỏi danh sách chính; chỉ nên trích qua GEC-5/DOT manuals.
+- Kulhawy & Mayne EL-6800**: OSTI.gov từ chối kết nối (ECONNREFUSED) hai lần, trang sản phẩm EPRI không hiển thị metadata; chỉ xác minh được trang bìa qua Scribd — đã ghi rõ trong LIT-162, độ tin cậy xác minh thấp hơn các nguồn còn lại.
+- rosap.ntl.bts.gov** (bản gốc GEC-5 và DIGGS) và **cdnsciencepub.com** (2 bài CGJ) đều trả 403 với WebFetch — phải xác minh vòng qua TRID/Crossref; URL cdnsciencepub trong LIT-164/LIT-168 là URL DOI chính tắc nhưng người đọc cần quyền truy cập.
+- FHWA NHI-05-037** (kết quả tìm kiếm về boring spacing) đã kiểm tra: là sổ tay địa kỹ thuật MẶT ĐƯỜNG, không có hướng dẫn hố khoan riêng cho cầu → không đưa vào.
+- Chưa tìm được nguồn mở chất lượng cao **chuyên về ảnh hưởng của dữ liệu khảo sát đến lựa chọn móng cầu cụ thể tại VN** (các bài VN tìm thấy chủ yếu về xử lý nền đắp/PVD, hoặc nằm trên ResearchGate/Academia không fetch xác minh được).
+- TCVN hiện hành thay thế 22 TCN 263:2000** cho khảo sát cầu: chưa xác minh được văn bản thay thế chính thức trong phiên tìm kiếm này — nên kiểm tra lại tình trạng hiệu lực trước khi viện dẫn trong hồ sơ.
+
+**Thuỷ văn, thuỷ lực, xói & gió công trình** (8)
+
+- TCVN 9845:2013 "Tính toán các đặc trưng dòng chảy lũ"** — tiêu chuẩn Việt Nam đúng nhất cho lưu lượng lũ thiết kế công trình thoát nước trên đường; tồn tại chắc chắn (nhiều bản ghi: thuvienphapluat.vn, vsqi.gov.vn, vanbanphapluat.co) nhưng mọi trang toàn văn đều không mở được (403 / lỗi chứng chỉ / ECONNREFUSED). Nên tìm bản giấy/PDF nội bộ để đưa vào thư viện VERIFIED sau.
+- TCVN 2737 (1995/2023) toàn văn + bản đồ phân vùng áp lực gió** — không có nguồn chính thức mở được; chỉ xác minh gián tiếp cấu trúc 7 vùng gió (I-A…V-B) qua công cụ bản đồ của Dlubal (trang thương mại, không đạt chuẩn nguồn học thuật nên không lập LIT riêng).
+- "Causes and statistical characteristics of bridge failures: A review"** (Journal of Traffic and Transportation Engineering, ~2022) — bản cập nhật thống kê sập cầu đáng có, ScienceDirect trả 403.
+- "Effects of riverbed incision on the hydrology of the Vietnamese Mekong Delta"** (Hydrological Processes, Wiley) — rất liên quan (hạ đáy sông do khai thác cát → ảnh hưởng móng trụ), Wiley trả 403.
+- Bài IAWE "Extreme wind climate and a proposal to improve the [wind map]…" cho Việt Nam** — iawe.org trả 401.
+- HDS-7 2nd Edition (FHWA-HIF-24-001, 1/2024)** — thấy trong kết quả tìm kiếm, chưa fetch trực tiếp; LIT-172 dẫn bản 2012 đã xác minh.
+- Hạn chế chung về PDF**: các PDF chính thức (HEC-18, NCHRP 20-07/325, AASHTO GSWLB preview, APEC country report Vietnam) tải về được nhưng công cụ không trích xuất được text (PDF nén/scan; thiếu poppler cục bộ) — metadata các nguồn này đều đã xác minh qua trang thư viện/TRID/TRB, riêng trích dẫn nguyên văn bên trong cần người đọc đối chiếu thủ công; APEC country report vì thế bị loại hẳn.
+- Trang bị chặn có hệ thống**: ascelibrary.org, sciencedirect.com, rosap.ntl.bts.gov, researchgate.net, onlinelibrary.wiley.com, nottingham-repository.worktribe.com đều trả 403 với công cụ fetch — các nguồn chỉ có ở đó phải xác minh vòng qua TRID/TRB/Semantic Scholar như đã ghi từng mục.
+
+**Dữ liệu khảo sát số & dataset mở** (7)
+
+- SDNET2018 trang ScienceDirect** (S2352340918314082): HTTP 403 — đã thay bằng bản PMC chính thức toàn văn (LIT-181), nội dung đầy đủ, không mất thông tin.
+- "Uncrewed Aerial System (UAS) Applications in Bridge Inspection" (MDPI Drones 2026, 2504-446X/10/2/144)**: MDPI trả 403, không xác minh được nội dung → LOẠI dù tiêu đề rất khớp yêu cầu; nếu người dùng mở được bằng trình duyệt thì đây là ứng viên thay thế tốt cho LIT-184.
+- "UAV LiDAR bridge point cloud dataset and hybrid deep learning framework" (ScienceDirect, Automation in Construction 2026)**: chỉ thấy abstract qua search, trang 403 — có vẻ là dataset UAV LiDAR cầu gán nhãn cấp cấu kiện đúng nhu cầu, nhưng chưa xác minh được có link tải công khai hay không → LOẠI.
+- "Recent advances in structural health diagnosis: a machine learning perspective" (Advances in Bridge Engineering, SpringerOpen 2024)**: redirect sang trang auth của Springer, không fetch được → thay bằng LIT-185 (Sensors, open access, xác minh toàn văn).
+- ASCE "UAV Bridge Inspection through Evaluated 3D Reconstructions" (J. Bridge Eng. 2019)** và **Taylor & Francis "Automated UAV path-planning..." (2024)**: paywall/403, không xác minh trực tiếp → không đưa vào danh sách chính.
+- Repo `buildingSMART/IFC4.3.x-sample-models`**: URL cũ còn sống nhưng redirect sang `IFC4.x-specification-models`; repo mới KHÔNG chứa mô hình cầu hoàn chỉnh — chi tiết đã ghi trong LIT-188 để tránh trích dẫn nhầm tên repo đã chết.
+- Thư viện family Revit cầu công khai (OpenBridge/LEAP samples)**: không tìm được nguồn chính thức tải tự do xác minh được (các bộ mẫu Bentley nằm sau đăng nhập) → không đưa vào.
+
+**Thi công, lắp dựng & tải trọng thi công** (15)
+
+- **FHWA-RD-93-032 "Guide Design Specification for Bridge Temporary Works" (bản đầy đủ trên ROSAP, rosap.ntl.bts.gov/view/dot/68121)**: HTTP 403 Forbidden ở cả trang bản ghi lẫn file PDF → LOẠI. (Chỉ dùng được bản AASHTO 1995 phần đầu, xem LIT-192.)
+- **FHWA-RD-93-031 "Guide Standard Specification for Bridge Temporary Works" (rosap.ntl.bts.gov/view/dot/68122)**: cùng host ROSAP đang chặn 403 → LOẠI.
+- **AASHTO "Guide Design Specifications for Bridge Temporary Works", 2nd Edition 2017 và 2020 Interim Revisions**: chỉ có trang bán hàng trên AASHTO Store, không có toàn văn công khai → LOẠI (không được dùng nội dung mô tả trên trang bán để trích dẫn kỹ thuật).
+- **AASHTO "Construction Handbook for Bridge Temporary Works" (FHWA-RD-93-034), 2nd Edition**: chỉ có trang bán hàng và các bản đăng lại không chính thức (Scribd, pdfcoffee) → LOẠI.
+- **GDOT Research Project 05-15, Zureick et al., "Stability of Precast Prestressed Concrete Bridge Girders Considering Sweep and Thermal Effects" (dot.ga.gov)**: máy chủ trả về "Request Rejected" → LOẠI. Đây là mất mát đáng tiếc nhất vì nguồn này có số liệu thí nghiệm về hiệu ứng nhiệt lên ổn định dầm.
+- **Consolazio & Edwards, "Determination of Brace Forces Caused by Construction Loads and Wind Loads During Bridge Construction", UF Structures Research Report 2014/101350-102056**: file vượt giới hạn 10 MB của công cụ tải, bản ROSAP tương ứng trả về 403 → LOẠI.
+- **FDOT Structures Design Guidelines, Chương 11 "Temporary Works" (2023)**: file vượt giới hạn 10 MB của công cụ tải → LOẠI.
+- **Consolazio & Edwards, "Drag Coefficients for Construction-Stage Stability Analysis of Bridge Girders under Wind Loading", ASCE Journal of Bridge Engineering V.22 No.1**: paywall ASCE Library, chỉ có abstract → LOẠI.
+- **"Forensic Inquiry into Derailment of a Launching Gantry", ASCE Journal of Performance of Constructed Facilities V.34 No.1**: paywall ASCE Library, chỉ có abstract → LOẠI. (Là nguồn duy nhất tìm được về sự cố giàn lao lắp, rất tiếc.)
+- **"Miami Pedestrian Bridge Collapse: Computational Forensic Analysis", ASCE Journal of Bridge Engineering V.25 No.1**: paywall ASCE Library → LOẠI. (Nội dung sự cố này đã được phủ bằng LIT-199 là nguồn mở.)
+- **"A survey of failures of bridge falsework systems since 1970", ICE Proceedings — Forensic Engineering V.165 No.4 (Emerald)**: abstract-only → LOẠI.
+- **"Time-Dependent Analysis of Precast Segmental Bridges", International Journal of Concrete Structures and Materials, DOI 10.1186/s40069-020-00445-6**: URL SpringerOpen chuyển hướng sang idp.springer.com yêu cầu xác thực, không đọc được nội dung trang → LOẠI.
+- **PCI CB-02-16 "Recommended Practice for Lateral Stability of Precast, Prestressed Concrete Bridge Girders"**: sản phẩm bán của PCI, không có toàn văn công khai → LOẠI. (Nội dung của nó được phản ánh gián tiếp qua LIT-049 và LIT-196, là hai bài PCI Journal mở toàn văn.)
+- **Trang MDPI chính thức của LIT-193 (www.mdpi.com/2076-3417/12/12/5936)**: trả về 403 với công cụ tải. Nguồn vẫn được giữ vì đã xác minh trên **bản PDF open-access CC BY** có in đầy đủ trích dẫn, DOI 10.3390/app12125936, ngày nhận/chấp nhận/xuất bản và giấy phép ngay trong file.
+- **EN 1991-1-6:2005 (văn bản tiêu chuẩn gốc)**: bán thương mại, không có toàn văn công khai. Nội dung được xác minh qua tài liệu hội thảo chính thức của JRC/Ủy ban châu Âu (LIT-190), không phải qua bản tiêu chuẩn.
+
+**Tiêu chuẩn Việt Nam & đối chiếu AASHTO** (17)
+
+- `https://www.diendancauduong.com/2019/05/so-sanh-tieu-chuan-thiet-ke-cau-tcvn.html` — bài "So sánh tiêu chuẩn thiết kế cầu TCVN 11823-2017 và 22TCN 272-05". **DNS không phân giải (ENOTFOUND)** — tên miền đã chết. Đây đáng lẽ là nguồn tốt nhất cho chủ đề 5; hiện chưa có nguồn thay thế đọc được toàn văn.
+- `https://tieuchuan.vsqi.gov.vn/tieuchuan/view?sohieu=...` (cổng chính thức của Viện Tiêu chuẩn Chất lượng Việt Nam, dùng cho TCVN 11823-3, TCVN 10304, TCVN 9346, TCVN 12041) — **lỗi chứng chỉ SSL: "unable to verify the first certificate"**. Không xác minh được thư mục chính thức của bất kỳ tiêu chuẩn nào qua kênh này.
+- `https://moc.gov.vn/vn/tin-tuc/1173/73524/soat-xet-tcvn-9346-2012...` (Bộ Xây dựng, tin soát xét TCVN 9346:2012) — **lỗi chứng chỉ SSL**. Không xác minh được tình trạng soát xét/sửa đổi của TCVN 9346:2012.
+- `https://thuvienphapluat.vn/...` (cả trang TCVN 11823-3 và trang bài viết về TCVN 9346) — **HTTP 403 Forbidden**.
+- `https://vanbanphapluat.co/...` (TCVN 11823-3 và TCVN 11823-5) — **không phản hồi, thử 3 lần**.
+- `https://caselaw.vn/van-ban-phap-luat/344257-...` — mở được nhưng **chỉ trả về trang giới thiệu dịch vụ**, không có toàn văn tiêu chuẩn.
+- `https://cokhicongtrinh.com.vn/upload/files/TCVN 11823_Phan 1_Yeu-cau-chung.pdf` và `http://mtu.edu.vn/.../TCVN9386_2012.pdf` — tải được file nhưng **PDF ở dạng stream nén, không trích xuất được văn bản** trong môi trường này (thiếu poppler-utils). Nội dung hai tiêu chuẩn này cuối cùng được xác minh qua dulieuphaply.vn.
+- `hethongphapluat.com` và `luatvietnam.vn` — mở được nhưng **toàn văn nằm sau paywall**; chỉ xác minh được thư mục.
+- **Tải trọng thi công (construction loads)** — trường `UNKNOWN` trong design basis. Không trích được điều khoản tương ứng trong TCVN 11823-3 dù đã hỏi trực tiếp. Vẫn là lỗ hổng chưa có nguồn.
+- **Trị số cụ thể của tải trọng gió (TCVN 11823-3 Điều 8) và tác động động đất (Điều 9)** — chỉ xác nhận được sự tồn tại của hai điều này qua Bảng 3, không đọc được bảng số. Đây là chỗ then chốt nếu muốn viết rule `WIND-*`/`SEIS-*`, hiện chưa đủ căn cứ.
+- **Hệ số của từng ô trong Bảng 3 TCVN 11823-3** cho các tổ hợp Mỏi I/II và Đặc biệt I/II — chỉ có tên tổ hợp, không có trị số.
+- **Bảng chiều dày lớp bê tông bảo vệ trong TCVN 11823-5 Điều 10.1** — không đọc được. Nghịch lý đáng ghi: bộ tiêu chuẩn mà hệ khai là governing lại là nguồn duy nhất tôi **không** lấy được trị số lớp bảo vệ, trong khi hai tiêu chuẩn ngoài bộ (TCVN 9346, TCVN 12041) thì lấy được.
+- **Giới hạn độ võng trong TCVN 11823-4** — đã kiểm tra và **không có ở Phần 4**; toàn bộ quy định võng (L/800, L/1000, L/300, L/375) nằm ở **Phần 2**, kèm câu xác định đây là tiêu chuẩn *tùy chọn*. Ghi lại để tránh dẫn nguồn sai cho SERV-002.
+- **22TCN 272-05 toàn văn** — trang tailieucauduong.com chỉ có liên kết tải Google Drive, không có toàn văn hiển thị; **không xác minh được số quyết định ban hành của Bộ GTVT, tên đầy đủ, và bản AASHTO gốc**. Trang này ghi "AASHTO xuất bản lần thứ 2 năm 1998" nhưng không rõ là nói về bản LRFD hay bản khác, nên tôi không dùng con số này.
+- **Quy chuẩn kỹ thuật quốc gia (QCVN) riêng cho công trình cầu** (chủ đề 9) — **không tìm thấy**. QCVN 41 (bản 2019 và bản 2024/BGTVT theo Thông tư 51/2024/TT-BGTVT) là quy chuẩn về **báo hiệu đường bộ**, không liên quan thiết kế cầu. Cũng không tìm được TCCS nào của Cục Đường bộ / Bộ GTVT về quy trình khảo sát–thiết kế cầu. Chủ đề 9 coi như chưa phủ được.
+- **Nghiên cứu học thuật so sánh TCVN 11823 với AASHTO ở phần tải trọng/kết cấu** (chủ đề 7) — chỉ tìm được đúng một bài (LIT-212), và bài đó giới hạn ở **động đất/cách chấn**. Không tìm được bài nào so sánh phần hoạt tải HL-93, hệ số tải trọng, hay thiết kế dầm dự ứng lực giữa hai hệ. Tìm kiếm trên Transport and Communications Science Journal không cho kết quả trực tiếp.
+- **TCVN 2737:1995** (bản cũ, chủ đề 3) — không xác minh riêng; chỉ xác nhận gián tiếp qua dòng "thay thế TCVN 2737:1995" trong TCVN 2737:2023.
+
+**Thẩm mỹ, precedent & mô hình ảnh 3D** (20)
+
+- **Structurae** (`structurae.net/en/`, `/en/legal`, `/en/structures/bridges`) — chặn 403 ở cả ba đường dẫn thử. Đây là CSDL trọng tâm nhất của chủ đề 4 (kết quả tìm kiếm nêu >85.000 công trình và 411.000 ảnh, nhưng **không mở được trang để xác nhận, cũng không xác minh được license và điều kiện truy cập**). Cần mở thủ công bằng trình duyệt trước khi dùng.
+- **MIT Press** (`mitpress.mit.edu/9780262121057/bridges/`) — 403; buộc phải xác minh LIT-214 gián tiếp qua Open Library.
+- **ScienceDirect** — 403 với cả hai bài trọng yếu: *"Deep-learning-based aesthetic evaluation network for bridge pylon and aesthetics-oriented bridge design"* (pii `S235201242402321X`) và *"Evaluating the aesthetic quality of urban façades with deep learning approaches"* (pii `S2590123026022620`). Bài thứ nhất là bài **sát nhất** với nhu cầu "mạng đánh giá thẩm mỹ cho trụ tháp cầu" — rất nên lấy toàn văn qua thư viện trường.
+- **MDPI** (`mdpi.com/2071-1050/8/12/1295` — *A Review of MCDM Methods Applied to the Sustainable Bridge Design*) — 403 sau redirect từ DOI. Đây là nguồn cần cho câu hỏi "thẩm mỹ có nằm trong bộ tiêu chí MCDM cầu bền vững không".
+- **Springer Nature** (`link.springer.com/book/10.1007/978-3-0348-9131-8` — Christian Menn, *Prestressed Concrete Bridges*, Birkhäuser) — chuyển hướng sang cổng đăng nhập IdP, không xác minh được ISBN/mục lục. Chương 2 "Economy and Aesthetics" chỉ thấy trong kết quả tìm kiếm.
+- **Taylor & Francis** (`10.1201/9781003323020-326` — *Bridge tower aesthetic assessment using convolutional neural network*, Wang, Ning, Xiang, Chen) — 403 dù được đánh dấu open access.
+- **Academia.edu**, **ResearchGate** — 403.
+- **Library of Congress** `loc.gov/pictures/collection/hh/` (bộ sưu tập HABS/HAER, nguồn ảnh và bản vẽ đo đạc cầu lịch sử thuộc phạm vi công cộng) — 403. Trang NPS `nps.gov/subjects/heritagedocumentation/haer.htm` mở được và xác nhận HAER thành lập 1969, có tài liệu về cầu, lưu tại Library of Congress, **nhưng không nêu số lượng bản ghi cũng không nêu tình trạng bản quyền** → chưa đủ để lập khối nguồn.
+- **technical.buildingsmart.org/standards/ifc/ifc-examples/** — 403.
+- AASHTO Store PDF của Bridge Aesthetics Sourcebook (`store.transportation.org/…?id=887`, 816 KB) — chỉ còn luồng ảnh/nhị phân.
+- **NYSDOT Bridge Manual, Section 23 "Aesthetics"** (`dot.ny.gov/…/Section_23_US_2010.pdf`, 5,3 MB) — đây lẽ ra là nguồn hướng dẫn thẩm mỹ cấp bang tốt nhất, đã phải thay bằng DelDOT (LIT-216).
+- TxDOT OpenBridge Designer/Modeler Training Manual (174 trang, 6 MB).
+- **Gauvreau, "The Three Myths of Bridge Aesthetics"** (`civ.utoronto.ca/pg/Publications/…pdf`) — hai lần thử đều lỗi hạ tầng (chứng chỉ TLS không khớp tên miền, rồi ECONNREFUSED). Đây là bài **phản biện trực diện** ý tưởng quy thẩm mỹ cầu về công thức tỉ lệ — rất đáng lấy lại vì nó là đối trọng cần thiết với LIT-216 và LIT-218.
+- `github.com/buildingSMART/IFC4.3.x-sample-models` — mô hình dùng trong tài liệu chính thức IFC, **license CC BY-ND 4.0** (giấy phép rõ ràng nhất trong nhóm mô hình mở), nhưng **không có thư mục mô hình cầu nào**; có alignment, linear positioning, GIS referencing — vẫn hữu ích cho exporter IFC 4.3.
+- `github.com/buildingSMART/Sample-Test-Files` (nay là certification-datasets) — tệp mẫu phục vụ chứng nhận, chia theo IFC 4.0.2.1 và IFC 4.3.2.0 (ADD2); bản quyền © buildingSMART International Ltd.; **không xác nhận được có mô hình cầu hay không**. 345 sao, 131 fork.
+- `fib-international.org/federation/awards.html` — fib Award for Outstanding Concrete Structures, trao 4 năm/lần tại congress, hai hạng mục (Nhà; **Công trình xây dựng dân dụng gồm cầu**), trang liệt kê các đợt 2026, 2022, 2018, 2014, 2010, 2006, 2002. Phù hợp hơn IABSE với cầu bê tông (đúng loại Super-T), nhưng mô tả kỹ thuật nằm trong fib Bulletins bán qua shop — **chưa xác minh được tình trạng mở**.
+- Sketchfab — xác minh trên một trang mô hình cụ thể (`bridge-and-highway-3d-model-d20f5b7…`): giấy phép **CC Attribution**, 16,7k tam giác / 10,1k đỉnh, 1.246 lượt tải, đăng 20/08/2021, dựng bằng Blender. **Bắt buộc đăng nhập mới tải được**; trang không nêu định dạng và dung lượng tệp tải. Chất lượng hình học thấp, không dùng đối chứng kỹ thuật được.
+- Lai, Li, Liu, Chen, Zhao, Li, Xie (2024), *Application of bi-directional evolutionary structural optimization to the design of an innovative pedestrian bridge*, **AI in Civil Engineering** 3(1), bài số 9, DOI `10.1007/s43503-024-00027-5` — nhịp chính **152 m**, dầm sống lưng chiều cao thay đổi, trụ phân nhánh dạng cây sinh ra từ tối ưu tô-pô, đường dốc xe đạp dạng xoắn Fibonacci. Bài **không công bố số liệu định lượng về tỉ lệ tiết kiệm vật liệu** trong phần đã mở, nên yếu ở khía cạnh đối chứng số.
+- Xing, Shi, Sun (2024), *Measuring physical disorder of architectural façades…*, Frontiers in Sustainable Cities 6:1430071, DOI `10.3389/frsc.2024.1430071`, **CC BY** — 12.349 điểm lấy mẫu, 10.600 ảnh street view, 2.786 ảnh do 7 chuyên gia chấm tay để huấn luyện, CNN DenseNet169 đạt **83 % độ chính xác**, thang điểm 0–12. Là **khuôn mẫu quy trình** tốt cho việc chuyển điểm chuyên gia thành bộ dự báo tự động, dù đối tượng là mặt đứng đô thị chứ không phải cầu.
+- Zhang, H. (2023/2024), *An attempt to generate new bridge types from latent space of variational autoencoder*, arXiv `2311.03380` — VAE trên ảnh mặt đứng thang xám của cầu dầm/vòm/dây văng/dây võng ba nhịp, sinh loại cầu mới bằng nội suy không gian tiềm ẩn. **Không nêu kích thước tập dữ liệu**; ảnh do phần mềm hoạt hình 3D tự dựng chứ không phải cầu thật → giá trị đối chứng hình học thấp.
+
+**Trắc địa, LiDAR-UAV & số liệu khảo sát** (8)
+
+- **LandXML 1.2 (schema chuẩn trao đổi dữ liệu tuyến/địa hình/khảo sát).** Đã thử 3 lần: `http://www.landxml.org/schema/landxml-1.2/documentation/landxml-1.2doc.html`, phiên bản HTTPS, và tệp `.xsd` — tất cả trả về lỗi kết nối (`read ECONNRESET`); bản lưu trên web.archive.org bị công cụ chặn. **LOẠI** theo quy tắc 2: không trích dẫn nội dung LandXML từ kết quả tìm kiếm. Ghi chú cho lần sau: nếu cần chuẩn trao đổi cho dữ liệu khảo sát, IFC 4.3 (LIT-096) đã phủ phần alignment; phần bề mặt địa hình (`IfcGeographicElement` / TIN) cần tra riêng.
+- **TCVN 9398:2012 — Công tác trắc địa trong xây dựng công trình — Yêu cầu chung.** Mở được bản mirror trên [shac.vn](https://shac.vn/van-ban-phap-luat/tieu-chuan-quoc-gia-tcvn-93982012-ve-cong-tac-trac-dia-trong-xay-dung-cong-trinh-yeu-cau-chung) và [hocthatnhanh.vn](https://hocthatnhanh.vn/tcvn-9398-2012), xác minh được ba nội dung: (a) khi dùng hệ toạ độ quốc gia thì phải dùng **VN-2000** với **độ biến dạng chiều dài cạnh không vượt quá 1/50.000**; (b) **sai số giới hạn lấy bằng hai lần sai số trung phương**; (c) được bỏ qua số hiệu chỉnh độ cao khi chênh cao giữa mặt đất và mặt chiếu **nhỏ hơn 32 m**; và tiêu chuẩn chia công tác trắc địa thành 3 giai đoạn (khảo sát – thi công – quan trắc biến dạng). **KHÔNG xác minh được các bảng cấp hạng lưới khống chế thi công** (sai số trung phương đo góc, sai số trung phương tương đối đo cạnh 1/T theo từng loại công trình) và các quy định riêng cho công trình dạng tuyến/cầu — cả hai mirror đều chỉ hiển thị phần văn bản, không hiển thị bảng. Vì đây là mirror chứ không phải bản chính thức, tôi **không đưa vào danh sách 12 nguồn**.
+- **SRTM 1 Arc-Second Global.** Trang USGS EROS (`usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1`) trả về nội dung rỗng qua WebFetch ở cả hai biến thể URL; trang NASA Earthdata (`earthdata.nasa.gov/data/catalog/lpcloud-srtmgl1-003`) trả **HTTP 403**. **LOẠI** — không ghi lại con số 16 m LE90 vì chỉ thấy trong kết quả tìm kiếm, chưa mở được trang gốc.
+- **MDPI qua HTML.** Mọi URL `www.mdpi.com/...` đều trả **HTTP 403**. Ba bài MDPI trong danh sách (LIT-228, LIT-229, LIT-231) được xác minh bằng **bản PDF chính thức tại `mdpi-res.com`**, tải về và bóc text tại chỗ — tiêu đề, tác giả, tạp chí, số bài, năm, DOI và giấy phép đều đọc trực tiếp từ trang bìa bài báo.
+- **TDOT Survey Standards Manual (Tennessee DOT, 4th ed., 10/2023).** `www.tn.gov` hết thời gian chờ DNS (`getaddrinfo ETIMEOUT`). **LOẠI**; thay bằng WYDOT Section V (LIT-226), đã mở và xác minh được đầy đủ.
+- **Thông tư 68/2015/TT-BTNMT bản toàn văn.** thuvienphapluat.vn trả **HTTP 403**; lawnet.vn chuyển hướng 301 sang trang danh mục. Chỉ xác minh được **Điều 12** qua mirror hethongphapluat.com — vì vậy LIT-225 chỉ trích số liệu của Điều 12, không suy đoán các điều khác.
+- **Dữ liệu LiDAR mở của Việt Nam.** Không tìm thấy nguồn nào công bố dữ liệu LiDAR/DEM độ phân giải cao mở, có giấy phép rõ ràng, cho lãnh thổ Việt Nam trong các lượt tìm đã thực hiện. Với repo này, hai bộ DEM toàn cầu (LIT-233, LIT-234) là mức tốt nhất truy cập được — và cả hai đều **không đủ độ chính xác cho thiết kế cầu**, chỉ dùng cho bối cảnh nghiên cứu.
+- **Tiêu chuẩn Việt Nam về khảo sát địa hình chuyên cho cầu** (nội dung khảo sát, tỉ lệ bình đồ khu vực cầu, mật độ mặt cắt ngang sông). Chưa xác minh được nguồn nào mở được và có số liệu; các trang mirror tìm thấy đều thuộc nhóm bị 403 hoặc chỉ có tóm tắt. Cần tra tiếp trong lượt sau, ưu tiên tìm bản Công báo (congbao.chinhphu.vn) dạng PDF.

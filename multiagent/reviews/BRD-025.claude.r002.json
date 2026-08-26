@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "handoff_sha256": "d6d49dd1c6f7270316890bdceae1b6ce675b5f92c1704b25ed1e274fc547c2d9",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Hai diem codex neu o r001 da dong: so test dem lai dung (16 test section_types, khong phai 18 nhu r001 khai), va docstring section_types.py nay dan nguon that (TCVN 11823-1, AASHTO BDS 8.11-8.14 va 6.10, EN 1993-1-1 Bang 5.2). Tu chay lai: 16/16 test section_types xanh."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Yeu cau chinh van CHUA lam. Ba grammar van khai span_length_m = 35.0 (i_girder) va 40.0 (box, composite), trong khi docs/design_basis/DB-SUPERT-38M.json khoa span_length_m = 38.3 la KNOWN. Hau qua do duoc: tests/test_design_basis.py::test_design_basis_matches_runtime DO voi thong diep 'Obtained 38.3, Expected 40.0'. Day la test do DUY NHAT con lai chan toan bo lo trinh N0, va no nam TRONG write_scope cua BRD-025."
+    }
+  ],
+  "notes": "REVISE. Phan sua theo review cua codex thi tot va da dong. Nhung yeu cau thu hai - chuan hoa project_inputs cua ba grammar ve 38.3 m x 12.0 m - khong duoc dong den, va do moi la thu dang chan ca lo trinh. Ly do phai chuan hoa, khong phai chuyen thu tuc: ba ho nay la CAC LOAI KET CAU THAY THE cho CUNG MOT bai toan; so mot dam I nhip 35 m voi mot dam hop nhip 40 m khong phai nghien cuu chon loai cau, ma la hai bai toan khac nhau. Giu mot design basis duy nhat chinh la dieu lam cho buoc so sanh loai cau ve sau co nghia. Sau khi doi span, PHAI kiem lai he qua hinh hoc va bao cao trung thuc: ty so L/H doi, va neu FAB-007 (span-depth) nay noi o muc SOFT thi ghi ro ra chu KHONG duoc chinh nguong de che. Luu y pham vi: chi sua ba file grammar trong write_scope cua BRD-025; docs/design_basis/DB-SUPERT-38M.json da duoc BRD-029 bo sung grammar_bindings cho ca ba ho (kem tran claim rieng: i_girder SCREENED, box va composite IDEA) nen KHONG dung den; tests/test_design_basis.py va tests/test_shape_grammar_experimental.py deu ngoai pham vi."
+}

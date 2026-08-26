@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-029",
+  "agent_id": "claude",
+  "role": "bim_fem_integrator",
+  "summary": "Mo khoa hop dong cho bon ho san xuat MA KHONG dung toi lich su. (1) enum 'family' tu 2 len 4 nhung GIU dang enum - day la hang rao co chu y duy nhat chan ho vom khoi pipeline, doi sang type:string la vut no di. (2) project_inputs bo 'const' o cap thuoc tinh, thay bang 5 menh de if/then theo tung family: moi ho van bi khoa DUNG MOT pham vi (hom nay ca bon deu la 38.3 x 12.0, STRAIGHT, skew 0 theo design basis), va khi N1/N3 can nhip khac nhau thi chi phai sua mot menh de. (3) Them 12 khoa hinh dang cua ba ho moi, kem rang buoc moi ho KHONG duoc muon bien hinh dang cua ho khac (not/anyOf). (4) DB-SUPERT-38M.json khai grammar_bindings cho ca ba ho, kem TRAN CLAIM RIENG: i_girder SCREENED (S trong 1.8-2.9 m, Nb 4-6 nen he so phan bo ngang type-k con TRONG mien ap dung), box_girder va composite_i IDEA (type-k ngoai mien voi hop don o S=12000mm/Nb=1; composite bi SOLVER-COMPOSITE-001 chan HARD truoc solver). (5) pyproject.toml dong goi bridge_evolution.durability - engine tuoi tho cua BRD-026 truoc day khong vao wheel. BANG CHUNG QUAN TRONG NHAT, bang so chu khong bang lap luan: input_hash va case_id cua CA 7 gold case giu nguyen tung ky tu sau khi noi hop dong (test_opening_the_contract_did_not_move_any_historical_hash chot cung 7 gia tri). 5 test moi trong tests/test_state.py.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "contracts/bridge_design_state.schema.json",
+      "sha256": "4ddda1d898327f64d01dcb25b0bfebf0e6bb00551b5e9e2912b05b9ed93fed94",
+      "kind": "report"
+    },
+    {
+      "path": "docs/design_basis/DB-SUPERT-38M.json",
+      "sha256": "a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047",
+      "kind": "report"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_state.py",
+      "sha256": "20b526dec932605aae4537ad200f094b8d6023066461587e2474f8f5a116b966",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Tran claim phai ma hoa vao truong 'role' cua grammar_binding vi contracts/design_basis.schema.json khoa additionalProperties va chua co truong claim rieng; file schema do ngoai write_scope. Can task rieng them truong claim_ceiling.",
+    "Mo enum KHONG cap hieu luc cho ba ho moi. Chung chi di duoc toi verifier; tran claim rieng va cac cong hien co (composite_solver_gate, MODEL-001) van chan nhu cu."
+  ],
+  "unresolved_risks": [
+    "Da lam do 4 artifact duoc handoff cu neo hash (DB-SUPERT-38M.json cua BRD-002, pyproject.toml cua BRD-024, tests/test_shape_grammar_experimental.py cua ca BRD-004 lan BRD-022). Da xu ly bang COR-BRD-002-001, COR-BRD-024-002, COR-BRD-004-005, COR-BRD-022-001; dang cho codex review doc lap.",
+    "tests/test_design_basis.py::test_design_basis_matches_runtime van DO cho toi khi BRD-025 chuan hoa span ba grammar ve 38.3 m - viec do thuoc write_scope cua opencode, dang lam."
+  ],
+  "next_action": "Cross-provider review by codex"
+}

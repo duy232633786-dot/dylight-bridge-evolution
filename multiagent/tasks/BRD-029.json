@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-029",
+  "title": "Mở khoá hợp đồng đa loại cầu: enum family, project_inputs theo họ, grammar_bindings, đóng gói durability",
+  "research_question": "Hàng rào thật chặn ba họ cầu mới (i_girder, box_girder, composite_i) không nằm ở hình học mà ở hợp đồng: contracts/bridge_design_state.schema.json khoá 'family' bằng enum hai giá trị và khoá span/width/alignment/skew bằng 'const'. Làm sao nới hợp đồng cho đủ bốn họ mà (a) KHÔNG đổi một byte nào của canonical_json với state cũ, tức input_hash và case_id lịch sử bảo toàn, và (b) mỗi họ vẫn bị khoá đúng một phạm vi chứ không nới thành khoảng tự do?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "REVIEW",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "contracts/bridge_design_state.schema.json",
+    "docs/design_basis/DB-SUPERT-38M.json",
+    "pyproject.toml",
+    "tests/test_state.py"
+  ],
+  "acceptance_criteria": [
+    "enum 'family' nhận đủ bốn họ; GIỮ dạng enum, không đổi sang type:string — enum là hàng rào có chủ ý duy nhất đang chặn họ vòm",
+    "project_inputs không còn 'const' ở cấp thuộc tính mà dùng if/then theo family; Super-T v1/v2 vẫn bị khoá đúng 38.3/12.0/STRAIGHT/0",
+    "input_hash của cả 7 gold case KHÔNG đổi — chứng minh bằng test so sánh trước/sau, không phải bằng lập luận",
+    "docs/design_basis/DB-SUPERT-38M.json khai grammar_bindings cho ba grammar mới, kèm trần claim riêng: họ chưa có solver L1 hợp lệ phải ghi IDEA chứ không SCREENED",
+    "pyproject.toml đóng gói bridge_evolution.durability (hiện package này không vào wheel)",
+    "python -m pytest tests -q không thêm bất kỳ test đỏ nào so với mốc trước khi bắt đầu task"
+  ],
+  "required_artifacts": [
+    "contracts/bridge_design_state.schema.json",
+    "docs/design_basis/DB-SUPERT-38M.json",
+    "tests/test_state.py"
+  ],
+  "safety_notes": [
+    "TUYỆT ĐỐI không thêm khoá top-level mới vào BridgeDesignState: canonical_json chỉ loại provenance/case_id/status, nên mọi khoá mới sẽ đổi input_hash của TOÀN BỘ artifact lịch sử và làm hỏng mọi SHA-256 trong multiagent/snapshots/",
+    "Mở enum family KHÔNG có nghĩa là ba họ mới đạt SCREENED. Cầu hộp có hệ số phân bố ngang type-k nằm NGOÀI miền áp dụng (S=12000mm so với 1100-4900mm, Nb=1 so với >=4) và mô hình cắt giả định cốt đai Super-T; composite bị composite_solver_gate chặn HARD trước solver. Trần claim của chúng là IDEA",
+    "Không sửa ba file grammar (BRD-025 sở hữu) và không sửa tests/test_shape_grammar_experimental.py (BRD-028 sở hữu)",
+    "Nới hợp đồng là mở CỬA cho phương án chạy tới verifier, không phải cấp hiệu lực cho con số phát ra"
+  ],
+  "review_notes": [],
+  "preferred_provider": "claude",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_state.py",
+      "tests/test_gold_cases.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

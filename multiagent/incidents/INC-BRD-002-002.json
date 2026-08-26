@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-002-002",
+  "task_id": "BRD-002",
+  "detected_at_utc": "2026-08-25T19:34:41.796076Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-002.claude.r001.json",
+  "original_handoff_sha256": "86a4c50007f2d06f24d480f921a3e10e45a79c04d4859591824bb0e1a18ce2a5",
+  "artifact_path": "docs/design_basis/DB-SUPERT-38M.json",
+  "recorded_sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25",
+  "observed_sha256": "ce2ed66b1e58737d7d2337da0513a70e39326822f63e6e4b386ea8743a9ae842",
+  "reason": "Thay the COR-BRD-002-001 (codex tra REVISE, dung: nhet CLAIM_CEILING vao truong tu do 'role' la qua tai ngu nghia). Da them truong claim_ceiling (enum 6 cap) va claim_note_vi vao contracts/design_basis.schema.json roi chuyen du lieu sang do; 'role' tro lai gia tri sach SECTION_FAMILY_ARM.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

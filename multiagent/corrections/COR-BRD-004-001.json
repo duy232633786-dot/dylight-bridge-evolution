@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-004-001",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Sua mot assertion gion trong tests/test_shape_grammar_experimental.py: == 111 thanh >= 111. Muc dich thuc su cua test la chan grammar tro toi reference_id bia; so luong chinh xac nay do tests/test_literature_index.py neo cung khoi counts trong index.json. Khong doi hanh vi runtime, khong doi bat ky file nao khac trong artifact cua BRD-004.",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/f2334e8bcaba3554f02a547e8d4776fc7b6e10c08cbdcee0024a50393a29326c.blob",
+    "sha256": "f2334e8bcaba3554f02a547e8d4776fc7b6e10c08cbdcee0024a50393a29326c"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_shape_grammar_experimental.py",
+    "previous_sha256": "f2334e8bcaba3554f02a547e8d4776fc7b6e10c08cbdcee0024a50393a29326c",
+    "current_sha256": "734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_literature_index.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "File test nay nam trong write_scope cua BRD-028 (READY, chua ai claim); BRD-020 dang ACTIVE nen khong the lab amend-task de mo rong scope."
+  ],
+  "unresolved_risks": [
+    "Chong lan write_scope voi BRD-028; da khai bao tuong minh thay vi sua lang le."
+  ],
+  "supersedes_correction_sha256": null
+}

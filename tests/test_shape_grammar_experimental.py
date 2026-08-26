@@ -20,7 +20,8 @@ from pathlib import Path
 
 import pytest
 
-from bridge_evolution.catalogs import grid_domain, load_grammar
+from bridge_evolution.catalogs import GrammarIdError, grid_domain, load_grammar
+from bridge_evolution.optimization.common import gene_order
 from bridge_evolution.geometry_experimental import arch_geometry as ag
 from bridge_evolution.geometry_experimental import arch_l0_constructability as al0
 from bridge_evolution.geometry_experimental import shape_diversity as sd
@@ -135,7 +136,15 @@ def literature_ids():
 # ---------------------------------------------------------------------------
 
 def test_literature_index_is_readable(literature_ids):
-    assert len(literature_ids) == 111
+    """Index đọc được và không mất nguồn cũ.
+
+    Trước đây test khoá cứng `== 111`, nên mỗi đợt quét bổ sung lại làm đỏ một
+    test thuộc file khác — trong khi điều test này thực sự cần bảo vệ là
+    "grammar không được trỏ tới reference_id bịa". Thư viện chỉ được phép LỚN
+    lên; ID cũ biến mất mới là lỗi. Số lượng chính xác do
+    `tests/test_literature_index.py` neo cùng `counts` trong index.
+    """
+    assert len(literature_ids) >= 111
     assert "LIT-055" in literature_ids
 
 
@@ -371,18 +380,22 @@ def test_flat_grammar_name_does_not_reach_the_experimental_grammar():
         load_grammar("arch_deck_cfst_skeleton_v1")
 
 
-def test_loader_does_traverse_into_sandbox_documented_not_safe():
-    """Test ĐẶC TẢ SỰ THẬT, không phải test an toàn.
+def test_loader_refuses_to_traverse_into_sandbox():
+    """BRD-022 đã siết loader — cách ly nay là bất biến ĐƯỢC THỰC THI.
 
-    Phản biện BRD-004: artifact từng khẳng định load_grammar() "không nạp được"
-    sandbox. SAI — catalogs.py dựng GRAMMAR_DIR/f"{grammar_id}.json" và không
-    chặn dấu "/". Test này KHOÁ hành vi thật lại: nếu ai đó siết loader thì test
-    đỏ và buộc phải cập nhật cả phát biểu an toàn trong grammar. Việc siết loader
-    nằm NGOÀI write_scope BRD-004 nên đã tách thành task riêng.
+    Lịch sử: phản biện BRD-004 chỉ ra artifact từng khẳng định sai rằng
+    load_grammar() "không nạp được" sandbox; thực tế catalogs.py dựng
+    GRAMMAR_DIR/f"{grammar_id}.json" mà không chặn dấu "/". Test này khi đó KHOÁ
+    hành vi thật lại để việc siết loader không thể diễn ra âm thầm. BRD-022 siết
+    thật, nên test đảo chiều — và bản chất bất biến vẫn nguyên: phát biểu an toàn
+    phải khớp cơ chế đo được (xem test kế tiếp).
     """
-    g = load_grammar("experimental/arch_deck_v1")
-    assert g["family_id"] == "arch_deck_cfst_skeleton_v1"
-    assert g["claim_level"] == "IDEA"
+    with pytest.raises(GrammarIdError):
+        load_grammar("experimental/arch_deck_v1")
+    # Sandbox vẫn còn nguyên tại chỗ của nó — cái sai nằm ở loader, không ở sandbox.
+    sandbox = json.loads(GRAMMAR_PATH.read_text(encoding="utf-8"))
+    assert sandbox["family_id"] == "arch_deck_cfst_skeleton_v1"
+    assert sandbox["claim_level"] == "IDEA"
 
 
 def test_state_schema_is_the_real_barrier_against_the_arch_family(grammar):
@@ -410,17 +423,44 @@ def test_state_schema_is_the_real_barrier_against_the_arch_family(grammar):
     enum = find_family_enum(schema)
     assert enum is not None, "Schema state không còn khoá 'family' bằng enum"
     assert grammar["family_id"] not in enum
-    assert set(enum) == {"super_t_simple_v1", "super_t_parametric_v2"}
+
+    # Bất biến THẬT: enum phải trùng khít tập grammar PRODUCTION (top-level), không
+    # nhiều hơn cũng không ít hơn. Trước đây chỗ này khoá cứng hai tên, nên mỗi lần
+    # thêm một họ tiết diện hợp lệ lại làm đỏ một test thuộc file khác. Bản này tự
+    # bảo trì mà vẫn chặn đúng thứ cần chặn: bất kỳ grammar sandbox nào lọt vào enum
+    # đều làm test đỏ, vì sandbox không nằm ở top-level.
+    production = {p.stem for p in (ROOT / "bridge_grammar").glob("*.json")}
+    assert set(enum) == production, (
+        f"enum family lệch tập grammar production: enum={sorted(enum)} vs "
+        f"bridge_grammar/={sorted(production)}"
+    )
+    assert not any("arch" in name for name in enum), "họ vòm không được vào enum"
 
 
-def test_sandbox_policy_must_not_claim_the_loader_blocks_it():
-    """Phát biểu an toàn phải khớp cơ chế ĐO ĐƯỢC, không được nói quá."""
+def test_sandbox_policy_matches_the_measured_mechanism():
+    """Phát biểu an toàn phải khớp cơ chế ĐO ĐƯỢC — không nói quá, cũng không nói thiếu.
+
+    Trước BRD-022 test này bắt phát biểu phải ghi NOT_BLOCKED cho hai đường đi
+    còn hở. Nay loader đã chặn thật, nên phát biểu phải nói đúng điều đó — và
+    mỗi khẳng định BLOCKED ở đây được đối chiếu bằng hành vi runtime ngay dưới,
+    để phát biểu không thể "đẹp hơn" cơ chế.
+    """
     policy = json.loads(GRAMMAR_PATH.read_text(encoding="utf-8"))["sandbox_policy"]
     measured = policy["isolation_mechanism_measured"]
-    assert measured["load_grammar_with_slash"].startswith("NOT_BLOCKED")
-    assert measured["gene_order_gene_domains"].startswith("NOT_BLOCKED")
+    assert measured["load_grammar_flat_name"].startswith("BLOCKED_FileNotFoundError")
+    assert measured["load_grammar_with_slash"].startswith("BLOCKED_GrammarIdError")
+    assert measured["gene_order_gene_domains"].startswith("BLOCKED_GrammarIdError")
     assert measured["state_schema_family_enum"].startswith("BLOCKED")
+    # Chỗ này vẫn là tai nạn và phải tiếp tục tự khai là tai nạn.
     assert measured["budgeted_evaluator"].startswith("BLOCKED_BY_ACCIDENT")
+
+    # Đối chiếu từng khẳng định với hành vi thật.
+    with pytest.raises(FileNotFoundError):
+        load_grammar("arch_deck_v1")
+    with pytest.raises(GrammarIdError):
+        load_grammar("experimental/arch_deck_v1")
+    with pytest.raises(GrammarIdError):
+        gene_order("experimental/arch_deck_v1")
 
 
 def test_production_grammars_do_not_reference_the_arch_family(grammar):

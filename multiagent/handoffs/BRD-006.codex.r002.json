@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-006",
+  "agent_id": "codex",
+  "role": "aesthetics_context",
+  "summary": "r001 was REVISE because one test was self-contradictory: it set both aesthetic override flags to True and asserted they were not True, without invoking the schema validator. Changed the test to mutate both flags and assert Draft 2020-12 validation returns exactly two errors, proving the schema barrier; no design or schema change was needed.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0",
+    "G1"
+  ],
+  "artifacts": [
+    {
+      "path": "research/aesthetics/review_protocol.json",
+      "sha256": "fe2e3b2125afbc1f93deb8263aa3b98b870dda2a62e8b3f101188d233a5a5755",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/aesthetic_review.schema.json",
+      "sha256": "882a204ad91d75b26f45c18d8cf3f76095a7740300598697790f00e263215858",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_aesthetic_review.py",
+      "sha256": "dce41178c8fe4dece133584279dacbee94c28f52beec5d6e2f9a5b8ef54c6064",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "The existing review protocol remains the canonical IDEA-level aesthetics artifact, and the schema's const:false constraints are the hard barrier against aesthetic override of hard constraints."
+  ],
+  "unresolved_risks": [
+    "This remains context-bound, non-authoritative aesthetics screening; it does not establish structural safety, constructability, or release readiness."
+  ],
+  "next_action": "Independent review"
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-021",
+  "agent_id": "claude",
+  "role": "materials_researcher",
+  "summary": "Ghi chi muc canonical research/library/ - phan con thieu cua task nay. Vault da co 1881 muc trong Library/ tu lan chay truoc, NHUNG research/library/index.json chua tung duoc ghi, tuc phan canonical bi trong: dung kieu loi NGUOC voi thu vien hoc thuat (o do canonical co ma note thieu). Ket qua quet CHI-DOC: 263 tai lieu tu 18.275 file duyet tren o D:, phan loai 34 DIRECT / 13 ADJACENT / 216 UNRELATED, 216 ban ve DWG + 38 bang tinh + 9 PDF. README sinh TU CHINH chi muc nen khong con so nao go tay. Ba dieu quan trong ve tinh trung thuc cua con so nay: (1) o E: la o roi va HIEN KHONG GAN MAY - mo ta task noi ~19.000 tai lieu la tinh ca E: va ca ban sao trong vault; toi chi quet goc thuc su co mat va KHONG bia muc cho o da thao; (2) chi mc loai tru chinh repo va vault de khong tu lap chi muc ban sao cua chinh minh; (3) tai lieu ca nhan bi loai bang tu khoa, chi de lai duong dan va ly do trong khoi skipped chu khong im lang bo di. 40 test xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/library/index.json",
+      "sha256": "9ad1c4cdaf9c377a48a1a588b660849a1ceeeb2cc830994c469e5a8ad367809a",
+      "kind": "report"
+    },
+    {
+      "path": "research/library/README.md",
+      "sha256": "ddeb726af0a706e955403fa6efd3e8392a3a4d951a855e59c133b706f14481d6",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/local_document_index.schema.json",
+      "sha256": "38fe665833411de352b023c8597f9412f01461252be16a59506daa4ae1cfb0fb",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/knowledge/local_library.py",
+      "sha256": "cd1a412952208976e7bbb00cfb456edfd63704e5789585e2c501f031beebaa2c",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_local_library.py",
+      "sha256": "5ab7634f693d9974102c3a9e85a4dd0e79d7e818892bba21330da27743da55f3",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "INDEX_EXTENSIONS chi gom pdf/dwg/dxf/xlsx/xls/xlsm, kem ghi chu trong ma nguon 'pham vi do chu du an chot; phai khop enum extension cua schema'. Toi TON TRONG pham vi do va khong tu noi.",
+    "sha256 cua file lon hon 8 MiB la hash TUNG PHAN (1 MiB dau + 1 MiB cuoi + kich thuoc) - dung de dinh danh ban sao, KHONG phai bang chung toan ven. Truong sha256_is_partial ghi ro tung ban ghi."
+  ],
+  "unresolved_risks": [
+    "DANG LUU Y NHAT: .rvt va .rfa nam NGOAI pham vi chi muc, trong khi day la du an BIM cau va chinh mo ta task nhac toi 535 file RVT. Tren o D: hien co 51 .rvt va 14 .rfa khong duoc lap chi muc. Muon dua vao phai sua ca INDEX_EXTENSIONS lan enum extension trong schema - can chu du an quyet, khong phai viec agent tu nong.",
+    "31 file .docx tren D: cung ngoai pham vi; phan lon la tai lieu ca nhan (hop dong lao dong, to khai thue) nen viec chung khong vao chi muc du an la dung, nhung ly do dung la PHAM VI DUOI chu khong phai bo loc ca nhan - hai co che khac nhau, dung nham lan.",
+    "Chi mc chi ghi vi tri va sieu du lieu; CHUA file nao duoc mo ra doc. Truong runtime_link chi la GOI Y tu tu khoa trong duong dan, chua ai xac nhan - khong duoc suy so lieu ky thuat tu ten file."
+  ],
+  "next_action": "Cross-provider review by codex"
+}

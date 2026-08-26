@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "brief_id": "RND-20260824-f5b697be",
+  "created_at": "2026-08-24T12:37:07.080846Z",
+  "topic": "Revit Family dầm hộp bê tông dự ứng lực liên tục 210 m theo ảnh minh họa",
+  "objectives": [
+    "Lưu vết hình học BIM Family đã dựng, giả định 15+180+15 m, tiết diện hộp hai khoang biến chiều cao và giới hạn bằng chứng; không phát biểu đạt chịu lực"
+  ],
+  "constraints": [
+    "F0 IDEA; tổng dài 210 m; rộng 16 m; H giữa nhịp 3,5 m; H trụ 10,5 m giả định; artifact RFA phải có hash và QA kích thước; yêu cầu FEM/DƯL riêng trước kỹ thuật"
+  ],
+  "requested_by": "user",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "budget": {
+    "max_tasks": 4,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 21600
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}

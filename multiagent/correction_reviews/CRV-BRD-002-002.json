@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-002-002",
+  "task_id": "BRD-002",
+  "incident_id": "INC-BRD-002-002",
+  "correction_sha256": "9c5d6f0f59647b7dbae6654f0af64367f7fa11976dc08b6cd0a1a25dec723be1",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Schema declares typed claim_ceiling enum and claim_note_vi; all three bindings use role SECTION_FAMILY_ARM with ceilings SCREENED/IDEA/IDEA. Snapshot hash matches recorded baseline previous_sha256 21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25; live artifact matches recorded current hash. Ceilings are defensible: i_girder SCREENED within applicable L1 family physics; box_girder and composite_i IDEA because stated validity and solver gates are outside scope."
+  ],
+  "notes": "Independent cross-provider review by codex; COR-BRD-002-001 was REVISE/void, so baseline uses previous_sha256."
+}

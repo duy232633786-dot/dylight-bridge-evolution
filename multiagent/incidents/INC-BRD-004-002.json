@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-004-002",
+  "task_id": "BRD-004",
+  "detected_at_utc": "2026-08-25T18:42:23.434905Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "artifact_path": "bridge_grammar/experimental/arch_deck_v1.json",
+  "recorded_sha256": "5b89e72a746ac556473dd5890cecae99ebf0f0db05831b532db925830ba4991d",
+  "observed_sha256": "d310dbd593ea94517ab14a94d7e7099a25b1315d41efd51d3e6dad4982991f05",
+  "reason": "BRD-022 (nguoi dung uy quyen mo rong write_scope): phat bieu an toan sandbox_policy.isolation_mechanism_measured phai khop co che that sau khi BRD-022 siet load_grammar. Acceptance criteria cua BRD-022 doi hoi sua dong thoi ca ba file nay, nhung write_scope cua no chi khai catalogs.py va tests/test_catalogs.py - do la thieu sot cua hop dong task, da khai bao thay vi sua lang le.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

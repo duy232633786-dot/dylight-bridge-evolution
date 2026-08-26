@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-031",
+  "handoff_sha256": "af6491c9909993bb48f3ed542b9e070015148be2889e7976faea5f2c1f3b5f68",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "pytest site_spec 21 passed; no UNKNOWN defaulting, placeholder boreholes, or empty-profile readiness pass; recursive schema pointer enforcement passed"
+    }
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. Rule-input enforcement is useful non-circular contract checking, with runtime fail-closed tests."
+}

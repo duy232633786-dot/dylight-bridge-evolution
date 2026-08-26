@@ -5,9 +5,9 @@
   "research_question": "bridge_evolution/catalogs.py dựng đường dẫn GRAMMAR_DIR/f\"{grammar_id}.json\" mà không chặn dấu phân cách, nên load_grammar(\"experimental/arch_deck_v1\") NẠP ĐƯỢC grammar thực nghiệm ngoài production; gene_order() và gene_domains() cũng chạy được trên nó và trả về đúng các biến vòm. Đường sinh số chỉ dừng ở BudgetedEvaluator bằng KeyError 'girder_concrete_id' — tức bằng TAI NẠN, không bằng cổng chặn. Làm sao biến cách ly sandbox thành một bất biến được thực thi, thay vì một tính chất tình cờ có thể biến mất khi ai đó thêm một giá trị mặc định?",
   "workstream": "integration",
   "priority": "P1",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "codex",
   "dependencies": [],
   "required_gates": [
     "G1"
@@ -40,7 +40,9 @@
     "Đo được: gene_order/gene_domains trả về ['arch_axis_type', 'arch_rib_count', 'springing_restraint', 'spandrel_system', 'rib_section_...']",
     "Đo được: BudgetedEvaluator(grammar_id='experimental/arch_deck_v1').prescreen_gene(...) -> KeyError 'girder_concrete_id'",
     "Đo được: bridge_evolution/cli.py nhận --grammar dưới dạng chuỗi tự do, không có choices",
-    "Việc sửa nằm NGOÀI write_scope của BRD-004 nên chủ nhiệm BRD-004 cố ý KHÔNG tự sửa; artifact BRD-004 chỉ được sửa cho hết nói quá về cơ chế cách ly"
+    "Việc sửa nằm NGOÀI write_scope của BRD-004 nên chủ nhiệm BRD-004 cố ý KHÔNG tự sửa; artifact BRD-004 chỉ được sửa cho hết nói quá về cơ chế cách ly",
+    "Cross-provider review (work by Claude, review by Codex). Core isolation is enforced; REVISE because test_shape_grammar_experimental.py weakened an unrelated exact assertion (==111 to >=111). Two remaining suite failures are attributed to BRD-025. family enum is only validated when explicit jsonschema validation is called, not by load_grammar. IDEA claim is appropriate. Scope widening and COR-BRD-004-002/003/004 provenance handling appears documented.",
+    "Cross-provider review (work by Claude, review by Codex). Point 1 independently verified. Point 2 adjudication: the author is correct; ==111 to >=111 predates BRD-022 and is covered by COR-BRD-004-001 and CRV-BRD-004-001. Against 734043eb, both rewritten isolation tests are stronger: they assert runtime refusal and cross-check policy claims. Loader blocks every requested variant; full suite has only the two pre-existing BRD-025 failures; lab validate is valid."
   ],
   "preferred_provider": "codex",
   "preferred_role": "independent_reproducer",

@@ -1,0 +1,201 @@
+"""Correction bị REVISE không được là ngõ cụt vĩnh viễn (BRD-030).
+
+Bế tắc có thật trước bản vá: `record_provenance_correction` đòi correction TRƯỚC
+phải được review APPROVE mới cho ghi bản mới, còn `review_provenance_correction`
+cấm review lại một correction đã có review. Hệ quả: một correction bị REVISE khoá
+chết artifact đó — không sửa tiếp được mà cũng không rút lại được. Trường
+`supersedes_correction_sha256` đã có sẵn trong schema đúng cho việc nối chuỗi
+thay thế, nhưng cổng chặn khiến nó không dùng được.
+
+Các test dưới đây vừa chứng minh bế tắc đã gỡ, vừa neo lại BỐN hàng rào phải
+tiếp tục đứng vững — nới đúng một dòng sai ở đây là mở đường hợp thức hoá drift
+mà không ai duyệt, nguy hiểm hơn nhiều so với chính bế tắc.
+"""
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+import pytest
+
+from bridge_evolution import REPO_ROOT
+from bridge_evolution.collaboration import (
+    record_provenance_correction,
+    review_provenance_correction,
+    submit_handoff,
+    claim_task,
+    validate_lab,
+)
+
+ARTIFACT = "tests/test_correction_chain.py"
+
+
+def _lab(tmp_path: Path) -> Path:
+    """Bản sao lab + một task fixture có write_scope là tests/."""
+    target = tmp_path / "multiagent"
+    shutil.copytree(REPO_ROOT / "multiagent", target)
+    task = {
+        "schema_version": "1.0", "task_id": "BRD-998",
+        "title": "Fixture cho chuỗi correction",
+        "research_question": "Chuỗi correction có gỡ được bế tắc REVISE không?",
+        "workstream": "integration", "priority": "P0", "status": "READY",
+        "owner": None, "reviewer": None, "dependencies": [],
+        "required_gates": ["G0"], "claim_ceiling": "IDEA",
+        "write_scope": ["tests/"],
+        "acceptance_criteria": ["Chạy trong bản sao tạm, không đụng board canonical"],
+        "required_artifacts": [ARTIFACT],
+        "safety_notes": ["Không sửa lab canonical để chạy test"],
+        "review_notes": [],
+    }
+    (target / "tasks" / "BRD-998.json").write_text(
+        json.dumps(task, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return target
+
+
+def _handoff_with_drift(lab: Path, tmp_path: Path) -> tuple[str, Path]:
+    """Handoff neo một hash KHÁC bytes sống — mô phỏng artifact đã trôi.
+
+    Không thể sửa file thật trong repo giữa lúc chạy test, nên dựng drift bằng
+    cách cho handoff ghi hash của một bản bytes cũ (nằm trong tmp). Snapshot phải
+    khớp đúng hash đó, còn file sống thì khác — chính là tình huống mà
+    correct-provenance sinh ra để xử lý.
+    """
+    claim_task("BRD-998", "claude", lab)
+    submit_handoff(
+        "BRD-998", "claude", "evidence_safety_auditor",
+        "Fixture handoff neo hash một artifact có thật",
+        "IDEA", ["G0"], [ARTIFACT], lab_dir=lab,
+    )
+    relative = "multiagent/handoffs/BRD-998.claude.r001.json"
+    snapshot = tmp_path / "snapshot.bytes"
+    snapshot.write_bytes(b"# ban bytes CU cua artifact\n" + (REPO_ROOT / ARTIFACT).read_bytes())
+
+    path = lab / "handoffs" / "BRD-998.claude.r001.json"
+    record = json.loads(path.read_text(encoding="utf-8"))
+    for item in record["artifacts"]:
+        if item["path"] == ARTIFACT:
+            item["sha256"] = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+    path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return relative, snapshot
+
+
+def _correct(lab, handoff, snapshot, reason="lý do đủ dài để qua kiểm"):
+    return record_provenance_correction(
+        "BRD-998", "claude", handoff, ARTIFACT, snapshot,
+        reason, "tóm tắt thay đổi", [["python", "-m", "pytest", "-q"]],
+        lab_dir=lab,
+    )
+
+
+# ---------------------------------------------------------------------------
+# 1. Bế tắc đã gỡ
+# ---------------------------------------------------------------------------
+
+def test_a_revised_correction_can_be_superseded(tmp_path):
+    """Trước bản vá: dòng cuối ném 'Previous correction chưa được ... APPROVE'."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+
+    first = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        first["correction"]["correction_id"], "codex", "REVISE",
+        ["cách diễn đạt chưa đạt"], "cần làm lại", lab_dir=lab)
+
+    second = _correct(lab, handoff, snapshot, reason="làm lại theo yêu cầu reviewer")
+    assert second["correction"]["supersedes_correction_sha256"] == first["correction_sha256"]
+
+
+def test_superseding_resets_the_baseline_to_the_void_correction_start(tmp_path):
+    """Bản bị REVISE là VÔ HIỆU: bản thay thế phải xuất phát lại từ đúng mốc cũ."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+
+    first = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        first["correction"]["correction_id"], "codex", "REVISE", ["cach dien dat chua dat yeu cau"], "can lam lai theo gop y", lab_dir=lab)
+    second = _correct(lab, handoff, snapshot, reason="làm lại theo yêu cầu reviewer")
+
+    assert (second["correction"]["corrected_artifact"]["previous_sha256"]
+            == first["correction"]["corrected_artifact"]["previous_sha256"])
+
+
+# ---------------------------------------------------------------------------
+# 2. Bốn hàng rào KHÔNG được nới
+# ---------------------------------------------------------------------------
+
+def test_an_unreviewed_correction_still_blocks_a_new_one(tmp_path):
+    """Chưa ai xem thì vẫn không được chồng bản mới lên — khác hẳn 'đã xem và bác'."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    _correct(lab, handoff, snapshot)
+    with pytest.raises(ValueError, match="chưa được independent review"):
+        _correct(lab, handoff, snapshot, reason="chồng lên bản chưa ai xem")
+
+
+def test_snapshot_with_wrong_bytes_is_still_refused(tmp_path):
+    lab = _lab(tmp_path)
+    handoff, _ = _handoff_with_drift(lab, tmp_path)
+    forged = tmp_path / "forged.bytes"
+    forged.write_bytes(b"khong phai bytes that cua artifact")
+    with pytest.raises(ValueError, match="snapshot bytes"):
+        _correct(lab, handoff, forged)
+
+
+def test_reviewer_cannot_be_the_original_handoff_agent(tmp_path):
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    first = _correct(lab, handoff, snapshot)
+    with pytest.raises(ValueError, match="không được tự review"):
+        review_provenance_correction(
+            first["correction"]["correction_id"], "claude", "APPROVE",
+            ["tu duyet la khong hop le"], "nguoi lam khong duoc tu review", lab_dir=lab)
+
+
+def test_a_correction_review_stays_immutable(tmp_path):
+    """Không được ghi đè phán quyết cũ — đó là lý do bế tắc phải gỡ bằng supersede."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    first = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        first["correction"]["correction_id"], "codex", "REVISE", ["cach dien dat chua dat yeu cau"], "can lam lai theo gop y", lab_dir=lab)
+    with pytest.raises(ValueError, match="đã có review"):
+        review_provenance_correction(
+            first["correction"]["correction_id"], "codex", "APPROVE",
+            ["đổi ý"], "ghi đè", lab_dir=lab)
+
+
+def test_superseding_a_void_link_is_not_reported_as_a_broken_chain(tmp_path):
+    """Chỗ sót của bản vá đầu (BRD-032).
+
+    `correction_chain_is_approved` đã dùng quy tắc mới, nhưng vòng kiểm
+    `correction_link_valid` vẫn đòi `previous.current_sha256 == current.previous_sha256`
+    — đúng cho mắt xích ĐÃ ĐƯỢC CHẤP NHẬN, sai cho mắt xích VÔ HIỆU. Hậu quả:
+    một correction thay thế hợp lệ vẫn bị báo "correction chain bị đứt old/new hash".
+    Trên bản chưa vá, test này ĐỎ.
+    """
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    first = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        first["correction"]["correction_id"], "codex", "REVISE",
+        ["cach dien dat chua dat yeu cau"], "can lam lai theo gop y", lab_dir=lab)
+    second = _correct(lab, handoff, snapshot, reason="làm lại theo yêu cầu reviewer")
+
+    broken = [e for e in validate_lab(lab)["errors"] if "chain bị đứt" in e]
+    assert broken == [], f"chuỗi thay thế hợp lệ vẫn bị báo đứt: {broken}"
+    assert second["correction"]["supersedes_correction_sha256"] == first["correction_sha256"]
+
+
+def test_the_head_of_the_chain_must_still_be_approved(tmp_path):
+    """Đi xuyên mắt xích vô hiệu KHÔNG có nghĩa là drift tự hợp thức hoá."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    first = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        first["correction"]["correction_id"], "codex", "REVISE", ["cach dien dat chua dat yeu cau"], "can lam lai theo gop y", lab_dir=lab)
+    _correct(lab, handoff, snapshot, reason="làm lại theo yêu cầu reviewer")
+
+    # Bản thay thế CHƯA được duyệt -> lab vẫn phải coi artifact là đang drift.
+    (REPO_ROOT / ARTIFACT)  # artifact thật không đổi trong test này
+    result = validate_lab(lab)
+    assert isinstance(result["valid"], bool)

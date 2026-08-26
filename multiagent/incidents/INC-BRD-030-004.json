@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-030-004",
+  "task_id": "BRD-030",
+  "detected_at_utc": "2026-08-25T20:18:55.796764Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "artifact_path": "tests/test_correction_chain.py",
+  "recorded_sha256": "d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963",
+  "observed_sha256": "ddf0417556394565bb725563716ddbe5689ea6fe9c5673352db3f2be5bb53f72",
+  "reason": "BRD-032 r002 them mot test tai hien dung lo hong dau doc bang phan quyet ma codex tim ra.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

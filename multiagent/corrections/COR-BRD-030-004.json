@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-030-004",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-004",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them test_a_hand_written_duplicate_approval_cannot_poison_the_decision_table: chep tay mot review APPROVE thu hai cho cung mot correction, lab validate phai bao 'phan quyet xung dot'. Khong sua hay noi long 8 test cu.",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963.blob",
+    "sha256": "d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_correction_chain.py",
+    "previous_sha256": "d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963",
+    "current_sha256": "ddf0417556394565bb725563716ddbe5689ea6fe9c5673352db3f2be5bb53f72"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": "13380f073bf3f5c1920e42dbb9a76c0f0cfc9e9bea60bcee0bff4b125a194050"
+}

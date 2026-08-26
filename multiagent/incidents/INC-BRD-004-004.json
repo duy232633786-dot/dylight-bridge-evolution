@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-004-004",
+  "task_id": "BRD-004",
+  "detected_at_utc": "2026-08-25T18:43:42.384751Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "artifact_path": "tests/test_shape_grammar_experimental.py",
+  "recorded_sha256": "734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657",
+  "observed_sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef",
+  "reason": "BRD-022 (nguoi dung uy quyen mo rong write_scope): hai test co y KHOA hanh vi loader mat an toan phai dao chieu khi loader duoc siet. test_loader_does_traverse_into_sandbox_documented_not_safe doi thanh test_loader_refuses_to_traverse_into_sandbox; test_sandbox_policy_must_not_claim_the_loader_blocks_it doi thanh test_sandbox_policy_matches_the_measured_mechanism va nay doi chieu tung khang dinh BLOCKED voi hanh vi runtime that. Day la drift THU HAI cua artifact nay; correction truoc la COR-BRD-004-001 (sua == 111 thanh >= 111).",
+  "disposition": "CONTROLLED_CORRECTION"
+}

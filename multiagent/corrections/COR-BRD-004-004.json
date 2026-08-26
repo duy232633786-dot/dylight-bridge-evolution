@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-004-004",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-004",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Siet loader lam hai test dac ta hanh vi cu do - dung nhu chinh chung duoc viet ra de bao. Khong noi long khang dinh nao: test moi manh hon (them doi chieu runtime cho tung dong phat bieu an toan). Snapshot la bytes tai hash sau COR-BRD-004-001.",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657.blob",
+    "sha256": "734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_shape_grammar_experimental.py",
+    "previous_sha256": "734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657",
+    "current_sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_catalogs.py",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Nguoi dung da uy quyen mo rong write_scope cua BRD-022 sang file nay vi acceptance criteria cua chinh task doi hoi."
+  ],
+  "unresolved_risks": [
+    "test_experimental_grammar_lives_only_in_sandbox van do do 3 grammar chua commit cua BRD-025, khong phai do thay doi nay."
+  ],
+  "supersedes_correction_sha256": "b79940c91713705b82b68b483027b14d79ad644ab8906b38b972101e596f5ae9"
+}

@@ -5,9 +5,9 @@
   "research_question": "Làm sao đo nhịp điệu, tỷ lệ, silhouette, view corridor và khả năng thi công mà không biến cảm nhận AI thành sự thật kỹ thuật?",
   "workstream": "aesthetics",
   "priority": "P1",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
   "dependencies": [],
   "required_gates": [
     "G0",
@@ -34,6 +34,8 @@
     "Không tối ưu một điểm nhìn duy nhất rồi tuyên bố đẹp toàn cảnh"
   ],
   "review_notes": [
-    "Phe duyet Aesthetic Review va Constructability Protocol"
+    "Phe duyet Aesthetic Review va Constructability Protocol",
+    "REVISE. Thiet ke DUNG, chi than test viet sai - sua rat nho. Toi da tu kiem: contracts/aesthetic_review.schema.json GHIM ca hai co bang const:false, va khi lat chung thanh True thi Draft202012Validator tra dung 2 loi ('False was expected'). Co che chan da co that; test chi thieu buoc GOI validator. Sua de xuat: sau khi lat co, validate ban da lat va khang dinh schema TU CHOI, vi du errors=list(Draft202012Validator(schema).iter_errors(mutated)); assert len(errors)==2 - nhu vay test se do neu ai do go const:false khoi schema, tuc no thuc su la mot cai phanh thay vi mot cau tu mau thuan. 7/8 test con lai xanh va co gia tri (tach hai chieu diem, viewpoint co rang buoc, contour features chi la gia thuyet sang loc). So voi giao thuc cu chi co mot trung binh 7,8/10 tu 5 nguoi, ban moi da bo con so do va tach chieu - dung huong. Day la review CROSS-PROVIDER theo chieu nguoc lai: viec do codex lam, claude review. Ngoai pham vi task nay: 2 test do tien ton tai cua BRD-025 van con.",
+    "APPROVE. Khuyet tat duy nhat cua r001 da dong dung cach: thay vi xoa test do, codex bien no thanh phep kiem that - lat co override roi doi schema TU CHOI. Do la khac biet giua mot cau tu mau thuan va mot cai phanh. Gia tri thuc cua ban giao thuc moi: bo con so 7,8/10 gop tu 5 nguoi (thieu cong suat thong ke va nhap nhang hai chieu), tach thanh hai chieu diem rieng, rang buoc viewpoint, va giu contour features o muc GIA THUYET SANG LOC chu khong phai thuoc do. Tham my van la objective rieng va khong duoc doi lay safety margin - dung PROTOCOL quy tac 4. Day la review CROSS-PROVIDER theo chieu nguoc: viec do codex lam, claude review. Ngoai pham vi: 2 test do tien ton tai cua BRD-025 van con, khong lien quan task nay."
   ]
 }

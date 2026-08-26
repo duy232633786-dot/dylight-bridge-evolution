@@ -1,21 +1,57 @@
-"""Kiểm thử hợp đồng schema Aesthetic & Constructability Review."""
+"""Contract tests for context-bound, non-authoritative aesthetic review."""
 import json
 from pathlib import Path
 import jsonschema
-import pytest
 
-from bridge_evolution import CONTRACTS_DIR
+ROOT = Path(__file__).parents[1]
 
+def load(path):
+    return json.loads((ROOT / path).read_text(encoding="utf-8"))
 
-def test_aesthetic_review_schema_valid():
-    with open(CONTRACTS_DIR / "aesthetic_review.schema.json", encoding="utf-8") as f:
-        schema = json.load(f)
+def test_protocol_matches_schema():
+    errors = list(jsonschema.Draft202012Validator(load("contracts/aesthetic_review.schema.json")).iter_errors(load("research/aesthetics/review_protocol.json")))
+    assert errors == []
 
-    protocol_path = Path("research/aesthetics/review_protocol.json")
-    if protocol_path.exists():
-        with open(protocol_path, encoding="utf-8") as f:
-            protocol = json.load(f)
+def test_aesthetics_cannot_override_hard_constraint():
+    p = load("research/aesthetics/review_protocol.json")
+    assert p["constructability_gate"]["is_hard_gate"] is True
+    assert p["constructability_gate"]["aesthetic_score_override_allowed"] is False
+    assert p["safety_boundary"]["aesthetic_score_may_override_hard_constraint"] is False
 
-        validator = jsonschema.Draft202012Validator(schema)
-        errors = list(validator.iter_errors(protocol))
-        assert errors == []
+def test_citations_exist_in_literature_index():
+    p = load("research/aesthetics/review_protocol.json")
+    ids = {e["reference_id"] for e in load("research/literature/index.json")["references"] if "reference_id" in e}
+    assert set(p["cited_literature"]) <= ids
+    assert set(p["automated_features"]["evidence_reference_ids"]) <= ids
+
+def test_single_aggregate_score_is_not_a_valid_protocol():
+    e = load("research/aesthetics/review_protocol.json")["human_panel_evaluation"]
+    assert e["dimensions"] == ["aesthetic_preference", "perceived_safety"]
+    assert "mean_score_out_of_10" not in e
+    assert e["minimum_panel_for_decision"] >= 9
+
+def test_viewpoints_lock_context_and_corridors():
+    views = load("research/aesthetics/review_protocol.json")["viewpoints"]
+    assert len(views) >= 3
+    required = {"weather", "lighting", "observer_scale", "view_corridor_id"}
+    assert all(required <= set(v) for v in views)
+
+def test_unknown_literature_id_is_rejected():
+    p = load("research/aesthetics/review_protocol.json")
+    ids = {e["reference_id"] for e in load("research/literature/index.json")["references"] if "reference_id" in e}
+    p["cited_literature"].append("LIT-DOES-NOT-EXIST")
+    assert not set(p["cited_literature"]) <= ids
+
+def test_hard_constraint_failure_cannot_be_repaired_by_aesthetic_score():
+    schema = load("contracts/aesthetic_review.schema.json")
+    mutated = load("research/aesthetics/review_protocol.json")
+    mutated["constructability_gate"]["aesthetic_score_override_allowed"] = True
+    mutated["safety_boundary"]["aesthetic_score_may_override_hard_constraint"] = True
+    errors = list(jsonschema.Draft202012Validator(schema).iter_errors(mutated))
+    assert len(errors) == 2
+
+def test_citation_checker_rejects_unknown_lit_id():
+    p = load("research/aesthetics/review_protocol.json")
+    ids = {e["reference_id"] for e in load("research/literature/index.json")["references"] if "reference_id" in e}
+    p["automated_features"]["evidence_reference_ids"].append("LIT-999999")
+    assert not set(p["automated_features"]["evidence_reference_ids"]) <= ids

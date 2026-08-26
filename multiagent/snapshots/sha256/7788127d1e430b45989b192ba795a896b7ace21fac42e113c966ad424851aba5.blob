@@ -1,0 +1,95 @@
+"""Carbonat hóa bê tông — mô hình sàng lọc √t (BRD-026).
+
+Mô hình: chiều sâu carbonat hóa phát triển theo căn thời gian
+
+    x_c(t) = k · √t        [mm, t năm]
+
+với k hiệu chỉnh từ cường độ bê tông, độ ẩm tương đối và mức phơi exposure:
+
+    k = k_ref · (f_ck_ref / f_ck)^0.5 · k_rh · k_exp
+
+Nguồn/định mức:
+  * Dạng √t là kết quả khuếch tán CO2 qua lớp đã carbonat đã khuếch tán —
+    chuẩn trong tài liệu tuổi thọ bê tông (fib Bulletin 34 §4; CEB
+    MC-SLD dạng đơn giản hóa; Papadakis 1991 cùng cho x ∝ √t).
+  * Luỹ thừa cường độ −0.5: các khớp thực nghiệm công bố nằm quanh
+    f_ck^(−0.4…−0.7) (Vagelis Papadakis 1991; DuraCrete §2.3.4) — chọn −0.5
+    làm bậc sàng lọc bảo thủ vừa phải.
+  * k_ref = 4.0 mm/√năm ứng C30, RH 70%, ngoài trời không che — giữa dải
+    công bố 3–6 mm/√năm cho bê tông thường (CEB MC-SLD bảng trị số; các
+    đo đạc cầu thực 2–8 tùy vi khí hậu). KHÔNG phải hằng số vật lý tuyệt
+    đối — là trị sàng lọc có dẫn nguồn, phải hiệu chỉnh lại khi có đo đạc
+    hiện trường (G6).
+  * k_rh: carbonat chạy nhanh nhất ở RH ~50–70%; bão hòa nước (RH>90%) gần
+    dừng, khí hậu rất khô (RH<40%) cũng chậm do thiếu nước phản ứng.
+  * k_exp: che mưa làm carbonat nhanh hơn (không có nước rửa CaCO3 và ẩm
+    bề mặt thấp); splash/tidal ưu tiên mô hình clorua.
+
+t_initiate = (cover / k)² — thời gian carbonat chạm tới cốt thép.
+"""
+from __future__ import annotations
+
+import math
+
+__all__ = ["carbonation_coefficient", "carbonation_initiation_years",
+           "CARBONATION_EXPOSURE_FACTORS"]
+
+#: Hệ số phơi theo vi khí hậu (sàng lọc, dẫn nguồn MC-SLD bảng 5.2-1 dạng
+#: định tính; trị số chọn giữa dải công bố).
+CARBONATION_EXPOSURE_FACTORS = {
+    "outdoor_sheltered": 1.0,    # ngoài trời có che mưa
+    "outdoor_exposed": 0.85,     # ngoài trời mưa tạt trực tiếp
+    "indoor": 1.25,              # trong nhà, không che đặc biệt
+    "buried": 0.50,              # tiếp đất ẩm — carbonat chậm
+}
+
+_F_CK_REF_MPA = 30.0
+_K_REF_MM_PER_SQRT_YEAR = 4.0
+_RH_REF = 70.0
+
+
+def _rh_factor(rh_percent: float) -> float:
+    """Hệ số RH quanh đỉnh 70% (điểm tham chiếu); hai đầu chậm lại (fib Bulletin 34)."""
+    if rh_percent <= 40.0:
+        return 0.6
+    if rh_percent >= 95.0:
+        return 0.1
+    # Parabol chuẩn hóa: đỉnh 1.0 tại RH=70 (điểm chuẩn k_ref), giảm về hai bên.
+    return max(0.1, 1.0 - ((rh_percent - 70.0) / 45.0) ** 2)
+
+
+def carbonation_coefficient(
+    fck_MPa: float = 30.0,
+    rh_percent: float = 70.0,
+    exposure: str = "outdoor_sheltered",
+) -> float:
+    """Hệ số carbonat k [mm/√năm] — tham số ngoài phạm vi sẽ raise ValueError."""
+    if fck_MPa <= 0:
+        raise ValueError("fck_MPa phải dương")
+    if not (0 < rh_percent <= 100):
+        raise ValueError("rh_percent phải trong (0, 100]")
+    if exposure not in CARBONATION_EXPOSURE_FACTORS:
+        raise ValueError(f"exposure lạ: {exposure!r}; cho phép: "
+                         f"{sorted(CARBONATION_EXPOSURE_FACTORS)}")
+    strength = math.sqrt(_F_CK_REF_MPA / fck_MPa)
+    return (_K_REF_MM_PER_SQRT_YEAR * strength
+            * _rh_factor(rh_percent)
+            * CARBONATION_EXPOSURE_FACTORS[exposure])
+
+
+def carbonation_initiation_years(
+    cover_mm: float,
+    fck_MPa: float = 30.0,
+    rh_percent: float = 70.0,
+    exposure: str = "outdoor_sheltered",
+) -> float:
+    """Số năm carbonat chạm cốt thép: t = (cover/k)².
+
+    Cover mỏng hơn → t giảm theo bình phương (đơn điệu mạnh); bê tông mạnh
+    hơn → k giảm → t tăng. Đây là THỜI GIAN KHỞI PHÁT ăn mòn, chưa gồm giai
+    đoạn lan truyền (xem service_life.propagation_years).
+    """
+    if cover_mm <= 0:
+        raise ValueError("cover_mm phải dương")
+    k = carbonation_coefficient(fck_MPa, rh_percent, exposure)
+    return (cover_mm / k) ** 2

@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "agent_id": "opencode",
+  "role": "structural_analyst",
+  "summary": "BRD-026 hoan thanh engine tuoi tho: carbonation.py (x_c=k*sqrt(t), k hieu chuan fck/RH/exposure, diem chuan 4mm/sqrt(nam) @ C30 RH70 - dan nguon fib Bulletin 34/MC-SLD/Papadakis); chloride.py (Fick-2 erf + D(t) giam theo tuoi DuraCrete m=0.30, chia doi tim t_init); fatigue.py (S-N EN 1993-1-9 N=2e6*(dsc_C/dsc)^m + Miner); service_life.py (initiation+propagation, remaining life hieu chuan condition state 1-4); maintenance.py (ke hoach quan trac + LCC-lite chon chu ky). 11/11 test xanh: diem chuan S-N 2e6@71MPa, Miner=1, erf don dieu, known-value carbonat 100 nam @ cover 40mm. MOI SO LIEU LA ADVISORY - khong PASS/FAIL, khong tham gia verifier.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/durability/__init__.py",
+      "sha256": "3735fa64342710fbbeba158dd5dc3cfb127a12011c1224a77214272b85003394",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/carbonation.py",
+      "sha256": "7788127d1e430b45989b192ba795a896b7ace21fac42e113c966ad424851aba5",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/chloride.py",
+      "sha256": "df673c698882f71ccf43294c62c644f0f632d7065d9c8536bd48f133164330ed",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/fatigue.py",
+      "sha256": "b82fc50539f98135a72a8dc3de99033d7893afc8c1a8edc47e5843aec4d0ef94",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/service_life.py",
+      "sha256": "95748bc4a240006a00be62e22c8d1191b9bd4609f17dacf9177d968b93bd7c83",
+      "kind": "test"
+    },
+    {
+      "path": "bridge_evolution/durability/maintenance.py",
+      "sha256": "3c2613e079963abea76d3bbead97fa8508cb0d58aa19b5c2fa70cfacc1e84b9f",
+      "kind": "test"
+    },
+    {
+      "path": "tests/test_durability.py",
+      "sha256": "6aa40c5b0d677779ca99b7e87ac987d7eece70fecb99b6daf012e1b38e8e7e41",
+      "kind": "test"
+    }
+  ],
+  "assumptions": [
+    "He so khau hao la tri sang loc co dan nguon (k_ref 4mm/sqrt(nam), m=0.30, propagation 8/4 nam) - phai hieu chuan theo do dac hien truog G6 khi co"
+  ],
+  "unresolved_risks": [
+    "G6 chua hoan thanh: thieu du lieu exposure that (Cs, RH, chloride) - mac dinh la tri sang loc, khong phai do dac"
+  ],
+  "next_action": "Reviewer doc lap kiem tra dan nguon he so; BRD-027 gan durability vao asset registry"
+}

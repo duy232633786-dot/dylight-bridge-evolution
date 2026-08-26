@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-030-002",
+  "task_id": "BRD-030",
+  "detected_at_utc": "2026-08-25T20:01:54.896007Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "artifact_path": "tests/test_correction_chain.py",
+  "recorded_sha256": "5f06ee8f8aee7ca4b717184ab25117ce6d0f82faa83c37482d9be7309dc24c63",
+  "observed_sha256": "d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963",
+  "reason": "BRD-032 them mot test cho cho sot cua BRD-030 (correction_link_valid van dung gia dinh cu), nen file test do BRD-030 neo hash bi drift.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

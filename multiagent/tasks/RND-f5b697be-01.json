@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-f5b697be-01",
+  "title": "Khóa design basis, bằng chứng và tiêu chí bác bỏ",
+  "research_question": "Dữ liệu đầu vào, nguồn gốc và tiêu chí nào phải khóa trước khi nghiên cứu đề tài này?",
+  "workstream": "design_basis",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260824-f5b697be/01_design_basis_and_evidence.md"
+  ],
+  "acceptance_criteria": [
+    "Phân biệt dữ liệu đã biết, chưa biết và giả định",
+    "Mỗi claim chính có nguồn/citation hoặc ghi UNVERIFIED",
+    "Có baseline, metric, ngân sách và falsification criterion"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260824-f5b697be/01_design_basis_and_evidence.md"
+  ],
+  "safety_notes": [
+    "Không tự bịa site, tải, địa chất, thủy văn hay thuộc tính vật liệu"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260824-f5b697be",
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "handoff_sha256": "9d426f887820736acd7f46e998b3e1891179cd219efd6f283a7dc5d85fbb1356",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "11 test known-value + monotonic + anti-garbage"
+    },
+    {
+      "gate": "G6",
+      "status": "FAIL",
+      "evidence": "Handoff explicitly records missing real exposure data (Cs, RH, chloride); defaults remain screening/advisory"
+    }
+  ],
+  "notes": "REVISE: 11/11 durability tests pass and the source docstrings appropriately cite fib Bulletin 34, DuraCrete, EN 1993-1-9/MC-SLD/Papadakis. However required G6 is not complete: the handoff explicitly lacks real exposure data (Cs, RH, chloride), so the default coefficients remain screening/advisory. Do not approve until G6 evidence is supplied; outputs must remain SCREENED/advisory."
+}

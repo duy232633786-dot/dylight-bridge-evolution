@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-002-001",
+  "task_id": "BRD-002",
+  "incident_id": "INC-BRD-002-001",
+  "correction_sha256": "105537fe06e42321bfa6904daee43102412199a6a9b2c6b7a18bd573472cbd46",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot and live SHA-256 match and the diff is limited to formatting plus the three bindings. However, CLAIM_CEILING encoded in free-text role is semantically overloaded and not acceptable as durable contract documentation; use a schema-supported claim field or a separately validated limits field.",
+    "Cross-provider independent review: snapshot authenticity and summary diff were checked."
+  ],
+  "notes": "This is a cross-provider review by Codex, independent of the Claude author. Full pytest result was 7 failures due to concurrent repository drift; no files were edited by this review."
+}

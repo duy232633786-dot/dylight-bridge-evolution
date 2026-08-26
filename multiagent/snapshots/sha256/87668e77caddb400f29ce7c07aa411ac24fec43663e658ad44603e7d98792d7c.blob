@@ -1,0 +1,41 @@
+{
+  "grammar_id": "i_girder_parametric_v1",
+  "grammar_version": "1.0.0",
+  "description": "Grammar tham số hóa cầu dầm I BTCT DUL tiền ứng lực giản đơn (BRD-025). girder_catalog_id khóa ở marker I-PARAM: đặc trưng tiết diện TÍNH từ 6 biến hình dạng qua bridge_evolution.section_types.i_girder_section_from_params, cùng contract khóa với Super-T nên chạy trọn L0 + L1 line-girder (solver liên hợp bản qua composite_section sẵn có). Rule profile BRIDGE-RULESET-V2 bật nhóm FAB với ngưỡng riêng của I DUL (dày sườn đổ xưởng, chỗ tao trong cánh dưới, cẩu, vận chuyển, L/H).",
+  "project_inputs": {
+    "span_length_m": 35.0,
+    "deck_width_m": 12.0,
+    "alignment_type": "STRAIGHT",
+    "skew_deg": 0
+  },
+  "fixed": {
+    "load_profile_id": "LOAD-PROFILE-01",
+    "rule_profile_id": "BRIDGE-RULESET-V2",
+    "prestressing_steel_id": "PS-15.2-1860",
+    "fidelity": "L1_LINE_GIRDER",
+    "solver": "BUILTIN_L1"
+  },
+  "design_variables": {
+    "girder_catalog_id": { "type": "catalog", "domain": ["I-PARAM"] },
+    "girder_count": { "type": "int", "domain": [4, 5, 6] },
+    "girder_spacing_mm": { "type": "grid", "min": 1800, "max": 2900, "step": 50 },
+    "deck_slab_thickness_mm": { "type": "grid", "min": 180, "max": 250, "step": 5 },
+    "girder_concrete_id": { "type": "catalog", "domain": ["C40", "C45", "C50", "C55", "C60"] },
+    "deck_concrete_id": { "type": "catalog", "domain": ["C30", "C35"] },
+    "diaphragm_layout_id": { "type": "catalog", "domain": ["DG-3", "DG-5"] },
+    "prestress_layout_id": { "type": "catalog", "domain": ["PT-34", "PT-38", "PT-42", "PT-46", "PT-50", "PT-54"] },
+
+    "girder_depth_mm": { "type": "grid", "min": 1400, "max": 2200, "step": 50 },
+    "top_flange_width_mm": { "type": "grid", "min": 800, "max": 1200, "step": 25 },
+    "top_flange_thickness_mm": { "type": "grid", "min": 150, "max": 260, "step": 10 },
+    "web_thickness_mm": { "type": "grid", "min": 160, "max": 300, "step": 10 },
+    "bottom_flange_width_mm": { "type": "grid", "min": 500, "max": 900, "step": 25 },
+    "bottom_flange_thickness_mm": { "type": "grid", "min": 180, "max": 350, "step": 10 }
+  },
+  "shape_notes": {
+    "model": "Tiết diện I đối xứng đứng: cánh trên + sườn giữa + cánh dưới. Biên dựng trong section_types._i_girder_ring, CCW, bê tông bên trái hướng đi.",
+    "coupling": "Điều kiện hợp lệ: tf + tfb < H; bf > tw; bfb > tw; bf - bfb >= tw + 100 (chuyển tiếp sườn-cánh). Vi phạm → SectionGeometryError → FAB-000 HARD ở L0, không tốn solver.",
+    "example_valid": "H=1800, bf=1000, tf=180, tw=200, bfb=650, tfb=300 — dựng được biên, cánh dưới chứa (550×200)/50² = 44 tao ≥ PT-42, khối lượng ~0.64×2.5×35 ≈ 56 t < 80 t cẩu, L/H = 19.4.",
+    "budget": "Cả 6 biến chỉ ảnh hưởng L0; ngân sách solver vẫn đếm theo BudgetedEvaluator như Super-T."
+  }
+}

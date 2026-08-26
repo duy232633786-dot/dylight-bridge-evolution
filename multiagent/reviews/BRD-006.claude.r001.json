@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-006",
+  "handoff_sha256": "7a4e84ce84062b91658f63ada4f5e056636cfadd48f2d0a1910e97bd7506b36e",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Protocol khoa design basis va tu khai claim_ceiling IDEA; schema ghim claim_ceiling const IDEA va safety_boundary.this_review_is_not_evidence_for minItems 1. Ba nguon trich dan LIT-216/217/222 deu TON TAI trong research/literature/index.json va deu thuoc dung chu de AESTHETICS_PRECEDENT_MODELS - da tu kiem, khong co ID bia."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Hash 3/3 artifact khop. Nhung 1/8 test DO ngay khi nop: test_hard_constraint_failure_cannot_be_repaired_by_aesthetic_score tu dat aesthetic_score_override_allowed=True va aesthetic_score_may_override_hard_constraint=True roi assert not (True or True) - menh de KHONG BAO GIO xanh duoc, khong phu thuoc du lieu. Day lai dung la test bao ve rang buoc quan trong nhat cua task: tham my khong duoc doi lay safety margin (PROTOCOL quy tac 4)."
+    }
+  ],
+  "notes": "REVISE. Thiet ke DUNG, chi than test viet sai - sua rat nho. Toi da tu kiem: contracts/aesthetic_review.schema.json GHIM ca hai co bang const:false, va khi lat chung thanh True thi Draft202012Validator tra dung 2 loi ('False was expected'). Co che chan da co that; test chi thieu buoc GOI validator. Sua de xuat: sau khi lat co, validate ban da lat va khang dinh schema TU CHOI, vi du errors=list(Draft202012Validator(schema).iter_errors(mutated)); assert len(errors)==2 - nhu vay test se do neu ai do go const:false khoi schema, tuc no thuc su la mot cai phanh thay vi mot cau tu mau thuan. 7/8 test con lai xanh va co gia tri (tach hai chieu diem, viewpoint co rang buoc, contour features chi la gia thuyet sang loc). So voi giao thuc cu chi co mot trung binh 7,8/10 tu 5 nguoi, ban moi da bo con so do va tach chieu - dung huong. Day la review CROSS-PROVIDER theo chieu nguoc lai: viec do codex lam, claude review. Ngoai pham vi task nay: 2 test do tien ton tai cua BRD-025 van con."
+}

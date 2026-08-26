@@ -1,0 +1,41 @@
+{
+  "grammar_id": "composite_i_girder_parametric_v1",
+  "grammar_version": "1.0.0",
+  "description": "Grammar tham số hóa dầm thép I liên hợp bản BT cốt thép (BRD-025). girder_catalog_id khóa ở marker CI-PARAM: section thép I tính qua composite_i_girder_section_from_params. MỨC HỖ TRỢ THẬT: CHỈ L0 — geometry.check_geometry gắn HARD violation SOLVER-COMPOSITE-001 chặn trước solver vì mô hình sức kháng L1 (khối nén bê tông MODEL-001 + tao DUL dính bám + Vc bê tông trên web) KHÔNG hợp lệ cho dầm thép. Mọi candidate composite sẽ REJECTED ở L0 cho tới khi có solver composite thật (task riêng) — đây là chặn trung thực, không phải lỗi hình học.",
+  "project_inputs": {
+    "span_length_m": 40.0,
+    "deck_width_m": 12.0,
+    "alignment_type": "STRAIGHT",
+    "skew_deg": 0
+  },
+  "fixed": {
+    "load_profile_id": "LOAD-PROFILE-01",
+    "rule_profile_id": "BRIDGE-RULESET-V2",
+    "prestressing_steel_id": "PS-15.2-1860",
+    "fidelity": "L1_LINE_GIRDER",
+    "solver": "BUILTIN_L1"
+  },
+  "design_variables": {
+    "girder_catalog_id": { "type": "catalog", "domain": ["CI-PARAM"] },
+    "girder_count": { "type": "int", "domain": [3, 4, 5] },
+    "girder_spacing_mm": { "type": "grid", "min": 1800, "max": 2900, "step": 50 },
+    "deck_slab_thickness_mm": { "type": "grid", "min": 200, "max": 300, "step": 10 },
+    "girder_concrete_id": { "type": "catalog", "domain": ["C40"] },
+    "deck_concrete_id": { "type": "catalog", "domain": ["C30", "C35"] },
+    "diaphragm_layout_id": { "type": "catalog", "domain": ["DG-3", "DG-5"] },
+    "prestress_layout_id": { "type": "catalog", "domain": ["PT-34"] },
+
+    "steel_depth_mm": { "type": "grid", "min": 1400, "max": 2400, "step": 50 },
+    "steel_top_flange_width_mm": { "type": "grid", "min": 400, "max": 700, "step": 25 },
+    "steel_top_flange_thickness_mm": { "type": "grid", "min": 25, "max": 60, "step": 5 },
+    "steel_web_thickness_mm": { "type": "grid", "min": 16, "max": 40, "step": 2 },
+    "steel_bottom_flange_width_mm": { "type": "grid", "min": 500, "max": 900, "step": 25 },
+    "steel_bottom_flange_thickness_mm": { "type": "grid", "min": 30, "max": 80, "step": 5 }
+  },
+  "shape_notes": {
+    "model": "Thép I hàn ghép bản: hs, cánh trên bft×tft, sườn tw, cánh dưới bfb×tfb. Bản BT liên hợp (deck_slab_thickness_mm) do solver composite — nhưng solver BỊ CHẶN bởi SOLVER-COMPOSITE-001 nên chỉ dùng cho L0.",
+    "l0_only": "FAB chạy thật ở L0: web slenderness hs/tw ≤ 110, cánh nén (bf/2)/tf ≤ 14 (ngưỡng screening lớp 1, tham chiếu EN 1993-1-1 Table 5.2), L/H ∈ [20, 30].",
+    "example_valid": "hs=2000, bft=500, tft=30, tw=20, bfb=700, tfb=50 — slenderness 100 và 8.3 sạch, L/H = 20.0. Candidate vẫn REJECTED bởi SOLVER-COMPOSITE-001 (đúng thiết kế task).",
+    "future": "Gỡ gate khi có solver composite thật: uốn 2 giai đoạn (thép tự chịu + liên hợp), cắt bản toa, chảy vắt lớp 1 thật."
+  }
+}

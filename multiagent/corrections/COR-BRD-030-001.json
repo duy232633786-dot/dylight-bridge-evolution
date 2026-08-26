@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-030-001",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them bang correction_decision tien tinh TRUOC vong lap corrections (reviews duoc xu ly sau nen khong duoc tra nguoc approved_corrections - se phu thuoc thu tu lap), roi dung DUNG MOT quy tac thong nhat voi correction_chain_is_approved: mat xich truoc APPROVE thi noi vao current_sha256, mat xich truoc VO HIEU thi noi vao previous_sha256. Khong noi them hang rao nao: 5 test hang rao cu van xanh, cong 1 test moi cho dung ca nay (8/8).",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/2339eeb3e0f3cc5c7786332c3b1646c357520b4a8fc942b8e92e4a4eaaaf3350.blob",
+    "sha256": "2339eeb3e0f3cc5c7786332c3b1646c357520b4a8fc942b8e92e4a4eaaaf3350"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "2339eeb3e0f3cc5c7786332c3b1646c357520b4a8fc942b8e92e4a4eaaaf3350",
+    "current_sha256": "653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Da grep lai toan file de chac khong con cho thu tu nao mang cung gia dinh: chi con mot cho dung current_sha256 va do la phep so voi observed_sha256, khong lien quan chuoi supersede."
+  ],
+  "unresolved_risks": [
+    "Day la lan thu hai sua bo may chong sua lich su trong mot phien. Can review doi khang muc tuong duong lan truoc."
+  ],
+  "supersedes_correction_sha256": null
+}

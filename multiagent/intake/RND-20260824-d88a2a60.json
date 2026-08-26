@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "brief_id": "RND-20260824-d88a2a60",
+  "created_at": "2026-08-24T15:11:47.934628Z",
+  "topic": "Ghi nhận BIM Family V3 cầu vòm bê tông 160 m với dàn thép open-spandrel: khử xung đột dàn-dầm, mở rộng vùng bố trí thép tại đỉnh vòm và nối vòm vào trụ",
+  "objectives": [
+    "Lưu vết hình học Revit V3, các kiểm tra QA, kết quả âm và giới hạn bằng chứng bằng artifact có SHA-256"
+  ],
+  "constraints": [
+    "Chỉ claim IDEA; đây là kiểm tra hình học BIM, không phải chứng minh chịu lực hoặc tuân thủ TCVN",
+    "Phải giữ verify tổng thể FALSE do thiếu legacy context và chênh cao 7 m giữa đầu trụ PSC với đáy mặt cầu vòm"
+  ],
+  "requested_by": "user",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "budget": {
+    "max_tasks": 4,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 21600
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}

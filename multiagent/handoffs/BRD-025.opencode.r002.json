@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "agent_id": "opencode",
+  "role": "form_inventor",
+  "summary": "BRD-025 r002 - xu ly REVISE cua codex: (1) Da them khoi NGUON NGUONG FAB vao docstring section_types.py dan nguon TCVN 11823-1/AASHTO BDS 8.11-8.14/EN 1993-1-1 Table 5.2/AASHTO BDS 6.10 cho tung ho; (2) Sua sai so dem test: chinh xac la 16 test section_types (khong phai 18) - so 18/18 trong r001 la stale; tong suite 2 module = 30/30 (16 section + 14 durability). Noi dung ky thuat giu nguyen r001: 3 builder section (I-girder DUL, hop-U, composite thep) contract keys day du, 3 grammar JSON, geometry.py dispatch marker giu hanh vi Super-T, hop tang ban tren qua composite san co, composite chan HARD SOLVER-COMPOSITE-001 truoc solver.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/section_types.py",
+      "sha256": "43971fd6cd57668d8d6365b93255ea6aa63efd0326bfbc24ddaa947d53e4669d",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_section_types.py",
+      "sha256": "815bb9ffb8d2fbdab4e1b1ab212567d73deecf795e3e6e675d0a95ef74a0e220",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_grammar/i_girder_parametric_v1.json",
+      "sha256": "87668e77caddb400f29ce7c07aa411ac24fec43663e658ad44603e7d98792d7c",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_grammar/box_girder_parametric_v1.json",
+      "sha256": "c6ec32edd37ca28cb8df427349cbd4d16272bb6f78c09ee74a54aa8926a65e4a",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_grammar/composite_i_girder_parametric_v1.json",
+      "sha256": "a52656ecdd975bfc43cec42de849679478e23ef5de2c190d0a82041706e8f01b",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/geometry.py",
+      "sha256": "02494260a0248fcd4f87906c64255a8e6cf48fce1ccf7c6c89475cffb8f3050c",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Box: L1 bo qua uon xoan - chi screening dam tuong duong"
+  ],
+  "unresolved_risks": [
+    "Composite chua co solver suc khang - can task rieng"
+  ],
+  "next_action": "Cho review r002; BRD-028 cap nhat 2 test pin"
+}

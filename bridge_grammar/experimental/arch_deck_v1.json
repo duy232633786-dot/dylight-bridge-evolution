@@ -9,7 +9,7 @@
   "sandbox_policy": {
     "location": "bridge_grammar/experimental/",
     "production_import_forbidden": true,
-    "statement_vi": "File này KHÔNG được nhập vào production grammar. CẢNH BÁO ĐÃ SỬA (phản biện BRD-004): phát biểu trước đây rằng load_grammar() 'không nạp được file này' là SAI. load_grammar('experimental/arch_deck_v1') NẠP ĐƯỢC, vì catalogs.py dựng đường dẫn GRAMMAR_DIR/f'{grammar_id}.json' mà không chặn dấu '/'; gene_order() và gene_domains() cũng chạy được trên file này và trả về đúng các biến vòm. Hàng rào THẬT nằm ở hai chỗ khác: (1) contracts/bridge_design_state.schema.json khoá 'family' bằng enum [super_t_simple_v1, super_t_parametric_v2]; (2) mọi đường sinh số dừng bằng KeyError vì grammar vòm không có các trường Super-T (đo được: BudgetedEvaluator -> KeyError 'girder_concrete_id'). Chỗ (2) là TAI NẠN chứ không phải cổng chặn có chủ ý, nên nó có thể biến mất khi ai đó thêm giá trị mặc định. Việc siết load_grammar() nằm NGOÀI write_scope của BRD-004 và đã được tách thành task riêng. Muốn dùng thật thì phải qua review của kỹ sư và qua toàn bộ constraints_needed dưới đây.",
+    "statement_vi": "File này KHÔNG được nhập vào production grammar. CẬP NHẬT SAU BRD-022: load_grammar() nay CHẶN được đường đi này. Trước đó catalogs.py dựng GRAMMAR_DIR/f'{grammar_id}.json' mà không chặn dấu phân cách, nên load_grammar('experimental/arch_deck_v1') nạp được và gene_order()/gene_domains() chạy trơn trên nó; đường sinh số chỉ dừng ở BudgetedEvaluator bằng KeyError 'girder_concrete_id' — tức bằng TAI NẠN, có thể biến mất khi ai đó thêm một giá trị mặc định. BRD-022 đã biến cách ly thành bất biến được thực thi: mọi grammar_id chứa '/', '\\', '..' hoặc đường dẫn tuyệt đối đều bị từ chối bằng GrammarIdError riêng, và tệp phải nằm trực tiếp trong thư mục grammar production. Hàng rào thứ hai vẫn nguyên: contracts/bridge_design_state.schema.json khoá 'family' bằng enum. Muốn dùng thật vẫn phải qua review của kỹ sư và toàn bộ constraints_needed dưới đây.",
     "runtime_can_evaluate_this_family": false,
     "runtime_evidence": {
       "matrix_id": "RCM-2.0.0",
@@ -25,10 +25,10 @@
     },
     "isolation_mechanism_measured": {
       "load_grammar_flat_name": "BLOCKED_FileNotFoundError",
-      "load_grammar_with_slash": "NOT_BLOCKED — nạp được, đã tái hiện",
-      "gene_order_gene_domains": "NOT_BLOCKED — trả về biến vòm",
+      "load_grammar_with_slash": "BLOCKED_GrammarIdError — BRD-022 siết loader; đo được bằng tests/test_catalogs.py::test_sandbox_grammar_is_refused_by_the_loader",
+      "gene_order_gene_domains": "BLOCKED_GrammarIdError — chặn ngay ở loader, không còn chạy được trên biến vòm; đo bằng tests/test_catalogs.py::test_gene_helpers_cannot_reach_the_sandbox_anymore",
       "state_schema_family_enum": "BLOCKED — enum không chứa họ vòm",
-      "budgeted_evaluator": "BLOCKED_BY_ACCIDENT — KeyError 'girder_concrete_id'",
+      "budgeted_evaluator": "BLOCKED_BY_ACCIDENT — KeyError 'girder_concrete_id'; vẫn là tai nạn, nay không còn là hàng rào duy nhất",
       "production_imports_geometry_experimental": "NONE — grep sạch"
     }
   },

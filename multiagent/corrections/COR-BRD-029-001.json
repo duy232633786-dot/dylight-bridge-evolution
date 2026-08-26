@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-029-001",
+  "task_id": "BRD-029",
+  "incident_id": "INC-BRD-029-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "role tro lai gia tri sach SECTION_FAMILY_ARM; tran claim va ly do do duoc chuyen sang hai truong co schema. Khong doi bat ky binding hay truong KNOWN/UNKNOWN nao khac.",
+  "original_handoff_path": "multiagent/handoffs/BRD-029.claude.r001.json",
+  "original_handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047.blob",
+    "sha256": "a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047"
+  },
+  "corrected_artifact": {
+    "path": "docs/design_basis/DB-SUPERT-38M.json",
+    "previous_sha256": "a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047",
+    "current_sha256": "ce2ed66b1e58737d7d2337da0513a70e39326822f63e6e4b386ea8743a9ae842"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_basis.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": null
+}

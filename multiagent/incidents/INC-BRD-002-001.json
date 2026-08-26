@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-002-001",
+  "task_id": "BRD-002",
+  "detected_at_utc": "2026-08-25T19:18:34.579831Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-002.claude.r001.json",
+  "original_handoff_sha256": "86a4c50007f2d06f24d480f921a3e10e45a79c04d4859591824bb0e1a18ce2a5",
+  "artifact_path": "docs/design_basis/DB-SUPERT-38M.json",
+  "recorded_sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25",
+  "observed_sha256": "a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047",
+  "reason": "BRD-029 mo khoa hop dong da loai cau: runtime_binding.grammar_bindings phai phu DUNG tap grammar trong bridge_grammar/ (tests/test_design_basis.py:292), nen ba ho tiet diene moi cua BRD-025 phai duoc khai o day.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

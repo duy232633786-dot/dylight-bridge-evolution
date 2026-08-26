@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-027",
+  "title": "Lớp tài sản vận hành BIM: asset registry, condition state, kế hoạch quan trắc, COBie-lite",
+  "research_question": "Cần mô hình dữ liệu tối thiểu nào để mỗi cấu kiện cầu trở thành tài sản vận hành (GUID ổn định, condition state 1-4, lịch sử kiểm tra, tuổi thọ thiết kế) và sinh kế hoạch quan trắc + xuất COBie-lite/JSON tái lập được từ design state?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": ["BRD-026"],
+  "required_gates": ["G0"],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/bim/asset_registry.py",
+    "bridge_evolution/bim/inspection_plan.py",
+    "tests/test_asset_registry.py"
+  ],
+  "acceptance_criteria": [
+    "GUID xác định (UUIDv5 từ namespace cố định + khóa cấu kiện) — cùng input cùng GUID, không RNG",
+    "Condition state 1-4 theo AASHTO element inspection; cập nhật condition chỉ qua bản ghi kiểm tra có ngày + người ghi",
+    "Kế hoạch quan trắc sinh từ durability (BRD-026): kiểm tra đầu trước t_initiate, chu kỳ lặp theo tốc độ khấu hao",
+    "Xuất COBie-lite JSON (type/component/attribute) + import ngược khớp round-trip",
+    "python -m pytest tests -q xanh"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/bim/asset_registry.py",
+    "tests/test_asset_registry.py"
+  ],
+  "safety_notes": [
+    "Không thay thế phần mềm quản lý tài sản chính thức; chỉ là lớp dữ liệu trung gian mở",
+    "Không tự nâng condition state; mọi thay đổi phải từ bản ghi kiểm tra do người thật nhập"
+  ],
+  "review_notes": []
+}

@@ -15,85 +15,215 @@
     "geotechnical_category"
   ],
   "properties": {
-    "schema_version": { "enum": ["1.0", "1.1"] },
-    "site_id": { "type": "string", "minLength": 1 },
+    "schema_version": {
+      "enum": [
+        "1.0",
+        "1.1",
+        "1.2"
+      ]
+    },
+    "site_id": {
+      "type": "string",
+      "minLength": 1
+    },
     "site_status": {
       "description": "SPECIFIED = có vị trí thật kèm hồ sơ khảo sát. UNSPECIFIED_PLACEHOLDER = hồ sơ rỗng có chủ đích, KHÔNG phải một vị trí thật.",
-      "enum": ["SPECIFIED", "UNSPECIFIED_PLACEHOLDER"]
+      "enum": [
+        "SPECIFIED",
+        "UNSPECIFIED_PLACEHOLDER"
+      ]
     },
-    "site_status_note": { "type": "string", "minLength": 1 },
-    "applicable_design_basis_ref": { "type": "string", "minLength": 1 },
+    "site_status_note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "applicable_design_basis_ref": {
+      "type": "string",
+      "minLength": 1
+    },
     "coordinate_reference_system": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["horizontal_crs", "vertical_datum"],
+      "required": [
+        "horizontal_crs",
+        "vertical_datum"
+      ],
       "properties": {
-        "horizontal_crs": { "$ref": "#/$defs/evidence_field" },
-        "vertical_datum": { "$ref": "#/$defs/evidence_field" },
-        "survey_control": { "$ref": "#/$defs/evidence_field" },
-        "station_reference": { "$ref": "#/$defs/evidence_field" }
+        "horizontal_crs": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "vertical_datum": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "survey_control": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "station_reference": {
+          "$ref": "#/$defs/evidence_field"
+        }
       }
     },
     "geographic_location": {
       "oneOf": [
-        { "$ref": "#/$defs/geographic_location_legacy" },
-        { "$ref": "#/$defs/geographic_location_evidence" }
+        {
+          "$ref": "#/$defs/geographic_location_legacy"
+        },
+        {
+          "$ref": "#/$defs/geographic_location_evidence"
+        }
       ]
     },
     "seismic_hazard": {
       "oneOf": [
-        { "$ref": "#/$defs/seismic_hazard_legacy" },
-        { "$ref": "#/$defs/seismic_hazard_evidence" }
+        {
+          "$ref": "#/$defs/seismic_hazard_legacy"
+        },
+        {
+          "$ref": "#/$defs/seismic_hazard_evidence"
+        }
       ]
     },
     "wind_hazard": {
       "oneOf": [
-        { "$ref": "#/$defs/wind_hazard_legacy" },
-        { "$ref": "#/$defs/wind_hazard_evidence" }
+        {
+          "$ref": "#/$defs/wind_hazard_legacy"
+        },
+        {
+          "$ref": "#/$defs/wind_hazard_evidence"
+        }
       ]
     },
     "hydrology_scour": {
       "oneOf": [
-        { "$ref": "#/$defs/hydrology_scour_legacy" },
-        { "$ref": "#/$defs/hydrology_scour_evidence" }
+        {
+          "$ref": "#/$defs/hydrology_scour_legacy"
+        },
+        {
+          "$ref": "#/$defs/hydrology_scour_evidence"
+        }
       ]
     },
     "geotechnical_category": {
       "oneOf": [
-        { "$ref": "#/$defs/geotechnical_category_enum" },
+        {
+          "$ref": "#/$defs/geotechnical_category_enum"
+        },
         {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "$ref": "#/$defs/geotechnical_category_enum" } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/geotechnical_category_enum"
+                }
+              }
+            }
           ]
         }
       ]
     },
     "corrosion_exposure": {
       "allOf": [
-        { "$ref": "#/$defs/evidence_field" },
-        { "properties": { "value": { "$ref": "#/$defs/exposure_class_enum" } } }
+        {
+          "$ref": "#/$defs/evidence_field"
+        },
+        {
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/exposure_class_enum"
+            }
+          }
+        }
       ]
     },
     "thermal_environment": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/evidence_field" }
+      "additionalProperties": {
+        "$ref": "#/$defs/evidence_field"
+      }
     },
     "obstacle_crossed": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/evidence_field" }
+      "additionalProperties": {
+        "$ref": "#/$defs/evidence_field"
+      }
     },
-    "g0_gate": { "$ref": "#/$defs/gate_status" },
-    "document_provenance": { "$ref": "#/$defs/document_provenance" }
+    "g0_gate": {
+      "$ref": "#/$defs/gate_status"
+    },
+    "document_provenance": {
+      "$ref": "#/$defs/document_provenance"
+    },
+    "geotechnical_investigation": {
+      "description": "Khảo sát địa kỹ thuật thật (schema_version 1.2 trở lên). Đây là thứ G0 đòi mà SITE-UNSPECIFIED.json để trống có chủ đích. NOT_PERFORMED nghĩa là chưa khoan — không phải 'đất tốt'.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "investigation_status"
+      ],
+      "properties": {
+        "investigation_status": {
+          "enum": [
+            "NOT_PERFORMED",
+            "PARTIAL",
+            "COMPLETE"
+          ]
+        },
+        "report_ref": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "groundwater_level_m": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "boreholes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/borehole"
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "investigation_status": {
+                "const": "NOT_PERFORMED"
+              }
+            },
+            "required": [
+              "investigation_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "boreholes": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    }
   },
   "allOf": [
     {
       "description": "Từ 1.1 trở đi: bắt buộc khai trạng thái vị trí, hệ quy chiếu, cấp ăn mòn và trạng thái Gate G0; mọi hazard phải ở dạng evidence_field.",
       "if": {
-        "properties": { "schema_version": { "const": "1.1" } },
-        "required": ["schema_version"]
+        "properties": {
+          "schema_version": {
+            "const": "1.1"
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
       },
       "then": {
         "required": [
@@ -104,31 +234,88 @@
           "g0_gate"
         ],
         "properties": {
-          "geographic_location": { "$ref": "#/$defs/geographic_location_evidence" },
-          "seismic_hazard": { "$ref": "#/$defs/seismic_hazard_evidence" },
-          "wind_hazard": { "$ref": "#/$defs/wind_hazard_evidence" },
-          "hydrology_scour": { "$ref": "#/$defs/hydrology_scour_evidence" },
-          "geotechnical_category": { "$ref": "#/$defs/evidence_field" }
+          "geographic_location": {
+            "$ref": "#/$defs/geographic_location_evidence"
+          },
+          "seismic_hazard": {
+            "$ref": "#/$defs/seismic_hazard_evidence"
+          },
+          "wind_hazard": {
+            "$ref": "#/$defs/wind_hazard_evidence"
+          },
+          "hydrology_scour": {
+            "$ref": "#/$defs/hydrology_scour_evidence"
+          },
+          "geotechnical_category": {
+            "$ref": "#/$defs/evidence_field"
+          }
         }
       }
     },
     {
       "description": "Hồ sơ rỗng có chủ đích: KHÔNG trường hazard/exposure nào được mang trạng thái KNOWN. Muốn khai KNOWN thì phải đổi site_status sang SPECIFIED và nộp hồ sơ khảo sát thật.",
       "if": {
-        "properties": { "site_status": { "const": "UNSPECIFIED_PLACEHOLDER" } },
-        "required": ["site_status"]
+        "properties": {
+          "site_status": {
+            "const": "UNSPECIFIED_PLACEHOLDER"
+          }
+        },
+        "required": [
+          "site_status"
+        ]
       },
       "then": {
         "properties": {
-          "coordinate_reference_system": { "$ref": "#/$defs/no_known_group" },
-          "geographic_location": { "$ref": "#/$defs/no_known_group" },
-          "seismic_hazard": { "$ref": "#/$defs/no_known_group" },
-          "wind_hazard": { "$ref": "#/$defs/no_known_group" },
-          "hydrology_scour": { "$ref": "#/$defs/no_known_group" },
-          "thermal_environment": { "$ref": "#/$defs/no_known_group" },
-          "obstacle_crossed": { "$ref": "#/$defs/no_known_group" },
-          "geotechnical_category": { "$ref": "#/$defs/non_known_evidence" },
-          "corrosion_exposure": { "$ref": "#/$defs/non_known_evidence" }
+          "coordinate_reference_system": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "geographic_location": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "seismic_hazard": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "wind_hazard": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "hydrology_scour": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "thermal_environment": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "obstacle_crossed": {
+            "$ref": "#/$defs/no_known_group"
+          },
+          "geotechnical_category": {
+            "$ref": "#/$defs/non_known_evidence"
+          },
+          "corrosion_exposure": {
+            "$ref": "#/$defs/non_known_evidence"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "site_status": {
+            "const": "UNSPECIFIED_PLACEHOLDER"
+          }
+        },
+        "required": [
+          "site_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "geotechnical_investigation": {
+            "properties": {
+              "investigation_status": {
+                "const": "NOT_PERFORMED"
+              }
+            }
+          }
         }
       }
     }
@@ -137,11 +324,17 @@
     "source_ref": {
       "description": "Đường dẫn tương đối tới file THẬT trong repo (cho phép hậu tố '#anchor'), hoặc danh sách các đường dẫn như vậy.",
       "oneOf": [
-        { "type": "string", "minLength": 1 },
+        {
+          "type": "string",
+          "minLength": 1
+        },
         {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       ]
     },
@@ -149,252 +342,746 @@
       "description": "Một đại lượng thực tế kèm trạng thái bằng chứng. KNOWN phải có value + source_ref; UNKNOWN phải có resolution_path và KHÔNG được có value; NOT_APPLICABLE phải có not_applicable_reason và KHÔNG được có value.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["status"],
+      "required": [
+        "status"
+      ],
       "properties": {
-        "status": { "enum": ["KNOWN", "UNKNOWN", "NOT_APPLICABLE"] },
+        "status": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
         "value": {},
-        "unit": { "type": "string" },
-        "source_ref": { "$ref": "#/$defs/source_ref" },
-        "resolution_path": { "type": "string", "minLength": 1 },
-        "not_applicable_reason": { "type": "string", "minLength": 1 },
-        "note": { "type": "string" }
+        "unit": {
+          "type": "string"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "resolution_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "not_applicable_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        }
       },
       "allOf": [
         {
-          "if": { "properties": { "status": { "const": "KNOWN" } }, "required": ["status"] },
-          "then": { "required": ["value", "source_ref"] }
-        },
-        {
-          "if": { "properties": { "status": { "const": "UNKNOWN" } }, "required": ["status"] },
+          "if": {
+            "properties": {
+              "status": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
           "then": {
-            "required": ["resolution_path"],
-            "not": { "required": ["value"] }
+            "required": [
+              "value",
+              "source_ref"
+            ]
           }
         },
         {
-          "if": { "properties": { "status": { "const": "NOT_APPLICABLE" } }, "required": ["status"] },
+          "if": {
+            "properties": {
+              "status": {
+                "const": "UNKNOWN"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
           "then": {
-            "required": ["not_applicable_reason"],
-            "not": { "required": ["value"] }
+            "required": [
+              "resolution_path"
+            ],
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "NOT_APPLICABLE"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "not_applicable_reason"
+            ],
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
           }
         }
       ]
     },
     "non_known_evidence": {
       "allOf": [
-        { "$ref": "#/$defs/evidence_field" },
-        { "properties": { "status": { "enum": ["UNKNOWN", "NOT_APPLICABLE"] } } }
+        {
+          "$ref": "#/$defs/evidence_field"
+        },
+        {
+          "properties": {
+            "status": {
+              "enum": [
+                "UNKNOWN",
+                "NOT_APPLICABLE"
+              ]
+            }
+          }
+        }
       ]
     },
     "no_known_group": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/non_known_evidence" }
+      "additionalProperties": {
+        "$ref": "#/$defs/non_known_evidence"
+      }
     },
     "terrain_category_enum": {
-      "enum": ["A_OPEN_SEA", "B_SUBURBAN", "C_URBAN", "D_DENSE_CITY"]
+      "enum": [
+        "A_OPEN_SEA",
+        "B_SUBURBAN",
+        "C_URBAN",
+        "D_DENSE_CITY"
+      ]
     },
     "site_class_enum": {
-      "enum": ["A_HARD_ROCK", "B_ROCK", "C_VERY_DENSE_SOIL", "D_STIFF_SOIL", "E_SOFT_SOIL", "F_LIQUEFIABLE"]
+      "enum": [
+        "A_HARD_ROCK",
+        "B_ROCK",
+        "C_VERY_DENSE_SOIL",
+        "D_STIFF_SOIL",
+        "E_SOFT_SOIL",
+        "F_LIQUEFIABLE"
+      ]
     },
-    "aerodynamic_risk_enum": { "enum": ["LOW", "MODERATE", "HIGH_AEROELASTIC"] },
+    "aerodynamic_risk_enum": {
+      "enum": [
+        "LOW",
+        "MODERATE",
+        "HIGH_AEROELASTIC"
+      ]
+    },
     "geotechnical_category_enum": {
-      "enum": ["SHALLOW_BEDROCK", "DEEP_ALLUVIAL", "SOFT_CLAY_DELTA", "KARST_CAVERN", "VARIABLE"]
+      "enum": [
+        "SHALLOW_BEDROCK",
+        "DEEP_ALLUVIAL",
+        "SOFT_CLAY_DELTA",
+        "KARST_CAVERN",
+        "VARIABLE"
+      ]
     },
     "exposure_class_enum": {
-      "enum": ["INLAND_MILD", "INLAND_AGGRESSIVE", "COASTAL_SPRAY", "MARINE_SUBMERGED", "INDUSTRIAL"]
+      "enum": [
+        "INLAND_MILD",
+        "INLAND_AGGRESSIVE",
+        "COASTAL_SPRAY",
+        "MARINE_SUBMERGED",
+        "INDUSTRIAL"
+      ]
     },
     "geographic_location_legacy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["latitude", "longitude", "terrain_category"],
+      "required": [
+        "latitude",
+        "longitude",
+        "terrain_category"
+      ],
       "properties": {
-        "latitude": { "type": "number", "minimum": -90.0, "maximum": 90.0 },
-        "longitude": { "type": "number", "minimum": -180.0, "maximum": 180.0 },
-        "terrain_category": { "$ref": "#/$defs/terrain_category_enum" }
+        "latitude": {
+          "type": "number",
+          "minimum": -90.0,
+          "maximum": 90.0
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180.0,
+          "maximum": 180.0
+        },
+        "terrain_category": {
+          "$ref": "#/$defs/terrain_category_enum"
+        }
       }
     },
     "geographic_location_evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["latitude", "longitude", "terrain_category"],
+      "required": [
+        "latitude",
+        "longitude",
+        "terrain_category"
+      ],
       "properties": {
         "latitude": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": -90.0, "maximum": 90.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": -90.0,
+                  "maximum": 90.0
+                }
+              }
+            }
           ]
         },
         "longitude": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": -180.0, "maximum": 180.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": -180.0,
+                  "maximum": 180.0
+                }
+              }
+            }
           ]
         },
         "terrain_category": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "$ref": "#/$defs/terrain_category_enum" } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/terrain_category_enum"
+                }
+              }
+            }
           ]
         },
-        "administrative_area": { "$ref": "#/$defs/evidence_field" },
-        "elevation_m": { "$ref": "#/$defs/evidence_field" }
+        "administrative_area": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "elevation_m": {
+          "$ref": "#/$defs/evidence_field"
+        }
       }
     },
     "seismic_hazard_legacy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pga_g", "site_class", "seismic_performance_zone"],
+      "required": [
+        "pga_g",
+        "site_class",
+        "seismic_performance_zone"
+      ],
       "properties": {
-        "pga_g": { "type": "number", "minimum": 0.0, "maximum": 2.0 },
-        "site_class": { "$ref": "#/$defs/site_class_enum" },
-        "seismic_performance_zone": { "type": "integer", "minimum": 1, "maximum": 4 }
+        "pga_g": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 2.0
+        },
+        "site_class": {
+          "$ref": "#/$defs/site_class_enum"
+        },
+        "seismic_performance_zone": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        }
       }
     },
     "seismic_hazard_evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pga_g", "site_class", "seismic_performance_zone"],
+      "required": [
+        "pga_g",
+        "site_class",
+        "seismic_performance_zone"
+      ],
       "properties": {
         "pga_g": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": 0.0, "maximum": 2.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 2.0
+                }
+              }
+            }
           ]
         },
         "site_class": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "$ref": "#/$defs/site_class_enum" } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/site_class_enum"
+                }
+              }
+            }
           ]
         },
         "seismic_performance_zone": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "integer", "minimum": 1, "maximum": 4 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4
+                }
+              }
+            }
           ]
         },
-        "design_response_spectrum": { "$ref": "#/$defs/evidence_field" },
-        "liquefaction_potential": { "$ref": "#/$defs/evidence_field" }
+        "design_response_spectrum": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "liquefaction_potential": {
+          "$ref": "#/$defs/evidence_field"
+        }
       }
     },
     "wind_hazard_legacy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["basic_wind_speed_m_s", "gust_effect_factor", "aerodynamic_risk_level"],
+      "required": [
+        "basic_wind_speed_m_s",
+        "gust_effect_factor",
+        "aerodynamic_risk_level"
+      ],
       "properties": {
-        "basic_wind_speed_m_s": { "type": "number", "minimum": 10.0, "maximum": 90.0 },
-        "gust_effect_factor": { "type": "number", "minimum": 0.8, "maximum": 2.0 },
-        "aerodynamic_risk_level": { "$ref": "#/$defs/aerodynamic_risk_enum" }
+        "basic_wind_speed_m_s": {
+          "type": "number",
+          "minimum": 10.0,
+          "maximum": 90.0
+        },
+        "gust_effect_factor": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 2.0
+        },
+        "aerodynamic_risk_level": {
+          "$ref": "#/$defs/aerodynamic_risk_enum"
+        }
       }
     },
     "wind_hazard_evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["basic_wind_speed_m_s", "gust_effect_factor", "aerodynamic_risk_level"],
+      "required": [
+        "basic_wind_speed_m_s",
+        "gust_effect_factor",
+        "aerodynamic_risk_level"
+      ],
       "properties": {
         "basic_wind_speed_m_s": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": 10.0, "maximum": 90.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 10.0,
+                  "maximum": 90.0
+                }
+              }
+            }
           ]
         },
         "gust_effect_factor": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": 0.8, "maximum": 2.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0.8,
+                  "maximum": 2.0
+                }
+              }
+            }
           ]
         },
         "aerodynamic_risk_level": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "$ref": "#/$defs/aerodynamic_risk_enum" } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "$ref": "#/$defs/aerodynamic_risk_enum"
+                }
+              }
+            }
           ]
         },
-        "wind_return_period_years": { "$ref": "#/$defs/evidence_field" },
-        "typhoon_exposure": { "$ref": "#/$defs/evidence_field" }
+        "wind_return_period_years": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "typhoon_exposure": {
+          "$ref": "#/$defs/evidence_field"
+        }
       }
     },
     "hydrology_scour_legacy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["design_flood_frequency_years", "estimated_scour_depth_m", "tidal_range_m"],
+      "required": [
+        "design_flood_frequency_years",
+        "estimated_scour_depth_m",
+        "tidal_range_m"
+      ],
       "properties": {
-        "design_flood_frequency_years": { "type": "integer", "minimum": 10 },
-        "estimated_scour_depth_m": { "type": "number", "minimum": 0.0 },
-        "tidal_range_m": { "type": "number", "minimum": 0.0 }
+        "design_flood_frequency_years": {
+          "type": "integer",
+          "minimum": 10
+        },
+        "estimated_scour_depth_m": {
+          "type": "number",
+          "minimum": 0.0
+        },
+        "tidal_range_m": {
+          "type": "number",
+          "minimum": 0.0
+        }
       }
     },
     "hydrology_scour_evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["design_flood_frequency_years", "estimated_scour_depth_m", "tidal_range_m"],
+      "required": [
+        "design_flood_frequency_years",
+        "estimated_scour_depth_m",
+        "tidal_range_m"
+      ],
       "properties": {
         "design_flood_frequency_years": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "integer", "minimum": 10 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "minimum": 10
+                }
+              }
+            }
           ]
         },
         "estimated_scour_depth_m": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": 0.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0.0
+                }
+              }
+            }
           ]
         },
         "tidal_range_m": {
           "allOf": [
-            { "$ref": "#/$defs/evidence_field" },
-            { "properties": { "value": { "type": "number", "minimum": 0.0 } } }
+            {
+              "$ref": "#/$defs/evidence_field"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0.0
+                }
+              }
+            }
           ]
         },
-        "design_water_level_m": { "$ref": "#/$defs/evidence_field" },
-        "navigation_clearance": { "$ref": "#/$defs/evidence_field" },
-        "debris_or_vessel_impact": { "$ref": "#/$defs/evidence_field" }
+        "design_water_level_m": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "navigation_clearance": {
+          "$ref": "#/$defs/evidence_field"
+        },
+        "debris_or_vessel_impact": {
+          "$ref": "#/$defs/evidence_field"
+        }
       }
     },
     "gate_status": {
       "description": "Trạng thái cổng vật lý. PASSED chỉ hợp lệ khi blocking_items rỗng.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["gate", "status", "assessed_by", "blocking_items"],
+      "required": [
+        "gate",
+        "status",
+        "assessed_by",
+        "blocking_items"
+      ],
       "properties": {
-        "gate": { "type": "string", "minLength": 1 },
-        "status": { "enum": ["PASSED", "BLOCKED"] },
-        "assessed_by": { "type": "string", "minLength": 1 },
-        "assessed_on": { "type": "string" },
+        "gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "PASSED",
+            "BLOCKED"
+          ]
+        },
+        "assessed_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assessed_on": {
+          "type": "string"
+        },
         "blocking_items": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "blocked_claims": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
-        "note": { "type": "string" }
+        "note": {
+          "type": "string"
+        }
       },
       "allOf": [
         {
-          "if": { "properties": { "status": { "const": "BLOCKED" } }, "required": ["status"] },
-          "then": { "properties": { "blocking_items": { "minItems": 1 } } }
+          "if": {
+            "properties": {
+              "status": {
+                "const": "BLOCKED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocking_items": {
+                "minItems": 1
+              }
+            }
+          }
         },
         {
-          "if": { "properties": { "status": { "const": "PASSED" } }, "required": ["status"] },
-          "then": { "properties": { "blocking_items": { "maxItems": 0 } } }
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PASSED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocking_items": {
+                "maxItems": 0
+              }
+            }
+          }
         }
       ]
     },
     "document_provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["task_id", "prepared_by", "review_status"],
+      "required": [
+        "task_id",
+        "prepared_by",
+        "review_status"
+      ],
       "properties": {
-        "task_id": { "type": "string", "minLength": 1 },
-        "prepared_by": { "type": "string", "minLength": 1 },
-        "prepared_on": { "type": "string" },
-        "review_status": { "enum": ["PENDING_HUMAN_REVIEW", "AGENT_REVIEWED", "ENGINEER_APPROVED"] },
-        "claim_ceiling": { "enum": ["IDEA", "SCREENED", "NUMERICALLY_VERIFIED", "ENGINEERING_CANDIDATE"] },
-        "note": { "type": "string" }
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prepared_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prepared_on": {
+          "type": "string"
+        },
+        "review_status": {
+          "enum": [
+            "PENDING_HUMAN_REVIEW",
+            "AGENT_REVIEWED",
+            "ENGINEER_APPROVED"
+          ]
+        },
+        "claim_ceiling": {
+          "enum": [
+            "IDEA",
+            "SCREENED",
+            "NUMERICALLY_VERIFIED",
+            "ENGINEERING_CANDIDATE"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "soil_layer": {
+      "description": "Một lớp địa tầng trong hố khoan. SPT để null khi lớp đó không thí nghiệm — KHÔNG nội suy.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_depth_m",
+        "to_depth_m",
+        "description"
+      ],
+      "properties": {
+        "from_depth_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "to_depth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spt_n_field": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "N đo tại hiện trường, CHƯA hiệu chỉnh."
+        },
+        "spt_n60": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "N đã hiệu chỉnh về năng lượng 60%. Chỉ điền khi thực sự tính, kèm hệ số trong note."
+        },
+        "unit_weight_kN_m3": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "borehole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "borehole_id",
+        "depth_m",
+        "layers"
+      ],
+      "properties": {
+        "borehole_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "easting_m": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "northing_m": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ground_elevation_m": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "depth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "groundwater_depth_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/soil_layer"
+          }
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        }
       }
     }
   }

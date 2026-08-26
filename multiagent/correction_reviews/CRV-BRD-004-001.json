@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-004-001",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-001",
+  "correction_sha256": "b79940c91713705b82b68b483027b14d79ad644ab8906b38b972101e596f5ae9",
+  "reviewer_id": "claude-reviewer",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Hash tự kiểm chứng độc lập, khớp chính xác: snapshot blob SHA-256 = f2334e8bcaba3554f02a547e8d4776fc7b6e10c08cbdcee0024a50393a29326c đúng bằng hash mà handoff BRD-004.claude.r001.json ghi cho tests/test_shape_grammar_experimental.py; file hiện tại = 734043ebf9aa6940e066d47bef2af09ed0fecd2b0f9d620b24bcbf1f22176657 đúng bằng current_sha256; self-hash handoff = 55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064 đúng bằng original_handoff_sha256.",
+    "Diff snapshot so với file hiện tại CHỈ có đúng một hunk tại dòng 135-142: assert len(literature_ids) == 111 đổi thành >= 111, cộng một docstring 8 dòng. Dòng assert 'LIT-055' in literature_ids giữ nguyên. Không có thêm bất kỳ thay đổi nào khác trong toàn bộ 133 test của file.",
+    "Nới == thành >= KHÔNG làm yếu chống bịa nguồn. Hàng rào thật là kiểm membership, không phải kiểm số lượng: test_sources_non_empty_and_all_exist_in_literature_index, test_every_reference_id_field_is_null_or_real, test_no_invented_lit_ids_anywhere_in_grammar_text, test_no_invented_lit_ids_anywhere_in_report_text và test_non_indexed_sources_are_flagged_not_hidden đều nằm ngoài hunk, byte-identical với snapshot, và tự chạy lại đều xanh.",
+    "Kết quả chạy thật hai lệnh đã khai: tests/test_shape_grammar_experimental.py cho 132 passed / 1 failed trên tổng 133; tests/test_literature_index.py cho 8 passed / 0 failed. Index hiện có 234 references và counts.total_indexed = 234.",
+    "Test đỏ duy nhất là tiền tồn tại, không phải hậu quả của correction — tự xác minh chứ không tin lời khai: test_experimental_grammar_lives_only_in_sandbox byte-identical giữa snapshot và bản hiện tại (nằm ngoài hunk duy nhất), nên về mặt định nghĩa correction không thể gây ra nó. Nguyên nhân thật là ba file bridge_grammar top-level i_girder_parametric_v1.json, box_girder_parametric_v1.json, composite_i_girder_parametric_v1.json do handoff BRD-025.opencode.r002 sinh ra, mtime 25/08 lúc 22:25-22:34, sớm hơn cả snapshot lúc 00:29 ngày 26/08.",
+    "Khoảng hở còn lại, cần một task riêng chứ không chặn correction này: summary của correction nói số lượng chính xác do tests/test_literature_index.py neo cùng counts là hơi quá lời. File đó chỉ neo counts TỰ NHẤT QUÁN với dữ liệu thật (counts.total_indexed == len(REFS)) và ID gapless 1..N; nó KHÔNG ghim con số tuyệt đối 234. Sàn thực tế của cả repo vẫn dừng ở 111, để hở cửa sổ 123 nguồn có thể biến mất im lặng nếu đồng thời sửa counts và đánh số lại. Nâng sàn nên làm trong tests/test_literature_index.py vì file đó nằm trong write_scope BRD-020.",
+    "Chồng lấn write_scope là có thật nhưng chấp nhận được vì đã khai tường minh và không có đường nào sạch hơn: tests/test_shape_grammar_experimental.py thuộc write_scope của BRD-004 (đang REVIEW) và BRD-028 (READY, chưa ai claim), KHÔNG thuộc write_scope BRD-020 (ACTIVE) của người sửa. PROTOCOL cấm lab amend-task với task ACTIVE/REVIEW nên không thể mở rộng scope BRD-020 hay BRD-004; sửa đúng một assertion sai sự thật rồi khai qua correct-provenance là đường hợp lệ duy nhất. Người nhận BRD-028 sau này cần được biết file đã drift một hunk."
+  ],
+  "notes": "Đây là độc lập về NGỮ CẢNH, KHÔNG phải độc lập về nhà cung cấp: reviewer claude-reviewer và người sửa claude cùng là Claude (Anthropic), chỉ khác ở chỗ reviewer không nhìn thấy quá trình sửa và đã tự tính lại toàn bộ hash, tự chạy lại diff và test từ đầu. Không được tính lần review này là cross-provider review. Mọi số liệu trong các finding đều do reviewer tự đo, không chép từ correction. Phán quyết APPROVE dựa trên: thay đổi tối thiểu đúng một assertion, hash khớp tuyệt đối, mục tiêu chống bịa nguồn còn nguyên vẹn và đã được chạy lại. Hai việc cần theo dõi tiếp: nâng sàn số nguồn trong tests/test_literature_index.py, và cảnh báo drift cho người sẽ claim BRD-028."
+}

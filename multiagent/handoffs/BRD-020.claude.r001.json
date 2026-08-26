@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-020",
+  "agent_id": "claude",
+  "role": "materials_researcher",
+  "summary": "Dot quet 3: them 123 nguon (LIT-112..LIT-234) cho 12 chu de moi 13-24, nang thu vien tu 111 len 234. Moi nguon deu qua vong kiem may: goi HTTP that tung URL, doi chieu moi DOI voi Crossref/DataCite. 228 nguon mo duoc truc tiep (VERIFIED_URL), 6 nguon bi nha xuat ban chan bot thi xac minh qua DOI metadata va ghi ro gioi han do trong unverified_fields. Khong nguon nao bi loai. Bo sung contracts/literature_reference.schema.json va tests/test_literature_index.py (ca hai da khai trong write_scope tu dau nhung chua bao gio duoc tao). Test moi bat duoc 2 khuyet tat co: LIT-016/LIT-049 trung URL tu dot quet truoc (da khai tuong minh trong duplicate_reference_ids), va README chep tay so lieu dot 1 (55 nguon) trong khi index da 111 - nay sinh lai tu index nen khong the lech.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/literature/index.json",
+      "sha256": "a888b6f424dcc3cf993df3342f90acd65a6705a4ea377fa5ca2b1b47e99cb24d",
+      "kind": "report"
+    },
+    {
+      "path": "research/literature/README.md",
+      "sha256": "7594049958f818c081d374048b4062c9bb80486f36aeba3a527087bf6976e96e",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/literature_reference.schema.json",
+      "sha256": "701a40e6837d791adf248ec2f7a7c845e54fc0b4230c2e7f0d095d6742861e10",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_literature_index.py",
+      "sha256": "44e9e095c3dc66f04d6bea937bcba1e3d38d71a448c625ffb741d794ff8f03f2",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Nguon bi tuong bot chan (HTTP 403/202) van duoc giu neu DOI phan giai dung tieu de o Crossref/DataCite hoac file that tai ve doc duoc; gioi han nay ghi trong unverified_fields cua tung ban ghi.",
+    "Bo sinh note Obsidian (tmp/export_literature.py) nam ngoai git (.gitignore), nen phan vault khong tai dung duoc tu Git. Da mo rong bang LABEL/VI cho 12 chu de moi."
+  ],
+  "unresolved_risks": [
+    "Da sua mot assertion trong tests/test_shape_grammar_experimental.py (== 111 -> >= 111); file do thuoc write_scope BRD-028 va duoc BRD-004 neo hash. Da xu ly bang lab correct-provenance COR-BRD-004-001, review doc lap CRV-BRD-004-001 APPROVE.",
+    "Review doc lap la doc lap ve NGU CANH, khong phai ve nha cung cap - cung la Claude. Chua co cross-provider review."
+  ],
+  "next_action": "Independent review; sau do can mot task rieng de dua tmp/export_literature.py vao version control."
+}

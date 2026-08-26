@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-002-002",
+  "task_id": "BRD-002",
+  "incident_id": "INC-BRD-002-002",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them 3 grammar_bindings (i_girder SCREENED, box_girder IDEA, composite_i IDEA) vao runtime_binding cua design basis, moi cai mang tran claim rieng o TRUONG CO SCHEMA cong ly do do duoc. Khong doi bat ky truong KNOWN/UNKNOWN nao khac.",
+  "original_handoff_path": "multiagent/handoffs/BRD-002.claude.r001.json",
+  "original_handoff_sha256": "86a4c50007f2d06f24d480f921a3e10e45a79c04d4859591824bb0e1a18ce2a5",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25.blob",
+    "sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25"
+  },
+  "corrected_artifact": {
+    "path": "docs/design_basis/DB-SUPERT-38M.json",
+    "previous_sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25",
+    "current_sha256": "ce2ed66b1e58737d7d2337da0513a70e39326822f63e6e4b386ea8743a9ae842"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_basis.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "contracts/design_basis.schema.json duoc mo rong theo yeu cau cua reviewer; file do thuoc write_scope BRD-002 va khong duoc handoff nao neo hash nen khong gay drift."
+  ],
+  "unresolved_risks": [
+    "Correction nay chi ghi duoc sau khi BRD-030 sua be tac 'correction bi REVISE la ngo cut' trong lab.py. Chinh no la ca thu nghiem cua ban va."
+  ],
+  "supersedes_correction_sha256": "105537fe06e42321bfa6904daee43102412199a6a9b2c6b7a18bd573472cbd46"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-032",
+  "handoff_sha256": "2f2000cb5c225b3050ba51a47ffea9ed45467e1bcce50cea58b8097a522f1a6e",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "pytest focused 8 passed; duplicate conflicting reviews are not rejected and last-write-wins can poison correction_decision."
+    }
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. BRD-032 fixes the third occurrence, but conflicting duplicate review decisions are unsafe; fail closed or reject duplicates."
+}

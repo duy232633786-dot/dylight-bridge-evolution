@@ -1,0 +1,266 @@
+"""SiteSpec khoá G0: thiếu dữ liệu thì DỪNG, và không ai được lấp bằng giả định.
+
+Điều test này bảo vệ không phải là một công thức, mà là một thói quen: hồ sơ site
+rỗng của dự án (`SITE-UNSPECIFIED.json`, 100% trường UNKNOWN) là một KẾT LUẬN có
+chủ đích, không phải chỗ trống chờ điền cho tiện.
+"""
+import json
+from pathlib import Path
+
+import jsonschema
+import pytest
+
+from bridge_evolution import REPO_ROOT
+from bridge_evolution.site import (
+    SITE_READINESS_RULE,
+    SiteDataError,
+    borehole_layer_at,
+    check_site_readiness,
+    evidence,
+    load_site_profile,
+    n60,
+    required_site_fields,
+    site_binding,
+)
+
+SITE_SCHEMA = REPO_ROOT / "contracts" / "site_hazard_profile.schema.json"
+PLACEHOLDER = REPO_ROOT / "docs" / "design_basis" / "SITE-UNSPECIFIED.json"
+
+
+def load(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _known(value, unit=None):
+    field = {"status": "KNOWN", "value": value,
+             "source_ref": {"kind": "report", "ref": "BAO-CAO-KHAO-SAT-TEST-01"}}
+    if unit:
+        field["unit"] = unit
+    return field
+
+
+# ---------------------------------------------------------------------------
+# 1. Hồ sơ rỗng phải CHẶN, không phải chạy tiếp
+# ---------------------------------------------------------------------------
+
+def test_placeholder_profile_blocks_every_downstream_rule_group():
+    profile = load_site_profile(PLACEHOLDER)
+    for group in ("HYDRO-001", "SEIS-001", "WIND-001", "GEO-001", "DUR-001"):
+        violations = check_site_readiness(profile, group)
+        assert violations, f"{group} phải bị chặn trên hồ sơ rỗng"
+        assert violations[0]["rule_id"] == SITE_READINESS_RULE
+        assert violations[0]["severity"] == "HARD"
+
+
+def test_missing_profile_is_itself_a_violation():
+    """Không khai site mà vẫn chạy rule hazard là kiểu hỏng im lặng nguy hiểm nhất."""
+    violations = check_site_readiness(None, "HYDRO-001")
+    assert violations and violations[0]["rule_id"] == SITE_READINESS_RULE
+
+
+def test_violation_names_the_missing_fields_not_a_vague_complaint():
+    profile = load_site_profile(PLACEHOLDER)
+    message = check_site_readiness(profile, "SEIS-001")[0]["message"]
+    assert "seismic_hazard/pga_g" in message
+    assert "seismic_hazard/site_class" in message
+
+
+def test_no_rule_group_means_no_site_requirement():
+    assert check_site_readiness(None, "STR-001") == []
+    assert required_site_fields("STR-001") == ()
+
+
+# ---------------------------------------------------------------------------
+# 2. Chống bịa: UNKNOWN đi vào thì UNKNOWN đi ra
+# ---------------------------------------------------------------------------
+
+def test_unknown_field_never_gains_a_default_value():
+    profile = load_site_profile(PLACEHOLDER)
+    for pointer in ("seismic_hazard/pga_g", "wind_hazard/basic_wind_speed_m_s",
+                    "hydrology_scour/design_water_level_m"):
+        status, value = evidence(profile, pointer)
+        assert status == "UNKNOWN"
+        assert value is None
+
+
+def test_absent_field_is_reported_as_missing_not_unknown():
+    """'Chưa khai' khác 'đã khai là chưa biết' — gộp hai thứ này là mất thông tin."""
+    status, value = evidence({"site_id": "X"}, "seismic_hazard/pga_g")
+    assert status == "MISSING"
+    assert value is None
+
+
+def test_a_known_field_unblocks_only_that_field():
+    profile = load_site_profile(PLACEHOLDER)
+    profile["seismic_hazard"]["pga_g"] = _known(0.08, "g")
+    message = check_site_readiness(profile, "SEIS-001")[0]["message"]
+    assert "seismic_hazard/pga_g" not in message
+    assert "seismic_hazard/site_class" in message
+
+
+def test_fully_known_group_passes():
+    profile = load_site_profile(PLACEHOLDER)
+    profile["seismic_hazard"]["pga_g"] = _known(0.08, "g")
+    profile["seismic_hazard"]["site_class"] = _known("C")
+    assert check_site_readiness(profile, "SEIS-001") == []
+
+
+# ---------------------------------------------------------------------------
+# 3. Schema 1.2 — khảo sát địa kỹ thuật
+# ---------------------------------------------------------------------------
+
+def test_schema_accepts_a_real_borehole_record():
+    schema = load(SITE_SCHEMA)
+    profile = load(PLACEHOLDER)
+    profile["schema_version"] = "1.2"
+    profile["site_status"] = "SPECIFIED"
+    profile["geotechnical_investigation"] = {
+        "investigation_status": "PARTIAL",
+        "boreholes": [{
+            "borehole_id": "BH-01",
+            "depth_m": 30.0,
+            "groundwater_depth_m": 2.5,
+            "layers": [
+                {"from_depth_m": 0.0, "to_depth_m": 6.0,
+                 "description": "Sét pha dẻo mềm", "spt_n_field": 4},
+                {"from_depth_m": 6.0, "to_depth_m": 30.0,
+                 "description": "Cát hạt trung chặt vừa", "spt_n_field": 22},
+            ],
+        }],
+    }
+    assert list(jsonschema.Draft202012Validator(schema).iter_errors(profile)) == []
+
+
+def test_placeholder_profile_cannot_claim_boreholes():
+    """Hồ sơ rỗng có chủ đích không được khai là đã khoan."""
+    schema = load(SITE_SCHEMA)
+    profile = load(PLACEHOLDER)
+    profile["schema_version"] = "1.2"
+    profile["geotechnical_investigation"] = {
+        "investigation_status": "COMPLETE",
+        "boreholes": [{"borehole_id": "BH-X", "depth_m": 10.0,
+                       "layers": [{"from_depth_m": 0.0, "to_depth_m": 10.0,
+                                   "description": "bịa"}]}],
+    }
+    assert list(jsonschema.Draft202012Validator(schema).iter_errors(profile))
+
+
+def test_not_performed_means_no_boreholes():
+    schema = load(SITE_SCHEMA)
+    profile = load(PLACEHOLDER)
+    profile["schema_version"] = "1.2"
+    profile["site_status"] = "SPECIFIED"
+    profile["geotechnical_investigation"] = {
+        "investigation_status": "NOT_PERFORMED",
+        "boreholes": [{"borehole_id": "BH-X", "depth_m": 10.0,
+                       "layers": [{"from_depth_m": 0.0, "to_depth_m": 10.0,
+                                   "description": "mâu thuẫn"}]}],
+    }
+    assert list(jsonschema.Draft202012Validator(schema).iter_errors(profile))
+
+
+def test_existing_profiles_still_validate():
+    """Nới schema lên 1.2 không được làm hỏng hồ sơ 1.1 đang có."""
+    schema = load(SITE_SCHEMA)
+    assert list(jsonschema.Draft202012Validator(schema).iter_errors(load(PLACEHOLDER))) == []
+
+
+# ---------------------------------------------------------------------------
+# 4. SPT: hiệu chỉnh năng lượng, không phải hiệu chỉnh ứng suất phủ
+# ---------------------------------------------------------------------------
+
+def test_n60_matches_a_worked_example():
+    """Búa 60%, cần dài, lỗ 100 mm, không liner -> N60 = N."""
+    assert n60(20, energy_ratio=0.60, rod_length_m=12.0) == pytest.approx(20.0)
+
+
+def test_higher_hammer_energy_raises_n60():
+    """Búa an toàn 45% cho N60 thấp hơn; búa tự động 80% cho cao hơn."""
+    low = n60(20, energy_ratio=0.45, rod_length_m=12.0)
+    high = n60(20, energy_ratio=0.80, rod_length_m=12.0)
+    assert low < 20 < high
+    assert low == pytest.approx(15.0)
+    assert high == pytest.approx(26.6667, rel=1e-4)
+
+
+def test_short_rods_reduce_n60():
+    assert n60(20, energy_ratio=0.60, rod_length_m=2.5) < n60(20, energy_ratio=0.60, rod_length_m=12.0)
+
+
+def test_absurd_spt_inputs_raise():
+    with pytest.raises(SiteDataError):
+        n60(-1, energy_ratio=0.60, rod_length_m=10.0)
+    with pytest.raises(SiteDataError):
+        n60(10, energy_ratio=0.0, rod_length_m=10.0)
+
+
+def test_layer_lookup_is_half_open_and_bounded():
+    borehole = {"layers": [
+        {"from_depth_m": 0.0, "to_depth_m": 6.0, "description": "sét"},
+        {"from_depth_m": 6.0, "to_depth_m": 30.0, "description": "cát"},
+    ]}
+    assert borehole_layer_at(borehole, 0.0)["description"] == "sét"
+    assert borehole_layer_at(borehole, 6.0)["description"] == "cát"
+    assert borehole_layer_at(borehole, 40.0) is None
+    with pytest.raises(SiteDataError):
+        borehole_layer_at(borehole, -1.0)
+
+
+# ---------------------------------------------------------------------------
+# 5. Provenance
+# ---------------------------------------------------------------------------
+
+def test_every_declared_rule_input_exists_in_the_site_schema():
+    """Bảng RULE_INPUT_REQUIREMENTS khai tay — một con trỏ gõ sai sẽ không bao giờ khớp.
+
+    Hậu quả không phải "chạy bừa" (con trỏ sai luôn trả MISSING nên vẫn chặn), mà là
+    một rule bị chặn VĨNH VIỄN vì lý do sai, và người đọc log sẽ đi tìm dữ liệu mà
+    hồ sơ đã có. Test này neo bảng khai vào schema thật.
+    """
+    from bridge_evolution.site.spec import RULE_INPUT_REQUIREMENTS
+
+    schema = load(SITE_SCHEMA)
+
+    def expand(node):
+        """Gom properties qua $ref / oneOf / anyOf / allOf — schema này dùng cả bốn."""
+        if not isinstance(node, dict):
+            return {}
+        if "$ref" in node:
+            return expand(schema["$defs"][node["$ref"].removeprefix("#/$defs/")])
+        props = dict(node.get("properties") or {})
+        for key in ("oneOf", "anyOf", "allOf"):
+            for branch in node.get(key, []):
+                props.update(expand(branch))
+        return props
+
+    def resolves(pointer):
+        node = schema
+        for part in pointer.split("/"):
+            props = expand(node)
+            if part not in props:
+                return False
+            node = props[part]
+        return True
+
+    bad = [(group, pointer)
+           for group, pointers in RULE_INPUT_REQUIREMENTS.items()
+           for pointer in pointers if not resolves(pointer)]
+    assert bad == [], f"con trỏ không tồn tại trong schema site: {bad}"
+
+
+def test_the_site_package_is_actually_shipped():
+    """Module không nằm trong packages thì không vào wheel — đúng lỗi mà durability từng mắc."""
+    text = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"bridge_evolution.site"' in text
+
+
+def test_site_binding_records_which_profile_was_used():
+    binding = site_binding(load_site_profile(PLACEHOLDER))
+    assert binding["site_id"] == "SITE-UNSPECIFIED"
+    assert binding["site_status"] == "UNSPECIFIED_PLACEHOLDER"
+    assert site_binding(None) is None
+
+
+def test_unreadable_profile_raises_instead_of_returning_empty():
+    with pytest.raises(SiteDataError):
+        load_site_profile(REPO_ROOT / "khong_ton_tai_site.json")

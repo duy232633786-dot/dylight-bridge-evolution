@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-030-001",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-001",
+  "correction_sha256": "d92c3496240663f48bf808170902e1edffe999d8170fb14c55c15f5b65bfb8fb",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Independent SHA-256: snapshot 2339eeb3... matches corrected_artifact.previous_sha256; live lab.py is 653cea78... matching current_sha256. Diff is confined to the precomputed decision map and unified predecessor-link rule; grep found no fourth supersede-link occurrence beyond the intended checks."
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. Focused pytest passed 8/8."
+}

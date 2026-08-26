@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "handoff_sha256": "82c16f97beb2141602cb9f7c5494cd33aebd17917c1ef5e7c3b7fdf59d1ae677",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "16 test section_types pass; handoff claims 18/18 and requested suite total is 27, not 29"
+    }
+  ],
+  "notes": "REVISE: Source and artifact hashes match the handoff, and the section tests pass, but the claimed 18/18 is not reproducible: the repository collects 16 section tests, while the requested combined suite collects and passes 27/27, not 29/29. Also section_types.py does not document fib Bulletin 34 or DuraCrete; EN 1993-1-9 is not present there (only EN 1993-1-1 screening is cited). Correct the test-count/source documentation discrepancy before approval."
+}

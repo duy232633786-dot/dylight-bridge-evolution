@@ -5,7 +5,7 @@
   "research_question": "Máy người dùng có khoảng 19.000 tài liệu kỹ thuật trải trên nhiều ổ (1.224 PDF, 15.824 DWG, 535 RVT, 1.216 tài liệu Office). Làm sao đưa toàn bộ vào tầm với của não 2 trong Obsidian mà KHÔNG copy hàng trăm GB và không làm vault quá tải, đồng thời chỉ ra được tài liệu nào có giá trị trực tiếp cho runtime?",
   "workstream": "knowledge",
   "priority": "P1",
-  "status": "ACTIVE",
+  "status": "REVIEW",
   "owner": "claude",
   "reviewer": null,
   "dependencies": [],

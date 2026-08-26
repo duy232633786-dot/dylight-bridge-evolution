@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-031",
+  "handoff_sha256": "78e1fe5c6f91a7ef5300d57f78577cb5870205b70bf3afad70124655caad95ec",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "19 focused tests passed, but bridge_evolution.site is omitted from pyproject package inclusion; wheel consumers cannot import the new SiteSpec. The admitted hand-maintained rule table has no enforcement test."
+    }
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. Site package omission blocks acceptance because the delivered artifact is not distributable."
+}

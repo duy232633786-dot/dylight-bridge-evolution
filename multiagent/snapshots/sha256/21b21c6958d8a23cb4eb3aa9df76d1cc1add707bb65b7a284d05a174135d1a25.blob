@@ -1,0 +1,408 @@
+{
+  "schema_version": "1.1",
+  "project_id": "DYLIGHT-NCKH2026-SUPERT-38M",
+  "bridge_name": "Cầu dầm Super-T giản đơn nhịp 38,3 m — MÔ HÌNH NGHIÊN CỨU, KHÔNG gắn với vị trí xây dựng thật",
+  "governing_standard": {
+    "code": "TCVN_11823",
+    "version": "2017",
+    "jurisdiction": "Vietnam",
+    "parts": [
+      "TCVN 11823-3:2017",
+      "TCVN 11823-5:2017"
+    ],
+    "source_ref": [
+      "docs/01_research_contract.md",
+      "docs/design_basis/README.md",
+      "research/materials/unverified_claims_register.md"
+    ],
+    "note": "Chỉ liệt kê những phần ĐANG được viện dẫn thật trong repo: phần 3 (tải trọng HL-93, IM) qua docs/01_research_contract.md §1, phần 5 (kết cấu bê tông, khối ứng suất chữ nhật) qua unverified_claims_register.md UCR-001 và docs/03_shape_evolution.md §4. KHÔNG trộn phiên bản: mọi phần đều :2017."
+  },
+  "design_life_years": {
+    "status": "UNKNOWN",
+    "resolution_path": "RC-1.1 (docs/01_research_contract.md) không ấn định tuổi thọ thiết kế, và không có phần nào khác trong repo nêu con số này. Cần nhiệm vụ thiết kế của chủ đầu tư ấn định tuổi thọ theo bộ TCVN 11823. Lưu ý: kể cả khi có con số danh định, tuổi thọ theo môi trường vẫn không kiểm được chừng nào exposure_class còn UNKNOWN (xem docs/design_basis/SITE-UNSPECIFIED.json).",
+    "note": "KHÔNG được điền 100 năm chỉ vì đó là con số hay gặp — đó sẽ là số bịa."
+  },
+  "exposure_class": {
+    "status": "UNKNOWN",
+    "resolution_path": "Cấp phơi nhiễm/ăn mòn phụ thuộc vị trí (khoảng cách tới bờ biển, nguồn clorua, hóa chất công nghiệp, chu kỳ ẩm–khô). Dự án chưa có vị trí nên KHÔNG suy ra được. Cần hồ sơ vị trí + số liệu môi trường đo đạc; đồng bộ với trường corrosion_exposure trong docs/design_basis/SITE-UNSPECIFIED.json.",
+    "note": "Chặn mọi claim về độ bền lâu, lớp bảo vệ cốt thép và tuổi thọ theo môi trường."
+  },
+  "units": {
+    "length": "m",
+    "force": "kN",
+    "stress": "MPa",
+    "mass": "tonne",
+    "temperature": "celsius",
+    "angle": "degree",
+    "source_ref": [
+      "catalogs/catalogs.json",
+      "bridge_evolution/bim/ifc_bridge_exporter.py"
+    ],
+    "note": "Hệ SI khóa cứng. Catalog dùng MPa/GPa cho vật liệu, kN cho tải, m cho hình học; IFC export đặt LENGTHUNIT = METRE, PLANEANGLEUNIT = RADIAN (góc trong dữ liệu người đọc dùng độ, chuyển sang radian khi ghi IFC)."
+  },
+  "coordinate_system": {
+    "length_unit": {
+      "status": "KNOWN",
+      "value": "m",
+      "source_ref": "bridge_evolution/bim/ifc_bridge_exporter.py",
+      "note": "IfcSIUnit LENGTHUNIT = METRE trong unit_assignment."
+    },
+    "model_axis_convention": {
+      "status": "KNOWN",
+      "value": {
+        "x": "dọc cầu — phương đùn dầm chủ, tăng dần từ đầu nhịp",
+        "y": "ngang cầu — dầm chủ bố trí theo tọa độ y, tim mặt cầu tại y = 0",
+        "z": "thẳng đứng, hướng lên"
+      },
+      "source_ref": "bridge_evolution/bim/ifc_bridge_exporter.py",
+      "note": "Suy trực tiếp từ mã: WorldCoordinateSystem có Axis = (0,0,1) và RefDirection = (1,0,0); mỗi dầm đặt tại (0, girder_y, 0) và đùn theo trục X; bản mặt cầu đặt từ y = -deck_W/2, tâm tại x = span_L/2, y = 0."
+    },
+    "model_origin": {
+      "status": "KNOWN",
+      "value": "Gốc mô hình cục bộ tại (0, 0, 0) — đầu nhịp, trên tim cầu.",
+      "source_ref": "bridge_evolution/bim/ifc_bridge_exporter.py",
+      "note": "Đây là gốc CỤC BỘ của mô hình. Nó KHÔNG gắn với bất kỳ tọa độ hay cao độ thực nào; xem trường georeferencing bên dưới."
+    },
+    "horizontal_crs": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cần hồ sơ khảo sát trắc địa tuyến do chủ đầu tư cung cấp: hệ tọa độ quốc gia, múi chiếu, và mốc khống chế. Repo hiện không có bất kỳ hồ sơ vị trí nào.",
+      "note": "Tên hệ tọa độ và múi chiếu phải lấy từ hồ sơ thật, không được suy đoán từ việc dự án dùng TCVN."
+    },
+    "vertical_datum": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cần mốc cao độ quốc gia và hệ cao độ tham chiếu trong hồ sơ khảo sát trắc địa; repo chưa có. Không có cao độ tham chiếu thì không định được cao độ đáy dầm, tĩnh không và mực nước thiết kế."
+    },
+    "georeferencing": {
+      "status": "UNKNOWN",
+      "resolution_path": "Mô hình IFC hiện xuất với WorldCoordinateSystem đặt tại gốc cục bộ, KHÔNG có IfcMapConversion/IfcProjectedCRS. Chỉ ghi được sau khi có horizontal_crs và vertical_datum thật.",
+      "source_ref": "bridge_evolution/bim/ifc_bridge_exporter.py"
+    },
+    "station_reference": {
+      "status": "UNKNOWN",
+      "resolution_path": "Lý trình đầu cầu trên tuyến do hồ sơ thiết kế tuyến quy định; RC-1.1 chỉ khóa 'tuyến thẳng, skew = 0' chứ không có lý trình."
+    }
+  },
+  "geometry_constraints": {
+    "span_length_m": {
+      "status": "KNOWN",
+      "value": 38.3,
+      "unit": "m",
+      "source_ref": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_grammar/super_t_parametric_v2.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "project_inputs.span_length_m = 38.3 ở cả hai grammar; RC-1.1 §1 ghi 38,3 m tim gối → tim gối. Đây là giá trị runtime THỰC SỰ dùng."
+    },
+    "deck_width_m": {
+      "status": "KNOWN",
+      "value": 12.0,
+      "unit": "m",
+      "source_ref": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_grammar/super_t_parametric_v2.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "project_inputs.deck_width_m = 12.0; RC-1.1 §1 ghi 12,0 m cho 3 làn xe cơ giới quy đổi."
+    },
+    "skew_angle_deg": {
+      "status": "KNOWN",
+      "value": 0.0,
+      "unit": "degree",
+      "source_ref": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_grammar/super_t_parametric_v2.json"
+      ],
+      "note": "project_inputs.skew_deg = 0."
+    },
+    "alignment_type": {
+      "status": "KNOWN",
+      "value": "STRAIGHT",
+      "source_ref": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_grammar/super_t_parametric_v2.json"
+      ],
+      "note": "project_inputs.alignment_type = STRAIGHT; RC-1.1 §1 'tuyến thẳng, không cong, không xiên'."
+    },
+    "vertical_clearance_m": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tĩnh không đứng do vật cản dưới cầu quyết định (cấp sông thông thuyền hoặc cấp đường bộ/đường sắt bên dưới). Chưa có vị trí và chưa biết cầu vượt cái gì, nên không suy ra được. Cần nhiệm vụ thiết kế + hồ sơ tuyến và hồ sơ thủy văn/giao thông của chủ đầu tư.",
+      "note": "Ràng buộc này KHÔNG có trong runtime hiện tại: L0/L1 không kiểm tĩnh không. Mọi phát biểu 'phương án đạt tĩnh không' đều bị chặn."
+    },
+    "horizontal_clearance_m": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tương tự tĩnh không đứng — phụ thuộc vật cản dưới cầu và khoang thông thuyền; chưa có vị trí."
+    }
+  },
+  "load_requirements": {
+    "live_load_model": {
+      "status": "KNOWN",
+      "value": "TCVN_HL93",
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "catalogs load_profiles.LOAD-PROFILE-01 mô tả 'HL-93 theo TCVN 11823-3 (design truck + lane load, IM trên truck)'; RC-1.1 §1 khóa cùng mô hình tải."
+    },
+    "impact_percentage": {
+      "status": "KNOWN",
+      "value": 33.0,
+      "unit": "%",
+      "source_ref": "catalogs/catalogs.json",
+      "note": "load_profiles.LOAD-PROFILE-01.impact_factor = 0.33, chỉ áp cho xe tải (truck), không áp cho tải làn."
+    },
+    "lane_load_kN_per_m": {
+      "status": "KNOWN",
+      "value": 9.3,
+      "unit": "kN/m",
+      "source_ref": "catalogs/catalogs.json"
+    },
+    "design_lane_width_m": {
+      "status": "KNOWN",
+      "value": 3.5,
+      "unit": "m",
+      "source_ref": "catalogs/catalogs.json"
+    },
+    "multiple_presence_factors": {
+      "status": "KNOWN",
+      "value": { "1": 1.2, "2": 1.0, "3": 0.85, "4": 0.65 },
+      "source_ref": "catalogs/catalogs.json",
+      "note": "load_profiles.LOAD-PROFILE-01.multiple_presence, khóa theo số làn chất tải."
+    },
+    "wearing_surface_thickness_m": {
+      "status": "KNOWN",
+      "value": 0.075,
+      "unit": "m",
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "Lớp phủ asphalt 75 mm (DW)."
+    },
+    "wearing_surface_unit_weight_kN_m3": {
+      "status": "KNOWN",
+      "value": 22.5,
+      "unit": "kN/m3",
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/01_research_contract.md"
+      ]
+    },
+    "barrier_line_load_kN_per_m": {
+      "status": "KNOWN",
+      "value": 5.0,
+      "unit": "kN/m",
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "Lan can 2 × 5,0 kN/m tính vào DW."
+    },
+    "barrier_count": {
+      "status": "KNOWN",
+      "value": 2,
+      "source_ref": "catalogs/catalogs.json"
+    },
+    "misc_smeared_dead_load_kN_per_m_per_girder": {
+      "status": "KNOWN",
+      "value": 1.5,
+      "unit": "kN/m",
+      "source_ref": "catalogs/catalogs.json",
+      "note": "Tĩnh tải phụ rải đều quy về mỗi dầm trong LOAD-PROFILE-01."
+    },
+    "pedestrian_load_kPa": {
+      "status": "NOT_APPLICABLE",
+      "not_applicable_reason": "Mặt cắt ngang khóa trong RC-1.1 §1 gồm 3 làn xe cơ giới quy đổi trên bề rộng 12,0 m và 2 lan can, KHÔNG có lề bộ hành; LOAD-PROFILE-01 trong catalogs cũng không có trường hợp tải người đi bộ nên runtime không hề dùng đại lượng này. Nếu mặt cắt ngang thay đổi (thêm lề bộ hành/đường dành cho người đi bộ) thì trường này phải chuyển lại thành UNKNOWN và bổ sung tải theo TCVN 11823-3.",
+      "source_ref": [
+        "docs/01_research_contract.md",
+        "catalogs/catalogs.json"
+      ]
+    },
+    "construction_loads": {
+      "status": "UNKNOWN",
+      "resolution_path": "Runtime hiện chỉ có L0 + L1 line-girder, KHÔNG có khái niệm giai đoạn thi công (xem docs/runtime_capability_matrix.md và research/materials/unverified_claims_register.md UCR-003). Cần mô hình L3 có giai đoạn thi công cùng biện pháp thi công thật (cẩu, xe lao, đà giáo) mới khai được nhóm tải này.",
+      "source_ref": "docs/runtime_capability_matrix.md"
+    },
+    "vehicle_collision_load": {
+      "status": "UNKNOWN",
+      "resolution_path": "Va xe/va tàu vào trụ thuộc tổ hợp Sự cố đặc biệt, phụ thuộc vật cản dưới cầu và cấp đường/cấp sông tại vị trí; chưa có vị trí nên chưa xác định được."
+    }
+  },
+  "load_combinations": {
+    "combinations": {
+      "status": "KNOWN",
+      "value": [
+        {
+          "name": "STRENGTH_I",
+          "factors": { "DC": 1.25, "DW": 1.5, "LL": 1.75 }
+        },
+        {
+          "name": "SERVICE_III",
+          "factors": { "DC": 1.0, "DW": 1.0, "LL": 0.8 }
+        }
+      ],
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "Hệ số lấy đúng từ catalogs rule_profiles.BRIDGE-RULESET-V1.strength1 và .service3 — đây là hệ số runtime THỰC SỰ dùng. RC-1.1 §1 khóa 'Cường độ I, Sử dụng III'."
+    },
+    "deflection_limit": {
+      "status": "KNOWN",
+      "value": 800,
+      "unit": "L/x",
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/01_research_contract.md"
+      ],
+      "note": "Võng hoạt tải ≤ L/800 — rule_profiles.BRIDGE-RULESET-V1.deflection_limit_span_ratio = 800 (SERV-002)."
+    },
+    "fatigue_combination": {
+      "status": "UNKNOWN",
+      "resolution_path": "Runtime chưa có kiểm mỏi: L0/L1 chỉ kiểm uốn/cắt Cường độ I, ứng suất Sử dụng III và võng. Cần phổ hoạt tải mỏi, chu kỳ ADTT và mô hình chi tiết ở L2/L3 (Gate G3) trước khi khai tổ hợp mỏi.",
+      "source_ref": [
+        "docs/01_research_contract.md",
+        "docs/runtime_capability_matrix.md"
+      ]
+    },
+    "extreme_event_combination": {
+      "status": "UNKNOWN",
+      "resolution_path": "Tổ hợp Sự cố đặc biệt (động đất, va tàu/va xe, lũ kiểm tra) đòi hỏi dữ liệu vị trí — gia tốc nền, phổ phản ứng, mực nước và cấp thông thuyền. Toàn bộ đang UNKNOWN trong docs/design_basis/SITE-UNSPECIFIED.json.",
+      "source_ref": "docs/design_basis/SITE-UNSPECIFIED.json"
+    }
+  },
+  "materials_policy": {
+    "allowed_concrete_grades": {
+      "status": "KNOWN",
+      "value": ["C30", "C35", "C40", "C45", "C50", "C55", "C60"],
+      "source_ref": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_grammar/super_t_parametric_v2.json",
+        "catalogs/catalogs.json"
+      ],
+      "note": "Hợp của miền girder_concrete_id và deck_concrete_id trên TOÀN BỘ grammar trong bridge_grammar/: v1 cho {C40,C45,C50} dầm + {C30,C35} bản; v2 mở dầm lên {C40…C60}. Mọi cấp đều có entry trong catalogs.concretes. C55/C60 là PLACEHOLDER nội suy (catalogs ghi rõ), chỉ dùng xếp hạng tương đối trong cùng một run."
+    },
+    "allowed_prestress_types": {
+      "status": "KNOWN",
+      "value": ["PS-15.2-1860"],
+      "source_ref": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_grammar/super_t_parametric_v2.json",
+        "catalogs/catalogs.json"
+      ],
+      "note": "fixed.prestressing_steel_id = PS-15.2-1860 ở cả hai grammar; catalogs.prestressing_steels chỉ có duy nhất loại này."
+    },
+    "max_concrete_grade_MPa": {
+      "status": "KNOWN",
+      "value": 60,
+      "unit": "MPa",
+      "source_ref": [
+        "catalogs/catalogs.json",
+        "docs/03_shape_evolution.md",
+        "research/materials/unverified_claims_register.md"
+      ],
+      "note": "Trần bê tông THƯỜNG = 60 MPa, bằng đúng f'c lớn nhất trong catalogs.concretes. Đây là trần MIỀN HIỆU LỰC MÔ HÌNH, không phải trần công nghệ: khối ứng suất chữ nhật của TCVN 11823-5 không phủ vùng f'c > ~120 MPa, và STR-001/STR-002/SERV-001 hiện hành sẽ cho số 'trông hợp lệ nhưng vô nghĩa' nếu vượt ra ngoài."
+    },
+    "blocked_materials": {
+      "status": "KNOWN",
+      "value": [
+        {
+          "material_id": "UHPC",
+          "register_ref": "research/materials/unverified_claims_register.md#UCR-001",
+          "reason": "UHPC f'c ≥ 160 MPa nằm NGOÀI miền hiệu lực của mô hình sức kháng hiện hành (khối ứng suất chữ nhật TCVN 11823-5), và đóng góp của cốt sợi vào sức kháng cắt là cơ chế riêng mà L1 không mô tả được. BỊ CHẶN cho tới khi thay mô hình vật liệu + mô hình sức kháng và có gold case do kỹ sư duyệt."
+        },
+        {
+          "material_id": "CFRP_TENDON",
+          "register_ref": "research/materials/unverified_claims_register.md#UCR-002",
+          "reason": "Claim dão < 0,5% sau 100 năm không có bằng chứng; CFRP phá hoại giòn nên đổi cả triết lý an toàn chứ không chỉ đổi một dòng catalog. BỊ CHẶN cho tới khi có dữ liệu dão kèm khoảng tin cậy, dữ liệu mỏi/môi trường và hệ số riêng phần theo tiêu chuẩn áp dụng."
+        },
+        {
+          "material_id": "SEGMENTAL_ULTRALIGHT_ROBOT_ERECTION",
+          "register_ref": "research/materials/unverified_claims_register.md#UCR-003",
+          "reason": "Lắp ghép phân đoạn siêu nhẹ + cẩu robot nằm NGOÀI phạm vi mô hình: runtime không có giai đoạn thi công, không có mô hình mối nối epoxy. Chưa đánh giá được, cũng chưa bác bỏ được."
+        }
+      ],
+      "source_ref": "research/materials/unverified_claims_register.md",
+      "note": "Danh sách này là hàng rào G6/MODEL-001: agent KHÔNG được đề xuất, xếp hạng hay báo cáo phương án chứa các vật liệu/công nghệ này."
+    },
+    "max_aggregate_size_mm": {
+      "status": "UNKNOWN",
+      "resolution_path": "Cỡ hạt lớn nhất do chỉ dẫn kỹ thuật vật liệu và thiết kế cấp phối bê tông của dự án quy định; RC-1.1 và catalogs/catalogs.json đều không nêu. Cần TCKT vật liệu + thiết kế cấp phối được duyệt.",
+      "note": "Ảnh hưởng tới khoảng cách cốt thép, chiều dày bản bụng tối thiểu và bố trí cáp — nên KHÔNG được đoán."
+    },
+    "reinforcement_cover_mm": {
+      "status": "UNKNOWN",
+      "resolution_path": "Lớp bê tông bảo vệ phụ thuộc cấp phơi nhiễm (exposure_class), hiện đang UNKNOWN vì chưa có vị trí. Chỉ khai được sau khi có hồ sơ vị trí và cấp ăn mòn thực đo.",
+      "note": "catalogs rule_profiles.BRIDGE-RULESET-V2.fab_limits.cover_mm = 50 là ngưỡng CHẾ TẠO placeholder cho bố trí cáp, KHÔNG phải lớp bảo vệ theo độ bền lâu — không được dùng thay thế."
+    },
+    "concrete_model_validity": {
+      "status": "KNOWN",
+      "value": "Chỉ bê tông thường trong dải f'c ≤ 60 MPa của catalogs.concretes; khối ứng suất chữ nhật TCVN 11823-5 còn hiệu lực trong dải này.",
+      "source_ref": [
+        "docs/03_shape_evolution.md",
+        "catalogs/catalogs.json"
+      ]
+    }
+  },
+  "runtime_binding": {
+    "catalogs_version": "1.1.0",
+    "catalogs_ref": "catalogs/catalogs.json",
+    "fidelity_available": ["L0", "L1_LINE_GIRDER"],
+    "fidelity_note": "Runtime hiện chỉ có L0 (hình học/cấu tạo) và L1 (dầm đơn + hệ số phân bố ngang). L2/L3 (Midas Civil, OpenSees grillage) CHƯA được hiệu chuẩn, nên trần claim là SCREENED. Xem docs/runtime_capability_matrix.md và multiagent/PHYSICS_GATES.md.",
+    "grammar_bindings": [
+      {
+        "grammar_id": "super_t_simple_v1",
+        "grammar_version": "1.0.0",
+        "grammar_ref": "bridge_grammar/super_t_simple_v1.json",
+        "load_profile_id": "LOAD-PROFILE-01",
+        "rule_profile_id": "BRIDGE-RULESET-V1",
+        "prestressing_steel_id": "PS-15.2-1860",
+        "fidelity": "L1_LINE_GIRDER",
+        "solver": "BUILTIN_L1",
+        "role": "BASELINE_ARM"
+      },
+      {
+        "grammar_id": "super_t_parametric_v2",
+        "grammar_version": "2.0.0",
+        "grammar_ref": "bridge_grammar/super_t_parametric_v2.json",
+        "load_profile_id": "LOAD-PROFILE-01",
+        "rule_profile_id": "BRIDGE-RULESET-V2",
+        "prestressing_steel_id": "PS-15.2-1860",
+        "fidelity": "L1_LINE_GIRDER",
+        "solver": "BUILTIN_L1",
+        "role": "SHAPE_EVOLUTION_ARM"
+      }
+    ]
+  },
+  "site_hazard_profile_ref": "docs/design_basis/SITE-UNSPECIFIED.json",
+  "g0_gate": {
+    "gate": "G0",
+    "status": "BLOCKED",
+    "assessed_by": "claude (agent) — CHƯA có kỹ sư cầu duyệt",
+    "assessed_on": "2026-08-21",
+    "blocking_items": [
+      "Không có vị trí xây dựng: toàn bộ docs/design_basis/SITE-UNSPECIFIED.json ở trạng thái UNKNOWN (tọa độ, địa chất, thủy văn/xói, gió, động đất, ăn mòn).",
+      "design_life_years UNKNOWN — chưa có nhiệm vụ thiết kế ấn định tuổi thọ.",
+      "exposure_class UNKNOWN — hệ quả trực tiếp của việc không có vị trí.",
+      "vertical_clearance_m và horizontal_clearance_m UNKNOWN — chưa biết cầu vượt vật cản gì.",
+      "max_aggregate_size_mm và reinforcement_cover_mm UNKNOWN — chưa có chỉ dẫn kỹ thuật vật liệu.",
+      "Tổ hợp mỏi và tổ hợp Sự cố đặc biệt UNKNOWN — runtime không có kiểm mỏi, và tổ hợp sự cố cần dữ liệu vị trí.",
+      "Tải trọng thi công UNKNOWN — runtime không có giai đoạn thi công (chỉ L0 + L1)."
+    ],
+    "blocked_claims": [
+      "Mọi claim phụ thuộc vị trí: động đất, gió/khí động, xói, mực nước, ăn mòn, tuổi thọ theo môi trường.",
+      "Mọi claim dạng 'phương án này khả thi cho một cây cầu tại một vị trí' — L2 sau này chỉ verify được MÔ HÌNH/CẤU KIỆN.",
+      "Mọi claim về tĩnh không, thông thuyền, va tàu/va xe.",
+      "Mọi claim về mỏi, độ bền lâu và giai đoạn thi công."
+    ],
+    "note": "Theo multiagent/PHYSICS_GATES.md, G0 yêu cầu khóa đủ site/geotech/hydraulic/wind/seismic exposure — 'Thiếu dữ liệu thì dừng'. G0 ở đây BLOCKED một cách CÓ CHỦ ĐÍCH và đúng sự thật. Hồ sơ này vẫn dùng được cho nghiên cứu MÔ HÌNH (so sánh thuật toán tối ưu trên cùng một bài toán chuẩn hóa), nhưng KHÔNG dùng được để phát biểu về một công trình thật."
+  },
+  "document_provenance": {
+    "task_id": "BRD-002",
+    "prepared_by": "claude (agent)",
+    "prepared_on": "2026-08-21",
+    "review_status": "PENDING_HUMAN_REVIEW",
+    "claim_ceiling": "IDEA",
+    "note": "Mọi trường KNOWN đều trỏ tới file thật trong repo và được tests/test_design_basis.py đối chiếu lại với grammar + catalogs. Không có trường nào được điền bằng suy đoán."
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-022",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Bit lo hong load_grammar() di xuyen vao sandbox. Truoc: catalogs.py dung GRAMMAR_DIR/f'{grammar_id}.json' khong chan dau phan cach, nen load_grammar('experimental/arch_deck_v1') nap duoc grammar vom (ho ket cau runtime KHONG co solver, claim IDEA) va gene_order()/gene_domains() chay tron tren no; duong sinh so chi dung o BudgetedEvaluator bang KeyError 'girder_concrete_id' - tuc bang TAI NAN. Do lai con rong hon mo ta trong task: '../bridge_grammar/super_t_simple_v1' va './experimental/arch_deck_v1' cung di xuyen duoc, tuc traversal tuy y chu khong chi mot cap thu muc. Sau: GrammarIdError rieng, pattern [A-Za-z0-9][A-Za-z0-9_-]* (chan '/', '\\', '..', ':', duong dan tuyet doi, UNC, va ca ten co duoi .json), cong phong thu tang hai kiem tep phai nam TRUC TIEP trong GRAMMAR_DIR. tests/test_catalogs.py moi: 22 test, gom 13 bien the duong dan (ca Windows), phan biet ro GrammarIdError voi FileNotFoundError, va kiem gene_order/gene_domains nay bi chan NGAY O LOADER. Dong bo phat bieu an toan: isolation_mechanism_measured trong arch_deck_v1.json va muc tuong ung trong arch_render_study.md doi tu NOT_BLOCKED sang BLOCKED_GrammarIdError; hai test tung co y KHOA hanh vi mat an toan da dao chieu va duoc lam MANH hon (nay doi chieu tung dong phat bieu voi hanh vi runtime that thay vi chi doc chuoi JSON). Khong sua/xoa sandbox de ne van de - cai sai nam o loader.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G1"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/catalogs.py",
+      "sha256": "c1f2a389a02ab7a5b9bc1e11c5525167b6ec7691875053a4d1f2e208ef518556",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_catalogs.py",
+      "sha256": "28467b8397f5793001008c3239c5dacc844e716ceedf0eb38b065ef681984b35",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_grammar/experimental/arch_deck_v1.json",
+      "sha256": "d310dbd593ea94517ab14a94d7e7099a25b1315d41efd51d3e6dad4982991f05",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/shape_discovery/arch_render_study.md",
+      "sha256": "2b13b0f1e4c19d1d974d150319521134956ad5271f54259bda11105ec86c2139",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_shape_grammar_experimental.py",
+      "sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Claim level de IDEA chu khong phai SCREENED nhu tran cua task: day la thay doi HANG RAO TRUY VET o tang loader, khong dua ra bat ky claim ky thuat nao ve ung xu cau, nen khong cham G0/G2. lab submit cung tu choi SCREENED vi thieu G0+G2 - dung.",
+    "Ba file ngoai write_scope goc duoc sua sau khi NGUOI DUNG uy quyen mo rong scope: acceptance criteria cua chinh BRD-022 doi hoi sua dong thoi, nhung write_scope viet thieu va task da ACTIVE nen khong con amend duoc.",
+    "Viec sua ba file do lam drift hash artifact cua handoff BRD-004; da xu ly bang COR-BRD-004-002/003/004, ca ba duoc codex review doc lap va APPROVE; lab validate: valid."
+  ],
+  "unresolved_risks": [
+    "Toan suite con 2 test do, ca hai TIEN TON TAI va thuoc BRD-025: test_design_basis_matches_runtime (grammar moi khai nhip 35/40 m lech design basis 38,3 m) va test_experimental_grammar_lives_only_in_sandbox (danh sach grammar top-level hard-code). Acceptance criteria cua BRD-022 doi 'toan bo pytest xanh' - KHONG dat duoc chung nao BRD-025 chua giai quyet, nam ngoai tam tay task nay.",
+    "budgeted_evaluator van la BLOCKED_BY_ACCIDENT va van tu khai dung nhu vay; BRD-022 chi them mot hang rao co chu y o loader chu khong bien tai nan do thanh cong chan."
+  ],
+  "next_action": "Independent cross-provider review by codex"
+}

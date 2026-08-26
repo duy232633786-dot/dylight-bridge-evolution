@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-002-001",
+  "task_id": "BRD-002",
+  "incident_id": "INC-BRD-002-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them 3 grammar_bindings (i_girder, box_girder, composite_i) kem TRAN CLAIM RIENG ghi trong truong role: i_girder CLAIM_CEILING=SCREENED (he so phan bo ngang type-k con trong mien ap dung), box_girder va composite_i CLAIM_CEILING=IDEA (type-k ngoai mien voi hop don o S=12000mm/Nb=1; composite bi SOLVER-COMPOSITE-001 chan HARD truoc solver). Khong doi bat ky truong KNOWN/UNKNOWN nao khac cua design basis.",
+  "original_handoff_path": "multiagent/handoffs/BRD-002.claude.r001.json",
+  "original_handoff_sha256": "86a4c50007f2d06f24d480f921a3e10e45a79c04d4859591824bb0e1a18ce2a5",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25.blob",
+    "sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25"
+  },
+  "corrected_artifact": {
+    "path": "docs/design_basis/DB-SUPERT-38M.json",
+    "previous_sha256": "21b21c6958d8a23cb4eb3aa9df76d1cc1add707bb65b7a284d05a174135d1a25",
+    "current_sha256": "a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_basis.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Tran claim phai nhet vao truong 'role' vi contracts/design_basis.schema.json khoa additionalProperties va chua co truong claim rieng cho grammar binding. Can mot task rieng them truong claim_ceiling vao schema do."
+  ],
+  "supersedes_correction_sha256": null
+}

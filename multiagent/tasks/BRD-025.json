@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "title": "Mở rộng grammar đa loại cầu: I-girder DUL, hộp đơn ô, composite thép-BT (L0/L1)",
+  "research_question": "Những họ tiết diện và grammar tham số nào mở rộng không gian thiết kế cầu dầm-superstructure (I-girder BTCT DUL, hộp đơn ô đúc tại chỗ, composite thép-BT) mà vẫn chạy trọn L0 sàng lọc và L1 line-girder với contract section keys không đổi?",
+  "workstream": "geometry",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "owner": "opencode",
+  "reviewer": "claude",
+  "dependencies": [],
+  "required_gates": [
+    "G0",
+    "G1"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/section_types.py",
+    "bridge_grammar/i_girder_parametric_v1.json",
+    "bridge_grammar/box_girder_parametric_v1.json",
+    "bridge_grammar/composite_i_girder_parametric_v1.json",
+    "bridge_evolution/geometry.py",
+    "tests/test_section_types.py"
+  ],
+  "acceptance_criteria": [
+    "Ba builder tiết diện mới trả đúng bộ khóa contract (depth_m, area_m2, I_m4, y_bottom_m, top_flange_width_m, web_width_total_m)",
+    "Composite dùng tiết diện quy đổi với modular ratio n từ module đàn hồi, ghi rõ n trong provenance của kết quả",
+    "Mỗi grammar JSON có FAB riêng (tỷ lệ nhịp/cao, dày sườn tối thiểu, vận chuyển) và example_valid dựng được biên",
+    "resolve_section dispatch theo marker (I-PARAM/BOX-PARAM/CI-PARAM) mà không phá hành vi Super-T v1/v2",
+    "python -m pytest tests -q xanh toàn bộ, bao gồm test mới cho từng loại tiết diện"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/section_types.py",
+    "tests/test_section_types.py"
+  ],
+  "safety_notes": [
+    "Cầu vòm/dây văng/treo KHÔNG đưa vào task này: L1 line-girder không hợp lệ cho chúng, chỉ mở khi có solver tương ứng (tránh SCREENED giả mạo)",
+    "Composite: kiểm chảy vắt thép và dày bản tối thiểu ở L0, không tự suy công thức dầm hỗn hợp ngoài L1",
+    "Không sửa catalogs/catalogs.json — marker mới chỉ nằm trong grammar"
+  ],
+  "review_notes": [
+    "REVISE: Source and artifact hashes match the handoff, and the section tests pass, but the claimed 18/18 is not reproducible: the repository collects 16 section tests, while the requested combined suite collects and passes 27/27, not 29/29. Also section_types.py does not document fib Bulletin 34 or DuraCrete; EN 1993-1-9 is not present there (only EN 1993-1-1 screening is cited). Correct the test-count/source documentation discrepancy before approval.",
+    "REVISE. Phan sua theo review cua codex thi tot va da dong. Nhung yeu cau thu hai - chuan hoa project_inputs cua ba grammar ve 38.3 m x 12.0 m - khong duoc dong den, va do moi la thu dang chan ca lo trinh. Ly do phai chuan hoa, khong phai chuyen thu tuc: ba ho nay la CAC LOAI KET CAU THAY THE cho CUNG MOT bai toan; so mot dam I nhip 35 m voi mot dam hop nhip 40 m khong phai nghien cuu chon loai cau, ma la hai bai toan khac nhau. Giu mot design basis duy nhat chinh la dieu lam cho buoc so sanh loai cau ve sau co nghia. Sau khi doi span, PHAI kiem lai he qua hinh hoc va bao cao trung thuc: ty so L/H doi, va neu FAB-007 (span-depth) nay noi o muc SOFT thi ghi ro ra chu KHONG duoc chinh nguong de che. Luu y pham vi: chi sua ba file grammar trong write_scope cua BRD-025; docs/design_basis/DB-SUPERT-38M.json da duoc BRD-029 bo sung grammar_bindings cho ca ba ho (kem tran claim rieng: i_girder SCREENED, box va composite IDEA) nen KHONG dung den; tests/test_design_basis.py va tests/test_shape_grammar_experimental.py deu ngoai pham vi."
+  ]
+}

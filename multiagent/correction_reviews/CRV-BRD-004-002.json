@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-004-002",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-002",
+  "correction_sha256": "41bd747691350b343da28171109370c94850cfed8b06b81e033c660f5aede16d",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot SHA-256 recomputed and matched; live artifact hash matched declared current hash.",
+    "JSON now records BLOCKED_GrammarIdError, consistent with direct runtime probes for slash, backslash, traversal, and absolute path forms."
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. Diff contained only the described policy-measurement update."
+}

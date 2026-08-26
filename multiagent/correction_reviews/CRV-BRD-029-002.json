@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-029-002",
+  "task_id": "BRD-029",
+  "incident_id": "INC-BRD-029-002",
+  "correction_sha256": "9a9b2d7cb5099a33bf0bb26ded108ca9b4cfffdd08afec54954445719888cf6a",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "PASS: snapshot SHA-256 89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0 equals corrected_artifact.previous_sha256 and the BRD-029 handoff artifact hash.",
+    "PASS: live diff is exactly one added package line bridge_evolution.site; no dependency, version or pytest-config change."
+  ],
+  "notes": "Cross-provider review (work by Claude, review by Codex)."
+}

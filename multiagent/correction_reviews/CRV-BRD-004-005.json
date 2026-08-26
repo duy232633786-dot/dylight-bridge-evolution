@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-004-005",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-005",
+  "correction_sha256": "9ea470e7515ef08957351b7a6d514b8ffa61ee284c65c044546be8c860bc4d78",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot and live SHA-256 match; diff is only the intended family/grammar invariant. In-memory mutation checks reject arch enum additions, grammar-only additions, and enum-only omissions; the invariant is stronger for synchronization, though it relies on top-level placement.",
+    "Cross-provider independent review: snapshot authenticity and summary diff were checked."
+  ],
+  "notes": "This is a cross-provider review by Codex, independent of the Claude author. Full pytest result was 7 failures due to concurrent repository drift; no files were edited by this review."
+}

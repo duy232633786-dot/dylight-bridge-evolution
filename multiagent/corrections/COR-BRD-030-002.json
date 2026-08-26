@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-030-002",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-002",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them dung mot test: test_superseding_a_void_link_is_not_reported_as_a_broken_chain. No ĐỎ tren ban chua va va XANH sau ban va, tuc la mot cai phanh that chu khong phai mot khang dinh trang tri. Khong sua hay noi long bat ky test nao trong 7 test cu.",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/5f06ee8f8aee7ca4b717184ab25117ce6d0f82faa83c37482d9be7309dc24c63.blob",
+    "sha256": "5f06ee8f8aee7ca4b717184ab25117ce6d0f82faa83c37482d9be7309dc24c63"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_correction_chain.py",
+    "previous_sha256": "5f06ee8f8aee7ca4b717184ab25117ce6d0f82faa83c37482d9be7309dc24c63",
+    "current_sha256": "d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": null
+}

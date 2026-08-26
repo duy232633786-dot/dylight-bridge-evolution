@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-030-001",
+  "task_id": "BRD-030",
+  "detected_at_utc": "2026-08-25T20:00:44.728129Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "artifact_path": "bridge_evolution/collaboration/lab.py",
+  "recorded_sha256": "2339eeb3e0f3cc5c7786332c3b1646c357520b4a8fc942b8e92e4a4eaaaf3350",
+  "observed_sha256": "653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9",
+  "reason": "BRD-030 sua sot mot cho: gia dinh 'mat xich truoc da duoc chap nhan' nam o BA cho chu khong phai hai. BRD-030 sua record_provenance_correction va correction_chain_is_approved nhung bo sot vong kiem correction_link_valid, nen COR-BRD-002-002 bao 'correction chain bi dut old/new hash' du no hop le. BRD-032 sua not.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

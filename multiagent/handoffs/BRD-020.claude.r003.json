@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-020",
+  "agent_id": "claude",
+  "role": "materials_researcher",
+  "summary": "Ban r003 - sua hai diem reviewer chi ra o r002. (1) Sot dung 1 ID cuc bo: truong authors cua LIT-222 con ghi LIT-104 (EPD thanh cap PC, chu de LCA_CARBON) trong khi dich dung la LIT-217 'Empirical aesthetics of bridges'. Nguyen nhan: dot remap chi quet 4 truong van ban, khong quet authors. Da sua va da sinh lai vault (chuoi sai da bien khoi note 23 va note tong hop). (2) Quan trong hon: test_internal_lit_references_point_at_real_entries cua r002 KHONG phanh duoc dung benh no khai - no chi hoi 'ID co ton tai khong', ma toan bo 89 token hong o r001 deu la ID hop le. Da thay bang test_internal_lit_references_point_at_the_right_document, bat biến moi la: mot ban ghi chi duoc nhac toi nguon CUNG CHU DE, nhac cheo thi cap do phai duoc khai trong cross_topic_references; pham vi quet mo rong tu 4 len 6 truong (them authors, venue, unverified_fields). Bang chung may moc: chay ca hai phep kiem tren chinh blob index r001 con trong snapshot store (a888b6f4) - phep kiem CU cho 0 vi pham (test XANH tren file loi), phep kiem MOI cho 90 vi pham (test DO); tren ban hien tai ca hai deu 0. Them: test_unique_document_count_is_honest nay bat buoc phai co key unique_documents thay vi im lang bo qua khi key vang mat. tests/test_literature_index.py: 13 passed.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/literature/index.json",
+      "sha256": "c76042839f2153ae13a0f3bca70742875bd2f53f9339d6858584d464e206f1bd",
+      "kind": "report"
+    },
+    {
+      "path": "research/literature/README.md",
+      "sha256": "c0fab1cd7c4b674c3e60f36cea78f4db1c1e698699a3b6df8c2f56e6f08f6a7f",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/literature_reference.schema.json",
+      "sha256": "41e7f864b42aa918423e167ddd1f2b0fec14b273e8cfaf688571428c2c87e2a3",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_literature_index.py",
+      "sha256": "d1b26006de2cf76aeed5fe391fd0b37e2cf8c6d71327dec798270c30e67a0947",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Bat bien 'trich dan noi bo phai cung chu de hoac duoc khai cheo' dung cho 90/90 lan nhac hien tai; neu sau nay co nhu cau trich cheo chu de that thi phai them ban ghi vao cross_topic_references chu khong duoc noi test."
+  ],
+  "unresolved_risks": [
+    "Ca ba vong review deu la doc lap ve NGU CANH, khong phai ve nha cung cap - cung la Claude. review_provider khai trong task la codex; van chua co vong review cross-provider.",
+    "Bo sinh note Obsidian (tmp/export_literature.py) van nam ngoai git; can task rieng de dua vao version control."
+  ],
+  "next_action": "Re-review r003"
+}

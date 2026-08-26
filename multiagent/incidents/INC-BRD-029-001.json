@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-029-001",
+  "task_id": "BRD-029",
+  "detected_at_utc": "2026-08-25T20:37:38.620478Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-029.claude.r001.json",
+  "original_handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "artifact_path": "docs/design_basis/DB-SUPERT-38M.json",
+  "recorded_sha256": "a7189d5af3c2f0a64cf8c3feb0d909ca35ced34816e5ccb2a736cdcb32d29047",
+  "observed_sha256": "ce2ed66b1e58737d7d2337da0513a70e39326822f63e6e4b386ea8743a9ae842",
+  "reason": "Codex tra REVISE cho COR-BRD-002-001 vi tran claim bi nhet vao truong tu do 'role'. Da them truong claim_ceiling (enum) va claim_note_vi vao contracts/design_basis.schema.json roi chuyen du lieu sang do, nen artifact nay doi sau khi handoff r001 da nop.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

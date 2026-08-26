@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-004-003",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-003",
+  "correction_sha256": "1f5debfc3abee7ae79e73b59786f86eb8719c163bb1f02422cdd2a9983e4244a",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot and live SHA-256 values matched the correction record.",
+    "Markdown changes only the provenance/policy narrative and describes the same GrammarIdError mechanism as the JSON."
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. No unrelated markdown changes observed."
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-030-003",
+  "task_id": "BRD-030",
+  "detected_at_utc": "2026-08-25T20:18:54.699620Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "artifact_path": "bridge_evolution/collaboration/lab.py",
+  "recorded_sha256": "653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9",
+  "observed_sha256": "73e56145e626de653a2017f753d32c4ff5736a52aef81a4bc2ec4c37b35535de",
+  "reason": "BRD-032 r002 bit lo hong ma codex tim ra o r001: bang correction_decision lay cai ghi sau cung khi mot correction co nhieu review, nen mot file review APPROVE chep tay dat canh mot REVISE co the hop thuc hoa drift.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

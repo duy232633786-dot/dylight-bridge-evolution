@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-030-002",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-002",
+  "correction_sha256": "13380f073bf3f5c1920e42dbb9a76c0f0cfc9e9bea60bcee0bff4b125a194050",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Independent SHA-256: snapshot 5f06ee8f... matches corrected_artifact.previous_sha256; live test file is d94439... matching current_sha256. Diff adds the claimed regression test only."
+  ],
+  "notes": "Cross-provider review: work by Claude, review by Codex. Focused pytest passed 8/8."
+}

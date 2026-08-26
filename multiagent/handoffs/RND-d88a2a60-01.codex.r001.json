@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-d88a2a60-01",
+  "agent_id": "codex",
+  "role": "bim_fem_integrator",
+  "summary": "Revit Family V3 cầu vòm 160 m đã có QA hình học: dàn không xuyên dầm, vùng thép đỉnh vòm 3,25 m và giao diện vòm-trụ; vẫn còn thiếu context legacy và adapter đầu trụ 7 m.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260824-d88a2a60/01_design_basis_and_evidence.md",
+      "sha256": "1a35c54fae090f23d043275234e9a8bbc4a3b05f05ab6c6d32f4d3925a25fa97",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Các tiết diện RHS, bản nút và chi tiết chưa ghi kích thước trong ảnh chỉ là giả định LOD 300."
+  ],
+  "unresolved_risks": [
+    "Chưa có kiểm chứng kết cấu L2/L3 hoặc chứng minh tuân thủ TCVN.",
+    "Đầu trụ PSC hiện thấp hơn đáy mặt cầu vòm 7 m."
+  ],
+  "next_action": "Reviewer khác agent kiểm provenance; sau đó thiết kế adapter đầu trụ riêng và dựng mô hình FEM độc lập."
+}

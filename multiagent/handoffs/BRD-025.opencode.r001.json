@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "agent_id": "opencode",
+  "role": "form_inventor",
+  "summary": "BRD-025 hoan thanh: section_types.py voi 3 builder (I-girder BTCT DUL, hop don o dang mang-U, composite thep I) dung contract khoa section; 3 grammar JSON moi (i_girder/box_girder/composite_i_girder parametric v1); geometry.py dispatch theo marker (I-PARAM/BOX-PARAM/CI-PARAM) giu nguyen hanh vi Super-T v1/v2; hop don o tang ban tren qua duong composite san co cua solver; composite bi chan HARD SOLVER-COMPOSITE-001 truoc solver vi mo hieu suc khang L1 khong hop le cho thep - trung thuc khong sinh so gia. G2 evidence: 18/18 test doi chieu cong thuc giai tich dong (A, y_bottom, I) cho ca 3 loai tiet dien; solver BUILTIN_L1 khong doi (builtin-l1/0.2.0, pkg 0.8.0); material domain tu catalogs 1.1.0 co version; L0 HARD chan input suy bien truoc solver. 2 test pin cu (design_basis, sandbox whitelist) chua cap nhat - thuoc BRD-012, da ghi next_action.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/section_types.py",
+      "sha256": "a6489c864efdd929c0e98dce57ea148150a5ca9052670a0917bc3a0ebe7f76ab",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_section_types.py",
+      "sha256": "815bb9ffb8d2fbdab4e1b1ab212567d73deecf795e3e6e675d0a95ef74a0e220",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_grammar/i_girder_parametric_v1.json",
+      "sha256": "87668e77caddb400f29ce7c07aa411ac24fec43663e658ad44603e7d98792d7c",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_grammar/box_girder_parametric_v1.json",
+      "sha256": "c6ec32edd37ca28cb8df427349cbd4d16272bb6f78c09ee74a54aa8926a65e4a",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_grammar/composite_i_girder_parametric_v1.json",
+      "sha256": "a52656ecdd975bfc43cec42de849679478e23ef5de2c190d0a82041706e8f01b",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/geometry.py",
+      "sha256": "02494260a0248fcd4f87906c64255a8e6cf48fce1ccf7c6c89475cffb8f3050c",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Box: L1 line-girder bo qua uon xoan - ket qua chi screening dam tuong duong (equivalent beam)"
+  ],
+  "unresolved_risks": [
+    "Composite chua co solver suc khang; can task rieng cho uon 2 giai doan + cat ban toa"
+  ],
+  "next_action": "BRD-012 cap nhat 2 test pin (design_basis, sandbox whitelist) + capability matrix + README"
+}

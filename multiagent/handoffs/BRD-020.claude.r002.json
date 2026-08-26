@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-020",
+  "agent_id": "claude",
+  "role": "materials_researcher",
+  "summary": "Ban r002 - da sua het 3 khuyet tat reviewer chi ra o r001. (1) 89 chuoi LIT-xxx trong key_content/relevance_to_runtime/contradicts/not_found la ID CUC BO cua tung bao cao agent, moi cai am tham tro vao mot tai lieu that nhung khong lien quan; da anh xa 89/89 ve ID toan cuc dung theo thu tu bao cao, 0 phai trung hoa, va them test_internal_lit_references_point_at_real_entries de chan tai dien. (2) Hai cap trung tai lieu khac URL ma khu trung theo URL khong bat duoc - LIT-117=LIT-018 (cung bai PCI Winter 2011, hai URL pci.org) va LIT-205=LIT-074 (TCVN 11823-10 tren hai mirror) - da khai trong duplicate_reference_ids va them test_same_document_at_two_urls_is_declared so theo tieu de chuan hoa. Tong that: 234 ban ghi = 231 tai lieu duy nhat, da them counts.unique_documents. (3) So lieu khai sai da sua: dung la 224 VERIFIED_URL / 10 VERIFIED_DOI_METADATA (r001 khai 228/6); README ghi dot 3 la 12 chu de 13-24 (truoc ghi 8 chu de 13-20); LIT-221 tra year ve null vi 2027 tren trang la phien ban Revit chu khong phai nam xuat ban. Them test san thu vien (LIBRARY_FLOOR=234) va mo neo tung dot quet theo goi y cua reviewer. tests/test_literature_index.py: 13 passed.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/literature/index.json",
+      "sha256": "abc30c863a748692cf106388659abe1bb0bae35d019b0e075a266bcfae817806",
+      "kind": "report"
+    },
+    {
+      "path": "research/literature/README.md",
+      "sha256": "c0fab1cd7c4b674c3e60f36cea78f4db1c1e698699a3b6df8c2f56e6f08f6a7f",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/literature_reference.schema.json",
+      "sha256": "41e7f864b42aa918423e167ddd1f2b0fec14b273e8cfaf688571428c2c87e2a3",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_literature_index.py",
+      "sha256": "205326699d0c9e0c3b64e5bac1e4396ea137327e5659c8c291a7388973e78261",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Anh xa ID cuc bo dua tren gia thiet: nguon thu N trong bao cao cua mot chu de = ID toan cuc thu N cua chu de do. Da kiem 12/12 chu de anh xa kin, 0 token khong anh xa duoc, va doi chieu ngu canh mau (ISO 16204 dan fib Bulletin 34 - dung).",
+    "Nguon bi tuong bot chan van duoc giu neu DOI phan giai dung tieu de hoac file that tai ve doc duoc; gioi han ghi trong unverified_fields tung ban ghi."
+  ],
+  "unresolved_risks": [
+    "Review r001 la doc lap ve NGU CANH, khong phai ve nha cung cap - cung la Claude. review_provider khai trong task la codex; chua co vong review cross-provider.",
+    "Bo sinh note Obsidian (tmp/export_literature.py) van nam ngoai git; phan vault chua tai dung duoc tu Git. Can task rieng.",
+    "Da sua tests/test_shape_grammar_experimental.py (thuoc write_scope BRD-028, duoc BRD-004 neo hash); da xu ly qua COR-BRD-004-001 + CRV-BRD-004-001 APPROVE."
+  ],
+  "next_action": "Re-review r002"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-022",
+  "handoff_sha256": "339d114b23a7b708fc25f362c2819d828b7bc80885f4ae515d8b96c93cfbb7cc",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "All five SHA256 hashes match. Requested path matrix plus extra variants: every load_grammar, gene_order, and gene_domains probe was blocked by GrammarIdError or FileNotFoundError; no bypass. Targeted pytest has 1 failure; full pytest has 2 failures: sandbox top-level inventory and BRD-025 design-basis 38.3 versus 40.0. Exact HEAD catalogs.py baseline makes test_catalogs collection fail because GrammarIdError is absent. test_shape_grammar_experimental.py weakens ==111 to >=111, violating safety_notes."
+    }
+  ],
+  "notes": "Cross-provider review (work by Claude, review by Codex). Core isolation is enforced; REVISE because test_shape_grammar_experimental.py weakened an unrelated exact assertion (==111 to >=111). Two remaining suite failures are attributed to BRD-025. family enum is only validated when explicit jsonschema validation is called, not by load_grammar. IDEA claim is appropriate. Scope widening and COR-BRD-004-002/003/004 provenance handling appears documented."
+}

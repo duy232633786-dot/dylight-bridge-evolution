@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-030-003",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-003",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Fail-closed o hai cho: bang phan quyet nay gom TAP phan quyet, xung dot thi coi nhu chua co phan quyet va bao loi; va vong lap them vao approved_corrections cung kiem dieu kien do, vi neu thieu thi review APPROVE gia van tu dua correction vao tap da duyet.",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9.blob",
+    "sha256": "653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9",
+    "current_sha256": "73e56145e626de653a2017f753d32c4ff5736a52aef81a4bc2ec4c37b35535de"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": "d92c3496240663f48bf808170902e1edffe999d8170fb14c55c15f5b65bfb8fb"
+}

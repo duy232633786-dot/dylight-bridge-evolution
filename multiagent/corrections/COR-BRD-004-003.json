@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-004-003",
+  "task_id": "BRD-004",
+  "incident_id": "INC-BRD-004-003",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Dong bo phat bieu cach ly sandbox voi co che thuc thi moi. load_grammar() nay tu choi moi grammar_id chua dau phan cach, '..' hoac duong dan tuyet doi bang GrammarIdError rieng; tep phai nam truc tiep trong thu muc grammar production. Cach ly sandbox chuyen tu tinh chat tinh co (KeyError o BudgetedEvaluator) thanh bat bien duoc thuc thi.",
+  "original_handoff_path": "multiagent/handoffs/BRD-004.claude.r001.json",
+  "original_handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/0d45068b15f33710dcc1e6d18e962aedc37f13f5021bf3dfc8b721d1d82bbf83.blob",
+    "sha256": "0d45068b15f33710dcc1e6d18e962aedc37f13f5021bf3dfc8b721d1d82bbf83"
+  },
+  "corrected_artifact": {
+    "path": "experiments/shape_discovery/arch_render_study.md",
+    "previous_sha256": "0d45068b15f33710dcc1e6d18e962aedc37f13f5021bf3dfc8b721d1d82bbf83",
+    "current_sha256": "2b13b0f1e4c19d1d974d150319521134956ad5271f54259bda11105ec86c2139"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_catalogs.py",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Nguoi dung da uy quyen mo rong write_scope cua BRD-022 sang ba file nay vi acceptance criteria cua chinh task doi hoi."
+  ],
+  "unresolved_risks": [
+    "Test test_experimental_grammar_lives_only_in_sandbox van do, nhung do la loi tien ton tai cua BRD-025 (3 grammar chua commit), khong phai do thay doi nay."
+  ],
+  "supersedes_correction_sha256": null
+}

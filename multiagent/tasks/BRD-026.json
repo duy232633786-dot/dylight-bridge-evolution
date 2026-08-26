@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "title": "Engine tuổi thọ-khấu hao: carbonat hóa, xâm thực clorua, mỏi, kế hoạch bảo trì",
+  "research_question": "Với mô hình khấu hao vật liệu chuẩn (carbonat fib/MC-SLD, clorua Fick-2 có hệ số tuổi D(t), mỏi S-N + Miner), cần đầu vào nào tối thiểu từ design state để ước lượng tuổi thọ khai thác và chu kỳ kiểm tra-bảo trì có thể bảo vệ (defensible), và đầu ra đó gắn vào pipeline như advisory (không PASS/FAIL) thế nào?",
+  "workstream": "durability",
+  "priority": "P0",
+  "status": "REVIEW",
+  "owner": "opencode",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0",
+    "G6"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/durability/",
+    "tests/test_durability.py"
+  ],
+  "acceptance_criteria": [
+    "carbonation: t_initiate = (cover/k)^2 với k theo fck, RH; test chéo với ví dụ số liệu công khai (ví dụ cover 25mm, C30, RH 70% cho t trong khoảng tài liệu)",
+    "chloride: C(x,t) = Cs(1-erf(x/(2√(D_app·t)))), D_app giảm theo tuổi (m=0.2-0.4); test tính chất đơn điệu (tăng cover → tăng t_init)",
+    "fatigue: log N = log A - m log(Δσ), Miner Σn/N; test Miner=1 tại đúng số chu kỳ",
+    "service_life: tổng hợp initiation + propagation, trả remaining_life(t_inspect); test tuổi thọ giảm khi cover giảm",
+    "maintenance_plan: chu kỳ kiểm tra đề xuất từ tốc độ khấu hao, đầu ra là ADVISORY kèm nhãn rõ 'không phải phê duyệt kỹ thuật'",
+    "Mọi hằng số mô hình có tham chiếu nguồn (fib Bulletin 34, DuraCrete, EN 1993-1-9) trong docstring"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/durability/service_life.py",
+    "tests/test_durability.py"
+  ],
+  "safety_notes": [
+    "Đầu ra tuổi thọ là SCREENED/ADVISORY — không được dùng thay kiểm định thực tế hay nâng claim ceiling",
+    "Không gán PASS/FAIL theo tuổi thọ; chỉ báo cáo và cảnh báo sớm",
+    "Chưa có dữ liệu môi trường thật: mọi exposure class phải do người dùng cung cấp, mặc định là NOT_APPLICABLE có lý do"
+  ],
+  "review_notes": [
+    "REVISE: 11/11 durability tests pass and the source docstrings appropriately cite fib Bulletin 34, DuraCrete, EN 1993-1-9/MC-SLD/Papadakis. However required G6 is not complete: the handoff explicitly lacks real exposure data (Cs, RH, chloride), so the default coefficients remain screening/advisory. Do not approve until G6 evidence is supplied; outputs must remain SCREENED/advisory."
+  ]
+}

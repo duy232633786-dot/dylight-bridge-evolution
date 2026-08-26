@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-f5b697be-04",
+  "title": "Tái lập độc lập và audit sai lệch",
+  "research_question": "Một agent/phương pháp độc lập có tái lập được kết quả và phát hiện confound nào?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-f5b697be-03"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2",
+    "G3",
+    "G4"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "research/orchestration/RND-20260824-f5b697be/04_independent_reproduction.md"
+  ],
+  "acceptance_criteria": [
+    "Tái tính blind từ input canonical và so tolerance đăng ký trước",
+    "Không lấy trung bình các sai lệch chưa reconcile",
+    "Kiểm solver budget, duplicate/cache, mục tiêu suy biến và provenance"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260824-f5b697be/04_independent_reproduction.md"
+  ],
+  "safety_notes": [
+    "Thiếu solver/phương pháp độc lập phải ghi BLOCKED, không fake verification"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260824-f5b697be",
+  "preferred_provider": "opencode",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

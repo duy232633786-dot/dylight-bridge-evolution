@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-032",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Sua not cho sot cua BRD-030. Gia dinh 'mat xich truoc da duoc chap nhan' nam o BA cho chu khong phai hai: BRD-030 sua record_provenance_correction va correction_chain_is_approved, nhung vong kiem correction_link_valid van doi previous.current_sha256 == current.previous_sha256. Hau qua do duoc: COR-BRD-002-002 bao 'correction chain bi dut old/new hash' du no hoan toan hop le. SUA: them bang correction_decision tien tinh TRUOC vong lap corrections - bat buoc phai tien tinh vi vong kiem review chay SAU vong kiem correction, tra nguoc approved_corrections se phu thuoc thu tu lap - roi dung dung mot quy tac thong nhat: mat xich truoc APPROVE thi noi vao current_sha256, mat xich truoc VO HIEU thi noi vao previous_sha256. KET QUA DO DUOC: loi 'chain bi dut' bien mat khoi lab validate; 8/8 test trong tests/test_correction_chain.py xanh, gom 5 test hang ro cu (chua ai xem van chan, snapshot sai bytes van bi tu choi, khong duoc tu review, review bat bien, dau chuoi van phai duoc duyet) va 1 test moi cho dung ca nay. Da grep lai toan file: chi con mot cho dung current_sha256 va do la phep so voi observed_sha256, khong lien quan chuoi supersede.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/lab.py",
+      "sha256": "653cea78f6f92fc09ffaac2c1edf2b981379622e25e052048776a9c97af63fe9",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_correction_chain.py",
+      "sha256": "d94439b724442cd5ad755ab1e7bec988928e69cb17f5e8f86e87dd8e572cd963",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Bang correction_decision lay tu valid_correction_reviews, tuc chi tinh review da qua kiem schema va linkage."
+  ],
+  "unresolved_risks": [
+    "Lan thu hai sua bo may chong sua lich su trong mot phien. Ban truoc da bi codex thu 7 huong tan cong khong pha duoc; ban nay can muc soi tuong duong, dac biet cau hoi: bang phan quyet tien tinh co the bi dau doc bang mot review khong hop le khong.",
+    "Chinh viec BRD-030 sot mot cho cho thay grep truoc khi tuyen bo da sua xong la bat buoc, khong phai tuy chon."
+  ],
+  "next_action": "Cross-provider review by codex"
+}

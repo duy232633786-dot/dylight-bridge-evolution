@@ -165,7 +165,12 @@
     },
     "multiple_presence_factors": {
       "status": "KNOWN",
-      "value": { "1": 1.2, "2": 1.0, "3": 0.85, "4": 0.65 },
+      "value": {
+        "1": 1.2,
+        "2": 1.0,
+        "3": 0.85,
+        "4": 0.65
+      },
       "source_ref": "catalogs/catalogs.json",
       "note": "load_profiles.LOAD-PROFILE-01.multiple_presence, khóa theo số làn chất tải."
     },
@@ -234,11 +239,19 @@
       "value": [
         {
           "name": "STRENGTH_I",
-          "factors": { "DC": 1.25, "DW": 1.5, "LL": 1.75 }
+          "factors": {
+            "DC": 1.25,
+            "DW": 1.5,
+            "LL": 1.75
+          }
         },
         {
           "name": "SERVICE_III",
-          "factors": { "DC": 1.0, "DW": 1.0, "LL": 0.8 }
+          "factors": {
+            "DC": 1.0,
+            "DW": 1.0,
+            "LL": 0.8
+          }
         }
       ],
       "source_ref": [
@@ -274,7 +287,15 @@
   "materials_policy": {
     "allowed_concrete_grades": {
       "status": "KNOWN",
-      "value": ["C30", "C35", "C40", "C45", "C50", "C55", "C60"],
+      "value": [
+        "C30",
+        "C35",
+        "C40",
+        "C45",
+        "C50",
+        "C55",
+        "C60"
+      ],
       "source_ref": [
         "bridge_grammar/super_t_simple_v1.json",
         "bridge_grammar/super_t_parametric_v2.json",
@@ -284,7 +305,9 @@
     },
     "allowed_prestress_types": {
       "status": "KNOWN",
-      "value": ["PS-15.2-1860"],
+      "value": [
+        "PS-15.2-1860"
+      ],
       "source_ref": [
         "bridge_grammar/super_t_simple_v1.json",
         "bridge_grammar/super_t_parametric_v2.json",
@@ -347,7 +370,10 @@
   "runtime_binding": {
     "catalogs_version": "1.1.0",
     "catalogs_ref": "catalogs/catalogs.json",
-    "fidelity_available": ["L0", "L1_LINE_GIRDER"],
+    "fidelity_available": [
+      "L0",
+      "L1_LINE_GIRDER"
+    ],
     "fidelity_note": "Runtime hiện chỉ có L0 (hình học/cấu tạo) và L1 (dầm đơn + hệ số phân bố ngang). L2/L3 (Midas Civil, OpenSees grillage) CHƯA được hiệu chuẩn, nên trần claim là SCREENED. Xem docs/runtime_capability_matrix.md và multiagent/PHYSICS_GATES.md.",
     "grammar_bindings": [
       {
@@ -371,6 +397,45 @@
         "fidelity": "L1_LINE_GIRDER",
         "solver": "BUILTIN_L1",
         "role": "SHAPE_EVOLUTION_ARM"
+      },
+      {
+        "grammar_id": "i_girder_parametric_v1",
+        "grammar_version": "1.0.0",
+        "grammar_ref": "bridge_grammar/i_girder_parametric_v1.json",
+        "load_profile_id": "LOAD-PROFILE-01",
+        "rule_profile_id": "BRIDGE-RULESET-V2",
+        "prestressing_steel_id": "PS-15.2-1860",
+        "fidelity": "L1_LINE_GIRDER",
+        "solver": "BUILTIN_L1",
+        "role": "SECTION_FAMILY_ARM",
+        "claim_ceiling": "SCREENED",
+        "claim_note_vi": "Cùng vật lý BTCT-DUL với Super-T; S ∈ [1.8, 2.9] m và Nb ∈ {4,5,6} nên hệ số phân bố ngang type-k còn NẰM TRONG miền áp dụng của nó."
+      },
+      {
+        "grammar_id": "box_girder_parametric_v1",
+        "grammar_version": "1.0.0",
+        "grammar_ref": "bridge_grammar/box_girder_parametric_v1.json",
+        "load_profile_id": "LOAD-PROFILE-01",
+        "rule_profile_id": "BRIDGE-RULESET-V2",
+        "prestressing_steel_id": "PS-15.2-1860",
+        "fidelity": "L1_LINE_GIRDER",
+        "solver": "BUILTIN_L1",
+        "role": "SECTION_FAMILY_ARM",
+        "claim_ceiling": "IDEA",
+        "claim_note_vi": "Hệ số phân bố ngang type-k nằm NGOÀI miền áp dụng (S = 12000 mm so với 1100–4900 mm; Nb = 1 so với ≥ 4); mô hình cắt giả định cốt đai 4 nhánh D10@125 của Super-T không áp dụng cho bề rộng sườn 2·tw; xoắn của hộp kín chịu tải lệch tâm không được mô hình. Mọi con số L1 cho họ này nằm ngoài phạm vi hiệu lực của chính nó."
+      },
+      {
+        "grammar_id": "composite_i_girder_parametric_v1",
+        "grammar_version": "1.0.0",
+        "grammar_ref": "bridge_grammar/composite_i_girder_parametric_v1.json",
+        "load_profile_id": "LOAD-PROFILE-01",
+        "rule_profile_id": "BRIDGE-RULESET-V2",
+        "prestressing_steel_id": "PS-15.2-1860",
+        "fidelity": "L1_LINE_GIRDER",
+        "solver": "BUILTIN_L1",
+        "role": "SECTION_FAMILY_ARM",
+        "claim_ceiling": "IDEA",
+        "claim_note_vi": "composite_solver_gate() chặn HARD trước solver (SOLVER-COMPOSITE-001); chỉ có L0 hình học và kiểm chế tạo."
       }
     ]
   },

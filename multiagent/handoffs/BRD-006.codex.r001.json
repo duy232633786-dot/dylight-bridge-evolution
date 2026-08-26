@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-006",
+  "agent_id": "codex",
+  "role": "aesthetics_context",
+  "summary": "Defined context-locked, multi-viewpoint human evaluation of rhythm, proportion, silhouette and view corridors with separate aesthetic-preference and perceived-safety dimensions. Automated contour features remain screening hypotheses; constructability and safety remain independent hard gates.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0",
+    "G1"
+  ],
+  "artifacts": [
+    {
+      "path": "research/aesthetics/review_protocol.json",
+      "sha256": "fe2e3b2125afbc1f93deb8263aa3b98b870dda2a62e8b3f101188d233a5a5755",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/aesthetic_review.schema.json",
+      "sha256": "882a204ad91d75b26f45c18d8cf3f76095a7740300598697790f00e263215858",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_aesthetic_review.py",
+      "sha256": "509ffd7f9210a2bb8fd89cc9d5490b34b529eb8b2a750b274181ac2729365774",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "All rendered viewpoints use the same SI design basis, calibrated camera, lighting recipe and agreed site context; pilot rater records are illustrative until a preregistered panel supplies complete raw scores."
+  ],
+  "unresolved_risks": [
+    "No authoritative structural, code, constructability or safety evidence is produced. The protocol does not yet wire a qualitative objective into NSGA-II, and small illustrative scores cannot support population inference."
+  ],
+  "next_action": "Independent review"
+}

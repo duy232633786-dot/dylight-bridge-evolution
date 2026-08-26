@@ -1,0 +1,433 @@
+# Nghiên cứu ảnh render cầu vòm khẩu độ lớn — BRD-004
+
+Task: BRD-004 — "Grammar hình cầu mới có load path và khả năng chế tạo".
+Artifact liên quan: `bridge_grammar/experimental/arch_deck_v1.json`,
+`bridge_evolution/geometry_experimental/arch_geometry.py`,
+`tests/test_shape_grammar_experimental.py`.
+
+---
+
+## 0. CẢNH BÁO MỨC CLAIM — ĐỌC TRƯỚC MỌI THỨ KHÁC
+
+**Toàn bộ tài liệu này ở mức F0 IDEA** theo thang fidelity của
+`multiagent/PHYSICS_GATES.md`. Cụ thể:
+
+- Đầu vào là một **ảnh render do AI sinh**. Theo PHYSICS_GATES, ảnh render chỉ
+  sinh **giả thuyết** — không có kích thước, không có tải trọng, không có địa
+  chất nào đọc được từ ảnh.
+- **Runtime DYLIGHT hiện tại KHÔNG đánh giá được vòm.** Theo
+  `docs/runtime_capability_matrix.json` (RCM-2.0.0, claim_ceiling = SCREENED),
+  hệ chỉ có L0 + L1 line-girder cho hệ n dầm Super-T song song nhịp giản đơn;
+  SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D và
+  STAGED_PRESTRESS_EFFECTS đều ABSENT. Bất kỳ con số hiệu năng nào hệ sinh ra
+  cho họ vòm sẽ nằm ngoài phạm vi hiệu lực của chính nó, dù trông hợp lệ.
+- Không dòng nào dưới đây được tính bởi solver; toàn bộ là cân bằng tĩnh học
+  làm tay cộng thư viện 111 nguồn đã xác minh URL
+  (`research/literature/index.json`, BRD-020).
+- Vì thế tài liệu này **KHÔNG** phát biểu bất kỳ phương án nào là "khả thi",
+  và **KHÔNG** phát biểu bất kỳ phương án nào là "thi công được" — cả hai đều
+  là claim vượt mức F0 IDEA.
+- Mọi con số xuất hiện đều hoặc TRÍCH từ nguồn có reference_id, hoặc SUY RA
+  bằng phép tính trình bày từng bước (mục 3.0), hoặc để **TBD**. Không có con
+  số nào do người viết tự gán cho cây cầu trong ảnh.
+
+---
+
+## 1. Bảng "mỗi bộ phận chịu kéo hay nén"
+
+Nhãn cho trạng thái **KHAI THÁC đã hợp long** (ảnh có xe tải đang chạy).
+Chỗ nào dấu nội lực đảo trong thi công đều được ghi chú — xem thêm mục 4.
+
+| # | Bộ phận | Trạng thái làm việc | Ghi chú then chốt |
+|---|---------|--------------------|--------------------|
+| 1 | Sườn vòm (vành vòm bê tông) | **NÉN** (kèm uốn thứ cấp) | Thực chất là cột–dầm nén–uốn; trạng thái giới hạn thật là ỔN ĐỊNH trong/ngoài mặt phẳng. CẢNH BÁO DẤU: trong đúc/lắp hẫng mỗi nửa vòm là CONSOL — thớ trên KÉO, làm việc bằng UỐN (LIT-054, LIT-055). |
+| 2 | Cột đứng khoang vòm | **NÉN** | Càng gần chân vòm cột càng ngắn, độ cứng ngang ~1/h³ nên cột ngắn HÚT lực bất thường; vùng đó nên là tường khoang vòm đặc. |
+| 3 | Thanh chéo chữ X trong khoang vòm | **HỖN HỢP** (đảo dấu) | Chéo gánh LỰC CẮT khoang; dấu đảo khi hoạt tải di chuyển — vì thế mới cần HAI chéo. Mọi chéo phải kiểm cả hai dấu; nhánh nén kiểm oằn; nút hàn chịu MỎI (không có nguồn mỏi thép trong thư viện — TBD). |
+| 4 | Mặt cầu — ứng xử cục bộ giữa hai điểm đỡ | **UỐN** | Bộ phận duy nhất giống bài toán runtime biết làm, nhưng nhịp khoang ngắn hơn hẳn nhịp Super-T nên ngưỡng FAB/GEOM không chuyển thẳng sang được. |
+| 5 | Mặt cầu — lực dọc TỔNG THỂ | **KHÔNG XÁC ĐỊNH** | Ba khả năng loại trừ nhau: (a) tách bằng khe → lực dọc ≈ 0; (b) liên tục giằng vào vòm → NÉN (thanh biên giàn sâu); (c) tied arch → KÉO, nhưng (c) bị chính ảnh loại vì lực xô đã vào đá. Đây là quyết định thiết kế lớn nhất chưa lộ ra (INC-005). |
+| 6 | Tháp / chân nghiêng bê tông bên trái | **HỖN HỢP** | Chỉ hợp lý khi làm việc chủ yếu bằng NÉN; cáp một phía không backstay thì tháp thành cột–dầm mô men lớn ở chân, móng gánh mô men lật (LIT-069 cảnh báo về quy nhóm cọc về một hằng số độ cứng ngang; LIT-066 nếu cần móng sâu). |
+| 7 | Bó cáp xiên | **KÉO** | Cáp chỉ truyền được kéo — chắc chắn tuyệt đối. VAI TRÒ thì KHÔNG xác định được (mục 2, mâu thuẫn #1). Bộ phận DUY NHẤT chịu kéo thuần trong toàn ảnh — chỗ duy nhất đặt CFRP đúng chỗ, kèm ba cảnh báo LIT-042 / LIT-044 / LIT-045. |
+| 8 | Bệ chân vòm bên trái | **NÉN** | Nén + thành phần NGANG vào đá bằng ma sát cộng chốt/neo. Kiểm khống chế: nón ma sát và TRƯỢT NÊM ĐÁ — bài toán cơ học đá, không phải bearing capacity (gói dữ liệu theo LIT-068). |
+| 9 | Bệ chân vòm bên phải | **NÉN** | Cùng cơ chế. Bệ đơn giản hơn bên trái KHÔNG phải bằng chứng lỗi — xem mâu thuẫn #2. |
+| 10 | Khối đá hai chân vòm (mố thiên nhiên) | **NÉN** (+ cắt) | Nơi đường lực KẾT THÚC; bộ phận chịu lực quan trọng nhất toàn ảnh dù không ai vẽ. Khả năng hoàn toàn TBD vì chưa có khảo sát. |
+| 11 | Liên kết chân vòm (khớp hay ngàm) | **KHÔNG XÁC ĐỊNH** | Ẩn số bậc nhất: 2 khớp / 3 khớp / ngàm cho ba biểu đồ mô men và ba mức nhạy chuyển vị–nhiệt khác hẳn nhau. Phải chốt TRƯỚC mọi tính toán khác. |
+| 12 | Cầu dẫn bên phải — dầm | **UỐN** | Bộ phận DUY NHẤT runtime hiện chạm tới được, và chỉ khi đúng là hệ n dầm song song nhịp giản đơn. Còn thiếu ổn định ngang khi cẩu/vận chuyển/lao lắp chưa đổ bản (LIT-049, LIT-050). |
+| 13 | Cầu dẫn bên phải — trụ | **NÉN** (+ uốn) | Nếu mặt cầu liên tục qua vòm không khe phân cách, trụ chịu CHUYỂN VỊ CƯỠNG BỨC theo vòm — bài toán khác hẳn, runtime không có ô nào chứa nó (INC-005). |
+
+**Trả lời trực tiếp câu hỏi kéo/nén:** cây cầu trong ảnh là một kết cấu **ĐẨY**.
+Đường lực: mặt cầu (uốn cục bộ) → cột/giàn khoang vòm → vành vòm (nén) → bệ chân
+vòm (nén + ngang) → **khối đá** (nén + cắt). Đường lực chỉ khép kín được ở khối
+đá. Hệ quả vật liệu: chỗ duy nhất đặt được vật liệu chỉ giỏi kéo (carbon/FRP) là
+bó cáp; đặt vào vành vòm, cột, bệ, tháp hay lưới chéo chữ X đều sai chỗ theo
+đúng nghĩa cơ học (chéo đảo dấu nên phải chịu được cả nén và oằn).
+
+---
+
+## 2. Ba mâu thuẫn — kết quả kiểm lại
+
+### Mâu thuẫn #1 — "Bó cáp xiên neo vào chân vòm" → **XÁC NHẬN như đang vẽ, nhưng có cách đọc làm nó hợp lý**
+
+- **Vì sao có thật:** cáp văng tồn tại để TREO cấu kiện chịu uốn. Chân vòm đã bị
+  đá chặn cứng nên gần như không chuyển vị → cáp gần như không biến dạng → lực
+  cáp không tăng theo hoạt tải → trong sơ đồ khai thác, cáp không gánh gì.
+- **Cách đọc B (mạnh nhất về kỹ thuật): CÁP TREO TẠM CỦA THI CÔNG HẪNG.**
+  LIT-054 nêu đích danh hệ quan trắc–điều khiển "buckle-anchor" (hệ neo–khoá
+  cáp treo tạm) và thiết kế DƯL tạm cho đúc hẫng vòm hộp bê tông khẩu độ lớn
+  vùng núi (cầu Shatuo, Quý Châu); LIT-055 mô tả họ vòm CFST với khung xương
+  ống thép lắp trước, bơm bê tông sau. Hình học "tháp cao + bó cáp chạy xuống
+  vùng chân vòm" chính là diện mạo của hệ treo tạm khi lắp hẫng nửa vòm.
+  *Phạm vi:* việc ánh xạ hình học này lên ảnh là DIỄN GIẢI; nguồn chỉ xác nhận
+  sự tồn tại và vai trò chi phối của hệ, không mô tả vị trí tháp hay điểm neo
+  (toàn văn LIT-054 không truy cập được — chỉ metadata + tóm tắt đã xác minh).
+- **Cách đọc C: néo ngược lực xô vào khối đá (strut-and-tie ngoài).** Chỉ hợp
+  lý khi tháp nằm PHÍA MỐ (ngoài nhịp) — khi đó cáp và tháp nằm NGOÀI hệ vòm và
+  thật sự chia được một phần H cho khối đá.
+  Nếu tháp nằm TRONG nhịp (chân tháp tựa lên vòm hoặc mặt cầu) thì vòng lực
+  cáp–tháp khép kín bên trong CÙNG một kết cấu: thành phần ngang kéo VÀO tại
+  điểm neo bị triệt tiêu bởi lực đẩy RA của chân tháp truyền qua vành vòm về
+  cùng chân đó. Ở bậc nhất, **lực xô truyền xuống ĐÁ không đổi**; cái tăng lên
+  là **lực nén và mô men trong đoạn vành vòm giữa chân tháp và chân vòm**, cộng
+  một tải tập trung lệch tâm tại chân tháp. Kết luận vẫn là có hại — nhưng hại
+  ở vành vòm, không phải ở khối đá.
+  *Mức chặt chẽ:* đây là lập luận cân bằng định tính; chưa vẽ đa giác lực, nên
+  phát biểu chỉ có hiệu lực ở bậc nhất và ở mức F0 IDEA.
+- **Phép thử quyết định:** tháp nằm phía nào của chân vòm, và đầu kia của bó
+  cáp neo vào đâu? Ảnh không trả lời được.
+- **Cách sửa (chọn MỘT):** (1) khai báo cáp là hệ TẠM — ảnh là trạng thái thi
+  công, bỏ xe tải; sau hợp long phải tháo/chùng có kiểm soát; (2) đổi điểm neo
+  từ chân vòm sang MẶT CẦU gần chân vòm — cáp mới thật sự gánh tải, thành hệ
+  lai vòm + dây văng, nhưng đẻ ra yêu cầu backstay cho tháp; (3) khai báo là hệ
+  neo đá: tháp phía mố, đầu kia là neo đá dự ứng lực CĂNG TRƯỚC, kiểm khối nêm
+  bao trùm cả bệ lẫn neo như một khối (gói dữ liệu theo LIT-068).
+
+### Mâu thuẫn #2 — "Hai chân vòm bất đối xứng" → **KHÔNG XÁC NHẬN theo phát biểu ban đầu; mối lo thật là BẤT ĐỐI XỨNG ĐỘ CỨNG**
+
+- ΣFx = 0 ràng buộc **LỰC** (H trái = H phải), tuyệt đối không ràng buộc
+  **HÌNH DÁNG** bộ phận truyền lực. Hai bờ khác nhau về chất lượng đá, hướng
+  khe nứt, thể tích đá huy động được — bệ mố bất đối xứng là bình thường,
+  nhiều khi bắt buộc. Vòm lệch (hai chân khác cao độ) thì cấu tạo khác nhau
+  mới là câu trả lời đúng.
+- **Phiên bản thật (XÁC NHẬN):** nếu bên trái lực xô đi qua cáp + tháp (hai
+  phần tử mềm mắc NỐI TIẾP) còn bên phải đi thẳng vào đá (cứng), thì dưới cùng
+  một H chân trái dịch ra nhiều hơn — vòm nhận chuyển vị cưỡng bức lệch, sinh
+  mô men mà trục vòm không được thiết kế để chịu. Đây là dạng hư hỏng kinh điển
+  của vòm. Mức nhạy phụ thuộc sơ đồ khớp/ngàm (ẩn số #11 ở bảng trên).
+- **Cảnh báo dùng nguồn:** LIT-070 đúng về chủ đề "chuyển vị móng sinh hiệu ứng
+  lực thứ cấp", nhưng Bảng 5-1 của nó (0,004 / 0,008 rad) hiệu chỉnh cho CẦU
+  DẦM và tuyệt đối KHÔNG áp cho vòm — với vòm, chuyển vị chân tấn công thẳng
+  vào cơ chế chịu lực chính. Ngược lại "Construction-Point Concept" của chính
+  LIT-070 áp cho vòm còn mạnh hơn. LIT-069: quy nhóm cọc về MỘT hằng số độ
+  cứng ngang là đơn giản hoá quá mức — với kết cấu sống bằng độ cứng chân, sai
+  số đó không còn là bậc hai.
+- **Cách sửa:** lực xô ở CẢ HAI chân đi vào đá bằng đường lực CỨNG và NGẮN;
+  không đặt cáp làm phần tử nối tiếp trong đường truyền lực xô chính; đặt tiêu
+  chí tường minh cho chênh lệch chuyển vị ngang hai chân, trị số suy từ mô men
+  trong vành vòm; cân bằng độ cứng bằng neo đá/chốt/mở rộng bệ chứ không bằng
+  thêm phần tử mềm; thu thập gói dữ liệu địa kỹ thuật theo LIT-068 TRƯỚC
+  (LIT-074 nhắc rằng Phần 10 Nền móng của TCVN 11823 chưa được runtime chạm tới).
+
+### Mâu thuẫn #3 — "Lưới giằng khoang vòm không nhất quán" → **XÁC NHẬN, nhưng lý do ban đầu chỉ đúng một nửa**
+
+- Chữ X **tự nó KHÔNG phải lỗi**: một khi khoang được giằng, hệ "vành vòm +
+  khoang + mặt cầu" làm việc như GIÀN SÂU, thanh chéo gánh lực cắt khoang, và
+  lực cắt đảo dấu dưới hoạt tải nửa nhịp — nên phải có hai chéo. "Cột khoang
+  vòm chủ yếu chịu nén" đúng cho CỘT nhưng không suy ra lưới giằng là thừa.
+- **Cái thật sự sai:** topo và mật độ đổi TUỲ TIỆN theo đoạn, trộn giàn phẳng
+  với giàn không gian. (a) Cơ học: tiết diện giằng phải bám bao lực cắt hoạt
+  tải nửa nhịp, biến thiên ĐƠN ĐIỆU từ đỉnh về chân; (b) Ổn định: chống oằn
+  NGOÀI mặt phẳng đòi hệ giằng ngang LIÊN TỤC suốt chiều dài vòm — quyết định
+  cấp hệ thống, làm một lần; (c) Chế tạo: LIT-055 cho thấy chế tạo–lắp dựng
+  ống thép là công nghệ then chốt làm như một thể thống nhất; topo ngẫu nhiên
+  nghĩa là nút nào cũng hàng đặt riêng.
+- **Chỗ mà lưới chéo dày đặc là THẬT:** bên trong vành vòm giàn CFST (khung
+  xương ống thép, LIT-055) — không phải trong khoang vòm.
+- **Cách sửa:** một mô đun khoang lặp lại duy nhất, kích thước chốt theo đốt
+  lắp/đúc hẫng và giới hạn vận chuyển–cẩu lắp; tiết diện giằng biến thiên đơn
+  điệu; một hệ giằng ngang liên tục; vùng gần chân thay cột ngắn bằng tường
+  khoang đặc; mỏi nút giằng ghi TBD tường minh (thư viện không có nguồn mỏi
+  thép); mọi chéo kiểm cả hai dấu, nhánh nén kiểm oằn.
+
+### Mâu thuẫn thứ tư (phát hiện thêm) — ảnh chồng HAI SƠ ĐỒ KHÔNG BAO GIỜ ĐỒNG THỜI TỒN TẠI
+
+Xe tải đang chạy = trạng thái KHAI THÁC; bó cáp treo còn nguyên = trạng thái
+THI CÔNG. Sau hợp long, hệ treo tạm phải được tháo hoặc chùng có kiểm soát —
+để lại thì cáp chỉ hút lực và gài mô men dư vào vành vòm. Điều này phơi bày bản
+chất bài toán: **một cây vòm khẩu độ lớn không phải một kết cấu — nó là một
+CHUỖI kết cấu**: dấu nội lực đảo giữa consol và vòm; tiết diện đổi giữa chừng
+(ống thép rỗng → ống nhồi bê tông, LIT-055); trạng thái khống chế nằm ở bước
+thi công trung gian (LIT-054). Hệ quả trực tiếp cho BRD-004: grammar phải mang
+trường **GIAI ĐOẠN** ngay từ định nghĩa — đã hiện thực hoá thành
+`construction_stage_id` (S0→S7) trong `arch_deck_v1.json`.
+
+### Hai ẩn số cấp hệ thống ghi lại thay vì bỏ qua
+
+- **INC-005 — khe/khớp giữa mặt cầu vòm và cầu dẫn:** liên tục thì trụ dẫn chịu
+  chuyển vị cưỡng bức và hút một phần lực xô; có khe thì chân vòm gánh H đầy đủ.
+  Phải chốt sơ đồ phân đoạn–gối–khe TRƯỚC mọi tính toán nội lực.
+- **INC-006 — số sườn vòm:** 2 sườn (cần giằng ngang liên tục giữa hai sườn) /
+  1 sườn (mặt cầu chịu xoắn khi hoạt tải lệch làn) / sườn hộp rộng. Quyết định
+  này thay đổi luôn lựa chọn giàn phẳng hay giàn không gian ở mâu thuẫn #3.
+
+---
+
+## 3. Hệ kết cấu thật giữ được ý đồ hình thái
+
+### 3.0. Phép tính nền (duy nhất có ra số, trình bày từng bước, chỉ dùng ký hiệu)
+
+Vòm parabol khẩu độ L, đường tên f, tải phân bố đều w trên toàn khẩu độ:
+
+1. Phản lực đứng mỗi chân: `V = w·L/2`
+2. Lực xô ngang: `H = w·L²/(8·f)`
+3. Tỉ số: `H/V = L/(4·f)`
+
+| L/f | 2 | 3 | 4 | 5 | 6 | 8 | 10 |
+|-----|---|---|---|---|---|---|----|
+| H/V | 0,50 | 0,75 | 1,00 | 1,25 | 1,50 | 2,00 | 2,50 |
+
+Suy ra không cần số liệu ngoài: **với mọi vòm thoải hơn L/f = 4, lực xô ngang
+LỚN HƠN phản lực đứng** → giữ chân vòm chỉ bằng ma sát mặt phẳng cần hệ số ma
+sát ≥ 1,0, không đạt được với bê tông trên đá → bệ chân vòm bắt buộc khoét/tỳ
+vào đá gốc theo mặt vuông góc hợp lực, hoặc neo dự ứng lực vào đá. *Phạm vi:*
+mô hình tải phân bố đều lý tưởng; vòm chạy trên thật nhận tải tập trung qua cột
+khoang, nên con số chỉ trả lời "lực xô có cùng bậc độ lớn với phản lực đứng
+không" (có, thậm chí lớn hơn), KHÔNG dùng để thiết kế. Ma sát và sức chịu ép
+mặt của đá: TBD theo khảo sát + LIT-074 + LIT-066.
+
+### 3.1. Phương án A — vòm chạy trên (deck arch) bê tông có khung xương ống thép, lực xô vào đá — **ĐƯỢC KHUYẾN NGHỊ**
+
+- **Họ kết cấu:** vòm chạy trên, khoang vòm hở (cột nén), vành vòm CFST hoặc
+  bê tông khung xương ống thép — đúng họ mà LIT-055 mô tả: thiết kế–chế tạo–
+  lắp dựng ống thép rồi bơm bê tông là công nghệ then chốt; tiết diện chịu lực
+  thay đổi trong quá trình thi công.
+- **Tiền lệ có reference_id:** LIT-055 (họ vòm CFST Trung Quốc, ví dụ được
+  nguồn nêu tên: cầu Hejiang Trường Giang số 1); LIT-054 (cầu Shatuo, Quý Châu
+  — đúc hẫng vòm hộp bê tông vùng núi với xe đúc + hệ neo–khoá cáp treo tạm +
+  DƯL tạm). Khẩu độ cụ thể của các cầu này nằm trong `unverified_fields` của
+  chính index.json nên KHÔNG con số nào được trích ở đây.
+- **Tiền lệ ngữ cảnh (KHÔNG có reference_id — không trích số):** Tian'e
+  Longtan, Pingnan Third, Beipan River, Mike O'Callaghan–Pat Tillman Memorial
+  (Hoover Dam Bypass). Các công trình này có thật và cùng họ, nhưng nguồn là
+  trang bách khoa mở, chưa qua quy trình cấp reference_id (BRD-020).
+- **Đường lực:** như bảng mục 1, khép kín ở khối đá. Nhánh ngang (gió/động
+  đất) qua hệ giằng liên tục giữa hai sườn — nhánh mà ảnh bỏ trắng.
+- **Nhược điểm thật:** sống chết bằng đá (cả cường độ lẫn ĐỘ CỨNG); trạng thái
+  khống chế nằm trong thi công (LIT-054); hình dạng thực lệch khỏi thiết kế và
+  phải hiệu chỉnh liên tục bằng quan trắc; nhạy lún lệch/dịch ngang chân; mất
+  một chân là mất cầu.
+
+### 3.2. Phương án B — vòm có thanh căng (tied/bowstring), lực xô TỰ cân bằng — **nhánh dự phòng bắt buộc**
+
+- Nếu khảo sát địa chất (FALS-01 trong grammar) bác bỏ khả năng đá nhận H, họ
+  "truyền xô vào đá" sụp và phương án B là lối thoát: thanh căng nằm NGANG ở
+  mức chân vòm nối hai chân, chịu KÉO thuần, khoá toàn bộ lực xô; mố chỉ còn
+  chịu lực đứng + lực hãm.
+- **Tiền lệ Việt Nam (ngữ cảnh, chưa có reference_id):** cầu Đông Trù (Hà Nội)
+  — vòm ống thép nhồi bê tông chạy dưới có cáp giằng chân vòm. Đây là tiền lệ
+  đáng theo đuổi nhất cho nhánh này vì có hồ sơ trong vault; phải xác minh hồ
+  sơ và cấp reference_id trước khi trích bất kỳ con số nào.
+- Hệ quả đảo dấu: mặt cầu/thanh căng chuyển từ nén (hoặc ~0) sang KÉO; toàn bộ
+  phân tích hai chân phải làm lại. Nếu thanh căng phơi lộ ở môi trường ven
+  biển thì LIT-081 (ăn mòn trong 10–30 năm khai thác ven biển Việt Nam) áp
+  dụng trực tiếp — một cấu kiện kéo nằm trong đường lực CHÍNH ở môi trường đó
+  là rủi ro độ bền lâu thật.
+
+### 3.3. Phương án C — hệ lai vòm + dây văng (cáp neo vào vành vòm/mặt cầu) — **KHÔNG khuyến nghị ở bước này**
+
+Giữ được nhiều nhất "diện mạo" của ảnh (tháp + cáp là vĩnh cửu), nhưng: cáp
+phải neo vào vành vòm hoặc mặt cầu chứ tuyệt đối không vào chân vòm; tháp phải
+có backstay; và hệ này cộng thêm toàn bộ nhược điểm của cầu dây văng (mềm, mỏi
+cáp, độ bền lâu cáp — LIT-081 nếu ven biển) vào một kết cấu vốn nhạy chuyển vị
+chân. Đường lực phức tạp hơn cả A lẫn B mà chưa có nhu cầu nào trong design
+basis đòi hỏi nó.
+
+### 3.4. Khuyến nghị
+
+**Phương án A** là family chính của grammar thực nghiệm
+(`arch_deck_cfst_skeleton_v1`), vì: (i) đúng họ kết cấu mà hai nguồn đã xác
+minh LIT-054/LIT-055 mô tả; (ii) giải đúng bài toán "hình dạng này chịu nén"
+bằng vật liệu chịu nén; (iii) chi tiết "tháp + cáp" của ảnh được giải thích
+trọn vẹn là hệ treo tạm thi công thay vì phải bịa vai trò vĩnh cửu cho nó.
+Phương án B giữ làm nhánh dự phòng gắn với falsifier FALS-01. Câu trả lời đúng
+cho vật liệu của cây cầu này không phải carbon mà là họ vòm bê tông–ống thép
+(LIT-055); carbon nếu dùng thì chỉ ở bộ phận kéo thuần, với ba cảnh báo
+LIT-042 (giới hạn ứng suất AASHTO CFRP-1 thấp hơn thép + dão đứt + mất mát do
+nhiệt ΔfpTH), LIT-044 (trên ~40% ứng suất tốc độ suy giảm tăng vọt — LƯU Ý PHẠM VI: LIT-044
+đo trên THANH GFRP chịu tải duy trì trong môi trường kiềm/nhiệt, KHÔNG phải cáp
+CFRP; dùng ở đây làm cảnh báo bảo thủ theo hướng, không phải số liệu áp được),
+LIT-045
+(mất 26–72% cường độ kéo trong khoảng 25–55 °C, không phục hồi sau cháy).
+
+---
+
+## 4. Trình tự thi công — chuỗi trạng thái S0→S7
+
+Trích từ `construction_stage_schema` của grammar. Mỗi giai đoạn là MỘT sơ đồ
+tĩnh học riêng, tiết diện riêng, tổ hợp tải riêng — đây là nội dung mà runtime
+một-trạng-thái hiện tại không biểu diễn được (STAGED_PRESTRESS_EFFECTS =
+ABSENT).
+
+| Giai đoạn | Sơ đồ | Tiết diện vành vòm | Hệ tạm |
+|-----------|-------|--------------------|--------|
+| S0_FOUNDATION | chưa có kết cấu nhịp | — | — |
+| S1_SPRINGING_BLOCK | bệ chân vòm trên đá | — | — |
+| S2_CANTILEVER_ERECTION | HAI CONSOL — thớ trên KÉO, làm việc bằng UỐN | ống thép rỗng (CFST) hoặc đốt bê tông | tháp khoá + cáp khoá (fore-stay) + cáp neo sau (back-stay) vào đá; xe đúc; DƯL tạm (LIT-054) |
+| S3_CLOSURE | CHUYỂN ĐỔI SƠ ĐỒ — consol thành vòm, dấu nội lực ĐẢO | như S2 | còn nguyên |
+| S4_CONCRETE_INFILL | vòm | ĐỔI TIẾT DIỆN: ống rỗng → ống nhồi bê tông (LIT-055) | còn nguyên |
+| S5_TEMPORARY_SYSTEM_REMOVAL | vòm trần | CFST / bê tông khung xương | tháo hoặc chùng CÓ KIỂM SOÁT |
+| S6_SPANDREL_AND_DECK | vòm + khoang + mặt cầu, tĩnh tải tăng dần | như S5 | cẩu lắp |
+| S7_SERVICE | khai thác — trạng thái mà bảng mục 1 mô tả | như S5 | — |
+
+Ba điểm không được im lặng bỏ qua:
+
+1. **Trạng thái khống chế nằm ở bước trung gian**, không ở sơ đồ hoàn thiện;
+   khi khẩu độ tăng, chính khiếm khuyết của hệ thiết bị TẠM gây ra vấn đề hiệu
+   quả–chi phí–an toàn (LIT-054). Hình dạng thực lệch khỏi thiết kế và phải
+   quan trắc–hiệu chỉnh liên tục.
+2. **Gió trong thi công:** theo tiêu chí đề xuất trong LIT-089 (chu kỳ cơ bản
+   > 1 s, hoặc cầu dây, coi là nhạy gió), trạng thái consol có cáp treo rơi
+   đúng vào nhóm mà LIT-089 ghi nhận là đã có cầu dao động quá mức do gió
+   TRONG THI CÔNG mà quy định hiện hành không nhận diện được. Lập luận bỏ qua
+   gió của dự án cho dầm Super-T 38,3 m KHÔNG chuyển sang được. Chưa biết tần
+   số cơ bản nên không kết luận nhạy gió hay không — chỉ kết luận rằng không
+   được miễn kiểm.
+3. **Cẩu lắp cấu kiện đúc sẵn:** LIT-049/LIT-050 chỉ ra ổn định NGANG khi cẩu,
+   vận chuyển và ở trạng thái đã lao lắp nhưng chưa đổ bản là các giai đoạn
+   runtime hoàn toàn không biết tới; LIT-053 chỉ ra mối nối phân đoạn là một
+   trạng thái giới hạn cắt riêng.
+
+---
+
+## 5. Những gì bức ảnh KHÔNG cho biết
+
+Tất cả các trường dưới đây là **UNKNOWN / TBD**; ảnh là render AI nên không
+trường nào đọc ra được, và KHÔNG trường nào được tự gán giá trị:
+
+1. **Khẩu độ, đường tên, tỷ số f/L** — mọi kích thước tiết diện vành vòm,
+   chiều dài khoang, kích thước cáp. Miền `span_m`/`rise_f_m` trong grammar là
+   HỘP TÌM KIẾM TẠM có nhãn `PLACEHOLDER_PENDING_DESIGN_BASIS`, không phải đề
+   xuất.
+2. **Sơ đồ khớp/ngàm chân vòm** (2 khớp / 3 khớp / ngàm) — ẩn số bậc nhất,
+   quyết định mức nhạy với chuyển vị chân và nhiệt.
+3. **Số sườn vòm và hệ dầm ngang** (INC-006).
+4. **Sơ đồ phân đoạn, gối, khe co giãn, điểm cố định** (INC-005).
+5. **Vị trí tháp so với chân vòm và điểm neo đầu kia của bó cáp** — phép thử
+   quyết định của mâu thuẫn #1.
+6. **Địa chất và cơ học đá:** cường độ, mức phong hoá, hướng và mức hở của hệ
+   khe nứt, thể tích đá huy động được. Đường lực kết thúc ở đá nên đây là ẩn
+   số có hậu quả lớn nhất; gói dữ liệu phải thu thập được LIT-068 (GEC 5)
+   định nghĩa.
+7. **Vùng động đất:** theo LIT-092 cần mã HUYỆN (agR chu kỳ lặp 500 năm, nền
+   loại A, Phụ lục H) và loại phổ (1 hay 2 theo tỉnh). LIT-088 tự giới hạn ở
+   "normal bridges" nhịp ≤ 500 ft nên điều khoản miễn phân tích kháng chấn cho
+   cầu một nhịp KHÔNG áp được cho kết cấu này.
+8. **Gió:** tốc độ gió cơ bản và tần số dao động cơ bản — chưa có.
+9. **Môi trường:** "vịnh hẹp" có phải môi trường biển không; nếu có thì
+   LIT-081 áp dụng cho mọi cấu kiện thép/cáp phơi lộ.
+10. **Tải trọng thiết kế và tổ hợp** — design basis chưa tồn tại cho site này.
+
+---
+
+## 6. Cần gì để đi tiếp — theo thang G0→G7 (multiagent/PHYSICS_GATES.md)
+
+| Gate | Cần gì cho họ vòm này | Trạng thái |
+|------|------------------------|------------|
+| **G0 — Design basis** | Chốt site, khẩu độ thật, cao độ hai chân, bề rộng mặt cầu, design life, codes; gói địa kỹ thuật theo LIT-068 (đặc biệt hướng khe nứt + nêm trượt hai vách); mã huyện + loại phổ theo LIT-092; tốc độ gió; exposure (LIT-081 nếu ven biển). Thiếu dữ liệu thì DỪNG — hiện toàn bộ `project_inputs` của grammar là null. | **CHƯA CÓ — đây là bước kế tiếp có giá trị nhất** |
+| **G1 — Geometry & reality** | Chốt 4 ẩn số hình thái: số sườn (INC-006), khớp/ngàm chân vòm, sơ đồ phân đoạn–gối–khe (INC-005), vai trò tháp+cáp (mâu thuẫn #1). Mô đun khoang lặp lại; kiểm chế tạo–vận chuyển–cẩu lắp cho đốt vòm (LIT-049, LIT-050, LIT-053). `arch_geometry.py` mới chỉ dựng trục/khoang/sườn cho trạng thái hoàn thiện; `arch_l0_constructability.py` thêm được sàng L0 thuần hình học cho chia đốt/cẩu/tiếp cận kiểm tra, nhưng CHƯA có `logistics_profile` thật nào được cấp — mọi check phụ thuộc ngưỡng hiện trả `UNKNOWN_INPUT_MISSING` (fail-closed), và PASS L0 cũng không nâng claim khỏi IDEA. | MỘT PHẦN (hình học sandbox) |
+| **G2 — Model quality** | Solver 3D thật (grillage/shell), equilibrium check, benchmark, version/hash. GRILLAGE_3D, SOLVER_OPENSEESPY, SOLVER_MIDAS_CIVIL đều ABSENT. | ABSENT |
+| **G3 — Limit states** | Ổn định trong/ngoài mặt phẳng vành vòm; CHUỖI trạng thái thi công (mỗi giai đoạn một sơ đồ + tiết diện + tổ hợp — thay đổi ở tầng kiến trúc contracts/verifier, không phải thêm rule); lực xô lên nền + trượt nêm đá + tiêu chí chênh chuyển vị hai chân (suy từ mô men vành vòm, KHÔNG lấy Bảng 5-1 LIT-070); gió (LIT-089); động đất (LIT-088, LIT-092); mỏi nút giằng — thư viện KHÔNG có nguồn mỏi thép, TBD tường minh. | ABSENT |
+| **G4 — Independent verification** | Blind re-calculation bằng analyst khác + solver/phương pháp khác; chênh lệch phải reconcile, không lấy trung bình. | ABSENT |
+| **G5 — Physical test** | Thí nghiệm có kế hoạch duyệt trước (coupon → component → scale model). Theo PROTOCOL, G5 luôn dừng chờ con người — agent không được tuyên bố thử nghiệm đã xảy ra khi không có raw data. | DỪNG CHỜ CON NGƯỜI |
+| **G6 — Material & exposure** | Provenance vật liệu; nếu dùng CFRP ở bộ phận kéo thuần thì toàn bộ hồ sơ LIT-042/LIT-044/LIT-045 (dão đứt, ngưỡng ~40% ứng suất, suy giảm 26–72% ở 25–55 °C và không phục hồi sau cháy); độ bền lâu cáp/neo phơi lộ (LIT-081). | DỪNG CHỜ CON NGƯỜI |
+| **G7 — Release** | QA/QC, constructability, LCCA/carbon, independent report, human sign-off. Theo PROTOCOL: `ENGINEERING_CANDIDATE` không phải IFC/build-ready; chỉ kỹ sư chịu trách nhiệm mới được phép cho dùng kỹ thuật. | DỪNG CHỜ CON NGƯỜI |
+
+**Thứ tự việc rẻ nhất → đắt nhất:** (i) bốn câu hỏi hình thái ở G1 — rẻ, khoá
+hầu hết mọi thứ còn lại; (ii) gói địa kỹ thuật G0 theo LIT-068 — vì đường lực
+kết thúc ở đá; (iii) chỉ sau đó mới bàn tiết diện, khẩu độ, đường tên.
+
+---
+
+## 7. Hồ sơ sandbox và ranh giới
+
+- `bridge_grammar/experimental/arch_deck_v1.json` — grammar thực nghiệm
+  `arch_deck_cfst_skeleton_v1`, status EXPERIMENTAL, claim_level IDEA, mang
+  trường giai đoạn S0→S7 ngay từ định nghĩa; mọi trường hiệu năng là null; mọi
+  miền biến là rời rạc, miền số chưa có căn cứ đều dán nhãn
+  `PLACEHOLDER_PENDING_DESIGN_BASIS` và khoá claim ở IDEA.
+- `bridge_evolution/geometry_experimental/arch_geometry.py` — CHỈ hình học
+  (trục parabol/dây xích, cột khoang, sườn); không tính nội lực; fail-closed
+  với tham số phi vật lý; từ chối dựng vòm lệch thay vì bịa hình.
+- Khối `lineage` trong output của `arch_geometry()` — `geometry_hash` =
+  sha256 trên canonical JSON (đúng quy ước `canonical_json` của
+  `bridge_evolution/state.py`) của THAM SỐ đã chuẩn hoá cộng cặp
+  generator id/version, KHÔNG hash trên đa tuyến toạ độ; kèm
+  `parent_geometry_hash` và `generation_action` (metadata phả hệ, không tham
+  gia hash); case id dạng `ARCH-<16 hex đầu>`. Hash là ĐỊNH DANH hình học mức
+  IDEA để tái lập và truy vết, không phải kết luận kỹ thuật.
+- `bridge_evolution/geometry_experimental/arch_l0_constructability.py` — sàng
+  L0 chế tạo/vận chuyển/cẩu lắp/tiếp cận kiểm tra cho đốt vòm
+  (ARCH-L0-01..07), CHỈ số học hình học: chia chiều dài cung, ước tính khối
+  lượng đốt bằng diện tích × chiều dài × khối lượng riêng, hiệu số cao độ và
+  khe ngang. KHÔNG ngưỡng nào hard-code — mọi ngưỡng đến từ
+  `logistics_profile` của kỹ sư kèm provenance từng ngưỡng; thiếu ngưỡng thì
+  check trả `UNKNOWN_INPUT_MISSING` và `all_known_pass` chỉ True khi không có
+  FAIL lẫn UNKNOWN (fail-closed — thiếu dữ liệu không bao giờ được hiểu là
+  đạt). CHƯA có `logistics_profile` nào được cấp; PASS ở L0 này không nâng
+  claim khỏi IDEA và không kiểm nội lực/ổn định/trình tự lắp.
+- `bridge_evolution/geometry_experimental/shape_diversity.py` — liệt kê giả
+  thuyết hình thái từ các miền `ENUMERATED_TOPOLOGY`/`SOURCE_*` của grammar
+  (miền placeholder bị từ chối) và chọn tập đại diện CHỈ theo đa dạng hình
+  thái: khoảng cách Gower + greedy max-min tất định, KHÔNG hàm mục tiêu,
+  không xếp hạng hiệu năng; ứng viên FAIL L0 bị loại trước, UNKNOWN/chưa sàng
+  được giữ nhưng gắn cờ tường minh.
+- `experiments/shape_discovery/pre_registration.json` — pre-registration khoá
+  TRƯỚC khi chạy: câu hỏi nghiên cứu, 4 giả thuyết hình thái H1–H4 (đều
+  NOT_TESTED, có falsifier), giao thức sàng ARCH-L0 (trạng thái
+  THRESHOLDS_NOT_YET_PROVIDED), quy tắc chọn đa dạng objective-free và các
+  điều kiện vô hiệu; claim_ceiling IDEA, không endpoint hiệu năng nào.
+- `tests/test_shape_grammar_experimental.py` — bốn hàng rào: chống bịa nguồn
+  (mọi mã nguồn dạng LIT trong grammar VÀ trong báo cáo này phải tồn tại trong
+  index.json), chống false precision, đặc tả ĐÚNG cơ chế cách ly sandbox, hình
+  học hợp lệ. LƯU Ý ĐÃ SỬA SAU PHẢN BIỆN: `load_grammar()` VẪN nạp được file
+  experimental qua đường `experimental/arch_deck_v1` (dấu `/` không bị chặn),
+  và `gene_order()`/`gene_domains()` cũng chạy được trên nó. Hàng rào thật là
+  enum `family` trong schema state; chỗ chặn còn lại chỉ là KeyError tình cờ.
+- Sandbox experimental KHÔNG được nhập thẳng vào production grammar — test
+  `test_experimental_geometry_module_is_not_imported_by_production` kiểm bằng
+  quét import. Render đẹp chỉ mang mức IDEA cho đến khi qua solver/verifier.
+
+## 8. Nguồn đã dùng
+
+Toàn bộ reference_id dưới đây tồn tại trong `research/literature/index.json`
+(evidence_policy của thư viện: UNVERIFIED reference library — sự tồn tại của
+tài liệu KHÔNG phải bằng chứng kỹ thuật):
+
+- **LIT-054** — thiết bị tạm cho đúc hẫng vòm hộp bê tông khẩu độ lớn vùng núi
+  (cầu Shatuo): hệ neo–khoá cáp treo tạm "buckle-anchor", DƯL tạm, quan trắc.
+  Toàn văn không truy cập được; chỉ metadata + tóm tắt đã xác minh.
+- **LIT-055** — họ vòm CFST Trung Quốc: khung xương ống thép lắp trước, bơm bê
+  tông sau; tiết diện chịu lực thay đổi theo giai đoạn.
+- **LIT-068** — GEC 5: gói dữ liệu khảo sát địa kỹ thuật tối thiểu.
+- **LIT-069** — nhóm cọc chịu tải ngang: một hằng số độ cứng là quá đơn giản.
+- **LIT-070** — chuyển vị móng trong LRFD: Construction-Point Concept; Bảng
+  5-1 KHÔNG áp cho vòm.
+- **LIT-074** — TCVN 11823-10 Nền móng: phần tiêu chuẩn dự án viện dẫn nhưng
+  runtime chưa hiện thực hoá.
+- **LIT-066** — GEC 10: cọc khoan nhồi LRFD, nếu cần móng sâu.
+- **LIT-088** — phạm vi seismic tự giới hạn ở normal bridges ≤ 500 ft.
+- **LIT-089** — tiêu chí nhạy gió; cầu dao động quá mức do gió trong thi công.
+- **LIT-092** — dữ liệu mở khoá kháng chấn TCVN 9386:2023: mã huyện, loại phổ.
+- **LIT-042** (CFRP, đúng phạm vi) / **LIT-044** (đo trên thanh GFRP — dùng
+  ngoài phạm vi đo, chỉ làm cảnh báo định hướng) / **LIT-045** (FRP nói chung)
+  — giới hạn ứng suất, dão đứt, suy giảm nhiệt.
+- **LIT-049 / LIT-050 / LIT-053** — ổn định ngang khi cẩu/vận chuyển/lao lắp;
+  mối nối phân đoạn là trạng thái giới hạn cắt riêng.
+- **LIT-081** — ăn mòn 10–30 năm ở ven biển Việt Nam (điều kiện: nếu "vịnh
+  hẹp" là môi trường biển).
+- **LIT-056** — TCVN 11823-9: bản mặt cầu.
+
+Nguồn NGOÀI thư viện, khai báo tường minh (KHÔNG có reference_id, chỉ ngữ
+cảnh, không trích số): NIS-01 — ICE Manual of Bridge Engineering, chương cầu
+vòm (PDF trong vault); NIS-02 — Balanced_Cantilever_Construction_Strategy.pdf
+(slide do AI sinh, đóng dấu NotebookLM — KHÔNG phải bằng chứng kỹ thuật; chỉ
+dùng một khái niệm: hợp long là lúc "chuyển đổi sơ đồ làm việc của toàn bộ
+công trình").

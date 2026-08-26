@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-022-001",
+  "task_id": "BRD-022",
+  "incident_id": "INC-BRD-022-001",
+  "correction_sha256": "d810be849355bee8dfa0525d950b1eb29808d369e874766222c6d35de2b9e9e5",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot and live SHA-256 match and exactly matches COR-BRD-004-005's shared test-file correction. The BRD-022 sandbox isolation assertions are unchanged.",
+    "Cross-provider independent review: snapshot authenticity and summary diff were checked."
+  ],
+  "notes": "This is a cross-provider review by Codex, independent of the Claude author. Full pytest result was 7 failures due to concurrent repository drift; no files were edited by this review."
+}

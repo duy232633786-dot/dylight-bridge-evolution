@@ -15,9 +15,30 @@ Toàn bộ module vẫn ở cấp L0 (rẻ, không mở solver): ``section_from_
 from .catalogs import load_catalogs, load_grammar, all_domains
 from .section import (PARAM_KEYS, SectionGeometryError, fabrication_violations,
                       section_from_params)
+from . import section_types as st
 
 #: Marker catalog báo "tiết diện được tham số hóa, đừng tra bảng".
 PARAMETRIC_SECTION_ID = "ST-PARAM"
+
+#: Registry marker → (builder tiết diện, khóa tham số, hàm FAB riêng).
+#: Super-T giữ đường cũ (section.py); các họ mới của BRD-025 vào đây.
+SECTION_BUILDERS = {
+    PARAMETRIC_SECTION_ID: (
+        section_from_params, PARAM_KEYS, fabrication_violations),
+    "I-PARAM": (
+        st.i_girder_section_from_params, st.I_GIRDER_PARAM_KEYS,
+        st.fabrication_violations_i_girder),
+    "BOX-PARAM": (
+        st.box_girder_section_from_params, st.BOX_GIRDER_PARAM_KEYS,
+        st.fabrication_violations_box_girder),
+    "CI-PARAM": (
+        st.composite_i_girder_section_from_params, st.COMPOSITE_I_PARAM_KEYS,
+        st.fabrication_violations_composite_i),
+}
+
+#: Marker hộp đơn ô: bản trên chính là deck — bỏ GEOM-001/002/003 (cánh hẫng,
+#: khe cánh, dày bản theo nhịp dầm) và thay bằng FAB riêng trong section_types.
+BOX_SECTION_ID = "BOX-PARAM"
 
 #: Ánh xạ tên khóa trong ``rule_profiles[...]["fab_limits"]`` (tên CATALOG) sang
 #: tên tham số của ``section.FAB_DEFAULTS``. Khóa lạ trong catalog bị bỏ qua để
@@ -36,20 +57,29 @@ _FAB_LIMIT_KEY_MAP = {
 }
 
 
+def _section_marker(state: dict) -> str | None:
+    """Marker tiết diện của state (rẻ, không dựng biên); None nếu không tham số hóa."""
+    dv = state["design_variables"]
+    marker = dv.get("girder_catalog_id")
+    return marker if marker in SECTION_BUILDERS else None
+
+
 def is_parametric_section(state: dict) -> bool:
     """State có dùng tiết diện tham số hóa hay không (rẻ, không dựng biên)."""
-    return state["design_variables"].get("girder_catalog_id") == PARAMETRIC_SECTION_ID
+    return _section_marker(state) is not None
 
 
 def section_params(state: dict) -> dict:
-    """6 tham số hình dạng lấy từ ``design_variables``.
+    """Tham số hình dạng lấy từ ``design_variables`` THEO ĐÚNG khóa của marker.
 
     Khóa thiếu KHÔNG được bịa giá trị mặc định: dict trả về chỉ chứa khóa thật sự
-    có trong state, để ``section_from_params`` báo đúng khóa nào thiếu bằng
+    có trong state, để builder báo đúng khóa nào thiếu bằng
     ``SectionGeometryError`` (fail-closed).
     """
+    marker = _section_marker(state)
+    keys = SECTION_BUILDERS[marker][1] if marker else PARAM_KEYS
     dv = state["design_variables"]
-    return {name: dv[name] for name in PARAM_KEYS if name in dv}
+    return {name: dv[name] for name in keys if name in dv}
 
 
 def _deck_layout(state: dict) -> dict:
@@ -74,13 +104,15 @@ def _deck_layout(state: dict) -> dict:
 
 
 def resolve_section(state: dict) -> tuple[dict, str]:
-    """(đặc trưng tiết diện, nguồn) — ``"PARAMETRIC"`` hoặc ``"CATALOG"``.
+    """(đặc trưng tiết diện, nguồn) — dispatch theo marker trong SECTION_BUILDERS.
 
     Raise ``SectionGeometryError`` khi tham số hình dạng phi vật lý và ``KeyError``
     khi id catalog không tồn tại (evaluate biến KeyError thành SCHEMA-002).
     """
-    if is_parametric_section(state):
-        return section_from_params(section_params(state)), "PARAMETRIC"
+    marker = _section_marker(state)
+    if marker is not None:
+        builder = SECTION_BUILDERS[marker][0]
+        return builder(section_params(state)), "PARAMETRIC"
     cat = load_catalogs()
     return cat["girder_sections"][state["design_variables"]["girder_catalog_id"]], "CATALOG"
 
@@ -103,6 +135,10 @@ def _fabrication_context(state: dict, geom: dict, cat: dict, rules: dict) -> dic
     """
     dv = state["design_variables"]
     context: dict = {"span_m": geom["span_m"]}
+
+    # Hộp: FAB-002 kiểm dày bản trên (biến deck_slab_thickness_mm).
+    if _section_marker(state) == BOX_SECTION_ID:
+        context["deck_slab_thickness_mm"] = dv["deck_slab_thickness_mm"]
 
     pt = cat["prestress_layouts"].get(dv["prestress_layout_id"])
     if isinstance(pt, dict) and "strand_count" in pt:
@@ -147,28 +183,35 @@ def check_geometry(state: dict) -> tuple[list[dict], dict]:
         geom["section_source"] = "PARAMETRIC_INVALID"
         fail("FAB-000", f"Tham số mặt cắt phi vật lý: {exc}", 1.0)
 
-    # GEOM-001: bố trí nằm gọn trong bề rộng cầu, cánh hẫng trong giới hạn
+    marker = _section_marker(state)
+    is_box = marker == BOX_SECTION_ID
+
+    # GEOM-001: bố trí nằm gọn trong bề rộng cầu, cánh hẫng trong giới hạn.
+    # Hộp đơn ô: bản trên chính là deck, không có khái niệm cánh hẫng dầm.
     oh, S = geom["overhang_m"], geom["spacing_m"]
-    oh_max = min(rules["overhang_max_m"], rules["overhang_max_spacing_ratio"] * S)
-    if oh < rules["overhang_min_m"]:
-        fail("GEOM-001", f"Cánh hẫng {oh:.3f} m < tối thiểu {rules['overhang_min_m']} m",
-             (rules["overhang_min_m"] - oh) / rules["overhang_min_m"])
-    elif oh > oh_max:
-        fail("GEOM-001", f"Cánh hẫng {oh:.3f} m > tối đa {oh_max:.3f} m", (oh - oh_max) / oh_max)
+    if not is_box:
+        oh_max = min(rules["overhang_max_m"], rules["overhang_max_spacing_ratio"] * S)
+        if oh < rules["overhang_min_m"]:
+            fail("GEOM-001", f"Cánh hẫng {oh:.3f} m < tối thiểu {rules['overhang_min_m']} m",
+                 (rules["overhang_min_m"] - oh) / rules["overhang_min_m"])
+        elif oh > oh_max:
+            fail("GEOM-001", f"Cánh hẫng {oh:.3f} m > tối đa {oh_max:.3f} m", (oh - oh_max) / oh_max)
 
-    # GEOM-002: khe hở cánh dầm liền kề (bỏ qua khi chưa có tiết diện)
-    gap = geom["flange_gap_m"]
-    if gap is not None and gap < rules["flange_gap_min_m"]:
-        fail("GEOM-002",
-             f"Khe hở cánh dầm {gap * 1000:.0f} mm < {rules['flange_gap_min_m'] * 1000:.0f} mm",
-             (rules["flange_gap_min_m"] - gap) / rules["flange_gap_min_m"])
+        # GEOM-002: khe hở cánh dầm liền kề (bỏ qua khi chưa có tiết diện)
+        gap = geom["flange_gap_m"]
+        if gap is not None and gap < rules["flange_gap_min_m"]:
+            fail("GEOM-002",
+                 f"Khe hở cánh dầm {gap * 1000:.0f} mm < {rules['flange_gap_min_m'] * 1000:.0f} mm",
+                 (rules["flange_gap_min_m"] - gap) / rules["flange_gap_min_m"])
 
-    # GEOM-003: chiều dày bản tối thiểu (theo nhịp bản = khoảng cách dầm)
-    ts_req = max(rules["slab_thickness_min_m"], (S * 1000 + 3000) / 30 / 1000)
-    if geom["slab_thickness_m"] < ts_req - 1e-9:
-        fail("GEOM-003",
-             f"Bản dày {geom['slab_thickness_m'] * 1000:.0f} mm < yêu cầu {ts_req * 1000:.0f} mm",
-             (ts_req - geom["slab_thickness_m"]) / ts_req)
+        # GEOM-003: chiều dày bản tối thiểu (theo nhịp bản = khoảng cách dầm).
+        # Hộp: dày bản trên do FAB-002 riêng kiểm (ngưỡng cấu tạo hộp, không
+        # phải công thức nhịp bản-dầm).
+        ts_req = max(rules["slab_thickness_min_m"], (S * 1000 + 3000) / 30 / 1000)
+        if geom["slab_thickness_m"] < ts_req - 1e-9:
+            fail("GEOM-003",
+                 f"Bản dày {geom['slab_thickness_m'] * 1000:.0f} mm < yêu cầu {ts_req * 1000:.0f} mm",
+                 (ts_req - geom["slab_thickness_m"]) / ts_req)
 
     # CONS-001: số hàng dầm ngang theo nhịp
     dia = cat["diaphragm_layouts"][state["design_variables"]["diaphragm_layout_id"]]
@@ -195,14 +238,20 @@ def check_geometry(state: dict) -> tuple[list[dict], dict]:
             if value not in domains[name]:
                 fail("CONS-002", f"{name}={value} nằm ngoài lưới grammar", 1.0)
 
-    # FAB-001…FAB-007: chế tạo / vận chuyển / cẩu lắp / bố trí cáp.
-    # Chỉ áp cho tiết diện tham số hóa — tiết diện định hình đã được nhà sản xuất
-    # bảo chứng nên grammar v1 không đổi hành vi.
-    if geom["section_source"] == "PARAMETRIC":
+    # FAB-001…FAB-007: chế tạo / vận chuyển / cẩu lắp / bố trí cáp — dispatch
+    # theo marker (mỗi họ một hàm FAB riêng trong SECTION_BUILDERS). Tiết diện
+    # định hình đã được nhà sản xuất bảo chứng nên không chạy FAB.
+    if marker is not None:
+        fab_fn = SECTION_BUILDERS[marker][2]
         try:
-            v.extend(fabrication_violations(
+            v.extend(fab_fn(
                 section_params(state), _fabrication_context(state, geom, cat, rules)))
         except SectionGeometryError as exc:  # fail-closed, không thể lọt ra ngoài
             fail("FAB-000", f"Tham số mặt cắt phi vật lý: {exc}", 1.0)
+
+    # SOLVER-COMPOSITE-001: composite thép-BT chưa có solver sức kháng hợp lệ
+    # (L1 chỉ mô hình BTCT-DUL). Chặn HARD TRƯỚC solver — không sinh số liệu giả.
+    if marker == "CI-PARAM":
+        v.append(st.composite_solver_gate())
 
     return v, geom

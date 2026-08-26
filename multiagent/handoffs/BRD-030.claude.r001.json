@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-030",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Go be tac: mot correction bi REVISE truoc day khoa chet artifact vinh vien. Nguyen nhan do duoc: lab.py doi correction TRUOC phai duoc review APPROVE moi cho ghi ban moi, trong khi review cua correction la BAT BIEN (khong review lai duoc). Hai cong do gap nhau tao ngo cut - artifact khong sua tiep duoc ma cung khong rut lai duoc. Truong supersedes_correction_sha256 von da co san trong schema dung cho viec noi chuoi thay the, nhung cong chan khien no khong dung duoc. SUA HAI CHO: (1) record_provenance_correction - neu ban truoc bi REVISE/REJECT thi no VO HIEU, moc so sanh quay ve previous_sha256 cua chinh no; van chan cung neu ban truoc CHUA AI XEM. (2) correction_chain_is_approved - cho phep di xuyen mat xich vo hieu, nhung mat xich DANG XET van bat buoc phai duoc review APPROVE, va moi buoc van phai noi dung moc. Ca thu nghiem that: COR-BRD-002-002 da ghi duoc, thay the COR-BRD-002-001 bi REVISE - truoc ban va thi khong the. tests/test_correction_chain.py: 7/7 xanh, gom 2 test chung minh be tac da go va 5 test neo lai cac hang rao KHONG duoc noi (chua ai xem thi van chan; snapshot sai bytes van bi tu choi; nguoi lam khong duoc tu review; review cu bat bien; mat xich dau chuoi van phai duoc duyet).",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/lab.py",
+      "sha256": "2339eeb3e0f3cc5c7786332c3b1646c357520b4a8fc942b8e92e4a4eaaaf3350",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_correction_chain.py",
+      "sha256": "5f06ee8f8aee7ca4b717184ab25117ce6d0f82faa83c37482d9be7309dc24c63",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Dung file test moi tests/test_correction_chain.py thay vi sua tests/test_collaboration.py vi file do dang bi handoff BRD-018 (vua ACCEPTED) neo hash - sua se lai gay drift.",
+    "Correction bi REVISE duoc coi la VO HIEU chu khong phai mot buoc da duoc chap nhan. Do la ly do moc quay ve previous_sha256 chu khong phai current_sha256."
+  ],
+  "unresolved_risks": [
+    "Day la bo may chong sua lich su. Noi sai mot dong o day nguy hiem hon be tac. Da neo 5 hang rao bang test, nhung can review doc lap doc ky phan correction_chain_is_approved.",
+    "4 test trong tests/test_collaboration.py dang do vi lab validate dang invalid (drift chua duyet cua BRD-002/BRD-024/BRD-029), khong phai do thay doi nay. Chung se xanh lai khi cac correction duoc duyet."
+  ],
+  "next_action": "Cross-provider review by codex"
+}

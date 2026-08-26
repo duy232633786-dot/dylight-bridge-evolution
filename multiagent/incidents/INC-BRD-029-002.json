@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-029-002",
+  "task_id": "BRD-029",
+  "detected_at_utc": "2026-08-25T20:37:39.062832Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-029.claude.r001.json",
+  "original_handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "artifact_path": "pyproject.toml",
+  "recorded_sha256": "89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0",
+  "observed_sha256": "40f46ff2dd2cae18fddef8b67fa5d37c776af1b5581de60fe4d0854e10164e2d",
+  "reason": "Codex tra REVISE cho BRD-031 vi package bridge_evolution.site khong nam trong danh sach packages nen khong vao wheel - dung loai loi dong goi ma durability tung mac. Sua o pyproject.toml, tuc artifact cua BRD-029.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

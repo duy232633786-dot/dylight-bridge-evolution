@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-022",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Ban r002 - tra loi hai diem cua codex. (1) DA SUA - diem codex bat DUNG: tests/test_catalogs.py import GrammarIdError o cap module nen tren ban CHUA va ca file khong collect duoc; pytest bao loi thu thap chu khong phai mot test do noi ro hang rao con thieu, tuc acceptance criterion 2 chua that su dat. Nay import phong thu (try/except ImportError) va di qua helper assert_refused(), bien moi truong hop thanh pytest.fail co thong diep. Da CHUNG MINH bang git worktree tach roi tai HEAD (41b9c0d, ban chua va) voi dung file test moi: cac test do that voi thong diep 'GrammarIdError khong ton tai - loader chua co hang ro rieng', gom ca 13 bien the duong dan, test_refusal_names_the_reason, test_non_string_id_is_refused va test_gene_helpers_cannot_reach_the_sandbox_anymore. Khong con loi collection. (2) KHONG SUA - diem codex nham quy ket: thay doi '== 111' thanh '>= 111' trong tests/test_shape_grammar_experimental.py KHONG thuoc BRD-022. No thuoc BRD-020 (thu vien tham khao tang tu 111 len 234 nguon lam assertion do gion vo hieu), da di qua COR-BRD-004-001 va duoc review doc lap CRV-BRD-004-001 APPROVE truoc khi BRD-022 bat dau. Codex diff voi snapshot GOC f2334e8b nen thay ca hai thay doi gop lai; moc dung de doi chieu phan viec cua BRD-022 la snapshot 734043eb (current_sha256 cua COR-BRD-004-001) - chinh la snapshot ma COR-BRD-004-004 dung. Doi chieu voi moc do thi BRD-022 chi cham dung hai test ve co che cach ly, va ca hai deu MANH len chu khong yeu di: test_sandbox_policy_matches_the_measured_mechanism nay doi chieu tung dong phat bieu an toan voi hanh vi runtime that thay vi chi doc chuoi trong JSON.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G1"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/catalogs.py",
+      "sha256": "c1f2a389a02ab7a5b9bc1e11c5525167b6ec7691875053a4d1f2e208ef518556",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_catalogs.py",
+      "sha256": "85a5f7f6831dc40a690e02fc7d8fe41724f20173348e5f42221c8f7d2af8a883",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_grammar/experimental/arch_deck_v1.json",
+      "sha256": "d310dbd593ea94517ab14a94d7e7099a25b1315d41efd51d3e6dad4982991f05",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/shape_discovery/arch_render_study.md",
+      "sha256": "2b13b0f1e4c19d1d974d150319521134956ad5271f54259bda11105ec86c2139",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_shape_grammar_experimental.py",
+      "sha256": "975f7ca41afa5b20482a033870ba2d7b5d8b3c0155409b5a0471ba67fcdf48ef",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Moc doi chieu dung cho phan viec cua BRD-022 tren tests/test_shape_grammar_experimental.py la snapshot 734043eb (sau COR-BRD-004-001), khong phai f2334e8b (goc).",
+    "Claim level IDEA chu khong phai SCREENED: day la hang rao truy vet o tang loader, khong dua ra claim ky thuat nao ve ung xu cau; lab submit cung tu choi SCREENED vi thieu G0+G2."
+  ],
+  "unresolved_risks": [
+    "Toan suite con 2 test do, ca hai tien ton tai va thuoc BRD-025 (nhip 35/40 m lech design basis 38,3 m; danh sach grammar top-level hard-code). Acceptance criterion 5 doi toan bo pytest xanh - khong dat duoc chung nao BRD-025 chua giai quyet.",
+    "budgeted_evaluator van la BLOCKED_BY_ACCIDENT va van tu khai dung nhu vay."
+  ],
+  "next_action": "Re-review r002 by codex"
+}

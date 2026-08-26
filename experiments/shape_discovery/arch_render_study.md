@@ -387,10 +387,15 @@ kết thúc ở đá; (iii) chỉ sau đó mới bàn tiết diện, khẩu đ�
 - `tests/test_shape_grammar_experimental.py` — bốn hàng rào: chống bịa nguồn
   (mọi mã nguồn dạng LIT trong grammar VÀ trong báo cáo này phải tồn tại trong
   index.json), chống false precision, đặc tả ĐÚNG cơ chế cách ly sandbox, hình
-  học hợp lệ. LƯU Ý ĐÃ SỬA SAU PHẢN BIỆN: `load_grammar()` VẪN nạp được file
-  experimental qua đường `experimental/arch_deck_v1` (dấu `/` không bị chặn),
-  và `gene_order()`/`gene_domains()` cũng chạy được trên nó. Hàng rào thật là
-  enum `family` trong schema state; chỗ chặn còn lại chỉ là KeyError tình cờ.
+  học hợp lệ. CẬP NHẬT SAU BRD-022: `load_grammar()` nay CHẶN đường đi này.
+  Trước đó nó nạp được file experimental qua `experimental/arch_deck_v1` (dấu
+  `/` không bị chặn) và `gene_order()`/`gene_domains()` chạy trơn trên nó —
+  đường sinh số chỉ dừng ở `BudgetedEvaluator` bằng một `KeyError` tình cờ.
+  BRD-022 siết loader bằng `GrammarIdError` riêng: mọi `grammar_id` chứa `/`,
+  `\`, `..` hoặc đường dẫn tuyệt đối đều bị từ chối, và tệp phải nằm trực tiếp
+  trong thư mục grammar production. Cách ly sandbox nay là **bất biến được thực
+  thi** chứ không còn là tính chất tình cờ. Hàng rào thứ hai vẫn nguyên: enum
+  `family` trong schema state.
 - Sandbox experimental KHÔNG được nhập thẳng vào production grammar — test
   `test_experimental_geometry_module_is_not_imported_by_production` kiểm bằng
   quét import. Render đẹp chỉ mang mức IDEA cho đến khi qua solver/verifier.
