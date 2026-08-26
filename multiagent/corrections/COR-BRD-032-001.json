@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-032-001",
+  "task_id": "BRD-032",
+  "incident_id": "INC-BRD-032-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "BRD-033 va lab.py: review_handoff nay tra lai chinh phan quyet tha drift cua validate_lab qua loi vao noi bo _validate_lab_detail, thay vi tu so hash roi raise. _ensure_artifact_snapshot kiem snapshot truoc khi doi file song, de duong REVISE khong chet tren drift da co correction. API cong khai cua validate_lab GIU NGUYEN hinh dang tra ve.",
+  "original_handoff_path": "multiagent/handoffs/BRD-032.claude.r002.json",
+  "original_handoff_sha256": "5fe75ef9dff37738badf9a45d8a4a29e357a3a47ee2cd25a4057c58807974ae7",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/73e56145e626de653a2017f753d32c4ff5736a52aef81a4bc2ec4c37b35535de.blob",
+    "sha256": "73e56145e626de653a2017f753d32c4ff5736a52aef81a4bc2ec4c37b35535de"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "73e56145e626de653a2017f753d32c4ff5736a52aef81a4bc2ec4c37b35535de",
+    "current_sha256": "e0fbebf27d043855f11b2d619bf82c27e3a6a1be64cb35c7fb5dcc8f26c0ec83"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Chua duoc review doc lap; can agent khac claude APPROVE."
+  ],
+  "supersedes_correction_sha256": null
+}

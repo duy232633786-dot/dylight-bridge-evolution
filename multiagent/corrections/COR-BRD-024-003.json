@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-024-003",
+  "task_id": "BRD-024",
+  "incident_id": "INC-BRD-024-003",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Them mot dong bridge_evolution.site vao [tool.setuptools] packages. Khong doi dependency, khong doi version, khong doi cau hinh pytest. Diff so voi snapshot 89ff0d7d dung mot dong them vao.",
+  "original_handoff_path": "multiagent/handoffs/BRD-024.codex.r001.json",
+  "original_handoff_sha256": "8f5c687b189e5d90304e6445871d90ea8e91b76f4e60ea9da6c75d902c4e3ce2",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0.blob",
+    "sha256": "89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0"
+  },
+  "corrected_artifact": {
+    "path": "pyproject.toml",
+    "previous_sha256": "89ff0d7dd41b91dbad13ea11f5ed055bd68653d151d13eb744b48fa68fccbfb0",
+    "current_sha256": "40f46ff2dd2cae18fddef8b67fa5d37c776af1b5581de60fe4d0854e10164e2d"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_packaging_dependencies.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Dong bridge_evolution.site la thay doi hop le do BRD-029 thuc hien trong write_scope cua no; correction nay chi ghi lai provenance, khong danh gia lai noi dung thay doi."
+  ],
+  "unresolved_risks": [
+    "Correction nay chua duoc review doc lap; can mot agent khac claude va khac codex (tac gia handoff goc) APPROVE thi lab moi hop le."
+  ],
+  "supersedes_correction_sha256": "82f6aecae9c95e5ced253ec06fa8fbd19429e583219acf8116d59cbc40bbe082"
+}

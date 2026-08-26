@@ -1,0 +1,250 @@
+{
+  "schema_version": "1.0",
+  "preregistration_id": "SHAPE-DISCOVERY-ARCH-DECK-V1",
+  "task_id": "BRD-004",
+  "title": "Pre-registration: Khám phá hình thái họ vòm chạy trên (arch_deck_cfst_skeleton_v1) — tập giả thuyết, sàng L0 và chọn tập đa dạng không hàm mục tiêu",
+  "created_at_utc": "2026-08-23T00:00:00Z",
+  "locked_before_running": true,
+  "claim_ceiling": "IDEA",
+  "claim_ceiling_note": "Runtime hiện KHÔNG có solver nào cho họ vòm (RCM-2.0.0: SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D, STAGED_PRESTRESS_EFFECTS đều ABSENT); chỉ có L0 + L1 line-girder cho dầm Super-T. Mọi bước số học trong pre-registration này chỉ là L0 hình học thuần toạ độ; KHÔNG bước nào trong file này sinh ra phán quyết kỹ thuật, KHÔNG bước nào sinh nội lực, ứng suất, ổn định, chuyển vị, tần số, chi phí hay carbon. PASS ở L0 hình học không nói lên điều gì về việc họ kết cấu dùng được hay không về kỹ thuật.",
+  "grammar_ref": "bridge_grammar/experimental/arch_deck_v1.json",
+  "family_id": "arch_deck_cfst_skeleton_v1",
+  "modules": {
+    "geometry": "bridge_evolution/geometry_experimental/arch_geometry.py",
+    "diversity_selection": "bridge_evolution/geometry_experimental/shape_diversity.py",
+    "l0_constructability_screening": "bridge_evolution/geometry_experimental/arch_l0_constructability.py"
+  },
+  "research_question": "Trong họ vòm chạy trên arch_deck_cfst_skeleton_v1, những tổ hợp hình thái rời rạc nào (trục vòm, số sườn, liên kết chân vòm, hệ khoang vòm, hệ giữ lực xô, liên kết dọc mặt cầu, phương pháp lắp, giai đoạn) đáng được giữ lại làm tập giả thuyết nghiên cứu tiếp — khi tiêu chí duy nhất được phép ở mức IDEA là ĐA DẠNG HÌNH THÁI cộng sàng hình học/logistics L0, tuyệt đối không phải hiệu năng?",
+  "hypotheses": [
+    {
+      "id": "H1",
+      "morphology_unknown_vi": "Số sườn vòm và hệ dầm ngang (INC-006): một sườn giữa hay hai sườn dưới hai mép mặt cầu.",
+      "hypothesis_vi": "Với mặt cầu nhiều làn, phương án hai sườn kèm hệ giằng ngang LIÊN TỤC suốt chiều dài vòm giữ đường truyền lực ngang tường minh hơn phương án một sườn giữa, vì một sườn buộc mặt cầu chịu xoắn khi hoạt tải lệch làn và dồn toàn bộ mô men xoắn xuống một sườn duy nhất.",
+      "falsifier_vi": "Giả thuyết bị bác nếu design basis chốt mặt cầu hẹp/ít làn tới mức hiệu ứng lệch làn nhỏ, hoặc nếu phân tích 3D (khi có solver) cho thấy hệ một sườn với mặt cầu đủ cứng chống xoắn có ứng xử ngang không xấu hơn hệ hai sườn có giằng.",
+      "what_would_decide_it": {
+        "evidence_kinds": [
+          "DESIGN_BASIS_G0 — bề rộng mặt cầu, số làn (project_inputs hiện toàn null)",
+          "SOLVER_L2_3D — grillage/shell cho xoắn dưới hoạt tải lệch làn (hiện ABSENT)"
+        ],
+        "notes_vi": "Quyết định này đổi luôn lựa chọn giàn phẳng hay giàn không gian của hệ giằng; chưa dữ liệu nào tồn tại để phân xử."
+      },
+      "related_ids": [
+        "INC-006",
+        "FALS-04"
+      ],
+      "sources": [],
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "H2",
+      "morphology_unknown_vi": "Liên kết chân vòm: ba khớp / hai khớp / ngàm — ẩn số bậc nhất, phải chốt trước mọi tính toán khác.",
+      "hypothesis_vi": "Khi độ cứng và chênh lệch độ cứng của đá hai chân còn chưa được khảo sát, sơ đồ ít siêu tĩnh hơn (ba khớp, hai khớp) ít nhạy với chuyển vị chân và nhiệt hơn sơ đồ ngàm; ngàm chỉ nên giữ lại làm giả thuyết nếu khảo sát đá xác nhận hai chân đủ cứng và gần đều nhau.",
+      "falsifier_vi": "Từng sơ đồ bị bác nếu phân tích với chuyển vị chân cưỡng bức lệch cho thấy mô men sinh ra trong vành vòm vượt khả năng của tiết diện tương ứng. Trị số cho phép phải SUY từ mô men vành vòm; tuyệt đối KHÔNG lấy Bảng 5-1 của LIT-070 (0,004/0,008 rad) vì bảng đó hiệu chỉnh cho cầu dầm, không cho vòm.",
+      "what_would_decide_it": {
+        "evidence_kinds": [
+          "ROCK_SURVEY — gói dữ liệu địa kỹ thuật theo LIT-068: hướng và mức hở khe nứt, nêm trượt hai vách, độ cứng hai chân",
+          "SOLVER_L2 — vòm chịu chuyển vị chân cưỡng bức lệch (hiện ABSENT)"
+        ],
+        "notes_vi": "LIT-069 cảnh báo quy nhóm cọc/nền về một hằng số độ cứng là đơn giản hoá quá mức với kết cấu sống bằng độ cứng chân."
+      },
+      "related_ids": [
+        "FALS-01",
+        "FALS-02",
+        "ARCH-NEED-05"
+      ],
+      "sources": [
+        "LIT-068",
+        "LIT-069",
+        "LIT-070"
+      ],
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "H3",
+      "morphology_unknown_vi": "Sơ đồ phân đoạn – gối – khe co giãn giữa mặt cầu trên vòm và cầu dẫn (INC-005): JOINTED_AT_BOTH_ARCH_ENDS hay CONTINUOUS_DECK_AS_CHORD.",
+      "hypothesis_vi": "Ở mức IDEA, JOINTED_AT_BOTH_ARCH_ENDS tách bạch đường lực rõ nhất: lực dọc mặt cầu xấp xỉ không và toàn bộ lực xô đi vào chân vòm. CONTINUOUS_DECK_AS_CHORD biến mặt cầu thành thanh biên chịu nén của giàn sâu vòm + khoang + mặt cầu — hệ cứng lên nhưng trụ cầu dẫn bị kéo theo chuyển vị dọc của vòm và chịu chuyển vị cưỡng bức thay vì chịu lực.",
+      "falsifier_vi": "Nhánh JOINTED bị bác nếu design basis (chính sách khe co giãn, độ bền lâu khe, êm thuận khai thác) đòi mặt cầu liên tục; nhánh CONTINUOUS bị bác nếu phân tích L2 có mô hình trụ dẫn cho thấy chuyển vị cưỡng bức áp lên trụ dẫn vượt cấu tạo chấp nhận theo design basis.",
+      "what_would_decide_it": {
+        "evidence_kinds": [
+          "DESIGN_BASIS_G0 — sơ đồ khai thác, chính sách khe co giãn, cấu tạo trụ dẫn",
+          "SOLVER_L2 — mô hình có trụ cầu dẫn trong đường truyền lực (hiện ABSENT)"
+        ],
+        "notes_vi": "Phải chốt sơ đồ phân đoạn – gối – khe TRƯỚC mọi tính toán nội lực; runtime hiện không có ô nào chứa bài toán trụ chịu chuyển vị cưỡng bức."
+      },
+      "related_ids": [
+        "INC-005"
+      ],
+      "sources": [],
+      "status": "NOT_TESTED"
+    },
+    {
+      "id": "H4",
+      "morphology_unknown_vi": "Vai trò của tháp + bó cáp xiên trong ảnh render (mâu thuẫn #1): hệ treo TẠM của lắp hẫng, hệ neo đá, hay hệ lai vòm + dây văng vĩnh cửu.",
+      "hypothesis_vi": "Cách đọc hợp lý nhất về kỹ thuật: tháp + cáp là hệ treo TẠM của thi công hẫng (hệ neo–khoá cáp tạm kiểu buckle-anchor mà LIT-054 mô tả cho cầu Shatuo); sau hợp long hệ này phải được tháo hoặc chùng có kiểm soát, không giữ vai trò vĩnh cửu. Cáp neo vào chân vòm đã bị đá chặn cứng thì trong khai thác gần như không gánh gì.",
+      "falsifier_vi": "Bị bác nếu hồ sơ hình học chốt tháp nằm phía mố với đầu cáp neo vào đá (khi đó là hệ neo đá dự ứng lực căng trước, kiểm khối nêm bao trùm cả bệ lẫn neo), hoặc chốt điểm neo vào mặt cầu (khi đó là hệ lai vòm + dây văng, kéo theo yêu cầu backstay cho tháp). Phép thử quyết định: vị trí tháp so với chân vòm và điểm neo đầu kia của bó cáp — ảnh không trả lời được.",
+      "what_would_decide_it": {
+        "evidence_kinds": [
+          "DESIGN_BASIS_G0 / hồ sơ hình học — vị trí tháp, điểm neo hai đầu bó cáp",
+          "ROCK_SURVEY theo LIT-068 — nếu là nhánh neo đá",
+          "SOLVER_L2 giai đoạn lắp hẫng — nếu là nhánh treo tạm (STAGED_PRESTRESS_EFFECTS hiện ABSENT)"
+        ],
+        "notes_vi": "Việc ánh xạ hình học buckle-anchor lên ảnh là DIỄN GIẢI; LIT-054 chỉ xác minh được ở mức metadata + tóm tắt."
+      },
+      "related_ids": [
+        "INC-001"
+      ],
+      "sources": [
+        "LIT-054"
+      ],
+      "status": "NOT_TESTED"
+    }
+  ],
+  "l0_screening_protocol": {
+    "statement_vi": "Sàng ARCH-L0 chỉ kiểm HÌNH HỌC và LOGISTICS của đốt/cấu kiện — không kiểm bất kỳ trạng thái giới hạn nào, không sinh nội lực. PASS ở L0 chỉ có nghĩa là hình học dựng ra được và lọt các ngưỡng logistics do kỹ sư cung cấp; đó không phải phán quyết kỹ thuật và không nâng claim khỏi IDEA.",
+    "checks": [
+      {
+        "check_id": "ARCH-L0-FAB",
+        "title_vi": "Chế tạo: kích thước đốt vòm / ống khung xương so với giới hạn xưởng và khổ vận chuyển khai báo trong logistics_profile; mối nối phân đoạn chỉ ghi nhận VỊ TRÍ, không đánh giá (LIT-053 chỉ ra mối nối phân đoạn là trạng thái giới hạn cắt riêng — ngoài phạm vi L0).",
+        "threshold_source": "logistics_profile do kỹ sư cung cấp, kèm trường provenance từng ngưỡng",
+        "status": "THRESHOLDS_NOT_YET_PROVIDED",
+        "sources": [
+          "LIT-053",
+          "LIT-055"
+        ],
+        "check_id_is_a_group_label": true,
+        "implemented_check_ids": [
+          {
+            "check_id": "ARCH-L0-01",
+            "title_vi": "Chế tạo/vận chuyển: chiều dài đốt vòm"
+          }
+        ]
+      },
+      {
+        "check_id": "ARCH-L0-LIFT",
+        "title_vi": "Cẩu lắp: khối lượng và kích thước đốt nặng nhất so với năng lực thiết bị cẩu trong logistics_profile. Ổn định NGANG khi cẩu/vận chuyển thuộc nhóm hiện tượng LIT-049/LIT-050 nêu — L0 chỉ ghi cờ cần kiểm, không tính.",
+        "threshold_source": "logistics_profile do kỹ sư cung cấp, kèm trường provenance từng ngưỡng",
+        "status": "THRESHOLDS_NOT_YET_PROVIDED",
+        "sources": [
+          "LIT-049",
+          "LIT-050"
+        ],
+        "check_id_is_a_group_label": true,
+        "implemented_check_ids": [
+          {
+            "check_id": "ARCH-L0-02",
+            "title_vi": "Cẩu lắp: khối lượng ước tính mỗi đốt (số học L0)"
+          }
+        ]
+      },
+      {
+        "check_id": "ARCH-L0-ERECTION",
+        "title_vi": "Lắp hẫng: hình học trạng thái consol (chiều dài hẫng lớn nhất theo giai đoạn S2, vị trí tháp/cáp tạm) dựng ra được trên mặt bằng và cao độ đã cho; đối chiếu với construction_stage_schema S0–S7 của grammar.",
+        "threshold_source": "logistics_profile + design basis (mặt bằng, cao độ) do kỹ sư cung cấp",
+        "status": "THRESHOLDS_NOT_YET_PROVIDED",
+        "sources": [
+          "LIT-054"
+        ],
+        "check_id_is_a_group_label": true,
+        "implemented_check_ids": [
+          {
+            "check_id": "ARCH-L0-03",
+            "title_vi": "Lắp dựng: số đốt chẵn (hợp long tại đỉnh)"
+          },
+          {
+            "check_id": "ARCH-L0-04",
+            "title_vi": "Lắp dựng: số đốt mỗi nửa vòm khi lắp hẫng"
+          }
+        ]
+      },
+      {
+        "check_id": "ARCH-L0-INSPECTION",
+        "title_vi": "Tiếp cận kiểm tra: khe hở hình học quanh vành vòm, cột khoang và nút giằng cho người/thiết bị kiểm tra định kỳ.",
+        "threshold_source": "logistics_profile do kỹ sư cung cấp, kèm trường provenance từng ngưỡng",
+        "status": "THRESHOLDS_NOT_YET_PROVIDED",
+        "sources": [],
+        "check_id_is_a_group_label": true,
+        "implemented_check_ids": [
+          {
+            "check_id": "ARCH-L0-05",
+            "title_vi": "Kiểm tra: khe hở đứng đỉnh vòm tới đáy mặt cầu"
+          },
+          {
+            "check_id": "ARCH-L0-06",
+            "title_vi": "Kiểm tra: chiều cao cột khoang vòm thấp nhất"
+          },
+          {
+            "check_id": "ARCH-L0-07",
+            "title_vi": "Kiểm tra: khe ngang thông thuỷ giữa các sườn vòm"
+          }
+        ]
+      }
+    ],
+    "threshold_policy_vi": "KHÔNG ngưỡng nào được hard-code trong code hay trong file này. Mọi ngưỡng (chiều dài đốt tối đa, tải cẩu, khe hở kiểm tra...) do kỹ sư cung cấp qua logistics_profile kèm trường provenance. Thiếu đầu vào thì kết quả check là UNKNOWN_INPUT_MISSING (fail-closed) — không bao giờ được coi là PASS.",
+    "current_state": "THRESHOLDS_NOT_YET_PROVIDED",
+    "id_mapping_note_vi": "check_id trong hồ sơ này (ARCH-L0-FAB/LIFT/ERECTION/INSPECTION) là NHÃN NHÓM của bốn nhóm kiểm tra, KHÔNG phải định danh chạy được. Định danh thật do bridge_evolution/geometry_experimental/arch_l0_constructability.py phát ra là ARCH-L0-01..07 và được liệt kê trong implemented_check_ids của từng nhóm. Ghi ánh xạ này để phát biểu trong hồ sơ và cơ chế chạy thật luôn truy được về nhau — không lặp lại kiểu lệch phát biểu–cơ chế của BRD-022."
+  },
+  "diversity_selection_rule": {
+    "statement_vi": "Tập đại diện được chọn CHỈ theo đa dạng hình thái, độc lập với mọi hàm mục tiêu: không chi phí, không carbon, không xếp hạng hiệu năng — vì runtime không có phương tiện nào sinh các đại lượng đó cho họ vòm, và vì tiêu chí nghiệm thu BRD-004 đòi giữ đa dạng hình dạng thay vì chỉ giữ phương án rẻ nhất.",
+    "selection_is_objective_free": true,
+    "distance_vi": "Gower: khoá categorical tính 0/1 theo trùng/khác; khoá numeric tính |a-b|/range với range do người gọi cung cấp hoặc tính từ tập ứng viên; range bằng 0 thì đóng góp bằng 0.",
+    "algorithm_vi": "Greedy max-min (farthest-first), tất định, không random; hoà thì chọn candidate_id nhỏ hơn theo thứ tự chuỗi; sau đó hoán đổi tất định để thoả coverage_quota, không thoả được thì ghi rõ trong quota_unmet.",
+    "implementation": "bridge_evolution/geometry_experimental/shape_diversity.py::select_diverse_top_set",
+    "coverage_quota_keys": [
+      "arch_axis_type",
+      "spandrel_system",
+      "springing_restraint",
+      "thrust_restraint_system"
+    ],
+    "k_policy_vi": "k CHƯA được khoá trong file này. k sẽ được khoá cùng design basis (G0); khi khoá phải mở phiên bản pre-registration mới thay vì sửa file này.",
+    "l0_status_policy_vi": "Ứng viên FAIL bị loại trước khi chọn (ghi vào excluded_l0_fail); ứng viên UNKNOWN_INPUT_MISSING được giữ nhưng gắn cờ trong unknown_l0_included; ứng viên chưa sàng được liệt kê trong unscreened_l0_included."
+  },
+  "primary_endpoint": {
+    "statement_vi": "Endpoint duy nhất: TẬP GIẢ THUYẾT HÌNH THÁI được lưu cùng geometry_hash/lineage và trạng thái L0 của từng ứng viên. KHÔNG có endpoint hiệu năng — không nội lực, không độ võng, không tần số, không chi phí, không xếp hạng.",
+    "artifact_kinds": [
+      "Danh sách candidate_id + descriptors liệt kê từ miền ENUMERATED_TOPOLOGY / SOURCE_* của grammar",
+      "geometry_hash và lineage theo quy ước sha256(canonical_json) của bridge_evolution/state.py",
+      "Trạng thái từng check ARCH-L0 (PASS / FAIL / UNKNOWN_INPUT_MISSING) khi logistics_profile được cung cấp",
+      "Tập chọn đa dạng kèm coverage, quota_unmet và min_pairwise_distance"
+    ],
+    "hash_convention": "candidate_id = 'HYP-' + 16 hex đầu của sha256 trên JSON chính tắc của descriptors; JSON chính tắc theo đúng quy ước canonical_json của bridge_evolution/state.py: json.dumps(sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False).",
+    "performance_endpoint": null
+  },
+  "invalidation_conditions": [
+    {
+      "condition_id": "PERFORMANCE-NUMBER-BEFORE-SOLVER",
+      "statement_vi": "Bất kỳ con số hiệu năng nào (nội lực, ứng suất, độ võng, tần số, ổn định, chi phí, carbon, khối lượng, điểm xếp hạng) xuất hiện cho họ này trước khi có solver L2 hợp lệ chạy qua.",
+      "action": "INVALIDATE"
+    },
+    {
+      "condition_id": "THRESHOLD-CHANGED-AFTER-RUN",
+      "statement_vi": "Ngưỡng trong logistics_profile bị thay đổi SAU khi sàng L0 đã chạy mà không mở pre-registration mới.",
+      "action": "INVALIDATE"
+    },
+    {
+      "condition_id": "SOURCE-NOT-IN-INDEX",
+      "statement_vi": "Bất kỳ reference_id nguồn nào được trích trong hồ sơ họ này mà không tồn tại trong research/literature/index.json.",
+      "action": "INVALIDATE"
+    },
+    {
+      "condition_id": "SELECTION-GAINS-OBJECTIVE",
+      "statement_vi": "Cơ chế chọn tập đa dạng bị gắn thêm bất kỳ hàm mục tiêu hay xếp hạng hiệu năng nào — vi phạm tuyên bố objective-free của file này.",
+      "action": "INVALIDATE"
+    },
+    {
+      "condition_id": "SELECTION-TUNED-AFTER-SEEING-RESULT",
+      "statement_vi": "seed_index, k hoặc coverage_quota bị chỉnh SAU khi đã nhìn thấy tập chọn nhằm đổi kết quả, mà không mở pre-registration mới.",
+      "action": "INVALIDATE"
+    }
+  ],
+  "sources": [
+    "LIT-049",
+    "LIT-050",
+    "LIT-053",
+    "LIT-054",
+    "LIT-055",
+    "LIT-068",
+    "LIT-069",
+    "LIT-070"
+  ],
+  "not_run_statement_vi": "Chưa chạy bước nào ngoài tự kiểm đơn vị; không có kết quả."
+}

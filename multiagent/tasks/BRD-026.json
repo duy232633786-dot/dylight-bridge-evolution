@@ -5,9 +5,9 @@
   "research_question": "Với mô hình khấu hao vật liệu chuẩn (carbonat fib/MC-SLD, clorua Fick-2 có hệ số tuổi D(t), mỏi S-N + Miner), cần đầu vào nào tối thiểu từ design state để ước lượng tuổi thọ khai thác và chu kỳ kiểm tra-bảo trì có thể bảo vệ (defensible), và đầu ra đó gắn vào pipeline như advisory (không PASS/FAIL) thế nào?",
   "workstream": "durability",
   "priority": "P0",
-  "status": "REVIEW",
+  "status": "ACCEPTED",
   "owner": "opencode",
-  "reviewer": null,
+  "reviewer": "claude",
   "dependencies": [],
   "required_gates": [
     "G0",
@@ -36,6 +36,8 @@
     "Chưa có dữ liệu môi trường thật: mọi exposure class phải do người dùng cung cấp, mặc định là NOT_APPLICABLE có lý do"
   ],
   "review_notes": [
-    "REVISE: 11/11 durability tests pass and the source docstrings appropriately cite fib Bulletin 34, DuraCrete, EN 1993-1-9/MC-SLD/Papadakis. However required G6 is not complete: the handoff explicitly lacks real exposure data (Cs, RH, chloride), so the default coefficients remain screening/advisory. Do not approve until G6 evidence is supplied; outputs must remain SCREENED/advisory."
+    "REVISE: 11/11 durability tests pass and the source docstrings appropriately cite fib Bulletin 34, DuraCrete, EN 1993-1-9/MC-SLD/Papadakis. However required G6 is not complete: the handoff explicitly lacks real exposure data (Cs, RH, chloride), so the default coefficients remain screening/advisory. Do not approve until G6 evidence is supplied; outputs must remain SCREENED/advisory.",
+    "Review doc lap boi claude (owner la opencode). Hai loi G6 duoc xac nhan bang tai lap chu khong phai doc code: (1) remaining_service_life tu nhan MEASURED du khong dung mot gia tri do dac nao - chung minh bang hai lan goi cho cung 108.0 nam nhung khac nhan; (2) load_exposure_data nap duoc ccrit_percent=-5.0. Ca hai deu danh vao dung cai ma r002 tuyen bo hoan tat, va G6 la mot trong hai required_gates cua task nen khong the APPROVE. Phan con lai cua task lam tot: khong ro ri PASS/FAIL, artifact khong drift, 30/30 test trong pham vi xanh, khong tu nang claim level. Huong sua goi y: cho remaining_service_life goi lai apply_exposure_overrides va lay co applied lam nguon duy nhat cua nhan provenance; them kiem tri ccrit_percent phai duong; them hai test hoi quy. Bay test do cua toan suite khong thuoc task nay.",
+    "Review doc lap boi claude (owner la opencode), vong 2. Ca hai loi G6 cua r002 da het va toi kiem bang tai lap dung hai ca da bat loi truoc day, khong doc code suong. Dang chu y: ban sua KHONG dung lai apply_exposure_overrides nhu review truoc cua toi goi y, ma xet theo tung co che - va do la lua chon DUNG HON, vi apply_exposure_overrides khong phan biet co che nen dung thang no se tai tao chinh loi cu. Toi ghi nhan minh goi y sai o diem do. Da tu kiem them ba ca bien khong nam trong test: chloride + rh_percent khong lien quan, chloride + du lieu that, va mechanism la - ca ba deu xu ly dung. RUI RO CON LAI de lai cho vong sau, khong chan APPROVE: danh sach khoa 'da ap dung' trong remaining_service_life duoc viet lai bang tay, tach roi voi danh sach khoa ma service_life_years thuc su tieu thu; hai cho nay dang khop nhau nhung se troi neu ai do them mot khoa measured moi - dung lop loi 'cung mot gia dinh nam o nhieu cho' da can BRD-030, BRD-032 va BRD-033. GHI NHAN CO CAU: handoff buoc phai khai G1 vi CLAIM_GATES[SCREENED]={G0,G1,G2}, trong khi task nay khong co hinh hoc de kiem; do la han che cua lab chu khong phai loi cua nguoi nop, va no cung ho voi be tac gate ma BRD-004 dang gap."
   ]
 }

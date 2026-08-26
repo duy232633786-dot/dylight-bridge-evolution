@@ -81,7 +81,7 @@
         },
         "girder_count": {
           "type": "integer",
-          "minimum": 2
+          "minimum": 1
         },
         "girder_spacing_mm": {
           "type": "integer",
@@ -308,6 +308,11 @@
             }
           },
           "design_variables": {
+            "properties": {
+              "girder_count": {
+                "minimum": 2
+              }
+            },
             "not": {
               "anyOf": [
                 {
@@ -444,6 +449,11 @@
               "bottom_bulb_width_mm",
               "bottom_bulb_height_mm"
             ],
+            "properties": {
+              "girder_count": {
+                "minimum": 2
+              }
+            },
             "not": {
               "anyOf": [
                 {
@@ -550,6 +560,11 @@
               "bottom_flange_width_mm",
               "bottom_flange_thickness_mm"
             ],
+            "properties": {
+              "girder_count": {
+                "minimum": 2
+              }
+            },
             "not": {
               "anyOf": [
                 {
@@ -770,6 +785,11 @@
               "steel_bottom_flange_width_mm",
               "steel_bottom_flange_thickness_mm"
             ],
+            "properties": {
+              "girder_count": {
+                "minimum": 2
+              }
+            },
             "not": {
               "anyOf": [
                 {

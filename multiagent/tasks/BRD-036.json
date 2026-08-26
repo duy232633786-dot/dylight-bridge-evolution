@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-036",
+  "title": "Từ khối DirectShape lên Family Revit: khảo sát năng lực API thật, dựng family theo ĐÚNG môi trường của từng loại cấu kiện (kể cả Adaptive), rồi lắp thành cầu",
+  "research_question": "Khối hình thái cầu vòm hiện dựng bằng DUY NHẤT một phép: GeometryCreationUtilities.CreateExtrusionGeometry, gom thành 24 DirectShape. Cách đó cho hình đúng nhưng KHÔNG cho family tham số, phân loại cấu kiện đúng, khả năng lên lịch, tiết diện biến thiên liên tục, hay khoét lỗ. Revit có BA môi trường dựng family khác nhau về nguyên tắc: (a) family thường theo mặt phẳng làm việc (FamilyItemFactory: NewExtrusion/NewSweep/NewBlend/NewSweptBlend/NewRevolution + void form); (b) family khối/adaptive nơi hình học do ĐIỂM THÍCH ỨNG và reference point/line điều khiển (AdaptiveComponentFamilyUtils, NewLoftForm/NewExtrusionForm/NewSweptBlendForm/NewRevolveForm); (c) in-place. 23 lệnh MCP có sẵn của add-in đều là lệnh KIẾN TRÚC nên khôi phục registry KHÔNG giải quyết được. Câu hỏi: những phép nào trong CẢ BA môi trường thật sự chạy được trên Revit 2026 máy này với ràng buộc gì, cấu kiện nào thuộc môi trường nào, và quy trình 'dựng từng family trước, ghép sau' chia thế nào để mỗi family kiểm được độc lập?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "ACTIVE",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/revit_family/",
+    "tests/test_revit_family.py",
+    "docs/revit_family_capability.md"
+  ],
+  "acceptance_criteria": [
+    "CỔNG CHẶN — PHA 1 KHẢO SÁT XONG TRƯỚC KHI VIẾT BẤT KỲ FAMILY NÀO. Chạy probe trên Revit thật, đo TỪNG phép, ghi: chạy được hay không, ràng buộc thực tế, thông báo lỗi NGUYÊN VĂN khi hỏng",
+    "Probe phải phủ CẢ HAI môi trường, không chỉ family thường: (a) FamilyItemFactory — NewExtrusion, NewSweep, NewBlend, NewSweptBlend, NewRevolution, và biến thể void isSolid=false; (b) MÔI TRƯỜNG ADAPTIVE — NewReferencePoint, AdaptiveComponentFamilyUtils.MakeAdaptivePoint, reference line/spline qua điểm, NewLoftForm / NewExtrusionForm / NewSweptBlendForm / NewRevolveForm, và AdaptiveComponentInstanceUtils.CreateAdaptiveComponentInstance + SetInstancePlacementPointElementRefIds lúc lắp",
+    "Probe phải đo ĐÍCH DANH ba nghi vấn: (i) NewSweptBlend có nhận path nhiều đoạn hay chỉ MỘT đường cong — nếu chỉ một thì vành vòm thuôn theo parabol phải chia đoạn, ghi rõ hệ quả; (ii) form trong môi trường adaptive có nhận profile không phẳng / mặt phẳng nghiêng theo điểm không; (iii) đổi vị trí điểm thích ứng rồi regenerate thì hình có chạy theo thật không (FLEX TEST) hay chỉ dựng một lần rồi cứng",
+    "Probe liệt kê family template CÓ THẬT trên máy kèm đường dẫn, tối thiểu: Structural Framing, Structural Column, Structural Foundation, Generic Model, và Generic Model Adaptive (hệ mét). Thiếu template nào thì ghi thiếu, KHÔNG lặng lẽ thay bằng template khác",
+    "Kết quả khảo sát ghi thành docs/revit_family_capability.md dạng bảng: môi trường × phép dựng × trạng thái × bằng chứng, theo tinh thần docs/runtime_capability_matrix. Phép nào ABSENT thì ghi ABSENT",
+    "PHA 2 — MỖI LOẠI CẤU KIỆN CHỌN MÔI TRƯỜNG VÀ PHÉP DỰNG RIÊNG, có lý do viết ra, KHÔNG dùng một phép cho tất cả. Ánh xạ đề xuất để probe xác nhận hoặc bác: đốt vành vòm cong tiết diện thuôn -> Sweep hoặc SweptBlend (family thường) HOẶC loft qua profile trên reference point (adaptive); thân trụ thuôn -> Blend; cấu kiện tròn xoay -> Revolution; dầm chủ / gờ lan can / lan can thép -> ADAPTIVE 2 ĐIỂM (dự án thật của chủ dự án đã dùng đúng kiểu này); lỗ và khoét -> void form. Nếu phải lùi về Extrusion thì phải ghi RÕ vì sao, dẫn kết quả probe",
+    "Family phải THAM SỐ HOÁ thật (FamilyManager.AddParameter cho family thường; điểm thích ứng cho family adaptive), không phải hình cứng. Test phải CHỨNG MINH bằng cách đo hai lần với hai bộ tham số / hai vị trí điểm và cho ra hình khác nhau — đây là FLEX TEST, không được thay bằng lời khẳng định trong docstring",
+    "Mỗi family kiểm ĐỘC LẬP trước khi lắp: lưu được .rfa, mở lại đếm được số solid, đo được bao. Không family nào được lắp vào cầu trước khi qua bước đó",
+    "PHA 3 — lắp: family thường thì LoadFamily + NewFamilyInstance; family adaptive thì CreateAdaptiveComponentInstance rồi đặt toạ độ từng điểm. Toạ độ lấy từ tmp/arch_massing/bars.json và arch_assembly_coords.json đã có. Số instance phải khớp số cấu kiện, kiểm bằng cách MỞ LẠI file chứ không tin số trả về",
+    "Giữ ranh giới claim F0 IDEA: family đẹp và tham số hoá KHÔNG nâng mức claim. Mỗi family và mỗi instance vẫn mang dấu claim level đọc được trong Revit như DirectShape hiện tại đang mang",
+    "Đường DirectShape hiện có (tmp/rvt_loader_csharp.py) KHÔNG bị xoá: nó là đường lùi khi family không dựng được, và là mốc đối chiếu hình học độc lập"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/revit_family/",
+    "docs/revit_family_capability.md",
+    "tests/test_revit_family.py"
+  ],
+  "safety_notes": [
+    "KHÔNG viết family dựa trên API đọc từ tài liệu mà chưa chạy thử trên chính Revit 2026 máy này. Đó là lý do PHA 1 là cổng chặn. Riêng môi trường adaptive rủi ro cao hơn hẳn: nó có bộ API riêng, ràng buộc riêng về mặt phẳng và profile, và hỏng theo kiểu khó đọc",
+    "FLEX TEST là bắt buộc, không phải tuỳ chọn. Một family adaptive dựng ra hình đúng NHƯNG không chạy theo điểm thì nó chỉ là khối cứng đội lốt family — tệ hơn DirectShape vì trông như tham số mà không phải",
+    "Revit MCP đang rollback-only (BRD-017). Đã ĐO ĐƯỢC hai đường vòng dùng được: app.NewProjectDocument -> Transaction riêng -> SaveAs; app.OpenDocumentFile -> sửa -> Save. Family theo lối tương tự: app.NewFamilyDocument -> ... -> SaveAs .rfa",
+    "TUYỆT ĐỐI không sửa commandRegistry.json — ngoài repo, cần restart Revit, có thể phục vụ phiên khác (safety note BRD-017). Với task này sửa nó cũng vô ích: 23 lệnh kia đều là lệnh kiến trúc",
+    "Family tham số hoá trông GIỐNG HỒ SƠ KỸ THUẬT THẬT hơn DirectShape rất nhiều, nên rủi ro đọc nhầm CAO HƠN. Dấu claim level phải đọc được ngay trong Revit, không chỉ nằm trong tài liệu",
+    "Lệnh MCP có thể báo timeout NHƯNG vẫn chạy xong bên Revit (đã gặp: 219 solid, timeout, file 38.6 MB xuất hiện sau ~10 giây). Kiểm file trên đĩa trước khi gọi lại, nếu không sẽ tạo trùng",
+    "Không đụng bridge_evolution/bim/ (production, đã hash) và không đụng write_scope của BRD-004"
+  ],
+  "review_notes": [
+    "Chủ dự án yêu cầu 2026-08-26, bốn ý: (1) mở rộng năng lực MCP; (2) AI dựng TỪNG family cấu kiện trước rồi mới ghép thành cầu; (3) dùng TOÀN BỘ công cụ vẽ chứ không chỉ extrusion; (4) family phức tạp thì mỗi loại một cách dựng khác nhau, và PHẢI dựng được cả trong môi trường ADAPTIVE theo đúng nguyên tắc của môi trường đó",
+    "Đo được: khối hình thái hiện tại dùng đúng MỘT phép CreateExtrusionGeometry cho toàn bộ 621 thanh / 24 nhóm",
+    "Đo được: add-in có 25 lệnh (23 RevitMCPCommandSet + 2 DYLIGHT.PierCapPlacer) nhưng registry chỉ đăng ký send_code_to_revit. Rà hết 23 lệnh: say_hello, get_available_family_types, get_current_view_elements, get_current_view_info, get_selected_elements, create_point_based_element, create_line_based_element, create_surface_based_element, color_splash, tag_walls, delete_element, ai_element_filter, operate_element, export_room_data, get_material_quantities, analyze_model_statistics, create_grid, create_structural_framing_system, create_room, tag_rooms, create_level, create_dimensions — KHÔNG lệnh nào dựng family. Kết luận: khôi phục registry không đáp ứng được yêu cầu (3) và (4)",
+    "TIỀN LỆ ADAPTIVE ĐÃ CÓ TRÊN MÁY NÀY: bộ skill dựng cầu của chủ dự án đã dùng adaptive component cho dầm chủ, gờ lan can adaptive 2 điểm, và lan can thép adaptive 2 điểm trên dự án THẬT. Tức môi trường adaptive không phải thử nghiệm mới mà là môi trường chính của dự án. Một skill cũng ghi lại bài học ngược: family panel adaptive 4 điểm đặt tự động bị MÉO nên đã phải lùi về khối DirectShape cho dầm ngang — probe phải làm rõ ranh giới đó thay vì lặp lại",
+    "Ba nghi vấn cần probe làm rõ trước tiên: NewSweptBlend có thể chỉ nhận MỘT đường cong làm path; form adaptive có thể kén profile không phẳng; và family adaptive có thể dựng đúng hình mà KHÔNG flex theo điểm",
+    "Toạ độ sẵn cho PHA 3: tmp/arch_massing/bars.json (621 thanh, 24 nhóm, sha16 186eefc7502ac274) và tmp/arch_massing/arch_assembly_coords.json (kèm 8 mâu thuẫn đã ghi)",
+    "Ba mâu thuẫn chọc khối MT-4, MT-5, MT-8 nên xử lý TRƯỚC hoặc TRONG pha 3: family có phân loại thật sẽ làm chúng lộ thành clash chứ không ẩn như với DirectShape"
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_revit_family.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

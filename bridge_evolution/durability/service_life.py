@@ -103,11 +103,20 @@ def remaining_service_life(
     if condition_state not in CONDITION_STATE_FACTORS:
         raise ValueError(f"condition_state phải trong {sorted(CONDITION_STATE_FACTORS)}")
 
-    provenance = "SCREENING_DEFAULT"
+    applied = False
     if measured:
-        provenance = "MEASURED"
-        if "rh_percent" in measured:
-            kwargs["rh_percent"] = float(measured["rh_percent"])
+        if mechanism == "carbonation":
+            if "carbonation_k_mm_sqrt_year" in measured:
+                applied = True
+            if "rh_percent" in measured:
+                kwargs["rh_percent"] = float(measured["rh_percent"])
+                applied = True
+        elif mechanism == "chloride":
+            chl = measured.get("chloride") or {}
+            if any(k in chl for k in ("cs_percent", "ccrit_percent",
+                                       "d_ref_m2s", "m")):
+                applied = True
+    provenance = "MEASURED" if applied else "SCREENING_DEFAULT"
     theoretical = service_life_years(cover_mm, mechanism, measured=measured, **kwargs)
     factor = CONDITION_STATE_FACTORS[condition_state]
     adjusted = theoretical * factor

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "handoff_sha256": "4ea4e745253be5e8acda9934b5c6c9085b5d88c59ea90791dfa39deb947603ed",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "Finding G1 mo cua r002 da dong. Tu kiem: ca ba grammar moi nay khai project_inputs.span_length_m = 38.3, bang dung hai grammar Super-T va bang gia tri KNOWN trong docs/design_basis/DB-SUPERT-38M.json. Hau qua do duoc: tests/test_design_basis.py truoc do DO voi 'Obtained 38.3, Expected 40.0', nay 24/24 xanh. Tu chay lai chu khong tin bao cao. Khai cua nguoi nop rang khong tham so nao khac phu thuoc nhip: toi kiem dai chieu cao tiet dien cua ca ba ho va thay deu phu duoc 38.3 m trong dai da khai, nen khong bac bo duoc - nhung xem finding G2 ben duoi, ho so nay chua chay duoc den buoc do de kiem bang so."
+    },
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Claim SCREENED khop claim_ceiling. Artifact khong drift: 6/6 khop sha256 tren dia. Gates khai G0/G1/G2 la rang buoc CLI (CLAIM_GATES[SCREENED]={G0,G1,G2}), khong phai overclaim."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "KHONG BLOCK task nay (required_gates cua BRD-025 la [G0,G1]) nhung phai vao ho so vi no chan buoc sau. DO DUOC: khong mot ho nao trong ba ho moi tao duoc mot BridgeDesignState hop le, nen evaluate_candidate() KHONG chay duoc cho bat ky ho nao - dung o SCHEMA-001 truoc khi solver kip chay. Ba nguyen nhan RIENG BIET, moi cai mot ho: (1) box_girder khai girder_count domain [1] (hop don o) trong khi contracts/bridge_design_state.schema.json dat girder_count minimum = 2, loi 'girder_count: 1 is less than the minimum of 2'; (2) i_girder tro toi girder_catalog_id 'I-PARAM' khong ton tai trong catalogs/catalogs.json; (3) composite_i_girder tro toi 'CI-PARAM' cung khong ton tai. Doi chieu: ho Super-T tham so dung 'ST-PARAM' va muc do CO trong catalog - tuc nguoi nop lam DUNG khuon mau da co, chi la ba muc catalog tuong ung chua duoc tao. QUY TRACH NHIEM: ca catalogs/catalogs.json lan contracts/bridge_design_state.schema.json deu NAM NGOAI write_scope cua BRD-025, nen day khong phai loi cau tha cua nguoi nop va khong the sua trong task nay."
+    },
+    {
+      "gate": "G3",
+      "status": "PASS",
+      "evidence": "Tu chay lai toan bo: tests/test_section_types.py 16/16 xanh, tests/test_design_basis.py 24/24 xanh, toan suite chi con DUNG MOT fail la tests/test_shape_grammar_experimental.py::test_experimental_grammar_lives_only_in_sandbox. Fail do khong thuoc task nay: assertion liet ke danh sach grammar top-level da cu sau khi them ba file, va tests/test_shape_grammar_experimental.py nam trong write_scope cua BRD-028. Dau phien lam viec suite co bay fail, nay con mot."
+    }
+  ],
+  "notes": "Review doc lap boi claude (owner la opencode), vong 3. Finding G1 mo tu r002 da dong va toi kiem bang cach chay lai chu khong doc bao cao: ba grammar nay deu ve 38.3 m, test_design_basis tu DO thanh 24/24 xanh. Toan suite tu BAY fail dau phien xuong con MOT, va cai con lai thuoc write_scope cua BRD-028. CANH BAO QUAN TRONG CHO NGUOI NHAN BRD-028 - doc truoc khi claim: tieu chi nghiem thu so 1 cua BRD-028 la 'evaluate_candidate chay duoc voi ca 4 family cung mot contract'. Toi da do va tieu chi do HIEN KHONG DAT DUOC TRONG WRITE_SCOPE CUA CHINH BRD-028. Ba ho moi deu chet o SCHEMA-001 truoc khi solver chay, vi ba nguyen nhan rieng biet: box_girder khai girder_count=1 vs schema minimum=2; i_girder tro toi catalog I-PARAM khong ton tai; composite tro toi CI-PARAM khong ton tai. Hai file phai sua la contracts/bridge_design_state.schema.json va catalogs/catalogs.json - CA HAI deu nam ngoai write_scope cua BRD-028 (write_scope cua no chi co evaluate.py, evaluation_result.schema.json, hai file capability matrix, README.md va hai file test). Nen BRD-028 nhu dang duoc dinh nghia se ket giong cach BRD-004 dang ket: hop dong doi mot thu ma pham vi cua no khong cho phep dat toi. Day la van de HOP DONG TASK, khong phai van de chat luong cong viec, va nguoi phat hien khong nen tu quyet huong xu ly - toi de lai cho chu du an. Mot huong kha di la mo rong write_scope cua BRD-028 bang lab amend-task khi no con READY chua ai claim, hoac tach mot task rieng cho phan catalog va schema."
+}

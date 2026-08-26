@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-033",
+  "handoff_sha256": "101c6bb469b241089cf71b1c5a64b412c77a42e4ec161b72ab47674a7b5b93fd",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "ATTACK 1: _build_correction_ledger is defined at module level (lab.py:749-989), not nested in validate_lab. Signature accepts (root, tasks, errors) and returns a tuple of two callables. validate_lab calls it at line 1232. review_handoff calls it at line 1717: _, drift_has_approved_correction = _build_correction_ledger(root, _all_tasks(root), []). Both callers receive the same function type and invoke it with the same four arguments (handoff_path, handoff, artifact, observed_sha256). Genuinely extracted, genuinely callable from outside validate_lab, and genuinely called by review_handoff."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "ATTACK 2: Net change is +41/-42 lines (after cancellations). Old review_handoff (backup:1707-1725) built drifted list as list[str] of paths, called _validate_lab_detail(root)[1] to get correction_covered_drift set, then checked (handoff_path.name, artifact_path) not in covered. New review_handoff (lab.py:1701-1724) builds drifted as list[tuple[dict,str]] of (artifact, hash) pairs, calls _build_correction_ledger(root, _all_tasks(root), []) to get the function, then calls drift_has_approved_correction(handoff_path, handoff, artifact, observed_sha256) for each drifted pair. The old intermediate set membership check and the new direct function call are semantically equivalent. No check was weakened or removed. The moved correction machinery inside _build_correction_ledger (lines 749-989) is character-for-character identical to the old code inside _validate_lab_detail (backup:991-1220)."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "ATTACK 3: validate_lab (lab.py:992-1330) returns exactly {valid: not errors, errors: errors, task_count: len(tasks)} at line 1330. No extra key is returned. The old validate_lab (backup:1328-1336) returned _validate_lab_detail(lab_dir)[0] which produced the same dict shape. The _validate_lab_detail wrapper and the correction_covered_drift return value have been removed entirely. validate_lab is now a direct function with the same body and same return value as the original canonical form."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "ATTACK 4: review_handoff (lab.py:1709-1724) when drifted artifacts exist calls _build_correction_ledger directly at line 1717, receives drift_has_approved_correction at line 1718, and for each drifted pair calls it at line 1720. There is no intermediate key or intermediate set. The function is the exact same closure returned by _build_correction_ledger, with the same closure variables (correction_by_sha, correction_link_valid, approved_corrections, correction_chain_is_approved, valid_incidents). A handoff whose drift has no approved correction will return False from drift_has_approved_correction, triggering the ValueError at line 1723. A handoff whose drift has an approved correction will return True and pass through. No path bypasses the correction check."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "ATTACK 5: _ensure_artifact_snapshot (lab.py:115-145) has three branches: (1) if snapshot exists at expected path, verify _sha256(target) == expected, raise if wrong bytes; (2) if source not a file, raise FileNotFoundError; (3) if source exists, verify _sha256(source) != expected then raise ValueError before writing snapshot. No path allows wrong bytes to pass. This function is only called during REVISE decision (lab.py:1743-1744), not during the drift check. Even if called, every branch validates hash bytes before proceeding."
+    },
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Not required by task BRD-033."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Not required by task BRD-033."
+    }
+  ],
+  "notes": "r002 genuinely extracts _build_correction_ledger as a module-level function callable from outside validate_lab. review_handoff calls it directly via _build_correction_ledger(root,_all_tasks(root),[]) at lab.py:1717 and invokes the returned drift_has_approved_correction for each drifted artifact. No check was weakened during the move: net change is +41/-42 lines after cancellations, and the moved correction machinery is character-for-character identical. validate_lab returns the same dict shape without extra keys. review_handoff traces through drift_has_approved_correction with no intermediate key. _ensure_artifact_snapshot validates hash bytes at every branch. 14/14 correction chain tests pass. All five acceptance criteria satisfied."
+}

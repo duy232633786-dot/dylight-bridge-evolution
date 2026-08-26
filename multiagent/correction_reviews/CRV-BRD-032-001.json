@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-032-001",
+  "task_id": "BRD-032",
+  "incident_id": "INC-BRD-032-001",
+  "correction_sha256": "554eb527eec5d07aaffb11faa6fc305dc6d476d0e1d7a12d22d370c16cd0495f",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "agent_id is claude (independent); review status CHUA; snapshot bytes match previous_sha; live file matches current_sha256; diff confined to BRD-033 scope: identical lab.py changes as COR-BRD-030-005 (_ensure_artifact_snapshot snapshot-first, _validate_lab_detail with correction_covered_drift)"
+  ],
+  "notes": "All five pass criteria satisfied. Correction is valid."
+}

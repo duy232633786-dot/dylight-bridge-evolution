@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "agent_id": "opencode",
+  "role": "materials_researcher",
+  "summary": "r003: Fix provenance inflation (DEFECT 1) - remaining_service_life now tracks an applied flag per mechanism so data_provenance is MEASURED only when a measured value actually entered the model, matching apply_exposure_overrides pattern. Fix incomplete fail-closed (DEFECT 2) - load_exposure_data now rejects non-positive ccrit_percent. Two regression tests added. All 16 durability tests pass. Boundary: no function returns PASS/FAIL; all outputs remain advisory.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/durability/service_life.py",
+      "sha256": "d38a5981d301317fe7d1d65d04cc2e9d311ef8b2d853688c88d8b25f6a3108aa",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/durability/exposure_data.py",
+      "sha256": "b44ec7e346f005aabe5dda8cb2cd293b849a3925910639672acf7e3b125fc6ec",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_durability.py",
+      "sha256": "8260e6d2df9f26305abfb419b85e4e64268f6960afbc2620070e378ab36fcbe8",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "SCREENED-level provenance and validation fixes only; no new physics claims; no solver changes; PASS/FAIL-free boundary invariant preserved."
+  ],
+  "next_action": "Independent review"
+}

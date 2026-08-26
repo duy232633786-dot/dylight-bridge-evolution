@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-028",
+  "title": "Tích hợp đa loại cầu vào pipeline đánh giá + cập nhật capability matrix và README",
+  "research_question": "Khi có 3 grammar mới (BRD-025) và engine tuổi thọ (BRD-026), cần nối chúng vào evaluate/objectives/CLI ở đâu để (a) không phá benchmark hiện có, (b) đầu ra tuổi thọ xuất hiện trong evaluation_result mà không tham gia PASS/FAIL, và (c) docs/runtime_capability_matrix phản đúng năng lực mới?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": ["BRD-025", "BRD-026"],
+  "required_gates": ["G0"],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/evaluate.py",
+    "contracts/evaluation_result.schema.json",
+    "docs/runtime_capability_matrix.md",
+    "docs/runtime_capability_matrix.json",
+    "README.md",
+    "tests/test_design_basis.py",
+    "tests/test_shape_grammar_experimental.py"
+  ],
+  "acceptance_criteria": [
+    "evaluate_candidate chạy được với cả 4 family (super_t v1/v2, i_girder, box, composite) cùng một contract",
+    "evaluation_result.schema có khối durability advisory (optional) — verifier không đọc khối này để PASS/FAIL",
+    "python docs/check_runtime_drift.py OK sau khi cập nhật matrix",
+    "README có bảng so sánh 4 loại cầu + ví dụ lệnh evaluate từng loại",
+    "python -m pytest tests -q xanh"
+  ],
+  "required_artifacts": [
+    "docs/runtime_capability_matrix.json"
+  ],
+  "safety_notes": [
+    "Tuổi thọ advisory không được phép đổi verdict hay objectives ranking",
+    "Benchmark cũ (run_baseline/multiseed) phải tái lập cùng số liệu như trước thay đổi"
+  ],
+  "review_notes": []
+}

@@ -9,7 +9,19 @@
     "ST-TEST-SINGULAR": { "depth_m": 1.75, "area_m2": 0.649, "I_m4": 0.0, "y_bottom_m": 0.795, "top_flange_width_m": 2.06, "web_width_total_m": 0.20, "test_only": true },
     "ST-PARAM": {
       "parametric": true,
-      "note": "MARKER, KHÔNG phải số liệu tiết diện. Khi design_variables.girder_catalog_id = ST-PARAM, đặc trưng tiết diện được TÍNH từ 6 tham số hình dạng qua bridge_evolution.section.section_from_params, không tra catalog. Entry tồn tại để tham chiếu catalog trong state contract vẫn phân giải được."
+      "note": "MARKER, KH\u1ed0NG ph\u1ea3i s\u1ed1 li\u1ec7u ti\u1ebft di\u1ec7n. Khi design_variables.girder_catalog_id = ST-PARAM, \u0111\u1eb7c tr\u01b0ng ti\u1ebft di\u1ec7n \u0111\u01b0\u1ee3c T\u00cdNH t\u1eeb 6 tham s\u1ed1 h\u00ecnh d\u1ea1ng qua bridge_evolution.section.section_from_params, kh\u00f4ng tra catalog. Entry t\u1ed3n t\u1ea1i \u0111\u1ec3 tham chi\u1ebfu catalog trong state contract v\u1eabn ph\u00e2n gi\u1ea3i \u0111\u01b0\u1ee3c."
+    },
+    "I-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KHONG phai so lieu tiet dien. Dac trung tiet dan I duoc TINH tu 6 tham so hinh dang (girder_depth, top_flange_width, top_flange_thickness, web_thickness, bottom_flange_width, bottom_flange_thickness) qua bridge_evolution.section_types.i_girder_section_from_params, khong tra catalog."
+    },
+    "BOX-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KHONG phai so lieu tiet dien. Dac trung tiet dan hop duoc TINH tu 4 tham so hinh dang (box_web_height, box_web_thickness, box_bottom_width, box_bottom_slab) qua bridge_evolution.section_types.box_girder_section_from_params, khong tra catalog."
+    },
+    "CI-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KHONG phai so lieu tiet dien. Dac trung tiet dan I thep lien hop duoc TINH tu 6 tham so hinh dang (steel_depth, steel_top_flange_width, steel_top_flange_thickness, steel_web_thickness, steel_bottom_flange_width, steel_bottom_flange_thickness) qua bridge_evolution.section_types.composite_i_girder_section_from_params, khong tra catalog."
     }
   },
 

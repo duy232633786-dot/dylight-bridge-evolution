@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-e03038f3-01",
+  "agent_id": "codex-gpt5",
+  "role": "evidence_safety_auditor",
+  "summary": "Khóa câu hỏi, nguồn bằng chứng, unknowns, baseline, kiến trúc audit envelope, metrics, budget và falsification criteria cho vòng lặp kiểm toán-đề xuất.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260826-e03038f3/01_design_basis_and_evidence.md",
+      "sha256": "eb26a7e9bbd000de580c5a015aa07646a6fed16b9a4113388d6a11ce918d0c74",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Video TikTok chỉ là nguồn mô tả thuật toán; utilization trong video không phải dữ liệu kỹ thuật."
+  ],
+  "unresolved_risks": [
+    "Thiếu design basis cụ thể và capability N-M/slenderness/P-Delta; mọi claim kỹ thuật phải STOP."
+  ],
+  "next_action": "Task kế tiếp hiện thực schema/contract và tests cho CandidateEnvelope, ModelAudit, LimitStateAudit, RepairProposal, FallbackTrace và SearchLedger."
+}

@@ -3,7 +3,7 @@
   "grammar_version": "1.0.0",
   "description": "Grammar tham số hóa cầu hộp BTCT đơn ô đúc tại chỗ (BRD-025). girder_catalog_id khóa ở marker BOX-PARAM: section là MÁNG CHỮ U (bản đáy + 2 sườn đứng) tính qua box_girder_section_from_params; BẢN TRÊN là biến deck_slab_thickness_mm và được solver liên hợp qua composite_section sẵn có — không cần sửa solver. Hạn chế đã khai báo: L1 line-girder KHÔNG mô hình uốn xoắn đóng của hộp; kết quả chỉ mang giá trị screening dầm thay thế (equivalent beam), không dùng để kết luận xoắn/đứt gãy bản đáy.",
   "project_inputs": {
-    "span_length_m": 40.0,
+    "span_length_m": 38.3,
     "deck_width_m": 12.0,
     "alignment_type": "STRAIGHT",
     "skew_deg": 0

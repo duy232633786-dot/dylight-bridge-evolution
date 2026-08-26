@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-037",
+  "title": "Hợp đồng task đòi cổng mà runtime không thể cấp: BRD-004 kẹt vĩnh viễn, và không có gì chặn việc đó lúc claim",
+  "research_question": "BRD-004 khai claim_ceiling=SCREENED với required_gates=[G0,G1,G2] — đúng bằng CLAIM_GATES['SCREENED']. Nhưng nó được dùng cho HỌ VÒM, mà docs/runtime_capability_matrix.json (RCM-2.0.0) khai SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D, STAGED_PRESTRESS_EFFECTS đều ABSENT. Không có solver thì G2 (chất lượng mô hình: equilibrium, benchmark, solver version/hash) KHÔNG THỂ đạt, bất kể owner làm tốt đến đâu và nộp bao nhiêu revision. Hai reviewer độc lập (codex, opencode) đều ra REVISE và cùng chốt G0 FAIL; codex chốt thêm G2 FAIL với đúng lý do 'no arch solver is available'. Task rơi vào bế tắc cấu trúc: không ACCEPTED được, mà lab amend-task lại từ chối vì task đang ACTIVE và đã có handoff. Hai câu hỏi: (a) một task đã kẹt như vậy thì có lối thoát TRUNG THỰC nào, không phải bằng cách nới cổng cho qua? (b) vì sao mâu thuẫn này chỉ lộ ra ở bước REVIEW — sau khi công việc đã làm xong và hai nhà cung cấp đã tốn công thẩm định — mà không bị chặn ngay lúc CLAIM?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/collaboration/lab.py",
+    "contracts/research_task.schema.json",
+    "tests/test_task_contract_reachability.py"
+  ],
+  "acceptance_criteria": [
+    "Chặn được TẠI BƯỚC CLAIM: nếu required_gates của task đòi năng lực mà runtime capability matrix khai ABSENT cho đối tượng của task, thì lab claim phải DỪNG với thông điệp nêu đích danh gate nào và năng lực nào thiếu — không để agent làm xong rồi mới biết ở review",
+    "Task phải khai được ĐỐI TƯỢNG của nó (họ kết cấu / phạm vi runtime) thì mới nối được sang capability matrix; nếu thêm trường vào research_task.schema.json thì phải TÙY CHỌN để mọi task hiện có vẫn validate, và phải nêu rõ task không khai thì xử lý thế nào (đề xuất: cảnh báo, không chặn)",
+    "Định nghĩa lối thoát trung thực cho task đã kẹt, dùng cơ chế SẴN CÓ nếu được (vòng đời đã có trạng thái REJECTED; PROTOCOL đã có nguyên tắc 'tạo candidate lineage mới thay vì sửa lịch sử'). Nếu phải thêm cơ chế mới thì phải ghi rõ vì sao cơ chế cũ không đủ",
+    "Áp dụng lối thoát đó cho BRD-004 và ghi lại đầy đủ lý do: task được scope ở mức SCREENED nhưng đem dùng cho họ kết cấu runtime không đánh giá được. Công việc F0 IDEA đã giao KHÔNG bị vứt — nó phải đi tiếp dưới một hợp đồng đúng mức IDEA, giữ nguyên artifact và hash hiện có",
+    "TUYỆT ĐỐI không hạ required_gates của BRD-004 tại chỗ để nó APPROVE được. Đó là nới cổng cho vừa kết quả, và nó phá đúng thứ vừa chứng minh là có tác dụng",
+    "Test tái hiện: một task khai claim_ceiling=SCREENED cho họ kết cấu có solver ABSENT thì claim phải bị chặn; test đó phải ĐỎ trên bản chưa vá",
+    "Test hàng rào: task khai đúng năng lực sẵn có vẫn claim được bình thường; mọi task hiện có vẫn validate; toàn suite không tệ hơn baseline",
+    "Không đụng nội dung artifact của BRD-004 (bridge_grammar/experimental/, bridge_evolution/geometry_experimental/, experiments/shape_discovery/, tests/test_shape_grammar_experimental.py) — công việc đó không có lỗi gì cần sửa"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/collaboration/lab.py",
+    "tests/test_task_contract_reachability.py"
+  ],
+  "safety_notes": [
+    "Owner của BRD-004 (claude, phiên đã nộp handoff BRD-004.claude.r001) KHÔNG được claim task này và KHÔNG được review nó. Mọi lối thoát cho BRD-004 đều có lợi cho owner của nó, nên người hưởng lợi không được là người viết lối thoát — cùng nguyên tắc đã áp cho BRD-033",
+    "Cám dỗ lớn nhất của task này là biến nó thành 'cách làm BRD-004 được duyệt'. KHÔNG PHẢI. Kết quả đúng có thể là BRD-004 kết thúc ở trạng thái KHÔNG được nghiệm thu, và đó là kết quả hợp lệ",
+    "Đây là lần thứ TƯ đụng vào lab.py (sau BRD-030, BRD-032, BRD-033). lab.py đã được hash trong nhiều handoff ACCEPTED ⇒ sửa nó chắc chắn gây drift ⇒ phải chạy lab correct-provenance cho từng handoff bị ảnh hưởng, và correction phải do agent khác duyệt",
+    "Thêm cổng chặn ở lab claim là thay đổi có thể khoá cứng công việc của người khác nếu quá tay. Phải có đường thoát tường minh (ví dụ task khai rõ nó cố ý ở mức thấp hơn) chứ không chặn mù",
+    "Không sửa multiagent/ canonical trong lúc phát triển; thử nghiệm claim/review chạy trên bản sao tạm"
+  ],
+  "review_notes": [
+    "Task này ban đầu được ghi dưới ID BRD-035 lúc 2026-08-26 nhưng bị một phiên claude khác GHI ĐÈ bằng task khác (ba họ cầu / catalog marker) do hai phiên cùng chọn ID trống mà không có cơ chế cấp phát. Nội dung được khôi phục nguyên vẹn sang BRD-037. Bài học hạ tầng: lab KHÔNG có cấp phát task_id nguyên tử, và hai phiên cùng agent_id 'claude' thì bảng task không truy được về phiên nào",
+    "Chủ dự án chọn hướng này 2026-08-26 sau khi được trình bày ba phương án (để nguyên / sửa hợp đồng / khoá design basis thật). Hướng 'khoá design basis thật' bị hoãn vì chưa có site thật: bộ số 180 m x 52 m đến từ một phác thảo tự ghi 'kích thước minh hoạ', không phải khảo sát",
+    "Đo được: BRD-004 claim_ceiling=SCREENED, required_gates=[G0,G1,G2]; CLAIM_GATES['SCREENED']=[G0,G1,G2] (trùng khít); CLAIM_GATES['IDEA']=rỗng. research_task.schema.json không đặt minItems cho required_gates nên mảng rỗng là hợp lệ",
+    "Findings của hai reviewer lưu tại multiagent/scratch/findings-brd004-oc.json (opencode, đã ghi vào lab) và findings-brd004-codex.json (codex, KHÔNG ghi được vào lab do lỗi chạy lệnh chập chờn). Hai bên độc lập, không biết kết luận của nhau: G0 FAIL/FAIL, G1 FAIL/PASS, G2 FAIL/PASS",
+    "opencode ghi rõ: handoff khai claim_level=IDEA với gates_completed rỗng là cách khai TRUNG THỰC duy nhất khi design basis trống — tức nó không chê owner khai thấp, nó chê thiếu design basis",
+    "Giá trị nghiên cứu của ca này: hai nhà cung cấp khác nhau, độc lập, cùng từ chối nghiệm thu một sản phẩm thiếu design basis và cùng chốt đúng một cổng. Đó là bằng chứng cơ chế an toàn có tác dụng thật. Bản vá của task này KHÔNG được làm yếu điều đó",
+    "Liên quan nhưng KHÁC task: regression test_experimental_grammar_lives_only_in_sandbox (kỳ vọng 2 grammar top-level, thực tế 5 sau BRD-025) thuộc write_scope của BRD-028, không thuộc task này"
+  ],
+  "preferred_provider": "opencode",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_task_contract_reachability.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

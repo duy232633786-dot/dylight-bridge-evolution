@@ -5,11 +5,15 @@
   "research_question": "Cần mô hình dữ liệu tối thiểu nào để mỗi cấu kiện cầu trở thành tài sản vận hành (GUID ổn định, condition state 1-4, lịch sử kiểm tra, tuổi thọ thiết kế) và sinh kế hoạch quan trắc + xuất COBie-lite/JSON tái lập được từ design state?",
   "workstream": "integration",
   "priority": "P1",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
-  "dependencies": ["BRD-026"],
-  "required_gates": ["G0"],
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "opencode",
+  "dependencies": [
+    "BRD-026"
+  ],
+  "required_gates": [
+    "G0"
+  ],
   "claim_ceiling": "IDEA",
   "write_scope": [
     "bridge_evolution/bim/asset_registry.py",
@@ -31,5 +35,7 @@
     "Không thay thế phần mềm quản lý tài sản chính thức; chỉ là lớp dữ liệu trung gian mở",
     "Không tự nâng condition state; mọi thay đổi phải từ bản ghi kiểm tra do người thật nhập"
   ],
-  "review_notes": []
+  "review_notes": [
+    "24/24 tests pass. GUID solid. COBie round-trip lossless. Forgery resistance verified. Schedule invariant holds across extremes. Physics fully delegated. One limitation noted: condition_state mutable via dict assignment but API-level enforcement adequate for IDEA ceiling."
+  ]
 }

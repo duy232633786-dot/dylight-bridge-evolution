@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-ff7936da179948ef",
+  "amendment_sha256": "4d0f7c49dae0a7d06be282b52b9260342312ef02c19ae2c612c04dd7cfed6f81",
+  "created_at": "2026-08-26T09:34:28.522940Z",
+  "task_id": "BRD-028",
+  "authorized_by": "user-request-2026-08-26",
+  "reason": "Người dùng yêu cầu nâng cấp từ logic theo cột sang kiểm toán và đề xuất dùng chung cho mọi cấu kiện cầu; tận dụng phạm vi integration hiện có mà không mở rộng write_scope.",
+  "pre_task_sha256": "98c42f6567516766f1e2d294abdf2b420aa26e3d5d50fb560df82a834a4f0d18",
+  "post_task_sha256": "cc4a29a4886f9925d5ed6a1bc2f4d0b0589d2bc481d0f52775afd40d54de5bb5",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/98c42f6567516766f1e2d294abdf2b420aa26e3d5d50fb560df82a834a4f0d18.json",
+    "sha256": "98c42f6567516766f1e2d294abdf2b420aa26e3d5d50fb560df82a834a4f0d18"
+  },
+  "changes": [
+    {
+      "field": "acceptance_criteria",
+      "before": [
+        "evaluate_candidate chạy được với cả 4 family (super_t v1/v2, i_girder, box, composite) cùng một contract",
+        "evaluation_result.schema có khối durability advisory (optional) — verifier không đọc khối này để PASS/FAIL",
+        "python docs/check_runtime_drift.py OK sau khi cập nhật matrix",
+        "README có bảng so sánh 4 loại cầu + ví dụ lệnh evaluate từng loại",
+        "python -m pytest tests -q xanh"
+      ],
+      "after": [
+        "evaluation_result.schema có component_audit optional với component kind, check status, evidence provenance, blocking reasons, repair proposals và deterministic audit hash",
+        "evaluate_candidate sinh audit envelope cho mọi component manifest do caller khai; loại chưa biết hoặc thiếu hard-check evidence trả BLOCKED/NOT_EVALUATED",
+        "Registry hỗ trợ dầm, bản, dầm ngang, trụ, mố, móng/cọc, gối, khe co giãn, cáp/DƯL, vòm, giàn, liên kết và cấu kiện tạm",
+        "Repair proposal không thay đổi verdict và luôn mang cờ requires_reanalysis=true; không proposal nào tự nhận feasible",
+        "Durability vẫn advisory và verifier hiện có vẫn là authority duy nhất cho PASS/FAIL",
+        "Capability matrix và README phân biệt IMPLEMENTED audit orchestration với NOT_IMPLEMENTED physics oracle",
+        "Các test trong write scope kiểm hard fail, missing evidence, unknown component, lineage, deterministic hash và không hồi quy benchmark"
+      ]
+    },
+    {
+      "field": "research_question",
+      "before": "Khi có 3 grammar mới (BRD-025) và engine tuổi thọ (BRD-026), cần nối chúng vào evaluate/objectives/CLI ở đâu để (a) không phá benchmark hiện có, (b) đầu ra tuổi thọ xuất hiện trong evaluation_result mà không tham gia PASS/FAIL, và (c) docs/runtime_capability_matrix phản đúng năng lực mới?",
+      "after": "Làm thế nào để evaluation_result mang một component audit fail-closed, có lineage và đề xuất tái phân tích cho mọi họ cấu kiện cầu, trong khi runtime hiện tại vẫn giữ nguyên verifier L1 và claim ceiling SCREENED?"
+    },
+    {
+      "field": "safety_notes",
+      "before": [
+        "Tuổi thọ advisory không được phép đổi verdict hay objectives ranking",
+        "Benchmark cũ (run_baseline/multiseed) phải tái lập cùng số liệu như trước thay đổi"
+      ],
+      "after": [
+        "Component audit chỉ tổ chức evidence; không tự tạo demand/capacity và không thay independent verifier",
+        "N-M, P-Delta, buckling, fatigue, geotech, hydraulic, staged construction và durability phải NOT_EVALUATED nếu không có evidence phù hợp",
+        "Không mở cầu vòm/dây văng/treo ở L1; registry chỉ cho phép mô tả capability và blocker",
+        "Hard safety gate không được đổi lấy chi phí, carbon, thẩm mỹ hoặc xác suất surrogate"
+      ]
+    },
+    {
+      "field": "title",
+      "before": "Tích hợp đa loại cầu vào pipeline đánh giá + cập nhật capability matrix và README",
+      "after": "Tích hợp kiểm toán và đề xuất đa cấu kiện cầu vào pipeline"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "READY"
+}

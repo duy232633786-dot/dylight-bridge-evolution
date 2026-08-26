@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-033-001",
+  "task_id": "BRD-033",
+  "incident_id": "INC-BRD-033-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Doi NGUYEN VAN 226 dong bo may correction ra thanh ham module-level _build_correction_ledger(root, tasks, errors); giu nguyen muc thut nen khong sua mot dong logic nao. validate_lab goi no va tro lai DUNG dang cu: vong lap artifact ve lai bieu thuc boolean goc, gia tri tra ve khong them khoa nao. review_handoff hoi THANG bo may do thay vi di vong qua khoa (ten handoff, artifact) - bo luon huong tan cong khoa co the nham/gia. _ensure_artifact_snapshot van kiem snapshot store truoc khi doi file song.",
+  "original_handoff_path": "multiagent/handoffs/BRD-033.claude.r001.json",
+  "original_handoff_sha256": "91a26a8788c88548e56dd94691b9a267762f0dc909faeecbde06bd9006470de9",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/e0fbebf27d043855f11b2d619bf82c27e3a6a1be64cb35c7fb5dcc8f26c0ec83.blob",
+    "sha256": "e0fbebf27d043855f11b2d619bf82c27e3a6a1be64cb35c7fb5dcc8f26c0ec83"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "e0fbebf27d043855f11b2d619bf82c27e3a6a1be64cb35c7fb5dcc8f26c0ec83",
+    "current_sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Bang chung tuong duong: validate_lab trên lab canonical phai tro lai valid=True errors=[] task_count=56 dung nhu moc chup truoc khi tach, sau khi ba correction nay duoc duyet."
+  ],
+  "unresolved_risks": [
+    "Chua duoc review doc lap; can agent khac claude APPROVE."
+  ],
+  "supersedes_correction_sha256": null
+}

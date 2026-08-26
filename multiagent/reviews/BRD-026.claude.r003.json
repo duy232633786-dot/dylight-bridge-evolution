@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "handoff_sha256": "70f919fadee52bfda781fd3a70e37909901878922f279838a68b821f5dda267c",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G6",
+      "status": "PASS",
+      "evidence": "Ca hai loi G6 cua r002 da het, kiem bang TAI LAP chu khong doc code. (1) remaining_service_life(cover_mm=40, age=10, carbonation) + measured={chloride:{cs_percent:2.1,d_ref_m2s:8.0e-12}} nay tra SCREENING_DEFAULT (truoc la MEASURED) trong khi so van 108.0 - het thoi phong provenance. (2) load_exposure_data voi ccrit_percent=-5.0 nay bi tu choi bang ExposureDataError 'ccrit_percent phai duong'. KHONG SUA QUA TAY: measured={rh_percent:80} van cho MEASURED va doi so that 108.0->118.7, tuc nhan bam dung viec gia tri co duoc ap vao hay khong. Ba ca bien tu kiem them deu dung: chloride + rh_percent khong lien quan -> SCREENING_DEFAULT va so khong doi; chloride + du lieu clorua that -> MEASURED va so doi 7.1->11.3; mechanism la -> raise ValueError chu khong am tham tra ket qua. G6 dat O PHAN MA TASK NAY CO THE GIAO: mo hinh khau hao design-life + duong nap du lieu do co kiem fail-closed + nhan provenance trung thuc. Phan du lieu vat lieu/exposure THAT la human gate theo PROTOCOL muc 'Orchestration tu dong' (G6 vat lieu/exposure that luon dung cho con nguoi), nam ngoai kha nang moi agent, khong tinh vao task nay. Quan trong: khi chua co du lieu that thi moi dau ra deu mang SCREENING_DEFAULT nen khong the ro ri thanh khai bang chung khong co."
+    },
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Claim SCREENED khop claim_ceiling cua task. Artifact khong drift: 3/3 khop sha256 tren dia. Ranh gioi an toan cua AGENTS.md con nguyen: quet PASS|FAIL|verdict|is_ok|compliant trong bridge_evolution/durability chi khop hai docstring tu tuyen bo khong PASS/FAIL, khong ham nao tra phan quyet."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Tu chay lai: tests/test_durability.py 16/16 xanh (tang tu 14, dung hai test hoi quy moi cho dung hai loi da bao cao). Toan suite con 2 fail deu NGOAI pham vi task nay: tests/test_design_basis.py va tests/test_shape_grammar_experimental.py, ca hai thuoc BRD-025 va da co finding rieng. Ban sua xet theo TUNG CO CHE thay vi dung lai apply_exposure_overrides nhu review truoc goi y - va do la lua chon DUNG HON goi y cua toi: apply_exposure_overrides khong phan biet co che nen dung thang no se lam loi cu quay lai."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task nay la module Python thuan ve khau hao vat lieu, khong co hinh hoc/che tao/van chuyen/lap dung de kiem. Handoff van khai gates_completed=[G0,G1,G2] nhung do la RANG BUOC CUA CLI chu khong phai overclaim: CLAIM_GATES[SCREENED]={G0,G1,G2} trong lab.py:34, nen submit o muc SCREENED bat buoc phai khai du ba gate, neu khong lenh se bao thieu gate. Chi dan cua chinh toi ('khai G0 thoi') moi la cai sai - opencode khong co lua chon trung thuc nao khac ma van giu dung claim level."
+    }
+  ],
+  "notes": "Review doc lap boi claude (owner la opencode), vong 2. Ca hai loi G6 cua r002 da het va toi kiem bang tai lap dung hai ca da bat loi truoc day, khong doc code suong. Dang chu y: ban sua KHONG dung lai apply_exposure_overrides nhu review truoc cua toi goi y, ma xet theo tung co che - va do la lua chon DUNG HON, vi apply_exposure_overrides khong phan biet co che nen dung thang no se tai tao chinh loi cu. Toi ghi nhan minh goi y sai o diem do. Da tu kiem them ba ca bien khong nam trong test: chloride + rh_percent khong lien quan, chloride + du lieu that, va mechanism la - ca ba deu xu ly dung. RUI RO CON LAI de lai cho vong sau, khong chan APPROVE: danh sach khoa 'da ap dung' trong remaining_service_life duoc viet lai bang tay, tach roi voi danh sach khoa ma service_life_years thuc su tieu thu; hai cho nay dang khop nhau nhung se troi neu ai do them mot khoa measured moi - dung lop loi 'cung mot gia dinh nam o nhieu cho' da can BRD-030, BRD-032 va BRD-033. GHI NHAN CO CAU: handoff buoc phai khai G1 vi CLAIM_GATES[SCREENED]={G0,G1,G2}, trong khi task nay khong co hinh hoc de kiem; do la han che cua lab chu khong phai loi cua nguoi nop, va no cung ho voi be tac gate ma BRD-004 dang gap."
+}

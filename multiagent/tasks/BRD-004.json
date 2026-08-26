@@ -5,9 +5,9 @@
   "research_question": "Những topology/hình dạng nào tạo xung đột thực giữa vật liệu, carbon, độ cứng, thi công và thẩm mỹ mà vẫn sàng lọc được bằng vật lý?",
   "workstream": "geometry",
   "priority": "P1",
-  "status": "REVIEW",
+  "status": "ACTIVE",
   "owner": "claude",
-  "reviewer": null,
+  "reviewer": "opencode",
   "dependencies": [
     "BRD-001",
     "BRD-002"
@@ -39,6 +39,7 @@
     "Render đẹp chỉ mang mức IDEA cho đến khi qua solver/verifier"
   ],
   "review_notes": [
-    "Chuyen BACKLOG -> READY ngay 2026-08-22: hai dependency BRD-001 va BRD-002 deu da ACCEPTED. Task duoc kich hoat de nghien cuu mot render cau vom do chu du an dua vao, dua tren thu vien 111 nguon trong research/literature/ va tai lieu da nhap vao Obsidian Library."
+    "Chuyen BACKLOG -> READY ngay 2026-08-22: hai dependency BRD-001 va BRD-002 deu da ACCEPTED. Task duoc kich hoat de nghien cuu mot render cau vom do chu du an dua vao, dua tren thu vien 111 nguon trong research/literature/ va tai lieu da nhap vao Obsidian Library.",
+    "G0 FAIL: all 16 project_inputs are null or TBD, no design basis locked. G1 PASS: sandbox isolation enforced, geometry parametric repeatable, L0 constructability fail-closed. G2 PASS: geometry validation and L0 checks implemented, hash reproducible, 133 tests pass. Overall REVISE: task cannot claim SCREENED without locked design basis (G0). One stale test assertion from BRD-025 cross-task regression."
   ]
 }

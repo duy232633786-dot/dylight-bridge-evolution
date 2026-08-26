@@ -3,7 +3,7 @@
   "grammar_version": "1.0.0",
   "description": "Grammar tham số hóa dầm thép I liên hợp bản BT cốt thép (BRD-025). girder_catalog_id khóa ở marker CI-PARAM: section thép I tính qua composite_i_girder_section_from_params. MỨC HỖ TRỢ THẬT: CHỈ L0 — geometry.check_geometry gắn HARD violation SOLVER-COMPOSITE-001 chặn trước solver vì mô hình sức kháng L1 (khối nén bê tông MODEL-001 + tao DUL dính bám + Vc bê tông trên web) KHÔNG hợp lệ cho dầm thép. Mọi candidate composite sẽ REJECTED ở L0 cho tới khi có solver composite thật (task riêng) — đây là chặn trung thực, không phải lỗi hình học.",
   "project_inputs": {
-    "span_length_m": 40.0,
+    "span_length_m": 38.3,
     "deck_width_m": 12.0,
     "alignment_type": "STRAIGHT",
     "skew_deg": 0

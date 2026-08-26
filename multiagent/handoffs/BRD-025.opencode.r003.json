@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-025",
+  "agent_id": "opencode",
+  "role": "structural_analyst",
+  "summary": "r003: Fixed G1 FAIL by setting project_inputs.span_length_m to 38.3 in all three new grammars (i_girder, box_girder, composite_i_girder) to match the locked design basis DB-SUPERT-38M.json. Checked span-dependent parameters (depth ranges, girder spacing, slab thickness, prestressing layouts, concrete grades) and found none require adjustment: all families can produce valid sections at 38.3m within their declared grids. test_design_basis.py passes; test_section_types.py passes (16/16); full suite has 1 pre-existing failure in test_shape_grammar_experimental.py (stale expected file list, BRD-028 scope).",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/section_types.py",
+      "sha256": "43971fd6cd57668d8d6365b93255ea6aa63efd0326bfbc24ddaa947d53e4669d",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_grammar/i_girder_parametric_v1.json",
+      "sha256": "e4131a7c16baecc857a180be54a8456846e38d4cfd8833c15a69271346d571cb",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_grammar/box_girder_parametric_v1.json",
+      "sha256": "a6bf5449cc2b6bc00bf5a3c6879540d78bd1a6cc552a3cd4c43f142f46ea7808",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_grammar/composite_i_girder_parametric_v1.json",
+      "sha256": "83b178b66dfd71ac23df79764db94a017c3a61469e4e7cf0c1d35fc692cdbb20",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/geometry.py",
+      "sha256": "02494260a0248fcd4f87906c64255a8e6cf48fce1ccf7c6c89475cffb8f3050c",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_section_types.py",
+      "sha256": "815bb9ffb8d2fbdab4e1b1ab212567d73deecf795e3e6e675d0a95ef74a0e220",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Box girder L1 line-girder results remain outside model validity (type-k distribution factor span, torsion not modeled, shear model from Super-T does not apply to box webs). Composite I-girder is hard-blocked by SOLVER-COMPOSITE-001 until a composite solver is implemented. Both families carry claim_ceiling IDEA in the design basis. No new risks introduced by the span correction."
+  ],
+  "next_action": "Independent review"
+}

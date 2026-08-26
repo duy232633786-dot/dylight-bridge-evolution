@@ -5,9 +5,9 @@
   "research_question": "Dữ liệu đầu vào, nguồn gốc và tiêu chí nào phải khóa trước khi nghiên cứu đề tài này?",
   "workstream": "design_basis",
   "priority": "P0",
-  "status": "REVIEW",
+  "status": "ACCEPTED",
   "owner": "codex",
-  "reviewer": null,
+  "reviewer": "claude",
   "dependencies": [],
   "required_gates": [
     "G0"
@@ -27,7 +27,9 @@
   "safety_notes": [
     "Không tự bịa site, tải, địa chất, thủy văn hay thuộc tính vật liệu"
   ],
-  "review_notes": [],
+  "review_notes": [
+    "APPROVE artifact F0 IDEA, KHONG endorse gate. Review cheo nha cung cap: owner=codex, reviewer=claude — doc lap thoa man (review_provider trong task ghi codex la SAI vi trung owner; review_handoff chi rang buoc owner != reviewer nen ban ghi nay hop le). DUYET CAI GI: mot ban ghi bang chung BIM tai lap duoc cho Revit Family V3 vom 160 m, gom 5 hash SHA-256 (RVT/RFA/generator/assembly/QA report), 5 metric phoi hop BIM, va bao luu day du KET QUA AM. KHONG DUYET: bat ky claim nao ve kha nang chiu luc, tuan thu TCVN 11823-6, hay tinh hoan chinh cua mo hinh. PHAN DOI CO GHI NHAN: handoff khai gates_completed=[G0] la NOI QUA — chinh artifact khong noi vay va con liet ke du lieu G0 dang thieu. Vi claim_level=IDEA khong doi gate nao (CLAIM_GATES[IDEA] rong) nen sai lech nay khong nang muc claim, do do ghi nhan thay vi REVISE. Nguoi doc sau KHONG duoc trich thanh 'G0 da dat'. BA RUI RO artifact tu neu va xu ly dung: (1) verifier du an van ok=false, khong duoc bao cao nhu mo hinh cau hoan chinh; (2) thieu 4 nhom context legacy ARCH_TRANSVERSE_BRACING, SUBSTRUCTURE_TOWER_BRACING, ABUTMENTS_WINGWALLS, BACKSTAY_ANCHORS; (3) lech dung 7.0 m giua dinh tru/goi hien huu z=41.5 va day mat cau phuong an vom z=48.5 — artifact noi dung rang giao cat hinh hoc giua vong co chan vom voi chan tru xien KHONG chung minh mat cau duoc do. Buoc ke tiep dung nhu artifact de xuat: thiet ke adapter dau tru rieng truoc khi noi bat ky duong truyen luc nao."
+  ],
   "source_brief_id": "RND-20260824-d88a2a60",
   "preferred_provider": "claude",
   "preferred_role": "evidence_safety_auditor",

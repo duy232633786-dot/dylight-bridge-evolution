@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-033",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "BUG DO DUOC: cung mot lab, validate_lab tra valid=True trong khi review_handoff raise 'Khong the review handoff da drift'. Task co artifact drift ket vinh vien o REVIEW du chuoi correction da duoc nha cung cap khac duyet. BAN VA: review_handoff khong tu phan nua ma hoi lai CHINH bo may cua validate_lab qua loi vao noi bo _validate_lab_detail(root)[1], tra ve tap (ten handoff, duong dan artifact) ma drift da duoc chuoi correction APPROVE tha. Mot bo may, hai loi vao - khong phai hai quy tac. CHO THU BA (safety_note bat grep het): _ensure_artifact_snapshot cung so hash rieng va chan duong REVISE. Neu chi sua review_handoff thi reviewer chi APPROVE duoc ma khong REVISE duoc mot handoff da drift - he tu tao ap luc phai duyet, te hon bug dang sua. Da sua bang cach kiem snapshot store TRUOC khi doi file song khop, vi dieu kien that su can la bytes tai recorded hash ton tai bat bien, khong phai file song con nguyen. BANG CHUNG: 5 test moi trong tests/test_correction_chain.py; test go be tac DA DO dung ly do truoc khi va (raise tai lab.py:1680) va xanh sau khi va. 14/14 test_correction_chain xanh, 9 test cu khong sua mot dong. Toan suite tu 7 fail xuong 2 fail; 5 fail test_collaboration bien mat vi lab hop le tro lai, 2 fail con lai (test_design_basis, test_shape_grammar_experimental) thuoc BRD-025 dang do dang va da co finding rieng.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/lab.py",
+      "sha256": "e0fbebf27d043855f11b2d619bf82c27e3a6a1be64cb35c7fb5dcc8f26c0ec83",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_correction_chain.py",
+      "sha256": "673a17a7e52766e7a981701533f6430efb2482a15d58ce7afa7fbb536a292ea1",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Tieu chi 2 cua hop dong yeu cau TACH bo may correction ra khoi than validate_lab. Toi KHONG tach nguyen khoi ~260 dong dan xen giua dung error va dung index, vi day la lan thu ba dung vao bo may chong sua lich su va hai lan truoc deu sot. Thay vao do giu DUY NHAT mot cai dat va them loi vao noi bo. Reviewer can phan xu xem cach nay co thoa 'dung CHUNG mot ham' hay khong.",
+    "Hinh dang tra ve cua validate_lab duoc giu NGUYEN co chu dich: tests/test_task_contract_amendment.py so sanh bang dung dict va nam NGOAI write_scope cua task nay. Lan thu nghiem dau tien them khoa vao dict do da lam do chinh test ay - da hoan lai."
+  ],
+  "unresolved_risks": [
+    "Nguoi thuc hien task nay KHONG duoc dong thoi review BRD-004 sau do: bug vua sua chinh la thu dang chan BRD-004 duoc review, nen se la tu tao dieu kien cho chinh minh. Rang buoc nay do hop dong dat ra va toi ghi nhan tuan thu.",
+    "Chua kiem tren lab canonical rang BRD-004 va BRD-029 gio review duoc; theo acceptance_criteria viec do phai chay tren BAN SAO. Reviewer nen tu chay lai tren ban sao thay vi tin bao cao.",
+    "4 correction provenance (COR-BRD-030-005/006, COR-BRD-032-001/002) da duoc opencode review doc lap APPROVE; neu reviewer thay mot trong so do khong dat thi ban va nay chua co duong provenance hop le."
+  ],
+  "next_action": "Independent review"
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-035",
+  "title": "Ba họ cầu mới không qua nổi hợp đồng: thiếu mục catalog và girder_count kẹt ở minimum 2",
+  "research_question": "BRD-025 đã thêm ba họ i_girder / box_girder / composite_i và BRD-029 đã mở enum family, nhưng KHÔNG họ nào tạo được một BridgeDesignState hợp lệ: cả ba chết ở SCHEMA-001 trước khi solver kịp chạy. Ba nguyên nhân riêng biệt, đo được: (1) box_girder khai girder_count domain [1] cho hộp đơn ô, trong khi contracts/bridge_design_state.schema.json đặt girder_count minimum = 2 ở CẤP GLOBAL; (2) i_girder trỏ tới girder_catalog_id 'I-PARAM' không tồn tại trong catalogs/catalogs.json; (3) composite_i trỏ tới 'CI-PARAM' cũng không tồn tại. Họ Super-T tham số dùng 'ST-PARAM' và mục đó CÓ trong catalog — tức khuôn mẫu đã đúng, chỉ là ba mục tương ứng chưa ai tạo. Hai file phải sửa đều nằm ngoài write_scope của BRD-025 lẫn BRD-028, nên không task nào hiện có đóng được khoảng trống này. Làm sao mở đường cho ba họ mà KHÔNG nới hàng rào cho các họ còn lại?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "owner": "opencode",
+  "reviewer": null,
+  "dependencies": [
+    "BRD-025",
+    "BRD-029"
+  ],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "catalogs/catalogs.json",
+    "contracts/bridge_design_state.schema.json",
+    "tests/test_multifamily_contract.py"
+  ],
+  "acceptance_criteria": [
+    "Thêm ba mục marker I-PARAM, BOX-PARAM, CI-PARAM vào catalogs/catalogs.json theo ĐÚNG khuôn ST-PARAM: parametric=true kèm note nói rõ đây là MARKER để tham chiếu catalog phân giải được, KHÔNG phải số liệu tiết diện",
+    "girder_count = 1 hợp lệ CHỈ cho box_girder_parametric_v1; bốn họ còn lại vẫn phải bị chặn ở minimum 2",
+    "Sau khi sửa, cả bốn họ (super_t_parametric_v2, i_girder, box_girder, composite_i) đều dựng được một BridgeDesignState qua validate_design_state mà KHÔNG còn lỗi schema",
+    "Bảy input_hash gold case trong tests/test_state.py phải y nguyên — nới hợp đồng không được dịch một byte nào của canonical_json",
+    "Test mới tests/test_multifamily_contract.py chứa ĐỦ bốn ca âm: girder_count=1 bị từ chối cho super_t, cho i_girder, cho composite_i, và girder_count=0 bị từ chối cho MỌI họ",
+    "python -m pytest tests -q không hồi quy"
+  ],
+  "required_artifacts": [
+    "catalogs/catalogs.json",
+    "contracts/bridge_design_state.schema.json",
+    "tests/test_multifamily_contract.py"
+  ],
+  "safety_notes": [
+    "BẪY CHÍNH: girder_count đang có minimum 2 ở cấp global trong properties. JSON Schema allOf là phép AND, nên một khối if/then KHÔNG nới được ràng buộc global. Muốn cho box girder dùng 1 thì phải hạ global rồi SIẾT LẠI từng họ khác trong khối if/then của chúng. Làm ẩu bước này là mở girder_count=1 cho cả bốn họ kia — hồi quy nghiêm trọng hơn nhiều so với bug đang sửa. Bốn ca âm trong acceptance_criteria sinh ra chính để bắt lỗi đó",
+    "Ba mục catalog là MARKER, không phải số liệu tiết diện. Không được điền đặc trưng hình học bịa vào đó; đặc trưng được TÍNH từ tham số hình dạng như ST-PARAM đang làm",
+    "Không đụng bridge_grammar/*.json: ba grammar đã được BRD-025 duyệt và nằm ngoài write_scope của task này. Nếu thấy grammar sai thì báo trong handoff, không tự sửa",
+    "Nới hợp đồng KHÔNG có nghĩa là ba họ mới đã được kiểm chứng. Trần claim riêng của từng họ trong grammar_bindings (box và composite đang ở IDEA vì hệ số phân bố ngang nằm ngoài miền áp dụng) vẫn giữ nguyên và vẫn chặn như cũ"
+  ],
+  "review_notes": [],
+  "preferred_provider": "opencode",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_multifamily_contract.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_state.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

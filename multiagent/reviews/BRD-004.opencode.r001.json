@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-004",
+  "handoff_sha256": "55911553f00873d29495c24394d0ef34383dcdb130392e338ab95cd701f5f064",
+  "reviewer_id": "opencode",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "project_inputs in arch_deck_v1.json has all 16 fields set to null or codes=[TBD]: site_id, crossing_span_available_m, valley_depth_m, deck_width_m, lane_count, design_live_load_model, rock_ucs_mpa, rock_mass_rating, joint_set_orientation_deg, wedge_daylighting, district_code_for_agR, seismic_spectrum_type, basic_wind_speed, exposure_class, design_life_years, codes. The pre_registration.json states project_inputs toan null and THRESHOLDS_NOT_YET_PROVIDED for every L0 group. The render study marks all design basis items as UNKNOWN. No G0 lock exists anywhere in the write scope. Without locked SI units, site, span, clearance, codes and geotech exposure, the claim ceiling cannot reach SCREENED."
+    },
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "arch_geometry.py provides parametric repeatable geometry for arch axis (parabola and catenary), spandrel column lines and rib transverse offsets with ArchGeometryError fail-closed validation on every input. Sandbox isolation is enforced: load_grammar('arch_deck_v1') raises FileNotFoundError (test passes), load_grammar('experimental/arch_deck_v1') raises GrammarIdError (test passes, BRD-022), and schema enum blocks arch family from production design state (test passes). Grammar file is correctly placed under bridge_grammar/experimental/ only. Pre-registration documents the sandbox scope and construction stage schema S0-S7. The test file test_shape_grammar_experimental.py has one stale assertion in test_experimental_grammar_lives_only_in_sandbox (expects 2 top-level grammar files, actual is 5 after BRD-025 added 3), but this is a cross-task regression on a BRD-004 artifact, not a sandbox isolation failure. The remaining 132 tests pass. FAB/LIFT/ERECTION/INSPECTION L0 checks implemented with thresholds_NOT_YET_PROVIDED and fail-closed UNKNOWN_INPUT_MISSING, which is the correct state at IDEA level."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "arch_geometry.py implements geometry validation (validate_arch_params checks span, rise, axis type, equal springing elevation) and arch_axis_polyline discretizes the arch axis with boundary condition enforcement (y=0 at springings, exact span). L0 constructability (arch_l0_constructability.py) implements 7 checks covering segment length, segment mass, even segment count for closure, half-arch segments, inspection clearance, minimum column height and rib clear gap, all with user-provided thresholds and provenance. Equilibrium is checked indirectly through the parabolic thrust derivation in the grammar (H/V = L/(4f), step-by-step). Element type is appropriate (2D polyline for F0 IDEA). No numerical solver is involved so solver version and mesh convergence are not applicable. The handoff admits that sandbox isolation still partly relies on accident (budgeted evaluator KeyError) and that 13 ARCH-NEED items are ABSENT/PARTIAL, but at SCREENED/IDEA level this is an honest representation of the state, not a defect in the G2 evidence. The 133 tests in test_shape_grammar_experimental.py verify hash reproducibility, lineage correctness and module contracts. One stale assertion exists (see G1 finding) but does not affect G2 gate evidence."
+    }
+  ],
+  "notes": "G0 FAIL: all 16 project_inputs are null or TBD, no design basis locked. G1 PASS: sandbox isolation enforced, geometry parametric repeatable, L0 constructability fail-closed. G2 PASS: geometry validation and L0 checks implemented, hash reproducible, 133 tests pass. Overall REVISE: task cannot claim SCREENED without locked design basis (G0). One stale test assertion from BRD-025 cross-task regression."
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-027",
+  "agent_id": "claude",
+  "role": "bim_fem_integrator",
+  "summary": "Lop tai san van hanh BIM cho bac N7. asset_registry.py: GUID XAC DINH bang uuid5 tren namespace co dinh DYLIGHT_ASSET_NAMESPACE + khoa (bridge_id, element_type, element_index) da chuan hoa trim+lower; khong dung uuid4 hay bat ky nguon ngau nhien nao. Thang tinh trang 1-4 muon THANG DO cua AASHTO Manual for Bridge Element Inspection (GOOD/FAIR/POOR/SEVERE) - module KHONG tu cham diem, khong suy tinh trang ra tu bat cu tinh toan nao. condition_state KHONG co setter: duong duy nhat doi no la record_inspection() voi ngay ISO va ten nguoi ghi; lich su chi noi them, khong sua khong xoa, va ngay lui ve truoc lan kiem gan nhat bi tu choi. So moi lap co condition_evidence=NONE de ho so NOI THANG rang chua ai kiem tra, thay vi de mac dinh 1=GOOD trong nhu mot ket luan. COBie-lite ba bang type/component/attribute, round-trip khop ca sau khi di qua json.dumps; khi nap nguoc thi GUID duoc TINH LAI tu (facility, TypeName, chi so) va lech la tu choi - sua tay mot ky tu se bi bat. inspection_plan.py KHONG chua mo hinh khau hao nao: uy thac toan bo phan vat ly cho bridge_evolution.durability cua BRD-026 (carbonation/chloride_initiation_years, inspection_plan, optimal_inspection_interval). Bat bien cua lich: lan kiem dau roi TRUOC thoi diem khoi phat du bao, va co truong first_inspection_precedes_initiation de noi ra khi khong dat. plan_for_registry ghi rieng khoi skipped kem ly do cho loai cau kien thieu cover_mm thay vi im lang bo qua. TEST: 24/24 test_asset_registry xanh, trong do co test chay TIEN TRINH KHAC bang subprocess de chung minh GUID tai lap duoc that su chu khong phai on dinh trong mot lan chay. Toan suite khong hoi quy: van dung 2 fail cu thuoc BRD-025.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/bim/asset_registry.py",
+      "sha256": "f47d7bd8ea7650e82dc0c373c445cdba39c949619111533aaaa68c7e58f823d1",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/bim/inspection_plan.py",
+      "sha256": "624d119caa1223c5712e2cd8fe89f2af4336d0a2df3144fb2b62e7ae09ccc41a",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_asset_registry.py",
+      "sha256": "04b6bdc9dbbbe46435c249f142b01980179cc37d87cec62056593a783feb1598",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Khong tao va khong sua bridge_evolution/bim/__init__.py vi no NAM NGOAI write_scope cua task (write_scope chi gom ba file). Thu muc bim da ton tai san va pyproject da liet ke bridge_evolution.bim nen khong co lo hong dong goi - toi da kiem truoc chu khong gia dinh.",
+    "Ngay thang do NGUOI GOI cung cap dang ISO YYYY-MM-DD; module khong goi datetime.now(). Chu y la lua chon co chu dich: mot ham sinh ho so kiem dinh ma tu lay gio he thong thi khong tai lap duoc va khong test duoc."
+  ],
+  "unresolved_risks": [
+    "Hai module moi KHONG duoc re-export tu bridge_evolution/bim/__init__.py (file do ngoai write_scope), khac voi durability von export API qua __init__. Nguoi dung phai import duong dan day du bridge_evolution.bim.asset_registry. Can mot task co __init__.py trong scope de dong nhat.",
+    "Chua noi vao verifier hay evaluate.py: lop nay hien la kho du lieu doc lap, chua co rule LCC-*/MAINT-* nao doc no, va chua co objective vong doi nao dung no. Do la buoc N6 chu khong phai task nay.",
+    "Thang tinh trang 1-4 muon cua AASHTO MBEI nhung chua doi chieu voi he phan loai kiem dinh cau cua Viet Nam (22 TCN 243-98 va cac van ban thay the). Truoc khi dung cho cong trinh that phai anh xa lai."
+  ],
+  "next_action": "Independent review"
+}

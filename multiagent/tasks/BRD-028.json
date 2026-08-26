@@ -1,15 +1,20 @@
 {
   "schema_version": "1.0",
   "task_id": "BRD-028",
-  "title": "Tích hợp đa loại cầu vào pipeline đánh giá + cập nhật capability matrix và README",
-  "research_question": "Khi có 3 grammar mới (BRD-025) và engine tuổi thọ (BRD-026), cần nối chúng vào evaluate/objectives/CLI ở đâu để (a) không phá benchmark hiện có, (b) đầu ra tuổi thọ xuất hiện trong evaluation_result mà không tham gia PASS/FAIL, và (c) docs/runtime_capability_matrix phản đúng năng lực mới?",
+  "title": "Tích hợp kiểm toán và đề xuất đa cấu kiện cầu vào pipeline",
+  "research_question": "Làm thế nào để evaluation_result mang một component audit fail-closed, có lineage và đề xuất tái phân tích cho mọi họ cấu kiện cầu, trong khi runtime hiện tại vẫn giữ nguyên verifier L1 và claim ceiling SCREENED?",
   "workstream": "integration",
   "priority": "P1",
-  "status": "READY",
-  "owner": null,
+  "status": "ACTIVE",
+  "owner": "codex-gpt5",
   "reviewer": null,
-  "dependencies": ["BRD-025", "BRD-026"],
-  "required_gates": ["G0"],
+  "dependencies": [
+    "BRD-025",
+    "BRD-026"
+  ],
+  "required_gates": [
+    "G0"
+  ],
   "claim_ceiling": "SCREENED",
   "write_scope": [
     "bridge_evolution/evaluate.py",
@@ -21,18 +26,22 @@
     "tests/test_shape_grammar_experimental.py"
   ],
   "acceptance_criteria": [
-    "evaluate_candidate chạy được với cả 4 family (super_t v1/v2, i_girder, box, composite) cùng một contract",
-    "evaluation_result.schema có khối durability advisory (optional) — verifier không đọc khối này để PASS/FAIL",
-    "python docs/check_runtime_drift.py OK sau khi cập nhật matrix",
-    "README có bảng so sánh 4 loại cầu + ví dụ lệnh evaluate từng loại",
-    "python -m pytest tests -q xanh"
+    "evaluation_result.schema có component_audit optional với component kind, check status, evidence provenance, blocking reasons, repair proposals và deterministic audit hash",
+    "evaluate_candidate sinh audit envelope cho mọi component manifest do caller khai; loại chưa biết hoặc thiếu hard-check evidence trả BLOCKED/NOT_EVALUATED",
+    "Registry hỗ trợ dầm, bản, dầm ngang, trụ, mố, móng/cọc, gối, khe co giãn, cáp/DƯL, vòm, giàn, liên kết và cấu kiện tạm",
+    "Repair proposal không thay đổi verdict và luôn mang cờ requires_reanalysis=true; không proposal nào tự nhận feasible",
+    "Durability vẫn advisory và verifier hiện có vẫn là authority duy nhất cho PASS/FAIL",
+    "Capability matrix và README phân biệt IMPLEMENTED audit orchestration với NOT_IMPLEMENTED physics oracle",
+    "Các test trong write scope kiểm hard fail, missing evidence, unknown component, lineage, deterministic hash và không hồi quy benchmark"
   ],
   "required_artifacts": [
     "docs/runtime_capability_matrix.json"
   ],
   "safety_notes": [
-    "Tuổi thọ advisory không được phép đổi verdict hay objectives ranking",
-    "Benchmark cũ (run_baseline/multiseed) phải tái lập cùng số liệu như trước thay đổi"
+    "Component audit chỉ tổ chức evidence; không tự tạo demand/capacity và không thay independent verifier",
+    "N-M, P-Delta, buckling, fatigue, geotech, hydraulic, staged construction và durability phải NOT_EVALUATED nếu không có evidence phù hợp",
+    "Không mở cầu vòm/dây văng/treo ở L1; registry chỉ cho phép mô tả capability và blocker",
+    "Hard safety gate không được đổi lấy chi phí, carbon, thẩm mỹ hoặc xác suất surrogate"
   ],
   "review_notes": []
 }

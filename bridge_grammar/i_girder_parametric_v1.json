@@ -3,7 +3,7 @@
   "grammar_version": "1.0.0",
   "description": "Grammar tham số hóa cầu dầm I BTCT DUL tiền ứng lực giản đơn (BRD-025). girder_catalog_id khóa ở marker I-PARAM: đặc trưng tiết diện TÍNH từ 6 biến hình dạng qua bridge_evolution.section_types.i_girder_section_from_params, cùng contract khóa với Super-T nên chạy trọn L0 + L1 line-girder (solver liên hợp bản qua composite_section sẵn có). Rule profile BRIDGE-RULESET-V2 bật nhóm FAB với ngưỡng riêng của I DUL (dày sườn đổ xưởng, chỗ tao trong cánh dưới, cẩu, vận chuyển, L/H).",
   "project_inputs": {
-    "span_length_m": 35.0,
+    "span_length_m": 38.3,
     "deck_width_m": 12.0,
     "alignment_type": "STRAIGHT",
     "skew_deg": 0

@@ -5,9 +5,9 @@
   "research_question": "Máy người dùng có khoảng 19.000 tài liệu kỹ thuật trải trên nhiều ổ (1.224 PDF, 15.824 DWG, 535 RVT, 1.216 tài liệu Office). Làm sao đưa toàn bộ vào tầm với của não 2 trong Obsidian mà KHÔNG copy hàng trăm GB và không làm vault quá tải, đồng thời chỉ ra được tài liệu nào có giá trị trực tiếp cho runtime?",
   "workstream": "knowledge",
   "priority": "P1",
-  "status": "REVIEW",
+  "status": "ACTIVE",
   "owner": "claude",
-  "reviewer": null,
+  "reviewer": "codex",
   "dependencies": [],
   "required_gates": [
     "G0"
@@ -41,7 +41,8 @@
     "Quy mô đo được 2026-08-21: ổ D 21 pdf/201 dwg/27 docx/16 xlsx/5 doc/8 rvt; ổ E 564 pdf/11675 dwg/142 docx/319 xlsx/127 doc/367 rvt; ổ G 639 pdf/3948 dwg/231 docx/565 xlsx/184 doc/160 rvt.",
     "PHÁT HIỆN GIÁ TRỊ NHẤT: /e/BIM  CIM/drive-download-20260307T164604Z-3-001/FLIE CAD-20230216T025818Z-001/FLIE CAD/Section Super T 38.2m.dwg — mặt cắt Super-T 38,2 m, đúng loại dầm mà catalog đang dùng số PLACEHOLDER cho A, I, y_b. Đây là đường gỡ gate engineer_approved PENDING trong docs/01_research_contract.md muc 7.",
     "Các tài liệu liên quan khác: TIM CAP DUL.dwg (bố trí cáp DƯL), Beam/Section I33m.dwg, hồ sơ TKBVTC cầu Ngô Quyền và Tôn Thất Thuyết, trụ cầu Tân An, Balanced_Cantilever_Construction_Strategy.pdf, 5 chuyên đề BIM, TCVN 4054/5729/7957/4513 cho phần đường.",
-    "TCVN 11823 (12 phần) ĐÃ có trong vault tại Standards/TCVN 11823-2017/PDF/ nên không import lại."
+    "TCVN 11823 (12 phần) ĐÃ có trong vault tại Standards/TCVN 11823-2017/PDF/ nên không import lại.",
+    "Independent review found the scoped test command blocked by Access is denied and no personal-document path with reason in skipped; counts and repo vault exclusion otherwise agree."
   ],
   "preferred_provider": "claude",
   "preferred_role": "bim_fem_integrator",

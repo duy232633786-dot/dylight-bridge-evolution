@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-030-006",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-006",
+  "correction_sha256": "fd39573a043a8476338806dd96b026274a547c892140f45c2ad720f9d3ab3d75",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "agent_id is claude (independent); review status CHUA; snapshot bytes match previous_sha; live file matches current_sha256; diff is pure additions (+99/-0) to test_correction_chain.py: new test_review_handoff_accepts_drift_covered_by_an_approved_correction and helpers, no existing test modified"
+  ],
+  "notes": "All five pass criteria satisfied. Correction is valid."
+}

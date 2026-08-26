@@ -194,3 +194,30 @@ def test_exposure_data_rejects_unknown_keys_and_missing_source(tmp_path):
     assert r0["data_provenance"] == "SCREENING_DEFAULT"
     r1 = remaining_service_life(10, 40, measured={"rh_percent": 80.0})
     assert r1["data_provenance"] == "MEASURED"
+
+
+# ------------------------------------------------------- regression: provenance inflation
+def test_irrelevant_measured_does_not_inflate_provenance():
+    """Measured chloride data must NOT inflate provenance for carbonation (DEFECT 1)."""
+    r = remaining_service_life(
+        cover_mm=40, current_age_years=10, mechanism="carbonation",
+        measured={"chloride": {"cs_percent": 2.1, "d_ref_m2s": 8.0e-12}},
+    )
+    assert r["data_provenance"] == "SCREENING_DEFAULT"
+    # theoretical life unchanged — chloride measured values were not applied
+    assert r["theoretical_life_years"] == pytest.approx(108.0)
+
+
+# ------------------------------------------------------- regression: fail-closed ccrit
+def test_exposure_data_rejects_negative_ccrit_percent(tmp_path):
+    """Non-positive ccrit_percent must be rejected (DEFECT 2)."""
+    from bridge_evolution.durability import ExposureDataError, load_exposure_data
+
+    f = tmp_path / "bad_ccrit.json"
+    f.write_text(
+        '{"source": "Tram QN 2024", "measured": '
+        '{"chloride": {"ccrit_percent": -5.0}}}',
+        encoding="utf-8",
+    )
+    with pytest.raises(ExposureDataError):
+        load_exposure_data(f)

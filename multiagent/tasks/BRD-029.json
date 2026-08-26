@@ -5,9 +5,9 @@
   "research_question": "Hàng rào thật chặn ba họ cầu mới (i_girder, box_girder, composite_i) không nằm ở hình học mà ở hợp đồng: contracts/bridge_design_state.schema.json khoá 'family' bằng enum hai giá trị và khoá span/width/alignment/skew bằng 'const'. Làm sao nới hợp đồng cho đủ bốn họ mà (a) KHÔNG đổi một byte nào của canonical_json với state cũ, tức input_hash và case_id lịch sử bảo toàn, và (b) mỗi họ vẫn bị khoá đúng một phạm vi chứ không nới thành khoảng tự do?",
   "workstream": "integration",
   "priority": "P0",
-  "status": "REVIEW",
+  "status": "ACCEPTED",
   "owner": "claude",
-  "reviewer": null,
+  "reviewer": "opencode",
   "dependencies": [],
   "required_gates": [
     "G0"
@@ -38,7 +38,9 @@
     "Không sửa ba file grammar (BRD-025 sở hữu) và không sửa tests/test_shape_grammar_experimental.py (BRD-028 sở hữu)",
     "Nới hợp đồng là mở CỬA cho phương án chạy tới verifier, không phải cấp hiệu lực cho con số phát ra"
   ],
-  "review_notes": [],
+  "review_notes": [
+    "Independent review confirmed: all 27 tests pass, lab status valid with empty errors. G0 design-basis discipline correct (enum expansion 2 to 5 with claim ceilings preserved, per-family if/then constraints lock project scope). G1 schema topology valid (additionalProperties=false, 5 allOf blocks, per-family shape key isolation). G2 model quality verified (input_hash preservation across 7 gold cases, packaging fix applied). Covered drifts in DB-SUPERT-38M.json and pyproject.toml are resolved by approved provenance corrections under BRD-033."
+  ],
   "preferred_provider": "claude",
   "preferred_role": "bim_fem_integrator",
   "review_provider": "codex",

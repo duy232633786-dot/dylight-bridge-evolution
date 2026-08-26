@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-027",
+  "handoff_sha256": "99992d132b972aea302e2aad41782bbe1e16624558e8d9029fd2755550dd1ef0",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Task at IDEA claim ceiling. All outputs carry advisory=True; no PASS/FAIL emitted by any function. Design basis not mutated. Units are dimensionless or ISO dates. Three files match write_scope."
+    },
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "GUID determinism verified: UUIDv5 from fixed namespace DYLIGHT_ASSET_NAMESPACE + normalized key (lower+strip). Unicode, whitespace, 10000-char names, huge indices all stable. Negative index and bool rejected. No collisions in 400 tested GUIDs. Cross-process reproducibility confirmed by subprocess test in suite."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Registry is plain dict; caller CAN set condition_state directly bypassing record_inspection. condition_evidence also freely mutable. Handoff states condition_state does not have a setter (true for dict value) but omits that caller can still assign to the dict key. API-level enforcement is adequate for IDEA claim; handoff language should note this design limitation."
+    },
+    {
+      "gate": "G3",
+      "status": "PASS",
+      "evidence": "COBie round-trip lossless: export-import-export produces identical JSON. Null design_life, unicode inspector names and notes all preserved. Triple round-trip confirmed stable via standalone debug."
+    },
+    {
+      "gate": "G4",
+      "status": "PASS",
+      "evidence": "Forged records rejected: importer recomputes GUID from (facility, TypeName, index) and rejects any mismatch. All vectors tested: forged facility, forged TypeName, forged Name, mismatched component/attribute ExternalIdentifiers. Cannot forge consistent document without knowing the UUID namespace."
+    },
+    {
+      "gate": "G5",
+      "status": "PASS",
+      "evidence": "Schedule invariant holds: first_inspection_precedes_initiation flag present and True for thin cover (5mm, t_init=1.6y, first=0.8y), old bridge (current_age=80y), short design life (10y), thick cover (100mm). Flag reports False honestly when invariant cannot hold."
+    },
+    {
+      "gate": "G6",
+      "status": "PASS",
+      "evidence": "inspection_plan.py contains zero degradation formulas. All physics delegated to bridge_evolution.durability via direct imports (carbonation_initiation_years, chloride_initiation_years, inspection_plan, optimal_inspection_interval)."
+    }
+  ],
+  "notes": "24/24 tests pass. GUID solid. COBie round-trip lossless. Forgery resistance verified. Schedule invariant holds across extremes. Physics fully delegated. One limitation noted: condition_state mutable via dict assignment but API-level enforcement adequate for IDEA ceiling."
+}

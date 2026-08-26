@@ -1,0 +1,38 @@
+"""Engine tuổi thọ — khấu hao vật liệu cho cầu BTCT/thép (BRD-026).
+
+MỨC CLAIM: SCREENED/ADVISORY. Mọi đầu ra ở đây là ƯỚC LƯỢNG SÀNG LỌC từ mô
+hình khấu hao chuẩn trong tài liệu, KHÔNG phải kết luận kiểm định. Không hàm
+nào ở đây được phép trả PASS/FAIL — chỉ trả số năm, mốc thời gian và kế hoạch
+đề xuất kèm nhãn advisory.
+
+Mô hình (nguồn trong docstring từng module):
+    carbonation.py — carbonat hóa √t, hiệu chỉnh theo fck/RH/exposure
+    chloride.py    — xâm thực clorua Fick-2, D(t) giảm theo tuổi (DuraCrete)
+    fatigue.py     — S-N (dạng log N = log A − m·log Δσ) + Miner
+    service_life.py— tổng hợp initiation + propagation → tuổi thọ còn lại
+    maintenance.py — chu kỳ kiểm tra/bảo trì + LCC-lite chọn chu kỳ
+"""
+from .carbonation import carbonation_coefficient, carbonation_initiation_years
+from .chloride import chloride_concentration, chloride_initiation_years
+from .exposure_data import (ExposureDataError, apply_exposure_overrides,
+                            load_exposure_data)
+from .fatigue import cycles_to_failure, fatigue_life_years, miner_damage
+from .maintenance import inspection_plan, optimal_inspection_interval
+from .service_life import remaining_service_life, service_life_years
+
+__all__ = [
+    "carbonation_coefficient",
+    "carbonation_initiation_years",
+    "chloride_concentration",
+    "chloride_initiation_years",
+    "cycles_to_failure",
+    "fatigue_life_years",
+    "miner_damage",
+    "service_life_years",
+    "remaining_service_life",
+    "inspection_plan",
+    "optimal_inspection_interval",
+    "ExposureDataError",
+    "load_exposure_data",
+    "apply_exposure_overrides",
+]

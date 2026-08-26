@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-026",
+  "handoff_sha256": "930d663e3541dcdd06d0dc3522cb098f7a2b4d462ec9befefb9d6dd0dcf86831",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G6",
+      "status": "FAIL",
+      "evidence": "Thoi phong provenance. remaining_service_life() trong service_life.py gan data_provenance=MEASURED chi vi tham so measured khac rong, KHONG kiem xem co gia tri do dac nao thuc su duoc ap vao mo hinh. Tai lap doc lap: remaining_service_life(cover_mm=40, current_age_years=10, mechanism=carbonation) tra SCREENING_DEFAULT voi theoretical_life_years=108.0; goi lai y het nhung them measured={chloride:{cs_percent:2.1, d_ref_m2s:8.0e-12}} tra MEASURED va van dung 108.0. Khong mot gia tri do dac nao duoc su dung nhung ket qua tu nhan la co do dac. Chinh module nay da lam DUNG viec do o apply_exposure_overrides() bang co applied; remaining_service_life khong tai su dung ma cai dat lai sai. Day la vi pham truc tiep cam ket cua r002 (khi co du lieu do dac thi data_provenance=MEASURED thay SCREENING_DEFAULT) va la loai loi khai khong bang chung ma G6 sinh ra de chan."
+    },
+    {
+      "gate": "G6",
+      "status": "FAIL",
+      "evidence": "Fail-closed khong day du. load_exposure_data() kiem tri cho cs_percent (phai duong), d_ref_m2s (phai duong) va m (trong [0,1]) nhung BO SOT ccrit_percent. Tai lap doc lap: file {source: tram QN 2024, measured:{chloride:{ccrit_percent:-5.0}}} duoc nap THANH CONG voi ccrit_percent=-5.0. Nguong clorua toi han am la vo nghia vat ly va se troi thang vao mo hinh khoi phat an mon. Trai voi cam ket ghi ngay trong docstring cua chinh module: du lieu kem chat luong khong duoc troi vao mo hinh duoi dang gia tri co ve hop le."
+    },
+    {
+      "gate": "G6",
+      "status": "FAIL",
+      "evidence": "Test khong bao phu duong that bai. tests/test_durability.py dong 191-196 chi thu duong hanh phuc: measured={rh_percent:80.0} la gia tri THUC SU duoc ap dung. Khong co test nao cho truong hop measured khac rong nhung khong ap dung duoc, nen bo test hien tai khoa cung hanh vi sai thay vi bat no. Sua xong phai them test hoi quy cho ca hai lo hong tren."
+    },
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Claim level SCREENED khop claim_ceiling cua task. Handoff khai gates_completed G0/G1/G2 va KHONG khai G6, nhat quan voi rui ro tu khai chua co du lieu phoi that. Viec khong tu nang claim la dung."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Kiem chung doc lap: 9/9 artifact cua handoff r002 khop sha256 tren dia, khong drift. Chay lai tests/test_durability.py + tests/test_section_types.py cho 30/30 xanh, dung con so handoff khai. Chay them tests/test_state.py + tests/test_site_spec.py (hai bo khac co cham durability) cho 48/48 xanh. Bay test do cua toan suite deu nam ngoai pham vi BRD-026 (test_collaboration do provenance pyproject.toml, test_design_basis va test_shape_grammar_experimental thuoc BRD-025/BRD-029 dang do dang) nen khong tinh vao task nay."
+    },
+    {
+      "gate": "G3",
+      "status": "PASS",
+      "evidence": "Ranh gioi an toan duoc giu: khong ham nao trong bridge_evolution/durability tra PASS/FAIL. Quet PASS|FAIL|verdict|is_ok|compliant chi khop hai docstring tu tuyen bo khong PASS/FAIL. Moi dau ra deu kem advisory=True va ghi chu khong thay the kiem dinh hien truong."
+    }
+  ],
+  "notes": "Review doc lap boi claude (owner la opencode). Hai loi G6 duoc xac nhan bang tai lap chu khong phai doc code: (1) remaining_service_life tu nhan MEASURED du khong dung mot gia tri do dac nao - chung minh bang hai lan goi cho cung 108.0 nam nhung khac nhan; (2) load_exposure_data nap duoc ccrit_percent=-5.0. Ca hai deu danh vao dung cai ma r002 tuyen bo hoan tat, va G6 la mot trong hai required_gates cua task nen khong the APPROVE. Phan con lai cua task lam tot: khong ro ri PASS/FAIL, artifact khong drift, 30/30 test trong pham vi xanh, khong tu nang claim level. Huong sua goi y: cho remaining_service_life goi lai apply_exposure_overrides va lay co applied lam nguon duy nhat cua nhan provenance; them kiem tri ccrit_percent phai duong; them hai test hoi quy. Bay test do cua toan suite khong thuoc task nay."
+}

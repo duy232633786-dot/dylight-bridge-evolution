@@ -76,6 +76,8 @@ def load_exposure_data(path: str | Path) -> dict:
             raise ExposureDataError("d_ref_m2s phải dương")
         if "m" in chl and not (0 <= float(chl["m"]) <= 1.0):
             raise ExposureDataError("m phải trong [0, 1]")
+        if "ccrit_percent" in chl and float(chl["ccrit_percent"]) <= 0:
+            raise ExposureDataError("ccrit_percent phải dương")
     if "source" not in raw or not str(raw["source"]).strip():
         raise ExposureDataError("Thiếu 'source' — dữ liệu không provenance thì không nạp")
     return raw

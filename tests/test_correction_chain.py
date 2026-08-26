@@ -23,6 +23,7 @@ from bridge_evolution.collaboration import (
     record_provenance_correction,
     review_provenance_correction,
     submit_handoff,
+    review_handoff,
     claim_task,
     validate_lab,
 )
@@ -231,3 +232,101 @@ def test_the_head_of_the_chain_must_still_be_approved(tmp_path):
     (REPO_ROOT / ARTIFACT)  # artifact thật không đổi trong test này
     result = validate_lab(lab)
     assert isinstance(result["valid"], bool)
+
+
+# ---------------------------------------------------------------------------
+# 3. review_handoff phải dùng CHUNG quy tắc tha drift với validate_lab (BRD-033)
+#
+#    Bế tắc trước bản vá: validate_lab tha drift khi chuỗi correction đã được
+#    một nhà cung cấp khác duyệt APPROVE, nhưng review_handoff chỉ có đúng một
+#    phép so hash trần rồi raise. Hệ quả: cùng một lab, validate_lab trả
+#    valid=True trong khi review_handoff từ chối — task có artifact drift kẹt
+#    vĩnh viễn ở REVIEW, không đường ra.
+#
+#    Ba test hàng rào bên dưới quan trọng hơn test gỡ bế tắc: nới sai một dòng
+#    ở đây là hợp thức hoá drift mà không ai duyệt.
+# ---------------------------------------------------------------------------
+
+_FINDINGS = [{
+    "gate": "G0", "status": "PASS",
+    "evidence": "Fixture BRD-033: chỉ kiểm đường đi của review, không kiểm nội dung kỹ thuật.",
+}]
+
+
+def _approved_correction(lab, handoff, snapshot):
+    """Chuỗi correction đầy đủ: ghi correction rồi được agent KHÁC duyệt APPROVE."""
+    correction = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        correction["correction"]["correction_id"], "codex", "APPROVE",
+        ["snapshot khớp recorded hash; diff đúng phạm vi khai báo"],
+        "correction hợp lệ", lab_dir=lab)
+    return correction
+
+
+def test_review_handoff_accepts_drift_covered_by_an_approved_correction(tmp_path):
+    """ĐỎ trước bản vá: review_handoff raise dù validate_lab đã tha drift này."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    _approved_correction(lab, handoff, snapshot)
+
+    # Tiền đề: validate_lab KHÔNG coi drift CỦA HANDOFF NÀY là chưa xử lý.
+    # Không dùng valid toàn kho: bản sao kế thừa mọi drift đang có của repo thật,
+    # kể cả drift do chính task đang chạy gây ra.
+    own = [e for e in validate_lab(lab)["errors"] if e.startswith("BRD-998")]
+    assert own == [], own
+
+    result = review_handoff(
+        "BRD-998", "codex", "APPROVE", _FINDINGS,
+        "review được vì drift đã đi qua correction có người khác duyệt", lab_dir=lab)
+    assert result["decision"] == "APPROVE"
+
+
+def test_review_handoff_still_refuses_drift_with_no_correction(tmp_path):
+    """HÀNG RÀO CHÍNH: không correction thì vẫn chặn y như cũ."""
+    lab = _lab(tmp_path)
+    _handoff_with_drift(lab, tmp_path)
+    with pytest.raises(ValueError, match="đã drift"):
+        review_handoff("BRD-998", "codex", "APPROVE", _FINDINGS,
+                       "không được lọt", lab_dir=lab)
+
+
+def test_review_handoff_still_refuses_drift_whose_correction_is_unreviewed(tmp_path):
+    """Có correction nhưng CHƯA ai xem thì chưa phải là đã xử lý."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    _correct(lab, handoff, snapshot)
+    with pytest.raises(ValueError, match="đã drift"):
+        review_handoff("BRD-998", "codex", "APPROVE", _FINDINGS,
+                       "correction chưa được review độc lập", lab_dir=lab)
+
+
+def test_review_handoff_still_refuses_drift_whose_correction_was_revised(tmp_path):
+    """Mắt xích bị REVISE là VÔ HIỆU; không có bản thay thế được duyệt thì vẫn chặn."""
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    correction = _correct(lab, handoff, snapshot)
+    review_provenance_correction(
+        correction["correction"]["correction_id"], "codex", "REVISE",
+        ["chưa đạt yêu cầu diễn đạt"], "làm lại", lab_dir=lab)
+    with pytest.raises(ValueError, match="đã drift"):
+        review_handoff("BRD-998", "codex", "APPROVE", _FINDINGS,
+                       "mắt xích vô hiệu không hợp thức hoá được drift", lab_dir=lab)
+
+
+def test_reviewer_can_also_revise_a_handoff_whose_drift_was_corrected(tmp_path):
+    """Nếu chỉ APPROVE chạy được còn REVISE thì chết, hệ tự tạo áp lực phải duyệt.
+
+    Đường REVISE đi qua _ensure_artifact_snapshot; trước bản vá hàm đó đòi file
+    SỐNG phải khớp recorded hash nên nó chết đúng ở ca drift đã có correction —
+    dù bytes tại recorded hash đã nằm sẵn trong snapshot store.
+    """
+    lab = _lab(tmp_path)
+    handoff, snapshot = _handoff_with_drift(lab, tmp_path)
+    _approved_correction(lab, handoff, snapshot)
+
+    result = review_handoff(
+        "BRD-998", "codex", "REVISE",
+        [{"gate": "G0", "status": "FAIL", "evidence": "Fixture: kiểm đường REVISE."}],
+        "phải trả về được ACTIVE chứ không phải nổ", lab_dir=lab)
+    assert result["decision"] == "REVISE"
+    assert json.loads((lab / "tasks" / "BRD-998.json").read_text(encoding="utf-8"))["status"] == "ACTIVE"

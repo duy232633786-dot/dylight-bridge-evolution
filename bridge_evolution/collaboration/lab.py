@@ -15,7 +15,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import tempfile
-from typing import Iterable
+from typing import Callable, Iterable
 import uuid
 
 from jsonschema import Draft202012Validator
@@ -113,21 +113,28 @@ def _snapshot_path(root: Path, sha256: str) -> Path:
 
 
 def _ensure_artifact_snapshot(root: Path, artifact: dict) -> Path:
-    """Persist exact reviewed bytes under their SHA-256 without overwriting."""
-    source = _project_path(artifact["path"])
-    if not source.is_file():
-        raise FileNotFoundError(source)
+    """Persist exact reviewed bytes under their SHA-256 without overwriting.
+
+    BRD-033: điều kiện thật sự cần là BYTES TẠI recorded hash phải tồn tại bất
+    biến, không phải file sống phải còn nguyên. Một artifact đã drift hợp lệ
+    (đi qua correct-provenance) đã có sẵn snapshot đúng bytes đó. Kiểm snapshot
+    TRƯỚC nên đường REVISE không còn chết ở đây — nếu không, reviewer chỉ
+    APPROVE được mà không REVISE được, tức là hệ tự tạo áp lực phải duyệt.
+    """
     expected = artifact["sha256"]
-    if _sha256(source) != expected:
-        raise ValueError(
-            f"Artifact đã drift trước review: {artifact['path']} không khớp {expected}"
-        )
     target = _snapshot_path(root, expected)
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
         if not target.is_file() or _sha256(target) != expected:
             raise ValueError(f"Snapshot path tồn tại nhưng bytes sai hash: {target}")
         return target
+    source = _project_path(artifact["path"])
+    if not source.is_file():
+        raise FileNotFoundError(source)
+    if _sha256(source) != expected:
+        raise ValueError(
+            f"Artifact đã drift trước review: {artifact['path']} không khớp {expected}"
+        )
     try:
         with target.open("xb") as stream:
             stream.write(source.read_bytes())
@@ -739,6 +746,249 @@ def _validate_contaminated_attempt_repairs(
                 )
 
 
+def _build_correction_ledger(
+    root: Path, tasks: dict, errors: list[str]
+) -> tuple[Callable[[str, str], bool], Callable[[Path, dict, dict, str], bool]]:
+    """Bộ máy correction dùng chung — MỘT cài đặt, nhiều nơi hỏi (BRD-033).
+
+    Trước đây toàn bộ khối này nằm lọt trong thân ``validate_lab`` nên
+    ``review_handoff`` không với tới được, và đã tự so hash rồi raise — tức là
+    quy tắc thứ hai chạy song song. Bài học BRD-030 rồi BRD-032: cùng một giả
+    định nằm ở nhiều chỗ là nguồn của mọi lần sót. Khối được dời ra NGUYÊN VĂN,
+    không sửa một dòng logic nào, để hành vi của ``validate_lab`` không đổi.
+
+    ``errors`` được ghi thêm tại chỗ. Nơi gọi nào không cần báo lỗi thì truyền
+    một list rời và bỏ đi; phần PHÁN QUYẾT không phụ thuộc vào việc đó.
+    """
+    _, valid_incidents = _record_collection(
+        root, "incidents", "provenance_incident.schema.json", "incident_id", errors)
+    _, valid_corrections = _record_collection(
+        root, "corrections", "provenance_correction.schema.json", "correction_id", errors)
+    _, valid_correction_reviews = _record_collection(
+        root, "correction_reviews", "provenance_correction_review.schema.json",
+        "review_id", errors)
+
+    for incident_id, (path, incident) in valid_incidents.items():
+        if path.name != f"{incident_id}.json":
+            errors.append(f"{path.name}: filename không khớp incident_id")
+        if incident["task_id"] not in tasks:
+            errors.append(f"{path.name}: task_id không tồn tại")
+
+    correction_by_sha = {
+        _sha256(path): (path, correction)
+        for path, correction in valid_corrections.values()
+    }
+    # Phán quyết của từng correction, tiền tính TRƯỚC vòng lặp dưới. Vòng kiểm
+    # review chạy sau vòng kiểm correction, nên không được tra ngược
+    # ``approved_corrections`` ở đây — sẽ phụ thuộc thứ tự lặp.
+    #
+    # FAIL-CLOSED với review trùng: ``review_provenance_correction`` không cho
+    # ghi review thứ hai, nhưng một file chép tay thì có thể. Nếu một correction
+    # có nhiều phán quyết KHÁC nhau thì không được lấy cái ghi sau cùng — đó là
+    # đường để đầu độc bảng này. Xung đột ⇒ coi như KHÔNG có phán quyết hợp lệ,
+    # và báo lỗi để người ta nhìn thấy.
+    _decisions_by_correction: dict[str, set[str]] = {}
+    for _path, _review in valid_correction_reviews.values():
+        _decisions_by_correction.setdefault(
+            _review["correction_sha256"], set()).add(_review["decision"])
+    correction_decision: dict[str, str] = {}
+    for _sha, _decisions in _decisions_by_correction.items():
+        if len(_decisions) == 1:
+            correction_decision[_sha] = next(iter(_decisions))
+        else:
+            errors.append(
+                f"correction {_sha[:12]}: có {len(_decisions)} phán quyết xung đột "
+                f"({sorted(_decisions)}); review của correction là bất biến nên đây là "
+                "dấu hiệu bản ghi bị sửa tay — coi như chưa có phán quyết"
+            )
+
+    correction_link_valid: dict[str, bool] = {}
+    for correction_id, (path, correction) in valid_corrections.items():
+        link_errors: list[str] = []
+        if path.name != f"{correction_id}.json":
+            link_errors.append("filename không khớp correction_id")
+        if correction["task_id"] not in tasks:
+            link_errors.append("task_id không tồn tại")
+        incident_entry = valid_incidents.get(correction["incident_id"])
+        if not incident_entry:
+            link_errors.append("incident_id không trỏ tới incident hợp lệ")
+        else:
+            _, incident = incident_entry
+            linked_fields = (
+                ("task_id", correction["task_id"]),
+                ("original_handoff_path", correction["original_handoff_path"]),
+                ("original_handoff_sha256", correction["original_handoff_sha256"]),
+                ("artifact_path", correction["corrected_artifact"]["path"]),
+                ("recorded_sha256", correction["corrected_artifact"]["previous_sha256"]),
+            )
+            for field, expected in linked_fields:
+                if incident[field] != expected:
+                    link_errors.append(f"incident linkage lệch {field}")
+        try:
+            original_handoff = _lab_link_path(root, correction["original_handoff_path"])
+            handoff_root = (root / "handoffs").resolve()
+            if original_handoff.parent != handoff_root:
+                link_errors.append("original_handoff_path không nằm trong handoffs canonical")
+            elif not original_handoff.is_file():
+                link_errors.append("thiếu original handoff")
+            elif _sha256(original_handoff) != correction["original_handoff_sha256"]:
+                link_errors.append("original handoff hash không khớp")
+            else:
+                original_value = _load_json(original_handoff)
+                if original_value.get("task_id") != correction["task_id"]:
+                    link_errors.append("original handoff thuộc task khác")
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            link_errors.append(f"original handoff không hợp lệ: {exc}")
+        try:
+            snapshot = _lab_link_path(root, correction["snapshot"]["path"])
+            expected_snapshot = correction["snapshot"]["sha256"]
+            expected_previous = correction["corrected_artifact"]["previous_sha256"]
+            if not snapshot.is_file():
+                link_errors.append("thiếu immutable snapshot")
+            elif _sha256(snapshot) != expected_snapshot:
+                link_errors.append("snapshot bytes không khớp snapshot hash")
+            if expected_snapshot != expected_previous:
+                link_errors.append("snapshot hash không khớp recorded artifact hash")
+        except (OSError, ValueError) as exc:
+            link_errors.append(f"snapshot không hợp lệ: {exc}")
+        supersedes = correction.get("supersedes_correction_sha256")
+        if supersedes:
+            previous = correction_by_sha.get(supersedes)
+            if not previous or previous[1].get("task_id") != correction["task_id"]:
+                link_errors.append("supersedes không trỏ tới correction cùng task")
+            else:
+                previous_correction = previous[1]
+                previous_artifact = previous_correction["corrected_artifact"]
+                current_artifact = correction["corrected_artifact"]
+                if (
+                    previous_correction["original_handoff_path"]
+                    != correction["original_handoff_path"]
+                    or previous_correction["original_handoff_sha256"]
+                    != correction["original_handoff_sha256"]
+                    or previous_artifact["path"] != current_artifact["path"]
+                ):
+                    link_errors.append("supersedes correction khác lineage/artifact")
+                # Cùng MỘT quy tắc với correction_chain_is_approved: mắt xích
+                # trước được APPROVE thì bước này nối vào kết quả của nó; mắt
+                # xích trước bị REVISE/REJECT là VÔ HIỆU nên bước này phải xuất
+                # phát lại từ đúng mốc mà nó xuất phát.
+                if correction_decision.get(supersedes) == "APPROVE":
+                    expected_link = previous_artifact["current_sha256"]
+                else:
+                    expected_link = previous_artifact["previous_sha256"]
+                if expected_link != current_artifact["previous_sha256"]:
+                    link_errors.append("correction chain bị đứt old/new hash")
+        for message in link_errors:
+            errors.append(f"{path.name}: {message}")
+        correction_link_valid[_sha256(path)] = not link_errors
+
+    approved_corrections: set[str] = set()
+    for review_id, (path, review) in valid_correction_reviews.items():
+        link_errors: list[str] = []
+        if path.name != f"{review_id}.json":
+            link_errors.append("filename không khớp review_id")
+        correction_entry = correction_by_sha.get(review["correction_sha256"])
+        if not correction_entry:
+            link_errors.append("correction_sha256 không trỏ tới correction handoff")
+        else:
+            _, correction = correction_entry
+            if review["task_id"] != correction["task_id"]:
+                link_errors.append("review task_id lệch correction")
+            if review["incident_id"] != correction["incident_id"]:
+                link_errors.append("review incident_id lệch correction")
+            if review["reviewer_id"] == correction["agent_id"]:
+                link_errors.append("correction agent không được tự review")
+            try:
+                original = _load_json(_lab_link_path(
+                    root, correction["original_handoff_path"]
+                ))
+                if review["reviewer_id"] == original.get("agent_id"):
+                    link_errors.append("original handoff agent không được review correction")
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                link_errors.append(f"không đọc được original handoff agent: {exc}")
+        for message in link_errors:
+            errors.append(f"{path.name}: {message}")
+        if (
+            not link_errors
+            and review["decision"] == "APPROVE"
+            and correction_link_valid.get(review["correction_sha256"], False)
+            # Xung đột phán quyết ⇒ không có phán quyết. Nếu thiếu điều kiện này
+            # thì chỉ cần chép thêm một file review APPROVE bên cạnh một REVISE
+            # là hợp thức hoá được drift.
+            and correction_decision.get(review["correction_sha256"]) == "APPROVE"
+        ):
+            approved_corrections.add(review["correction_sha256"])
+
+    def correction_chain_is_approved(
+        correction_sha256: str, original_artifact_sha256: str
+    ) -> bool:
+        """Require an unbroken, independently approved chain back to handoff bytes."""
+        visited: set[str] = set()
+        current_sha256 = correction_sha256
+        is_head = True
+        while current_sha256:
+            if current_sha256 in visited:
+                return False
+            visited.add(current_sha256)
+            entry = correction_by_sha.get(current_sha256)
+            if not entry or not correction_link_valid.get(current_sha256, False):
+                return False
+            # Mắt xích ĐANG XÉT phải được review độc lập APPROVE. Mắt xích cũ hơn
+            # có thể là bản VÔ HIỆU (bị REVISE/REJECT) đã bị thay thế — đi xuyên
+            # qua nó KHÔNG nới lỏng gì, vì bản thay thế vẫn phải được duyệt và
+            # snapshot của nó vẫn phải khớp đúng mốc mà bản vô hiệu xuất phát.
+            if is_head and current_sha256 not in approved_corrections:
+                return False
+            correction = entry[1]
+            supersedes = correction.get("supersedes_correction_sha256")
+            if not supersedes:
+                return (
+                    correction["corrected_artifact"]["previous_sha256"]
+                    == original_artifact_sha256
+                )
+            previous_entry = correction_by_sha.get(supersedes)
+            if not previous_entry or not correction_link_valid.get(supersedes, False):
+                return False
+            previous_correction = previous_entry[1]
+            if supersedes in approved_corrections:
+                # Bản trước ĐÃ được chấp nhận: bước này phải nối vào kết quả của nó.
+                expected = previous_correction["corrected_artifact"]["current_sha256"]
+            else:
+                # Bản trước VÔ HIỆU: bước này phải xuất phát từ đúng mốc của nó.
+                expected = previous_correction["corrected_artifact"]["previous_sha256"]
+            if correction["corrected_artifact"]["previous_sha256"] != expected:
+                return False
+            is_head = False
+            current_sha256 = supersedes
+        return False
+
+    def drift_has_approved_correction(
+        handoff_path: Path, handoff: dict, artifact: dict, observed_sha256: str
+    ) -> bool:
+        original_relative = _lab_relative(root, handoff_path)
+        original_sha256 = _sha256(handoff_path)
+        for correction_sha256, (_, correction) in correction_by_sha.items():
+            corrected = correction["corrected_artifact"]
+            incident_entry = valid_incidents.get(correction["incident_id"])
+            if not incident_entry:
+                continue
+            _, incident = incident_entry
+            if not (
+                correction_link_valid.get(correction_sha256, False)
+                and correction_chain_is_approved(correction_sha256, artifact["sha256"])
+                and correction["task_id"] == handoff.get("task_id")
+                and correction["original_handoff_path"] == original_relative
+                and correction["original_handoff_sha256"] == original_sha256
+                and corrected["path"] == artifact["path"]
+                and corrected["current_sha256"] == observed_sha256
+                and incident["observed_sha256"] == observed_sha256
+            ):
+                continue
+            return True
+        return False
+    return correction_chain_is_approved, drift_has_approved_correction
+
+
 def validate_lab(lab_dir: str | Path | None = None) -> dict:
     """Validate schemas, graph links, handoff hashes and review independence."""
     root = _lab_dir(lab_dir)
@@ -979,232 +1229,8 @@ def validate_lab(lab_dir: str | Path | None = None) -> dict:
                     "có silent edit hoặc transaction dang dở"
                 )
 
-    _, valid_incidents = _record_collection(
-        root, "incidents", "provenance_incident.schema.json", "incident_id", errors)
-    _, valid_corrections = _record_collection(
-        root, "corrections", "provenance_correction.schema.json", "correction_id", errors)
-    _, valid_correction_reviews = _record_collection(
-        root, "correction_reviews", "provenance_correction_review.schema.json",
-        "review_id", errors)
-
-    for incident_id, (path, incident) in valid_incidents.items():
-        if path.name != f"{incident_id}.json":
-            errors.append(f"{path.name}: filename không khớp incident_id")
-        if incident["task_id"] not in tasks:
-            errors.append(f"{path.name}: task_id không tồn tại")
-
-    correction_by_sha = {
-        _sha256(path): (path, correction)
-        for path, correction in valid_corrections.values()
-    }
-    # Phán quyết của từng correction, tiền tính TRƯỚC vòng lặp dưới. Vòng kiểm
-    # review chạy sau vòng kiểm correction, nên không được tra ngược
-    # ``approved_corrections`` ở đây — sẽ phụ thuộc thứ tự lặp.
-    #
-    # FAIL-CLOSED với review trùng: ``review_provenance_correction`` không cho
-    # ghi review thứ hai, nhưng một file chép tay thì có thể. Nếu một correction
-    # có nhiều phán quyết KHÁC nhau thì không được lấy cái ghi sau cùng — đó là
-    # đường để đầu độc bảng này. Xung đột ⇒ coi như KHÔNG có phán quyết hợp lệ,
-    # và báo lỗi để người ta nhìn thấy.
-    _decisions_by_correction: dict[str, set[str]] = {}
-    for _path, _review in valid_correction_reviews.values():
-        _decisions_by_correction.setdefault(
-            _review["correction_sha256"], set()).add(_review["decision"])
-    correction_decision: dict[str, str] = {}
-    for _sha, _decisions in _decisions_by_correction.items():
-        if len(_decisions) == 1:
-            correction_decision[_sha] = next(iter(_decisions))
-        else:
-            errors.append(
-                f"correction {_sha[:12]}: có {len(_decisions)} phán quyết xung đột "
-                f"({sorted(_decisions)}); review của correction là bất biến nên đây là "
-                "dấu hiệu bản ghi bị sửa tay — coi như chưa có phán quyết"
-            )
-
-    correction_link_valid: dict[str, bool] = {}
-    for correction_id, (path, correction) in valid_corrections.items():
-        link_errors: list[str] = []
-        if path.name != f"{correction_id}.json":
-            link_errors.append("filename không khớp correction_id")
-        if correction["task_id"] not in tasks:
-            link_errors.append("task_id không tồn tại")
-        incident_entry = valid_incidents.get(correction["incident_id"])
-        if not incident_entry:
-            link_errors.append("incident_id không trỏ tới incident hợp lệ")
-        else:
-            _, incident = incident_entry
-            linked_fields = (
-                ("task_id", correction["task_id"]),
-                ("original_handoff_path", correction["original_handoff_path"]),
-                ("original_handoff_sha256", correction["original_handoff_sha256"]),
-                ("artifact_path", correction["corrected_artifact"]["path"]),
-                ("recorded_sha256", correction["corrected_artifact"]["previous_sha256"]),
-            )
-            for field, expected in linked_fields:
-                if incident[field] != expected:
-                    link_errors.append(f"incident linkage lệch {field}")
-        try:
-            original_handoff = _lab_link_path(root, correction["original_handoff_path"])
-            handoff_root = (root / "handoffs").resolve()
-            if original_handoff.parent != handoff_root:
-                link_errors.append("original_handoff_path không nằm trong handoffs canonical")
-            elif not original_handoff.is_file():
-                link_errors.append("thiếu original handoff")
-            elif _sha256(original_handoff) != correction["original_handoff_sha256"]:
-                link_errors.append("original handoff hash không khớp")
-            else:
-                original_value = _load_json(original_handoff)
-                if original_value.get("task_id") != correction["task_id"]:
-                    link_errors.append("original handoff thuộc task khác")
-        except (OSError, ValueError, json.JSONDecodeError) as exc:
-            link_errors.append(f"original handoff không hợp lệ: {exc}")
-        try:
-            snapshot = _lab_link_path(root, correction["snapshot"]["path"])
-            expected_snapshot = correction["snapshot"]["sha256"]
-            expected_previous = correction["corrected_artifact"]["previous_sha256"]
-            if not snapshot.is_file():
-                link_errors.append("thiếu immutable snapshot")
-            elif _sha256(snapshot) != expected_snapshot:
-                link_errors.append("snapshot bytes không khớp snapshot hash")
-            if expected_snapshot != expected_previous:
-                link_errors.append("snapshot hash không khớp recorded artifact hash")
-        except (OSError, ValueError) as exc:
-            link_errors.append(f"snapshot không hợp lệ: {exc}")
-        supersedes = correction.get("supersedes_correction_sha256")
-        if supersedes:
-            previous = correction_by_sha.get(supersedes)
-            if not previous or previous[1].get("task_id") != correction["task_id"]:
-                link_errors.append("supersedes không trỏ tới correction cùng task")
-            else:
-                previous_correction = previous[1]
-                previous_artifact = previous_correction["corrected_artifact"]
-                current_artifact = correction["corrected_artifact"]
-                if (
-                    previous_correction["original_handoff_path"]
-                    != correction["original_handoff_path"]
-                    or previous_correction["original_handoff_sha256"]
-                    != correction["original_handoff_sha256"]
-                    or previous_artifact["path"] != current_artifact["path"]
-                ):
-                    link_errors.append("supersedes correction khác lineage/artifact")
-                # Cùng MỘT quy tắc với correction_chain_is_approved: mắt xích
-                # trước được APPROVE thì bước này nối vào kết quả của nó; mắt
-                # xích trước bị REVISE/REJECT là VÔ HIỆU nên bước này phải xuất
-                # phát lại từ đúng mốc mà nó xuất phát.
-                if correction_decision.get(supersedes) == "APPROVE":
-                    expected_link = previous_artifact["current_sha256"]
-                else:
-                    expected_link = previous_artifact["previous_sha256"]
-                if expected_link != current_artifact["previous_sha256"]:
-                    link_errors.append("correction chain bị đứt old/new hash")
-        for message in link_errors:
-            errors.append(f"{path.name}: {message}")
-        correction_link_valid[_sha256(path)] = not link_errors
-
-    approved_corrections: set[str] = set()
-    for review_id, (path, review) in valid_correction_reviews.items():
-        link_errors: list[str] = []
-        if path.name != f"{review_id}.json":
-            link_errors.append("filename không khớp review_id")
-        correction_entry = correction_by_sha.get(review["correction_sha256"])
-        if not correction_entry:
-            link_errors.append("correction_sha256 không trỏ tới correction handoff")
-        else:
-            _, correction = correction_entry
-            if review["task_id"] != correction["task_id"]:
-                link_errors.append("review task_id lệch correction")
-            if review["incident_id"] != correction["incident_id"]:
-                link_errors.append("review incident_id lệch correction")
-            if review["reviewer_id"] == correction["agent_id"]:
-                link_errors.append("correction agent không được tự review")
-            try:
-                original = _load_json(_lab_link_path(
-                    root, correction["original_handoff_path"]
-                ))
-                if review["reviewer_id"] == original.get("agent_id"):
-                    link_errors.append("original handoff agent không được review correction")
-            except (OSError, ValueError, json.JSONDecodeError) as exc:
-                link_errors.append(f"không đọc được original handoff agent: {exc}")
-        for message in link_errors:
-            errors.append(f"{path.name}: {message}")
-        if (
-            not link_errors
-            and review["decision"] == "APPROVE"
-            and correction_link_valid.get(review["correction_sha256"], False)
-            # Xung đột phán quyết ⇒ không có phán quyết. Nếu thiếu điều kiện này
-            # thì chỉ cần chép thêm một file review APPROVE bên cạnh một REVISE
-            # là hợp thức hoá được drift.
-            and correction_decision.get(review["correction_sha256"]) == "APPROVE"
-        ):
-            approved_corrections.add(review["correction_sha256"])
-
-    def correction_chain_is_approved(
-        correction_sha256: str, original_artifact_sha256: str
-    ) -> bool:
-        """Require an unbroken, independently approved chain back to handoff bytes."""
-        visited: set[str] = set()
-        current_sha256 = correction_sha256
-        is_head = True
-        while current_sha256:
-            if current_sha256 in visited:
-                return False
-            visited.add(current_sha256)
-            entry = correction_by_sha.get(current_sha256)
-            if not entry or not correction_link_valid.get(current_sha256, False):
-                return False
-            # Mắt xích ĐANG XÉT phải được review độc lập APPROVE. Mắt xích cũ hơn
-            # có thể là bản VÔ HIỆU (bị REVISE/REJECT) đã bị thay thế — đi xuyên
-            # qua nó KHÔNG nới lỏng gì, vì bản thay thế vẫn phải được duyệt và
-            # snapshot của nó vẫn phải khớp đúng mốc mà bản vô hiệu xuất phát.
-            if is_head and current_sha256 not in approved_corrections:
-                return False
-            correction = entry[1]
-            supersedes = correction.get("supersedes_correction_sha256")
-            if not supersedes:
-                return (
-                    correction["corrected_artifact"]["previous_sha256"]
-                    == original_artifact_sha256
-                )
-            previous_entry = correction_by_sha.get(supersedes)
-            if not previous_entry or not correction_link_valid.get(supersedes, False):
-                return False
-            previous_correction = previous_entry[1]
-            if supersedes in approved_corrections:
-                # Bản trước ĐÃ được chấp nhận: bước này phải nối vào kết quả của nó.
-                expected = previous_correction["corrected_artifact"]["current_sha256"]
-            else:
-                # Bản trước VÔ HIỆU: bước này phải xuất phát từ đúng mốc của nó.
-                expected = previous_correction["corrected_artifact"]["previous_sha256"]
-            if correction["corrected_artifact"]["previous_sha256"] != expected:
-                return False
-            is_head = False
-            current_sha256 = supersedes
-        return False
-
-    def drift_has_approved_correction(
-        handoff_path: Path, handoff: dict, artifact: dict, observed_sha256: str
-    ) -> bool:
-        original_relative = _lab_relative(root, handoff_path)
-        original_sha256 = _sha256(handoff_path)
-        for correction_sha256, (_, correction) in correction_by_sha.items():
-            corrected = correction["corrected_artifact"]
-            incident_entry = valid_incidents.get(correction["incident_id"])
-            if not incident_entry:
-                continue
-            _, incident = incident_entry
-            if not (
-                correction_link_valid.get(correction_sha256, False)
-                and correction_chain_is_approved(correction_sha256, artifact["sha256"])
-                and correction["task_id"] == handoff.get("task_id")
-                and correction["original_handoff_path"] == original_relative
-                and correction["original_handoff_sha256"] == original_sha256
-                and corrected["path"] == artifact["path"]
-                and corrected["current_sha256"] == observed_sha256
-                and incident["observed_sha256"] == observed_sha256
-            ):
-                continue
-            return True
-        return False
+    correction_chain_is_approved, drift_has_approved_correction = (
+        _build_correction_ledger(root, tasks, errors))
 
     # A REVISE review makes that exact handoff historical.  Only its latest
     # review decision matters; an APPROVE must never be bypassed by an older
@@ -1672,14 +1698,30 @@ def review_handoff(
             raise ValueError(f"Không tìm thấy handoff cho {task_id}")
         handoff_path = handoff_paths[-1]
         handoff = _load_json(handoff_path)
+        drifted: list[tuple[dict, str]] = []
         for artifact in handoff.get("artifacts", []):
             source = _project_path(artifact["path"])
             if not source.is_file():
                 raise FileNotFoundError(source)
-            if _sha256(source) != artifact["sha256"]:
-                raise ValueError(
-                    f"Không thể review handoff đã drift: {artifact['path']}"
-                )
+            observed_sha256 = _sha256(source)
+            if observed_sha256 != artifact["sha256"]:
+                drifted.append((artifact, observed_sha256))
+        if drifted:
+            # BRD-033: drift KHÔNG tự động chặn review. PROTOCOL.md nói rõ handoff
+            # APPROVE phải khớp artifact live "hoặc đi qua correction độc lập ở
+            # trên". Vế trong ngoặc trước đây bị bỏ qua đúng ở đây, khiến task có
+            # artifact drift kẹt vĩnh viễn ở REVIEW dù validate_lab đã tha.
+            #
+            # Hỏi THẲNG bộ máy mà validate_lab dùng — cùng một hàm, cùng một
+            # phán quyết, không có khoá trung gian nào để nhầm hay để giả.
+            _, drift_has_approved_correction = _build_correction_ledger(
+                root, _all_tasks(root), [])
+            for artifact, observed_sha256 in drifted:
+                if not drift_has_approved_correction(
+                        handoff_path, handoff, artifact, observed_sha256):
+                    raise ValueError(
+                        f"Không thể review handoff đã drift: {artifact['path']}"
+                    )
         review = {
             "schema_version": "1.0",
             "task_id": task_id,

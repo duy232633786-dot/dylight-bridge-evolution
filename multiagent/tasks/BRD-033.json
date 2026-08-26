@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-033",
+  "title": "review_handoff không tra correction đã duyệt: task có artifact drift kẹt vĩnh viễn ở REVIEW",
+  "research_question": "validate_lab có cả bộ máy tha drift khi có chuỗi correction đã được review độc lập APPROVE (drift_has_approved_correction → correction_chain_is_approved), nhưng review_handoff chỉ có ĐÚNG MỘT phép so hash trần và raise ngay, không hề tra correction. Hệ quả đo được: cùng một trạng thái lab, validate_lab trả valid=true errors=[] trong khi review_handoff('BRD-004','codex') và review_handoff('BRD-029','opencode') đều raise 'Không thể review handoff đã drift'. Task nào có artifact drift sau handoff thì KHÔNG BAO GIỜ review được, kẹt vĩnh viễn ở REVIEW — kể cả khi chuỗi correction đã được nhà cung cấp khác duyệt đầy đủ. PROTOCOL.md đã tiên liệu trường hợp này ('mọi handoff APPROVE vẫn phải khớp artifact live (hoặc đi qua correction độc lập ở trên)'), tức đây là lỗi cài đặt chứ không phải lựa chọn thiết kế. Làm sao cho hai hàm dùng CHUNG một quy tắc thay vì hai quy tắc song song?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "claude",
+  "reviewer": "opencode",
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/collaboration/lab.py",
+    "tests/test_correction_chain.py"
+  ],
+  "acceptance_criteria": [
+    "review_handoff tha drift ĐÚNG khi và chỉ khi validate_lab cũng tha: dùng CHUNG một hàm, không viết quy tắc song song thứ hai",
+    "Bộ máy correction (correction_by_sha, correction_link_valid, approved_corrections, correction_chain_is_approved, drift_has_approved_correction) phải được tách khỏi thân validate_lab thành đơn vị dùng lại được; validate_lab sau khi tách phải cho ra KẾT QUẢ HỆT như trước trên lab canonical hiện tại",
+    "Drift KHÔNG có chuỗi correction đã duyệt vẫn bị chặn y như cũ — đây là hàng rào chính, không được nới",
+    "Drift có correction nhưng correction CHƯA được review độc lập vẫn bị chặn",
+    "Drift có correction đã bị REVISE/REJECT (mắt xích vô hiệu) mà không có bản thay thế được duyệt vẫn bị chặn",
+    "Thêm test tái hiện đúng ca BRD-004: handoff có artifact drift + chuỗi correction đã APPROVE ⇒ review_handoff THÀNH CÔNG; và test đó phải ĐỎ trên bản chưa vá",
+    "Thêm test hàng rào: cùng handoff đó nhưng gỡ correction review đi ⇒ review_handoff phải raise",
+    "5 test hàng rào hiện có trong tests/test_correction_chain.py phải còn xanh",
+    "Sau khi vá, review_handoff('BRD-004', <agent khác claude>) chạy được trên BẢN SAO lab; không được chạy trên lab canonical trong lúc làm task này"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/collaboration/lab.py",
+    "tests/test_correction_chain.py"
+  ],
+  "safety_notes": [
+    "Đây là lần thứ BA đụng vào bộ máy chống sửa lịch sử (sau BRD-030 và BRD-032). Cả hai lần trước đều sót vì cùng một giả định nằm ở nhiều chỗ. Phải GREP HẾT mọi chỗ so hash artifact trước khi tuyên bố xong: đã biết ít nhất lab.py:121 (_ensure_artifact_snapshot), lab.py:1679 (review_handoff), lab.py:1792 (record_provenance_correction) đều có phép so riêng",
+    "TUYỆT ĐỐI không nới hàng rào để BRD-004 review được. Phải sửa đúng quy tắc rồi để nó review được như HỆ QUẢ. Nếu bản vá làm drift KHÔNG có correction cũng lọt thì đó là hồi quy nghiêm trọng hơn bug đang sửa",
+    "Người thực hiện task này KHÔNG được đồng thời là người review BRD-004 sau đó — sẽ là tự tạo điều kiện cho chính mình. Ghi rõ ràng buộc này vào handoff",
+    "lab.py đã được hash trong handoff BRD-030/031/032 (đều ACCEPTED). Sửa file này CHẮC CHẮN gây drift ⇒ phải chạy lab correct-provenance cho từng handoff bị ảnh hưởng, và correction đó phải do agent khác duyệt",
+    "Không sửa multiagent/ canonical trong lúc phát triển; mọi thử nghiệm review_handoff phải chạy trên bản sao tạm"
+  ],
+  "review_notes": [
+    "Phát hiện độc lập bởi hai phiên: phiên claude thứ hai báo triệu chứng, phiên này tái hiện lại bằng bản sao lab trước khi ghi task",
+    "Đo được trên bản sao lab (shutil.copytree multiagent/): validate_lab -> valid=True errors=[]; review_handoff('BRD-004','codex') -> ValueError 'Không thể review handoff đã drift: bridge_grammar/experimental/arch_deck_v1.json'; review_handoff('BRD-029','opencode') -> ValueError '... docs/design_basis/DB-SUPERT-38M.json'",
+    "BRD-004 có 3/7 artifact drift: bridge_grammar/experimental/arch_deck_v1.json, experiments/shape_discovery/arch_render_study.md, tests/test_shape_grammar_experimental.py. Cả ba drift đều đã có COR-BRD-004-001..005 và CRV-BRD-004-001..005 do codex APPROVE",
+    "BRD-029 tương tự: opencode đã review xong về NỘI DUNG và kết luận PASS G0/G1/G2 (27/27 test_state.py xanh, 7 gold-case hash không đổi) nhưng KHÔNG GHI ĐƯỢC vì chặn ở tầng công cụ. Findings tạm tại multiagent/scratch/findings-brd029-oc.json",
+    "PROTOCOL.md mục 'Sửa provenance sau handoff' viết: 'mọi handoff APPROVE vẫn phải khớp artifact live (hoặc đi qua correction độc lập ở trên)' — vế trong ngoặc chính là cái review_handoff đang bỏ qua",
+    "Ghi task này lúc lab đã valid=true (sau khi phiên thứ hai đóng COR-BRD-024-002/003), nên bug này là blocker DUY NHẤT còn lại cho hai task REVIEW nói trên",
+    "Criterion 2 requires extraction into a reusable unit. Internal entry point is not extraction. REVISE.",
+    "r002 genuinely extracts _build_correction_ledger as a module-level function callable from outside validate_lab. review_handoff calls it directly via _build_correction_ledger(root,_all_tasks(root),[]) at lab.py:1717 and invokes the returned drift_has_approved_correction for each drifted artifact. No check was weakened during the move: net change is +41/-42 lines after cancellations, and the moved correction machinery is character-for-character identical. validate_lab returns the same dict shape without extra keys. review_handoff traces through drift_has_approved_correction with no intermediate key. _ensure_artifact_snapshot validates hash bytes at every branch. 14/14 correction chain tests pass. All five acceptance criteria satisfied."
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

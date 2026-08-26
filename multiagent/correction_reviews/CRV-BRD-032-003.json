@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-032-003",
+  "task_id": "BRD-032",
+  "incident_id": "INC-BRD-032-003",
+  "correction_sha256": "0d1cfafa536bb611ee42dbd66b39092a09206a5aa11b168ec2a55bd0f61a4ba7",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "agent_id claude not opencode; da co review chua CHUA; snapshot bytes match previous_sha; live file matches current_sha256. Identical correction to COR-BRD-030-007 for same drift event. Net change: same safe refactor as above."
+  ],
+  "notes": "All pass criteria met. Same correction drift, same safe extraction. APPROVE."
+}

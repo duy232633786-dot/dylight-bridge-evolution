@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-032-002",
+  "task_id": "BRD-032",
+  "detected_at_utc": "2026-08-26T06:46:48.858435Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-032.claude.r002.json",
+  "original_handoff_sha256": "5fe75ef9dff37738badf9a45d8a4a29e357a3a47ee2cd25a4057c58807974ae7",
+  "artifact_path": "tests/test_correction_chain.py",
+  "recorded_sha256": "ddf0417556394565bb725563716ddbe5689ea6fe9c5673352db3f2be5bb53f72",
+  "observed_sha256": "673a17a7e52766e7a981701533f6430efb2482a15d58ce7afa7fbb536a292ea1",
+  "reason": "Task BRD-033 sua bug review_handoff khong tra correction da duyet; write_scope cua task gom dung hai file nay nen drift la he qua bat buoc, khong phai sua lich su.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

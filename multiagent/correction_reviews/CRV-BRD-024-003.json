@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-024-003",
+  "task_id": "BRD-024",
+  "incident_id": "INC-BRD-024-003",
+  "correction_sha256": "f210d52edeb4f5bd6e69ddcf8101f99c3ebafaa1c054b397c53dbd7f95bf9e7e",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "All four checks pass: no prior review exists, snapshot bytes match the recorded previous SHA-256, live file matches current_sha256=40f46ff2dd2c, and the diff shows exactly one added line: bridge_evolution.site. Correction agent_id is claude, not opencode."
+  ],
+  "notes": "Correction is consistent and well-formed. Single delta is the new pyproject.toml dependency bridge_evolution.site."
+}

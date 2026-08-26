@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-033-001",
+  "task_id": "BRD-033",
+  "detected_at_utc": "2026-08-26T07:14:34.317341Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-033.claude.r001.json",
+  "original_handoff_sha256": "91a26a8788c88548e56dd94691b9a267762f0dc909faeecbde06bd9006470de9",
+  "artifact_path": "bridge_evolution/collaboration/lab.py",
+  "recorded_sha256": "e0fbebf27d043855f11b2d619bf82c27e3a6a1be64cb35c7fb5dcc8f26c0ec83",
+  "observed_sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5",
+  "reason": "Vong 2 cua BRD-033: reviewer doc lap (codex) REVISE vi bo may correction van nam trong than validate_lab, chua thanh don vi dung lai duoc nhu acceptance_criteria doi. Ban nay tach that, nen lab.py drift them mot lan nua.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

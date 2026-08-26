@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-034",
+  "title": "Kiểm toán nén–uốn cho cột/trụ BTCT lăng trụ: đường tương tác N–M, độ mảnh và hiệu ứng bậc hai",
+  "research_question": "Runtime hiện KHÔNG có bất kỳ phương tiện nào kiểm cấu kiện nén–uốn: verifier chỉ có MODEL-001, STR-001 (uốn), STR-002 (cắt), SERV-001/002/003 — tất cả viết cho dầm giản đơn chịu uốn. Hệ quả đo được: trụ cầu, thân trụ, cột khoang vòm và vành vòm đều KHÔNG có ô nào chứa chúng; ARCH-NEED-01/02/09 của BRD-004 treo đúng vì lý do này. Câu hỏi: dựng engine tương tác N–M cho cột/trụ BTCT LĂNG TRỤ ở mức L1 thế nào để (a) tái lập được và kiểm chứng được bằng ví dụ có lời giải công bố, (b) fail-closed khi độ mảnh vượt miền áp dụng của phương pháp khuếch đại mô men, và (c) TỪ CHỐI chạy trên vành vòm — nơi ổn định là bài toán vòm chứ không phải bài toán cột có hệ số K?",
+  "workstream": "structural_physics",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/column_capacity/",
+    "tests/test_column_capacity.py",
+    "docs/runtime_capability_matrix.json",
+    "docs/runtime_capability_matrix.md"
+  ],
+  "acceptance_criteria": [
+    "Dựng đường tương tác N–M bằng TƯƠNG THÍCH BIẾN DẠNG trên tiết diện có bố trí cốt thép rời rạc, không dùng công thức đóng gói sẵn: quét vị trí trục trung hoà, tích phân khối ứng suất chữ nhật tương đương, cộng lực từng lớp thép theo biến dạng của nó",
+    "Đường tương tác phải đi qua đúng bốn mốc kiểm được: nén thuần Po, điểm cân bằng (thép chịu kéo đạt chảy đúng lúc bê tông đạt biến dạng cực hạn), uốn thuần Mo, và kéo thuần",
+    "Hệ số sức kháng phi BIẾN THIÊN theo biến dạng thép lớp ngoài cùng (vùng nén khống chế / chuyển tiếp / kéo khống chế), không dùng một hằng số duy nhất",
+    "Độ mảnh: tính kLu/r và phân nhánh rõ ràng — dưới ngưỡng thì bỏ qua hiệu ứng bậc hai; trên ngưỡng thì khuếch đại mô men delta = Cm/(1 - Pu/(phi_k*Pc)) với Pc = pi^2*EI/(kLu)^2 và EI tiết diện đã nứt",
+    "FAIL-CLOSED khi kLu/r vượt giới hạn áp dụng của phương pháp khuếch đại mô men: phải RAISE hoặc trả trạng thái OUT_OF_METHOD_RANGE, TUYỆT ĐỐI không ngoại suy ra một con số",
+    "TỪ CHỐI cấu kiện cong: hàm phải raise khi được gọi trên vành vòm hoặc bất kỳ cấu kiện nào không phải lăng trụ thẳng. Ổn định vòm là bài toán khác (đường áp lực, chiều dài quy đổi của vòm, hoặc trị riêng) — engine này KHÔNG được dùng thay",
+    "Kiểm chứng bằng ÍT NHẤT hai ví dụ có lời giải công bố (sách/tiêu chuẩn có trích dẫn đầy đủ), sai lệch trong dung sai khai báo trước; ghi cả kết quả lệch nếu có",
+    "Hệ số chiều dài tính toán k phải do NGƯỜI GỌI cung cấp kèm provenance — module KHÔNG được tự đoán k, vì k phụ thuộc sơ đồ khung chứ không phải tiết diện",
+    "Cập nhật docs/runtime_capability_matrix để phản đúng năng lực MỚI, và ghi rõ vành vòm vẫn ABSENT",
+    "Không đụng verifier/rules.py trong task này: engine đứng riêng đã, nối vào pipeline là task sau"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/column_capacity/",
+    "tests/test_column_capacity.py"
+  ],
+  "safety_notes": [
+    "Trần claim của task này là SCREENED, KHÔNG phải NUMERICALLY_VERIFIED. Khớp ví dụ sách là kiểm cài đặt, KHÔNG phải V&V: chưa có đối chiếu solver độc lập, chưa có thí nghiệm",
+    "CẤM áp engine này lên vành vòm. Ổn định trong/ngoài mặt phẳng của vòm là trạng thái giới hạn khống chế thật của họ vòm (ARCH-NEED-01/02) và KHÔNG quy được về cột có hệ số K. Một con số ra từ chỗ sai sẽ nhìn hợp lệ mà nằm ngoài phạm vi hiệu lực — đúng dạng sai sót mà PHYSICS_GATES xếp là STOP",
+    "CẤM tự đoán hệ số k. k phụ thuộc độ cứng khung và điều kiện biên; đoán k là bịa số ở chỗ nhạy bậc hai",
+    "Mỏi và ổn định cục bộ KHÔNG nằm trong task này; không được ngụ ý đã kiểm",
+    "Tổ hợp tải, mô hình vật liệu và cấu tạo vẫn do design basis quyết; engine chỉ nhận đầu vào đã khoá, không tự sinh tổ hợp"
+  ],
+  "review_notes": [
+    "Đề xuất từ chủ dự án 2026-08-26 sau khi xem một video mô phỏng vòng lặp thiết kế cột BTCT (dựng mô hình -> độ mảnh + hiệu ứng bậc hai -> đường tương tác N-M -> thử phương án -> loại phương án vượt sức kháng -> quay về nghiệm khả thi). Chính tác giả video cũng tự đặt ranh giới: con số utilization chỉ minh hoạ quan hệ nhân-quả của thuật toán, thiết kế thật vẫn cần đủ tổ hợp tải, mô hình vật liệu, cấu tạo, tiêu chuẩn và kỹ sư có thẩm quyền kiểm tra",
+    "Đo được trước khi ghi task: grep toàn bộ bridge_evolution/ không có interaction / second-order / axial-flexure / effective length. Chuỗi 'slenderness' duy nhất tìm thấy nằm ở section_types.py và là ĐỘ MẢNH BẢN (b/t, phân loại tiết diện lớp 1) — khác hoàn toàn độ mảnh cấu kiện kL/r",
+    "Giá trị trực tiếp: trụ hai thân trong khối hình thái cầu vòm (tmp/arch_part_substructure.py) là cấu kiện nén-uốn thuần tuý và hiện không có gì kiểm được. Đây là bước đi từ F0 IDEA lên F1 SCREENED cho hạ bộ",
+    "Tiêu chuẩn áp dụng gợi ý: TCVN 11823-5 (kết cấu bê tông). Repo đã trích TCVN 11823-6 (kết cấu thép) trong RND-d88a2a60-01 nên đường dẫn tài liệu tương tự có thể tái dụng",
+    "Ranh giới đã chốt khi ghi task: LÀM cột/trụ lăng trụ; KHÔNG làm vành vòm"
+  ],
+  "preferred_provider": "opencode",
+  "preferred_role": "structural_analyst",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_column_capacity.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-032-002",
+  "task_id": "BRD-032",
+  "incident_id": "INC-BRD-032-002",
+  "correction_sha256": "c5ccf5590118897e92dc5d6714bf22f3ba27b4bcace84083e0a0ee74af218e58",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "agent_id is claude (independent); review status CHUA; snapshot bytes match previous_sha; live file matches current_sha256; diff is pure additions (+99/-0) to test_correction_chain.py: identical test additions as COR-BRD-030-006, no existing test modified"
+  ],
+  "notes": "All five pass criteria satisfied. Correction is valid."
+}

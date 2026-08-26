@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-024-002",
+  "task_id": "BRD-024",
+  "incident_id": "INC-BRD-024-002",
+  "correction_sha256": "82f6aecae9c95e5ced253ec06fa8fbd19429e583219acf8116d59cbc40bbe082",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "All four provenance checks passed: (1) CRV record absent as expected, (2) blob 76f0a14a exists with matching SHA-256, (3) blob 89ff0d7d exists with matching SHA-256, (4) diff shows exactly one added line referencing bridge_evolution.durability with no other changes."
+  ],
+  "notes": "Provenance correction COR-BRD-024-002 is consistent and artifact hashes verified. Ready to proceed."
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-029",
+  "handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Design-basis discipline handled honestly for this task. g0_gate.status = BLOCKED in DB-SUPERT-38M.json reflects the broader project site-unspecified constraint, which is outside BRD-029 write_scope. This matches the established lab convention: BRD-001, BRD-002, BRD-020, and BRD-031 all passed G0 with the same project-level BLOCKED state, treating G0 at task level as whether THIS task handled design-basis discipline, not whether the whole site is specified. BRD-029 expanded enum family from 2 to 5 while preserving design basis integrity: grammar_bindings in DB-SUPERT-38M.json correctly declare claim ceilings (i_girder=SCREENED, box_girder=IDEA, composite_i=IDEA), per-family if/then constraints in schema lock project scope to 38.3/12.0/STRAIGHT/0, and no new top-level keys were added that would drift canonical_json. lab status reports valid=true with empty errors, confirming covered provenance corrections are resolved."
+    },
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "Schema topology valid: additionalProperties=false on BridgeDesignState with no new top-level keys. family enum has 5 values (2 Super-T variants + 3 new families). 5 allOf if/then blocks each lock project_inputs to const values per family. Each family has not/anyOf blocks forbidding shape keys of other families. Per-family design_variables required lists correct: super_t_simple=no extra shape keys, super_t_parametric=6 Super-T keys, i_girder=6 I-girder keys, box_girder=4 box keys, composite_i=6 steel keys. Parametric repeatable: schema validates via jsonschema and 27 test_state.py tests pass. No clash between family shape key sets."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Model quality verified: 27/27 tests/test_state.py pass including 5 BRD-029-specific tests (enum check, hash preservation for all 7 gold cases, per-family scope lock, cross-family shape key rejection, durability package). input_hash of all 7 gold cases unchanged after contract expansion. Two pre-existing test failures outside write_scope: test_design_basis.py fails due to BRD-025 grammar span mismatch (35.0/40.0 vs locked 38.3), test_shape_grammar_experimental.py fails because new grammar JSON files are now on disk — both known from earlier tasks, not introduced by BRD-029. bridge_evolution.durability now listed in pyproject.toml packages array, resolving the packaging omission from BRD-026."
+    }
+  ],
+  "notes": "Independent review confirmed: all 27 tests pass, lab status valid with empty errors. G0 design-basis discipline correct (enum expansion 2 to 5 with claim ceilings preserved, per-family if/then constraints lock project scope). G1 schema topology valid (additionalProperties=false, 5 allOf blocks, per-family shape key isolation). G2 model quality verified (input_hash preservation across 7 gold cases, packaging fix applied). Covered drifts in DB-SUPERT-38M.json and pyproject.toml are resolved by approved provenance corrections under BRD-033."
+}

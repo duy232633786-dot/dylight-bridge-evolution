@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-033",
+  "handoff_sha256": "91a26a8788c88548e56dd94691b9a267762f0dc909faeecbde06bd9006470de9",
+  "reviewer_id": "opencode",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Acceptance criterion 2 demands correction machinery be extracted from validate_lab into a reusable unit. The handoff explicitly states extraction was not done and an internal entry point was added instead. Functional equivalence is not sufficient when the contract requires physical extraction; REVISE is warranted."
+    }
+  ],
+  "notes": "Criterion 2 requires extraction into a reusable unit. Internal entry point is not extraction. REVISE."
+}

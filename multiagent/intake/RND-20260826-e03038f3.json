@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "brief_id": "RND-20260826-e03038f3",
+  "created_at": "2026-08-26T09:24:11.108563Z",
+  "topic": "Nâng cấp năng lực kiểm toán và đề xuất phương án theo vòng lặp thiết kế kiểm chứng: dựng candidate, kiểm tra độ mảnh và hiệu ứng bậc hai, đánh giá tương tác N-M khi dữ liệu/fidelity cho phép, loại nghiệm vượt sức kháng, truy hồi phương án khả thi, tiếp tục tối ưu; bổ sung audit trail, capability gates, uncertainty và phương án sửa chữa nhưng không vượt claim ceiling SCREENED khi chưa có solver L2/L3.",
+  "objectives": [
+    "Tạo giả thuyết có thể bác bỏ và giữ đa dạng phương án",
+    "Sàng lọc bằng mô hình vật lý trong đúng miền hiệu lực",
+    "Lưu cả kết quả dương, âm, giả định và rủi ro vào digital thread"
+  ],
+  "constraints": [
+    "Không dùng LLM hoặc surrogate làm solver/verifier",
+    "Không vượt claim SCREENED nếu chưa có L2/lab/field evidence",
+    "Mọi phát hành kỹ thuật cần responsible bridge engineer duyệt"
+  ],
+  "requested_by": "project_owner",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "budget": {
+    "max_tasks": 5,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 21600
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}
