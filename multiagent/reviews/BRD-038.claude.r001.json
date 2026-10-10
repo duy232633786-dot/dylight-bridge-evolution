@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-038",
+  "handoff_sha256": "822eca0b433020aff20b7b8fd8dafce6c648acac0a768e10f14da3eafe9f24ba",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Site canonical còn UNSPECIFIED và phần TCVN 11823-4 dùng cho miền phân bố ngang chưa nằm trong design basis governing của dự án."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Đường L0 triệt tiêu SOLVER-* HARD mà không giữ deferred evidence; điều kiện ngoài miền chưa thống nhất BLOCKED."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Registry tiêm vào không validate/hash, evaluator giả SUCCESS+feasible có thể nâng SCREENED, payload không validate và mẫu uncertainty trùng vẫn được tính độc lập."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Module chỉ điều phối screening, không kiểm đầy đủ trạng thái giới hạn."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Chưa có independent design check cho một phương án cầu thật."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có thí nghiệm vật lý hoặc calibration hiện trường."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu nghiệm thu, suy giảm hoặc vận hành bảo trì."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Claim tối đa SCREENED và không có quyền phát hành kỹ thuật."
+    }
+  ],
+  "notes": "Claude Opus review chỉ đọc: hash 4/4 khớp; REVISE vì registry tùy biến bỏ schema/hash, evaluator giả có thể phát SCREENED, mẫu uncertainty trùng được tính độc lập, outside-domain và blocker schema không fail-closed nhất quán. Codex chạy lại bộ mục tiêu chung 49/49 xanh; các finding là đường đối kháng chưa được test cũ phủ."
+}

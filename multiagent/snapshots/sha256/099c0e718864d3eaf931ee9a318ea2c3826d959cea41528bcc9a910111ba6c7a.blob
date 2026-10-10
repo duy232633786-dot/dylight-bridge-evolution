@@ -1,0 +1,209 @@
+# 06 — Vòng lặp thiết kế cấu kiện (Component Design Loop)
+
+Phiên bản: `design-loop/0.1.0` — 2026-09-03 (BRD-050). Module:
+`bridge_evolution/design_loop.py`; contract: `contracts/design_loop_report.schema.json`;
+basis: `docs/design_basis/design_loop_basis.json`; test: `tests/test_design_loop.py`.
+
+> Trần claim của mọi kết quả trong tài liệu này là **SCREENED**. Vòng lặp không
+> tính sức kháng, không ra PASS/FAIL và không thay L2/L3 hay kỹ sư. Nó chỉ quyết
+> định *thử phương án nào tiếp theo* và ghi lại toàn bộ lineage.
+
+## 1. Tại sao cần một thuật toán riêng
+
+Repo đã có bốn thuật toán **tìm kiếm toàn cục** (Random Search, NSGA-II,
+surrogate, Q-learning). Chúng trả lời câu hỏi "trong cả grammar, phương án nào
+tốt?" và cần hàng trăm lần gọi solver. Kỹ sư thiết kế **một cấu kiện** lại đặt
+câu hỏi khác:
+
+> Tôi có một phương án sơ bộ. Nó trượt kiểm tra nào? Sửa biến nào để đạt? Đạt
+> rồi thì còn bớt được gì mà vẫn đạt?
+
+Tầng chẩn đoán `analysis.suggest_repairs` đã trả lời được nửa đầu (FAIL → nước
+sửa) nhưng docstring của nó nói rõ: *"người dùng gọi suggest_repairs lặp nhiều
+vòng cho tới khi hết vi phạm"* — tức vòng lặp chưa tồn tại trong runtime. Module
+này đóng vòng đó lại bằng đúng các khối đã có, không tạo quyền mới cho khối nào:
+
+```
+seed ─► evaluate_candidate   (schema → L0 → L1 → independent verifier)      [quyền verdict]
+     ─► suggest_repairs      (vi phạm → nước sửa trong miền grammar, L0-safe) [không mở solver]
+     ─► BudgetedEvaluator    (ngân sách = số lần solver THẬT SỰ mở)           [đếm trung thực]
+     ─► build_component_audit (bằng chứng L1 của phương án cuối, fail-closed)
+```
+
+## 2. Thuật toán
+
+### 2.1. Thang tiến bộ (progress ladder)
+
+Mỗi record được xếp vào một *stage* theo đúng thứ tự pipeline, rồi tới mục tiêu:
+
+| Stage | Nhãn | Nghĩa | So sánh trong cùng stage |
+|---|---|---|---|
+| 0 | `NOT_ANALYSABLE` | `SCHEMA_INVALID` hoặc `SOLVER_FAILED` | không bao giờ được chấp nhận |
+| 1 | `L0_INVALID` | `GEOMETRY_INVALID` — chưa mở solver | tổng margin HARD (`cv`) |
+| 2 | `INFEASIBLE` | solver chạy, verifier FAIL | `cv` |
+| 3 | `FEASIBLE_OVER_TARGET` | verifier PASS nhưng `max_utilization > utilization_target` | mức vượt mục tiêu |
+| 4 | `ACCEPTABLE` | PASS và ≤ target | — |
+
+`progress_key(record) = (stage, −mức)` — so sánh từ điển. Chuyển từ stage 1 lên
+stage 2 (từ "không dựng nổi bố trí" sang "phân tích được nhưng trượt") là tiến
+bộ, kể cả khi `cv` mới lớn hơn `cv` cũ: hai con số đó đo hai thứ khác nhau.
+
+### 2.2. Hai pha
+
+```
+REPAIR  (stage < 4):
+    violations ← vi phạm HARD thật (stage ≤ 2)
+               | vi phạm TỔNG HỢP cho mọi rule có D/C > target (stage 3)
+    candidates ← suggest_repairs(state, violations)  ∪  _EXTRA_STEP_MOVES[rule]
+                 lọc: trong miền grammar, chưa thăm, không sinh vi phạm L0 HARD mới
+                 sắp: knowledge_priority (thứ tự chẩn đoán) | cheapest_first (objective giải tích)
+    thử LẦN LƯỢT; CHẤP NHẬN nước ĐẦU TIÊN có progress_key lớn hơn hiện tại
+    không nước nào tiến lên ⇒ NO_IMPROVING_REPAIR
+
+TRIM    (stage = 4):
+    candidates ← láng giềng ±1 bậc lưới theo gene_order
+                 lọc: chưa thăm, L0 sạch, objective giải tích THẤP HƠN hiện tại
+                 sắp: objective tăng dần (recent_reject_last: nước đã bị bác xuống cuối)
+    thử LẦN LƯỢT; CHẤP NHẬN nước ĐẦU TIÊN vẫn feasible và ≤ target
+    không nước nào giữ được ⇒ CONVERGED (tối ưu cục bộ 1 bước)
+```
+
+Mỗi nước đi đổi **đúng một biến** để lineage đọc được như một hồ sơ sửa đổi:
+"tăng cáp PT-38 → PT-42 vì SERV-001 (KC-001)", "giảm khoảng cách dầm 2800 → 2750
+vì rẻ hơn và vẫn đạt".
+
+### 2.3. Điều kiện dừng
+
+| `termination.reason` | Khi nào | Được phép kết luận gì |
+|---|---|---|
+| `CONVERGED` | Đạt mục tiêu và mọi láng giềng rẻ hơn đã thử đều hỏng (hoặc TRIM tắt) | tối ưu **cục bộ một bước** theo `objective_key`, không hơn |
+| `NO_IMPROVING_REPAIR` | Chưa đạt, không ứng viên sửa nào tiến lên | vòng lặp cục bộ bế tắc → tìm kiếm toàn cục hoặc kỹ sư |
+| `BUDGET_EXHAUSTED` | Hết số lần gọi solver | không kết luận hội tụ |
+| `MAX_ITERATIONS` | Đủ số nước đi được chấp nhận theo policy | không kết luận hội tụ |
+| `TRIM_PROBE_LIMIT` | Trần `max_trim_probes` cắt vòng TRIM cuối | không kết luận tối ưu cục bộ |
+| `SEED_REJECTED` | Seed sai contract / khác grammar / dùng fixture test-only | không có gì được thử |
+| `SOLVER_FAILED` | Solver NOT_CONVERGED tại seed | STOP theo PHYSICS_GATES; kiểm catalog (KC-007) |
+
+**Hội tụ hữu hạn.** Tập trạng thái là tích các miền grammar (hữu hạn). Mỗi probe
+đánh giá một trạng thái *chưa thăm* và ghi nó vào `visited`; mỗi vòng hoặc chấp
+nhận một trạng thái mới hoặc dừng. Do đó số probe ≤ |grammar|, số vòng ≤ số
+probe; ngân sách solver và `max_iterations` chặn thêm phía trên. Tập `visited`
+cũng bảo đảm vòng lặp **không thể dao động** (PT +1 rồi PT −1) và **không mở
+solver hai lần** cho cùng một thiết kế — `cache_hits` của evaluator luôn bằng 0.
+
+### 2.4. Bất biến an toàn
+
+1. **Không có quyền verdict.** `feasible` của mọi record là của independent
+   verifier qua `evaluate_candidate`. Report ghi
+   `design_verdict_authority = INDEPENDENT_VERIFIER`, `loop_authority = NONE`.
+2. **HARD là hàng rào.** TRIM không bao giờ chấp nhận phương án infeasible dù rẻ
+   hơn bao nhiêu. `utilization_target ∈ (0, 1]` chỉ *siết*, không bao giờ nới
+   verifier; giá trị > 1 bị từ chối.
+3. **Ngân sách trung thực.** Dùng nguyên `BudgetedEvaluator`: chỉ
+   `solver.status != NOT_RUN` mới tính; L0 reject miễn phí (seed GC-02 sửa hình
+   học với 0 lần gọi solver cho tới khi bố trí sạch).
+4. **Solver hỏng là STOP.** Ở nước đi: phương án bị loại, ghi `SOLVER_FAILED`,
+   vòng lặp đi tiếp bằng ứng viên khác và report có advisory KC-007. Ở seed:
+   dừng cả vòng lặp.
+5. **Fail-closed với seed.** Seed được `validate_design_state` *trước* khi dựng
+   lại từ gene; nếu không, `state_from_gene` sẽ lặng lẽ thay `project_inputs`
+   (ví dụ nhịp 40 m thành 38,3 m) và vòng lặp "sửa" một bài toán khác.
+6. **Tái lập.** Không RNG, không timestamp; mọi thứ tự là thứ tự khai báo
+   grammar. Report có `report_sha256`, SHA-256 của basis và của mã nguồn; hai
+   lần chạy cùng seed cho report bằng nhau từng byte.
+
+## 3. Bàn giao cho audit đa cấu kiện
+
+Phương án cuối (nếu `SUCCESS`) được chuyển cho `evaluate.build_component_audit`
+qua một `component_manifest` do vòng lặp dựng. Quy tắc bàn giao là **fail-closed**:
+
+| Check của registry | Vòng lặp khai | Vì sao |
+|---|---|---|
+| `LONGITUDINAL_GIRDER/FLEXURE_STRENGTH` | PASS/FAIL, evidence fidelity `L1`, utilization từ STR-001 | L1 có công thức sức kháng uốn (trong miền MODEL-001) |
+| `LONGITUDINAL_GIRDER/SERVICE_STRESS` | PASS/FAIL từ SERV-001 | L1 có ứng suất thớ dưới SD-III |
+| `LONGITUDINAL_GIRDER/DEFLECTION` | PASS/FAIL từ SERV-002 | L1 có võng hoạt tải đàn hồi |
+| `LONGITUDINAL_GIRDER/SHEAR_TORSION` | **NOT_EVALUATED** (message ghi tỷ số cắt L1) | L1 chỉ có cắt đơn giản hoá, **không có xoắn** — STR-002 không được nâng thành bằng chứng SHEAR_TORSION |
+| `FATIGUE`, `STABILITY` | NOT_EVALUATED (registry tự sinh) | không có trong runtime |
+| `DECK_SLAB/*`, `PRESTRESSING_SYSTEM/*` | khai component với **0 check** | vòng lặp *chạm* vào bản và cáp nhưng L1 không kiểm bản/vùng neo/mất mát theo giai đoạn |
+
+Hệ quả: `component_audit.status` **luôn `BLOCKED` ở L1**. Đó không phải lỗi mà
+là danh sách việc còn lại: `proposals` toàn `EVIDENCE_REQUEST`, claim
+`UNVERIFIED_PROPOSAL`. Audit không đổi verdict của evaluator
+(`alters_evaluation_verdict = false`).
+
+## 4. Kết quả trên gold case (đã kiểm bằng test, ngân sách 40)
+
+| Seed | Diễn biến | Kết thúc |
+|---|---|---|
+| GC-06 (rẻ nhưng trượt SERV-001) | REPAIR: PT-38 → PT-42 (vẫn FAIL, cv giảm) → PT-46 (PASS) rồi TRIM 10 nước: S 2800 → 2450, bản 195 → 185, ST-1750 → ST-1650 | `CONVERGED`, chi phí 2146 → **2105,11**, util 0,999 |
+| GC-03 (trượt STR-001+STR-002+SERV-001) | 4 nước REPAIR (PT-34 → PT-38, ST-1650 → ST-1750, PT-38 → PT-42 → PT-46) rồi TRIM | hội tụ về **cùng phương án 2105,11** với GC-06 |
+| GC-02 (L0: cánh hẫng = 0) | REPAIR spacing 2400 → 2200 với **0 lần gọi solver** cho seed, rồi TRIM | `CONVERGED` |
+| GC-07 (đạt nhưng quá dư) | 19 nước TRIM liên tiếp | `BUDGET_EXHAUSTED` ở 40, chi phí 2845 → 2430 |
+| GC-01 với `utilization_target = 0,85` | REPAIR stage 3 (tăng bản, nâng ST-1850) rồi TRIM giữ util ≤ 0,85 | `CONVERGED`, util 0,832 |
+| GC-05 (tiết diện test-only) | bị từ chối trước solver | `SEED_REJECTED` |
+
+Các con số chi phí là **đơn vị tương đối của catalog placeholder** — chỉ có nghĩa
+xếp hạng trong cùng một run (README, §"Điều kiện dữ liệu").
+
+## 5. Cách dùng
+
+```bash
+# Từ một BridgeDesignState; report đầy đủ ghi ra file, console in bản tóm tắt
+python -m bridge_evolution.design_loop gold_cases/cases/GC-06_cheap_but_fails.json \
+    --budget 40 --target 0.95 --trim-order recent_reject_last --out report.json
+```
+
+```python
+from bridge_evolution.design_loop import LoopPolicy, run_design_loop
+
+report = run_design_loop(seed_state, budget=40,
+                         policy=LoopPolicy(utilization_target=0.95,
+                                           trim_order="recent_reject_last"))
+report["final"]["gene"], report["lineage"], report["termination"]
+report["component_audit"]["proposals"]   # việc còn lại trước khi gọi là "thiết kế"
+```
+
+Mã thoát của CLI: 0 = phương án cuối khả thi theo verifier, 1 = không, 2 = lỗi
+đầu vào/policy.
+
+## 6. Giới hạn trung thực
+
+- **Cục bộ, một bước.** `CONVERGED` nghĩa là không láng giềng ±1 nào rẻ hơn mà
+  vẫn đạt. Tối ưu toàn cục v1 đã có oracle vét cạn (2072,94, `experiments/results/
+  exhaustive_*`); mọi phát biểu "vòng lặp tìm được nghiệm tốt" phải đối chiếu
+  oracle/NSGA-II cùng ngân sách theo `docs/03_validation_protocol.md`. GC-06 hội
+  tụ 2105,11 > 2072,94: vòng lặp **không** thay tìm kiếm toàn cục, nó là bước
+  *polish* rẻ cho một seed đã có.
+- **Một biến mỗi nước.** Vi phạm cần đổi đồng thời hai biến (KC-016: SERV-001 ↔
+  FAB-003 ở grammar v2) có thể dừng `NO_IMPROVING_REPAIR`. Đây là tín hiệu để
+  chuyển sang NSGA-II, không phải để nới rào.
+- **Chỉ những rule có nước sửa.** Diagnose phủ STR-001/002, SERV-001/002,
+  GEOM-001/002/003, CONS-001; module thêm MODEL-001. FAB-* của grammar v2 chưa
+  có nước sửa → seed v2 trượt FAB dừng `NO_IMPROVING_REPAIR`.
+- **Tỷ số D/C dựng lại từ `responses` đã làm tròn** (sai số ≤ 2·10⁻³, hằng
+  `UTIL_ROUNDING_TOL`); verifier vẫn là nguồn verdict, tỷ số chỉ để xếp ứng viên
+  và điền `utilization` cho audit. MODEL-001 được gán khi `max_utilization` vượt
+  mọi tỷ số dựng lại quá dung sai đó.
+- **L1 là L1.** Chưa có mất mát DƯL theo giai đoạn, ứng suất lúc truyền lực, co
+  ngót–từ biến, xoắn, ổn định thành mỏng, mỏi. Một phương án `ACCEPTABLE` với
+  util 0,999 ở L1 gần như chắc chắn cần thêm dự trữ khi lên L2/L3 — đó là lý do
+  `utilization_target` tồn tại và nên được kỹ sư đặt < 1.
+
+## 7. Mở rộng sang cấu kiện khác
+
+Vòng lặp chỉ cần bốn khả năng từ "bài toán cấu kiện": (a) trạng thái là gene
+rời rạc trong một grammar (`gene_order`/`gene_domains`), (b) một evaluator ra
+record với `status/feasible/cv/max_utilization/objectives/violations` qua
+`BudgetedEvaluator`, (c) một tầng chẩn đoán "rule → nước sửa L0-safe", (d)
+objective giải tích rẻ để xếp láng giềng. Để nối thân trụ (`PIER_COLUMN`) bằng
+engine `column_capacity` (BRD-034, `straight_prismatic_column`):
+
+1. khai grammar rời rạc cho tiết diện/cốt thép trụ và một `evaluate_pier` trả
+   record cùng contract (tỷ số D/C từ đường tương tác N–M, khuếch đại mômen);
+2. viết bảng nước sửa cho `AXIAL_FLEXURE`/`SECOND_ORDER` (tăng kích thước, tăng
+   cốt thép, giảm chiều dài tính toán chỉ khi có `EvidenceRef`);
+3. ánh xạ rule → check của registry (`PIER_COLUMN/AXIAL_FLEXURE`, `SECOND_ORDER`)
+   trong basis mới.
+
+Việc đó là task riêng (write_scope khác, đang do BRD-034 sở hữu); module này
+không chạm vào engine cột.

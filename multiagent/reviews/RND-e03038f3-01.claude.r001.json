@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-e03038f3-01",
+  "handoff_sha256": "61c7d0b5008b37217905a2a5c98e809f655857d4dc1dc907569ee50f78207945",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Ba tieu chi nghiem thu deu dat, va dat o muc tot hon thong le. (1) Phan biet da biet / chua biet / gia dinh: bang E-01..E-04 co cot Trang thai voi nhan REPO_VERIFIED va SOURCE_OBSERVED, con muc 'Du lieu chua biet' liet ke tam nhom (doi tuong thiet ke, tieu chuan, tai/to hop, dia chat-thuy van-gio-dong dat, vat lieu, solver L2/L3, dinh nghia N-M, tieu chi do manh) va dong lai bang cau 'khong duoc tu dien tu LLM hoac tu video'. (2) Moi claim co nguon hoac nhan UNVERIFIED: ba trong bon muc bang chung tro thang toi file trong repo va kiem lai duoc. (3) Baseline B0 vs A1, bay nhom metric tien dang ky, ngan sach 10 seed x 200 solver call, va tam tieu chi bac bo. Artifact khong drift; claim IDEA khop claim_ceiling; gates_completed rong la dung vi CLAIM_GATES[IDEA] khong doi gate nao. Quyet dinh tu ghi trong tai lieu la G0 = PARTIAL / STOP_FOR_ENGINEERING_CLAIMS - do la danh gia G0 cua DU AN, khong phai cua task; G0 o cap task nghia la task nay co ky luat design-basis trung thuc hay khong, va cau tra loi la co. Cung mot cach doc voi tien le BRD-001, BRD-002, BRD-020, BRD-031."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task chi sinh mot tai lieu G0, khong co ma nguon, khong solver, khong ket qua so nao de kiem chat luong mo hinh. Khong co claim ky thuat nao duoc phat hanh."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Khong co limit state nao duoc tinh hay tuyen bo. Tai lieu noi thang rang chua du design basis de tinh N-M, do manh hay P-Delta."
+    }
+  ],
+  "notes": "Review doc lap boi claude (owner la codex-gpt5). Ba tieu chi nghiem thu deu dat. Hai diem manh vuot muc thong le, dang ghi lai: (1) Tam tieu chi bac bo la tu troi minh chu khong phai trang tri - dac biet tieu chi 7 cam tuyen bo da kiem N-M, do manh hay P-Delta khi capability tuong ung chua ton tai, va tieu chi 6 giu dung quy tac so sanh cong bang cua PROTOCOL (cung solver budget, fidelity, seed policy va reference point). Muc ngan sach con noi ro khong duoc dung smoke test de claim superiority. (2) Cach xu ly nguon E-01 la dung: y tuong vong lap den tu mot video TikTok, va thay vi giau nguon do hoac nang no len thanh bang chung ky thuat, tai lieu ghi thang URL, gan nhan SOURCE_OBSERVED va cam dung con so trong video lam du lieu ky thuat. Nguon yeu duoc khai dung la nguon yeu thi khong con la van de. Quyet dinh G0 = PARTIAL / STOP_FOR_ENGINEERING_CLAIMS trong tai lieu la danh gia G0 cua du an chu khong phai cua task; o cap task, ky luat design basis la trung thuc nen G0 PASS - cung cach doc da ap dung cho BRD-001, BRD-002, BRD-020 va BRD-031. LUU Y NGOAI PHAM VI TASK NAY: lab dang valid=false vi bay loi drift provenance do BRD-028 (cung owner codex-gpt5) gay ra va chua ghi correction; vi vay mirror Obsidian cua chinh review nay se o trang thai pending cho toi khi phan do duoc xu ly. Do khong phai loi cua task nay."
+}

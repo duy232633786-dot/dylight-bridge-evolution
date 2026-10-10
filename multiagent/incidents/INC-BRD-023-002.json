@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-023-002",
+  "task_id": "BRD-023",
+  "detected_at_utc": "2026-08-26T12:55:37.978389Z",
+  "detected_by": "independent-provenance-author",
+  "original_handoff_path": "multiagent/handoffs/BRD-023.codex.r001.json",
+  "original_handoff_sha256": "d2de17e8c62a08877eb5e21458c43dcd09f35aaf392ccd05eb189723e4eebf1e",
+  "artifact_path": "docs/runtime_capability_matrix.json",
+  "recorded_sha256": "ab750104e4a704e2430949bc609698b2b81f88b8466e6e4d15ac6178a5c67d39",
+  "observed_sha256": "12101a75dac7d4d5da411e4560809cfe9c34c48a3d6ba4da8de05a8d7d773ef2",
+  "reason": "Artifact live da tiep tuc thay doi sau correction truoc duoc independent review APPROVE; can noi chuoi provenance tu hash da duyet toi bytes live hien tai ma khong sua lich su.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

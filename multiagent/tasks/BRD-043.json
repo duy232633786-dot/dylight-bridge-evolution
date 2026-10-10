@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-043",
+  "title": "Tham chiếu đường áp lực funicular độc lập để kiểm hình dạng vòm sáng tạo",
+  "research_question": "Có thể kiểm tra độc lập hình dạng vòm sáng tạo bằng cân bằng tĩnh học và đường áp lực dưới tải đứng đều, không dùng ma trận độ cứng frame_f1, rồi so bậc độ lớn lực xô hoặc lực tie với BRD-042 mà vẫn giữ claim ở IDEA và không phát hành verdict thiết kế hay không?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-042"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/funicular_reference.py",
+    "contracts/funicular_reference_study.schema.json",
+    "docs/design_basis/funicular_reference_basis.json",
+    "tests/test_funicular_reference.py"
+  ],
+  "acceptance_criteria": [
+    "Chỉ nhận BRD-042 study tái lập hợp lệ, claim_level IDEA, design_verdict_authority NONE và mọi load case ACTION_DIAGNOSTIC_COMPLETE; parent tamper, source drift hoặc lineage sai phải bị chặn trước phép tính tham chiếu",
+    "Kernel tham chiếu không được import hoặc gọi frame_f1 stiffness, assembly, solve hay local_force; chỉ dùng hình học, tải nút và các phương trình cân bằng tĩnh học được khai trong basis",
+    "Miền áp dụng phải fail-closed: một nhịp, hai chân cùng cao độ, tải chỉ theo GLOBAL_NEGATIVE_Y, tổng tải đứng khác 0, hoành độ rib tăng nghiêm ngặt và tải tương đương phân bố đều theo phương ngang",
+    "Từ tổng tải W, nhịp L và rise f phải tính w=W/L, H_ref=wL^2/(8f), đường funicular y_ref=4f x(L-x)/L^2, shear V=w(L/2-x) và lực nén tham chiếu sqrt(H_ref^2+V^2) với quy ước đơn vị rõ ràng",
+    "Phải báo sai lệch RMS/max của trục rib so với funicular, bending proxy M_ref(x)=w x(L-x)/2-H_ref y_actual(x), cùng các tỷ số không thứ nguyên; hình parabol canonical phải cho sai lệch và bending proxy gần 0",
+    "Phải so H_ref với foundation thrust của DECK_ARCH hoặc tie-force envelope của THROUGH_ARCH/NETWORK_ARCH bằng tỷ số có dấu và bậc độ lớn; kết quả chỉ được dùng nhãn AGREEMENT_WITHIN_ORDER_BAND, AGREEMENT_OUTSIDE_ORDER_BAND hoặc NOT_COMPARABLE",
+    "Hình dạng bất đối xứng hoặc phi-funicular phải tạo sai lệch/bending proxy khác 0 và không được bị rửa thành canonical bằng cách sửa output rồi reseal outer hash",
+    "Manifest phải giữ parent study hash, candidate/profile/model/result/basis/source hashes, funicular input hash và output hash; validation phải tái dẫn xuất toàn bộ thay vì tin dữ liệu đã niêm phong",
+    "Schema phải additionalProperties=false ở mọi object do module sở hữu, claim_level const IDEA, design_verdict_authority const NONE, technical_scope phủ định capacity/safety/design verdict và cấm feasible, verified, design_pass, utilization",
+    "Test phải phủ canonical, ba topology, shape bất đối xứng, tải ngang hoặc không đều ngoài miền, rise/span suy biến, parent tamper/reseal, source/basis drift, output tamper/reseal, deterministic và không drift artifact BRD-039/040/041/042"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/funicular_reference.py",
+    "contracts/funicular_reference_study.schema.json",
+    "docs/design_basis/funicular_reference_basis.json",
+    "tests/test_funicular_reference.py"
+  ],
+  "safety_notes": [
+    "H_ref là tham chiếu tĩnh học cho vòm parabol hai khớp dưới tải đứng đều theo phương ngang, không phải phản lực thiết kế móng",
+    "Bending proxy chỉ đo độ lệch khỏi đường áp lực lý tưởng, không phải nội lực thiết kế và không thay phân tích khung, ổn định hoặc phi tuyến",
+    "Order band là kiểm tra bậc độ lớn phục vụ phát hiện sai mô hình, không phải giới hạn chấp nhận theo tiêu chuẩn",
+    "Không có sức kháng, tổ hợp tải, gối-mố-móng-đất, thi công, gió, động đất, mỏi, độ bền hoặc kiểm định độc lập bằng phần mềm thứ hai"
+  ],
+  "review_notes": [
+    "QUYET DINH: APPROVE BRD-043 o dung muc IDEA, design_verdict_authority=NONE, toan bo G0..G7 NOT_APPLICABLE, khong co finding chan."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_funicular_reference.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "tests/test_creative_frame_adapter.py",
+      "tests/test_arch_action_f1.py",
+      "tests/test_funicular_reference.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

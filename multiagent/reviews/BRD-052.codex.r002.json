@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "handoff_sha256": "65af91086c79628f00e4585a5eb8d3d225bd3d616684b62001c72c607a8430db",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Validator van chap nhan lo cham bien/zero local ligament; family khong giu slope suon; UI co the phat stale output va PSC-Value flow dang hong."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task chi o IDEA/L0, khong mo solver va khong phat verdict model/ket cau; khong duoc suy G2 tu unit test."
+    }
+  ],
+  "notes": "REVISE: 10/10 hash khop. Hai lenh pytest cua contract deu NOT_RUN vi sandbox khong co lenh python; khong coi day la test fail. Claim van IDEA va khong thay verdict chiu luc ngoai verifier. Log rerun cho 1874 passed, 4 skipped, exit 0, nhung cac MAJOR tren lam G1 chua dat. | Ky thuat: CX-052-01 MAJOR: Containment moi chi sua giao cat proper. bridge_evolution/midas_section.py:288-304 bo qua tiep xuc/collinear; canh trong (1.2,-1.5)->(0.8,-2.5) co the di qua JO3=(1,-2) voi moi dinh strict-inside va web dinh/day van duong.; CX-052-02 MAJOR: Endpoint da dung, nhung noi suy tat ca dimension tai bridge_evolution/midas_section.py:770-778 khong giu slope song song giua mat suon ngoai va trong.; CX-052-03 NOTE: RESOLVED: db/SECT da co PSC_OPT1/2, SWIDTH, WARPING/WEB keys va defaults_source tai bridge_evolution/midas_section.py:602-644; defaults duoc khai bao tai basis:251-336.; CX-052-04 NOTE: RESOLVED: status da doi thanh VERIFIED_BY_EXTERNAL_EVIDENCE; ba evidence file ton tai va SHA-256 khop basis:30-50, output phat evidence/flags tai bridge_evolution/midas_section.py:677-723.; CX-052-05 MAJOR: Backend da sua VERTEX/vSIZE, nhung UI van doc .Vertex tai dashboard/midas_section.html:335. Ngoai ra vSIZE tai bridge_evolution/midas_section.py:880-895,903 tu gan bbox va thickness gene, trong khi [MIDAS Param for Design](https://support.midasuser.com/hc/en-us/articles/50911015122713-Param-for-Design) neu cac tham so nay duoc dung tinh shear strength; mapping chua co nguon xac minh.; CX-052-06 MAJOR: Stale protection con race: input debounce tai dashboard/midas_section.html:188,208 nhung seq chi tang tai :219; response cu den trong 160 ms van qua :223 va mo khoa copy tai :224-229. FCM/propose/Super-T tai :301-339 cung khong sequence va giu output cu khi loi.; CX-052-07 MAJOR: LabHandler test da co, nhung tests/test_midas_section.py:366-403 khong dispatch hai mapping propose/supert-value tai scripts/serve_lab.py:618-619; xoa chung van giu test xanh va loi UI PSC-Value khong bi bat.; CX-052-08 MINOR: Bool string va section_id abc da duoc sua, nhung _section_id tai bridge_evolution/midas_section.py:97-106 am tham ep 1.5 thanh 1; joints=[] va dims=[] bi doi thanh object rong tai :120,131; mot so payload Super-T sai kieu van thanh HTTP 500.; CX-052-09 MINOR: Handoff r002:6 bao full suite 78 pass, 0 skip tu log tail .tmp/lab-review/full_suite_r002.txt:1-4. Log rerun .tmp/lab-review/full_suite_r002_rerun.txt:1-28 cho 1874 passed, 4 skipped, exit 0. Day la loi bao cao, khong phai test fail.; CX-052-10 MAJOR: Proposal co hidden engineering default 0.05 m tai bridge_evolution/midas_section.py:845,848 va khong khai bao applicability domain; mot input UI hop le nhu L=30 m sinh cap pier/mid ma chinh family tu choi. | hash_verified=True tests_run_by_reviewer=NOT_RUN | Chi tiet: .tmp/lab-review/codex_BRD-052_review_findings.json"
+}

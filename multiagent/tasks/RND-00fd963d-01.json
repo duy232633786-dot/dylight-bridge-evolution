@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-01",
+  "title": "Khóa design basis, bằng chứng và tiêu chí bác bỏ",
+  "research_question": "Dữ liệu đầu vào, nguồn gốc và tiêu chí nào phải khóa trước khi nghiên cứu đề tài này?",
+  "workstream": "design_basis",
+  "priority": "P0",
+  "status": "ACTIVE",
+  "owner": "claude",
+  "reviewer": "codex",
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260901-00fd963d/01_design_basis_and_evidence.md"
+  ],
+  "acceptance_criteria": [
+    "Phân biệt dữ liệu đã biết, chưa biết và giả định",
+    "Mỗi claim chính có nguồn/citation hoặc ghi UNVERIFIED",
+    "Có baseline, metric, ngân sách và falsification criterion"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260901-00fd963d/01_design_basis_and_evidence.md"
+  ],
+  "safety_notes": [
+    "Không tự bịa site, tải, địa chất, thủy văn hay thuộc tính vật liệu"
+  ],
+  "review_notes": [
+    "G0 design basis is incomplete; retain IDEA and obtain verified engineering inputs before technical claims.",
+    "Claim remains IDEA; verified engineering inputs are required before technical claims.",
+    "r003 xử lý đúng nguồn Word và được chấp nhận về provenance; G0 của hybrid 650 m vẫn chưa thể PASS. Chỉ tiếp tục F0/IDEA và giữ lineage PSC 45+75+45 m tách biệt."
+  ],
+  "source_brief_id": "RND-20260901-00fd963d",
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

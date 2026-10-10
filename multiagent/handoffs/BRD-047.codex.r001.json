@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-047",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Safe Design Study lineage IDEA: pin ba authority schema và registry, khóa solver/evaluator identity, giữ severity, fail-closed robust evidence và JSON hữu hạn",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/design_study.py",
+      "sha256": "f56635414427fb6b7c242981db802914cfb0a98c61695e4efc96d9b4fd292397",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/model_applicability.schema.json",
+      "sha256": "48fdb628349006c017b68094b766d47741d566baca63f5ce9d9be23b4fd2ff4c",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/model_applicability.json",
+      "sha256": "10bb58dbd992319b1325fd2bab2d33ffbb92e860f31730a8acc6f4539665e2fb",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_design_study.py",
+      "sha256": "589f953dec0e04a7c1b5761ed00d6f87f9befad7c1abd72b7fca679bb5b2ca34",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Custom evaluator chỉ là diagnostic seam; chỉ evaluator mặc định có solver name/version đúng allowlist mới có thể tạo SCREENED trong test fixture VERIFIED",
+    "Canonical domain_evidence vẫn PARTIAL hoặc UNVERIFIED nên mọi L1 production family tiếp tục BLOCKED; task không tạo kết luận thiết kế cầu"
+  ],
+  "unresolved_risks": [
+    "Authority gate chưa được nối vào mọi CLI/optimization caller legacy; system-wide enforcement là task tích hợp riêng",
+    "SCREENED nếu xuất hiện chỉ là sàng lọc trong miền registry đã xác minh, không phải G3/G4, phê duyệt kỹ sư hay hồ sơ thi công"
+  ],
+  "next_action": "Claude Code review độc lập: tự băm 4 artifact, chạy 24 test riêng và 90 test tích hợp, thử forged solver/evaluator/schema/digest/NaN/replay"
+}

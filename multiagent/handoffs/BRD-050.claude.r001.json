@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-050",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "r001 BRD-050: thuat toan vong lap thiet ke cau kien REPAIR->TRIM trong bridge_evolution/design_loop.py, dung nguyen evaluate_candidate (verdict) + analysis.suggest_repairs (nuoc sua) + BudgetedEvaluator (ngan sach) + build_component_audit (ban giao bang chung L1). REPAIR chap nhan nuoc dau tien tien len tren thang stage 0..4 (schema/L0/infeasible/over-target/acceptable); TRIM thu lang gieng +-1 re hon theo objective giai tich, chi chap nhan khi van feasible va <= utilization_target; tap visited chan dao dong, khong RNG, report tu bam va tuan schema contracts/design_loop_report.schema.json. Ket qua gold case budget 40: GC-06 va GC-03 hoi tu cung phuong an cost 2105.11 util 0.999 (oracle vet can toan cuc v1 = 2072.94 nen day la polish cuc bo, khong thay NSGA-II); GC-02 sua hinh hoc voi 0 solver call cho seed; GC-05 SEED_REJECTED truoc solver; trim_order=recent_reject_last giam solver call 29->20 cung nghiem. Component audit cua phuong an cuoi luon BLOCKED o L1 (SHEAR_TORSION/FATIGUE/STABILITY/ban mat cau/he DUL NOT_EVALUATED) - day la danh sach viec con lai cho ky su. Test: tests/test_design_loop.py 28/28 PASS; full suite 1836 pass 4 skip 0 fail; docs/check_runtime_drift.py OK; lab validate OK.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/design_loop.py",
+      "sha256": "442e0b7b3f1564aab037630472971fcdd5777be9bff536f1033c2dd6f2616448",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/design_loop_report.schema.json",
+      "sha256": "348471a3e3abbb5b655d90ae94a590639227a59fc57a76400ae39e55ab2d5041",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/design_loop_basis.json",
+      "sha256": "a5aa0318fd6b85ef740ff40a719c16594e3a6a2dbbaf874fd0e6d2c426a34003",
+      "kind": "code"
+    },
+    {
+      "path": "docs/06_component_design_loop.md",
+      "sha256": "099c0e718864d3eaf931ee9a318ea2c3826d959cea41528bcc9a910111ba6c7a",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_design_loop.py",
+      "sha256": "b467dc1c68a596bb047c790c670eb618f4dcb008c2cdb4b45439b0a1cc870dda",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Nuoc sua cua tang chan doan (analysis.diagnose._STEP_MOVES) va bang _EXTRA_STEP_MOVES (MODEL-001) la du de sua cac rule L1 hien co; FAB-* cua grammar v2 chua co nuoc sua nen seed v2 truot FAB dung NO_IMPROVING_REPAIR.",
+    "Ty so D/C tung rule duoc dung lai tu responses da lam tron (sai so <= 2e-3, hang UTIL_ROUNDING_TOL); verifier van la nguon verdict duy nhat, ty so chi de xep ung vien va dien utilization cho audit.",
+    "generation_action cua BudgetedEvaluator duoc gan theo pha (DESIGN_LOOP_SEED/REPAIR/TRIM) qua thuoc tinh cong khai; provenance cua tung state ghi parent_candidate_id = case_id cua phuong an truoc."
+  ],
+  "unresolved_risks": [
+    "CONVERGED chi la toi uu cuc bo mot buoc theo objective_key; GC-06 hoi tu 2105.11 > oracle 2072.94. Moi phat bieu ve chat luong nghiem phai doi chieu oracle/NSGA-II cung ngan sach theo docs/03_validation_protocol.md.",
+    "Ket qua L1 chi SCREENED: chua co mat mat DUL theo giai doan, ung suat luc truyen luc, co ngot-tu bien, xoan, on dinh, moi; phuong an ACCEPTABLE util 0.999 o L1 gan nhu chac chan can them du tru o L2/L3 - ky su nen dat utilization_target < 1.",
+    "Chua noi runtime capability matrix (ngoai write_scope, file da neo hash); nang luc DESIGN_LOOP chua duoc khai trong docs/runtime_capability_matrix.json - can task rieng hoac amendment scope.",
+    "Mo rong sang PIER_COLUMN (engine column_capacity, BRD-034 do codex so huu) chua lam; module nay khong cham engine cot."
+  ],
+  "next_action": "Review doc lap boi codex hoac opencode: tu chay python -m pytest tests/test_design_loop.py -q va tests/test_diagnose.py tests/test_optimization_budget.py tests/test_evaluate.py; doi chieu 5/5 SHA-256 artifact; kiem rang khong co duong nao trong design_loop.py tu phat feasible/PASS ngoai evaluate_candidate; khong coi APPROVE phan mem la phe duyet thiet ke cau."
+}

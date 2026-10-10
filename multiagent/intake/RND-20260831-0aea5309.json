@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.1",
+  "brief_id": "RND-20260831-0aea5309",
+  "created_at": "2026-08-31T23:12:21.520564Z",
+  "topic": "Đánh giá và phát triển hình học-vật lý Final Concept v1.7 của Hybrid Grand Bridge: nhịp giữa dây võng 650 m, quạt dây văng chỉ phía đất liền, một vòm trung tâm CFST-UHPC và hai nửa vòm biên CFST-UHPC nối dầm gần mố.",
+  "objectives": [
+    "Phản biện độc lập đường truyền lực và phát hiện cơ chế thừa, xung đột độ cứng hoặc cấu kiện không có vai trò rõ ràng.",
+    "Tham số hóa hình học gồm độ vồng, khe dầm-vòm, điểm nối nửa vòm, vị trí nút chân tháp và hộp khổ thông thuyền.",
+    "Đề xuất ít nhất ba biến thể có tiêu chí bác bỏ định lượng ở mức F0/F1 và lộ trình lên mô hình phi tuyến, khí động, thi công."
+  ],
+  "constraints": [
+    "Chỉ claim IDEA hoặc SCREENED theo runtime hiện có; không gọi là thiết kế cơ sở, thiết kế thi công hay world-first.",
+    "Không bịa dữ liệu địa chất, thủy văn, gió, động đất, tải trọng hoặc thuộc tính vật liệu; thiếu design basis phải ghi UNKNOWN/STOP.",
+    "Khổ thông thuyền 60 m và toàn bộ kích thước v1.7 là design seed sơ bộ, phải kiểm tra lại."
+  ],
+  "requested_by": "project_owner",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "runtime_scope": {
+    "structural_families": [
+      "arch_deck_v1"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  },
+  "budget": {
+    "max_tasks": 5,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 21600
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}

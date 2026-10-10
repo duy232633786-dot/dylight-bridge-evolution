@@ -5,9 +5,9 @@
   "research_question": "Runtime hiện KHÔNG có bất kỳ phương tiện nào kiểm cấu kiện nén–uốn: verifier chỉ có MODEL-001, STR-001 (uốn), STR-002 (cắt), SERV-001/002/003 — tất cả viết cho dầm giản đơn chịu uốn. Hệ quả đo được: trụ cầu, thân trụ, cột khoang vòm và vành vòm đều KHÔNG có ô nào chứa chúng; ARCH-NEED-01/02/09 của BRD-004 treo đúng vì lý do này. Câu hỏi: dựng engine tương tác N–M cho cột/trụ BTCT LĂNG TRỤ ở mức L1 thế nào để (a) tái lập được và kiểm chứng được bằng ví dụ có lời giải công bố, (b) fail-closed khi độ mảnh vượt miền áp dụng của phương pháp khuếch đại mô men, và (c) TỪ CHỐI chạy trên vành vòm — nơi ổn định là bài toán vòm chứ không phải bài toán cột có hệ số K?",
   "workstream": "structural_physics",
   "priority": "P1",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
+  "status": "ACTIVE",
+  "owner": "codex",
+  "reviewer": "claude",
   "dependencies": [],
   "required_gates": [
     "G2"
@@ -47,7 +47,8 @@
     "Đo được trước khi ghi task: grep toàn bộ bridge_evolution/ không có interaction / second-order / axial-flexure / effective length. Chuỗi 'slenderness' duy nhất tìm thấy nằm ở section_types.py và là ĐỘ MẢNH BẢN (b/t, phân loại tiết diện lớp 1) — khác hoàn toàn độ mảnh cấu kiện kL/r",
     "Giá trị trực tiếp: trụ hai thân trong khối hình thái cầu vòm (tmp/arch_part_substructure.py) là cấu kiện nén-uốn thuần tuý và hiện không có gì kiểm được. Đây là bước đi từ F0 IDEA lên F1 SCREENED cho hạ bộ",
     "Tiêu chuẩn áp dụng gợi ý: TCVN 11823-5 (kết cấu bê tông). Repo đã trích TCVN 11823-6 (kết cấu thép) trong RND-d88a2a60-01 nên đường dẫn tài liệu tương tự có thể tái dụng",
-    "Ranh giới đã chốt khi ghi task: LÀM cột/trụ lăng trụ; KHÔNG làm vành vòm"
+    "Ranh giới đã chốt khi ghi task: LÀM cột/trụ lăng trụ; KHÔNG làm vành vòm",
+    "Claude Opus review chỉ đọc: hash 5/5 khớp; REVISE vì quy ước M1/M2 chưa khóa có thể bỏ khuếch đại, basis chưa canonical, miền vật liệu và benchmark chưa đủ. Claude không được phép chạy test trong phiên; Codex tái chạy bộ mục tiêu chung và 49/49 test xanh, nhưng test xanh không đóng các finding ngữ nghĩa."
   ],
   "preferred_provider": "opencode",
   "preferred_role": "structural_analyst",

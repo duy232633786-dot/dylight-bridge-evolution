@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-049",
+  "agent_id": "codex",
+  "role": "form_inventor",
+  "summary": "Creative portfolio shield nối MAP-Elites F0, frame adapter, F1, arch-action và funicular reference; mỗi candidate qua 3 perturbation deterministic, profile/schema/source pin và Pareto chỉ sau mọi check PASS.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_portfolio.py",
+      "sha256": "ad6e657f5e061804262fe347c84a691ea07e27d8b860f6bc5a574f6abfe1c9ab",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_portfolio_study.schema.json",
+      "sha256": "26fd9806814eb03f76b7e5b7d1b40d0089c5e2274784f083480ff32ea456fdc9",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_portfolio_basis.json",
+      "sha256": "e3dcf25442b7b22b7a818347f382deaa202907390b66e4459495f5f0e5417a75",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_portfolio.py",
+      "sha256": "53f9771211ad1dfead72664c6a5b7ca3f73857c15454a5f178703ae3cbfef951",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Profile kỹ thuật và structural-profile factory do caller cung cấp phải có nguồn hợp lệ; test dùng evidence giả lập chỉ để kiểm software contract.",
+    "RESEARCH_SCREENED chỉ có nghĩa không bị các check F0/F1 hiện có bác bỏ."
+  ],
+  "unresolved_risks": [
+    "Chưa có sức kháng, ổn định phi tuyến, mỏi, động lực, gió, động đất, địa chất, thủy văn, thi công, durability hoặc tổ hợp tiêu chuẩn.",
+    "Full suite 1788 test còn 5 failure tests/test_collaboration.py do 4 drift provenance BRD-001/030/032/033 cần reviewer thứ ba; 19 target và 200 integration test BRD-049 xanh."
+  ],
+  "next_action": "Claude Code review độc lập hash, schema, determinism, tamper/replay, cơ chế fail-closed và ranh giới claim IDEA; không coi test là phê duyệt cầu."
+}

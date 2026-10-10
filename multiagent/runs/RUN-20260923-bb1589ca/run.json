@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260923-bb1589ca",
+  "brief_id": "RND-20260923-bb1589ca",
+  "created_at": "2026-09-23T18:31:19.906409Z",
+  "updated_at": "2026-09-23T18:42:43.075309Z",
+  "status": "PLANNED",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-bb1589ca-01",
+    "RND-bb1589ca-02",
+    "RND-bb1589ca-03",
+    "RND-bb1589ca-04",
+    "RND-bb1589ca-05"
+  ],
+  "provider_policy": "AVAILABLE_WITH_FALLBACK",
+  "attempts": {
+    "RND-bb1589ca-01": 0,
+    "RND-bb1589ca-02": 0,
+    "RND-bb1589ca-03": 0,
+    "RND-bb1589ca-04": 0,
+    "RND-bb1589ca-05": 0
+  },
+  "recovery_grants": {
+    "RND-bb1589ca-01": 0,
+    "RND-bb1589ca-02": 0,
+    "RND-bb1589ca-03": 0,
+    "RND-bb1589ca-04": 0,
+    "RND-bb1589ca-05": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-23T18:31:19.906409Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    },
+    {
+      "at": "2026-09-23T18:34:11.378144Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-aa0c390c433c4635 155e9556554d17e3eadeb76b25c16434f16c6eb77ea71a5c85e02eaac093eb75: acceptance_criteria, research_question, safety_notes, title",
+      "task_id": "RND-bb1589ca-01"
+    },
+    {
+      "at": "2026-09-23T18:34:11.393132Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-c73ae3b65fe34c26 4681187d8517efa0a40eebc9600887c0684532dd84cb678732ab02bdc6677619: safety_notes, status",
+      "task_id": "RND-bb1589ca-02"
+    },
+    {
+      "at": "2026-09-23T18:34:11.407799Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-e0a75a06495b4dda 7f2cce9cd10bb761cf8ae7da7aa6c03442debe6218ac0fa3997c6b4767fe7472: safety_notes, status",
+      "task_id": "RND-bb1589ca-03"
+    },
+    {
+      "at": "2026-09-23T18:34:11.423494Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-0ac1926af2c8488b 1f0eb3192696a32c291055a3f312d21babab591311e6102bbf68ebd6bd33c655: safety_notes, status",
+      "task_id": "RND-bb1589ca-04"
+    },
+    {
+      "at": "2026-09-23T18:34:11.439550Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-a2497be548e1406a b872c6ee227dbb6927fa75c21e6ca12a0807713df4daf170c234c40931f0c475: safety_notes, status",
+      "task_id": "RND-bb1589ca-05"
+    },
+    {
+      "at": "2026-09-23T18:42:43.075309Z",
+      "kind": "KNOWLEDGE_SYNC",
+      "message": "Obsidian mirror: SYNCED"
+    }
+  ],
+  "human_gate": null,
+  "knowledge_sync": "SYNCED"
+}

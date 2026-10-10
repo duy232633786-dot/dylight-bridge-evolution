@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-046",
+  "handoff_sha256": "c05ccc2a5ee2409498e354d85ace4506ccf00c056ae8936c8800a14c8e45caa4",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Governance IDEA, không khóa design basis cầu."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không tạo hoặc thẩm tra hình học cầu."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không chạy solver kết cấu; pytest chỉ kiểm logic intake, scope và provider."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không kiểm trạng thái giới hạn kết cấu."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Independent governance review đã tự băm 4/4 artifact, chạy 60 test và đọc source; đây không phải blind recalculation kỹ thuật cầu."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có thử nghiệm vật lý hoặc calibration."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu vật liệu, exposure hoặc mô hình suy giảm."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Claim IDEA, không phát hành kỹ thuật hoặc sign-off kỹ sư."
+    }
+  ],
+  "notes": "Claude Code Opus review read-only: tự băm 4/4 raw-byte hash khớp r003; tự chạy đúng pytest command được khóa, 60 passed; tự đọc source và probe scope/provider/legacy partial-write. Xác nhận brief mới fail trước write khi thiếu runtime_scope; machine-gated task nhận scope; IDEA/G0-G7-only không tự nâng; fallback/execute/recover/CLI chỉ chọn Codex/Claude; provider cũ chỉ còn code legacy không reachable từ run mới; SCREENED task mẫu là limited-scope G0-G2 theo CLAIM_GATES, không phải G3/G4 hay phát hành kỹ thuật. MEDIUM: BRD-046 phụ thuộc hành vi reachability của BRD-037 chưa đóng; nên dọn code provider legacy ở task riêng. LOW: brief 1.0 sửa tay có runtime_scope vẫn re-plan; nhãn workstream còn suy từ topic nhưng không cấp solver. APPROVE chỉ governance IDEA, không xác nhận kỹ thuật cầu."
+}

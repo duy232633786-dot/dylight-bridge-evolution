@@ -1,0 +1,718 @@
+#!/usr/bin/env python3
+"""DYLIGHT Lab — máy chủ cục bộ cho phòng lab hướng 1: hình học sáng tạo + chất lượng cấu kiện.
+
+Chạy::
+
+    python scripts/serve_lab.py            # 127.0.0.1:8790
+    python scripts/serve_lab.py 8800       # cổng khác
+
+Mở ``http://127.0.0.1:8790/lab.html``.
+
+Máy chủ này chỉ là LỚP ĐỌC/GỌI mỏng lên các contract đã có của repo. Mọi số
+kỹ thuật đi qua đúng đường chuẩn (``evaluate_candidate`` → verifier,
+``run_design_loop``, ``check_geometry``, ``run_constrained_map_elites``); máy chủ
+không tính sức kháng, không phát PASS/FAIL và không nâng trần claim. Nó chỉ:
+
+* đọc trạng thái lab (task, handoff, review, run, incident) từ ``multiagent/``;
+* đọc ma trận năng lực, design basis, site profile và thẻ tri thức;
+* gọi vòng lặp thiết kế / studio tiết diện / MAP-Elites theo yêu cầu của UI và
+  lưu report thành artifact JSON có hash để bàn giao.
+
+Chỉ lắng nghe trên 127.0.0.1. Không có xác thực vì không phục vụ ra ngoài máy.
+"""
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+import re
+import sys
+import urllib.parse
+from datetime import datetime, timezone
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+# Console Windows mặc định cp1252 không in được đường dẫn tiếng Việt của repo;
+# ép UTF-8 để server không sập ngay dòng banner đầu tiên.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from bridge_evolution import ARTIFACTS_DIR, __version__  # noqa: E402
+from bridge_evolution.analysis import suggest_repairs  # noqa: E402
+from bridge_evolution.catalogs import all_domains, load_catalogs, load_grammar  # noqa: E402
+from bridge_evolution.collaboration.lab import lab_status, validate_lab  # noqa: E402
+from bridge_evolution.design_loop import (  # noqa: E402
+    ALGORITHM_VERSION as DESIGN_LOOP_VERSION, DesignLoopError, LoopPolicy, run_design_loop,
+)
+from bridge_evolution.design_study import load_applicability_registry  # noqa: E402
+from bridge_evolution.evaluate import evaluate_candidate  # noqa: E402
+from bridge_evolution.geometry import check_geometry  # noqa: E402
+from bridge_evolution.knowledge import load_cards, query_knowledge  # noqa: E402
+from bridge_evolution.objectives import compute_objectives  # noqa: E402
+from bridge_evolution.section import PARAM_KEYS, build_section_polygon  # noqa: E402
+from bridge_evolution.state import state_from_gene, validate_design_state  # noqa: E402
+from bridge_evolution import creative_shape  # noqa: E402
+from bridge_evolution import midas_section  # noqa: E402
+
+LAB_VERSION = "lab-ui/0.1.0"
+DASHBOARD_DIR = REPO_ROOT / "dashboard"
+MULTIAGENT_DIR = REPO_ROOT / "multiagent"
+LAB_RUNS_DIR = ARTIFACTS_DIR / "design_loop"
+CREATIVE_PROFILE_PATH = DASHBOARD_DIR / "lab_creative_profile.json"
+GOLD_CASES_DIR = REPO_ROOT / "gold_cases" / "cases"
+MAX_BUDGET = 400
+MAX_CREATIVE_ITERATIONS = 400
+_RUN_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]{1,120}\.json$")
+_GATE_LABELS = {
+    "G0": "Design basis", "G1": "Hình học & chế tạo", "G2": "Chất lượng mô hình",
+    "G3": "Trạng thái giới hạn", "G4": "Kiểm chứng độc lập", "G5": "Thí nghiệm",
+    "G6": "Vật liệu & phơi nhiễm", "G7": "Phát hành",
+}
+
+
+class LabApiError(ValueError):
+    """Đầu vào API sai; trả 400 kèm thông điệp."""
+
+
+# ---------------------------------------------------------------- tiện ích
+def _read_json(path: Path) -> dict | list | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+
+
+def _load_dir(folder: Path, pattern: str = "*.json") -> list[dict]:
+    items = []
+    for path in sorted(folder.glob(pattern)):
+        data = _read_json(path)
+        if isinstance(data, dict):
+            data = dict(data)
+            data["filename"] = path.name
+            items.append(data)
+    return items
+
+
+def _unknown_fields(node, path: str = "") -> list[str]:
+    out: list[str] = []
+    if isinstance(node, dict):
+        if node.get("status") == "UNKNOWN":
+            out.append(path or "<root>")
+        for key, value in node.items():
+            out.extend(_unknown_fields(value, f"{path}/{key}" if path else key))
+    return out
+
+
+def _int(value, name: str, lo: int, hi: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            raise LabApiError(f"{name} phải là số nguyên") from None
+    if not lo <= value <= hi:
+        raise LabApiError(f"{name} phải trong [{lo}, {hi}]")
+    return value
+
+
+# ---------------------------------------------------------------- lab data
+def get_live_data() -> dict:
+    tasks = {}
+    for path in sorted((MULTIAGENT_DIR / "tasks").glob("*.json")):
+        data = _read_json(path)
+        if isinstance(data, dict):
+            tasks[path.stem] = data
+    runs = {}
+    for path in sorted((MULTIAGENT_DIR / "runs").glob("*/run.json")):
+        data = _read_json(path)
+        if isinstance(data, dict):
+            runs[path.parent.name] = data
+    briefs = {}
+    for path in sorted((MULTIAGENT_DIR / "intake").glob("*.json")):
+        data = _read_json(path)
+        if isinstance(data, dict):
+            briefs[path.stem] = data
+    return {
+        "tasks": tasks,
+        "handoffs": _load_dir(MULTIAGENT_DIR / "handoffs"),
+        "reviews": _load_dir(MULTIAGENT_DIR / "reviews"),
+        "incidents": _load_dir(MULTIAGENT_DIR / "incidents"),
+        "corrections": _load_dir(MULTIAGENT_DIR / "corrections"),
+        "runs": runs,
+        "briefs": briefs,
+        "lab": _read_json(MULTIAGENT_DIR / "lab.json") or {},
+    }
+
+
+def api_lab_status() -> dict:
+    status = lab_status()
+    validation = validate_lab()
+    status["valid"] = validation.get("valid")
+    status["validation_errors"] = validation.get("errors", [])
+    return status
+
+
+# ---------------------------------------------------------------- overview
+def _gate_ladder(site_profile: dict | None, matrix: dict | None) -> list[dict]:
+    states = {c.get("id"): c.get("state") for c in (matrix or {}).get("capabilities", [])
+              if isinstance(c, dict)}
+    g0 = ((site_profile or {}).get("g0_gate") or {}).get("status", "UNKNOWN")
+    ladder = [
+        {"gate": "G0", "status": "PASSED" if g0 == "PASSED" else "BLOCKED",
+         "detail": f"Site profile g0_gate = {g0}; {len(_unknown_fields(site_profile or {}))} trường UNKNOWN"},
+        {"gate": "G1", "status": "AVAILABLE" if states.get("L0_LAYOUT_RULES") == "PRESENT" else "ABSENT",
+         "detail": "L0 bố trí (GEOM/CONS) PRESENT; FAB-* chỉ cho tiết diện tham số, ngưỡng mặc định repo"},
+        {"gate": "G2", "status": "AVAILABLE" if states.get("L1_LINE_GIRDER_SOLVER") == "PRESENT"
+         and states.get("INDEPENDENT_VERIFIER") == "PRESENT" else "ABSENT",
+         "detail": "L1 line-girder + independent verifier; chưa có L2/L3, chưa benchmark solver ngoài"},
+        {"gate": "G3", "status": "ABSENT", "detail": "Thiếu ổn định, mỏi, giai đoạn thi công, độ bền — chỉ STR/SERV của L1"},
+        {"gate": "G4", "status": "ABSENT", "detail": "Chưa có tái tính độc lập bằng solver khác (SOLVER_MIDAS_CIVIL/OPENSEESPY ABSENT)"},
+        {"gate": "G5", "status": "ABSENT", "detail": "Không có dữ liệu thí nghiệm"},
+        {"gate": "G6", "status": "ABSENT", "detail": "Exposure class UNKNOWN; vật liệu là placeholder"},
+        {"gate": "G7", "status": "ABSENT", "detail": "Chưa có kỹ sư chịu trách nhiệm phê duyệt"},
+    ]
+    for item in ladder:
+        item["label"] = _GATE_LABELS[item["gate"]]
+    return ladder
+
+
+def api_overview() -> dict:
+    lab_config = _read_json(MULTIAGENT_DIR / "lab.json") or {}
+    matrix = _read_json(REPO_ROOT / "docs" / "runtime_capability_matrix.json") or {}
+    site = _read_json(REPO_ROOT / "docs" / "design_basis" / "SITE-UNSPECIFIED.json") or {}
+    basis = _read_json(REPO_ROOT / "docs" / "design_basis" / "DB-SUPERT-38M.json") or {}
+    cards = load_cards()
+    card_counts: dict[str, int] = {}
+    for card in cards:
+        card_counts[card.get("status", "?")] = card_counts.get(card.get("status", "?"), 0) + 1
+    oracle = None
+    for folder in sorted((REPO_ROOT / "experiments" / "results").glob("exhaustive_*")):
+        summary = _read_json(folder / "summary.json")
+        pareto = _read_json(folder / "pareto_oracle.json")
+        if isinstance(summary, dict):
+            best_cost = None
+            entries = pareto.get("entries") if isinstance(pareto, dict) else pareto
+            if isinstance(entries, list):
+                costs = []
+                for entry in entries:
+                    objectives = entry.get("objectives") if isinstance(entry, dict) else None
+                    if isinstance(objectives, (list, tuple)) and objectives:
+                        costs.append(float(objectives[0]))
+                    elif isinstance(objectives, dict) and "relative_cost" in objectives:
+                        costs.append(float(objectives["relative_cost"]))
+                best_cost = min(costs) if costs else None
+            oracle = {
+                "folder": folder.name, "domain_size": summary.get("domain_size"),
+                "l0_valid": summary.get("l0_valid"), "feasible": summary.get("feasible"),
+                "pareto_size": summary.get("pareto_size"), "best_cost": best_cost,
+                "grammar": (summary.get("versions") or {}).get("grammar"),
+            }
+    capabilities = []
+    for entry in matrix.get("capabilities", []):
+        if not isinstance(entry, dict):
+            continue
+        capabilities.append({
+            "id": entry.get("id"), "state": entry.get("state"),
+            "title": entry.get("capability") or entry.get("title") or entry.get("label") or "",
+            "limit": entry.get("honest_limit") or entry.get("limit") or entry.get("limits") or "",
+        })
+    try:
+        status = api_lab_status()
+    except Exception as exc:  # lab hỏng thì overview vẫn phải mở được
+        status = {"error": str(exc)}
+    return {
+        "lab_version": LAB_VERSION,
+        "software_version": __version__,
+        "design_loop_version": DESIGN_LOOP_VERSION,
+        "direction": "1 — Sáng tạo hình học và tính chất lượng cấu kiện cầu",
+        "claim_ceiling": lab_config.get("current_project_claim_ceiling", "SCREENED"),
+        "claim_note": "Mọi số trong lab tối đa là SCREENED (L0/L1). Không có L2/L3, thí nghiệm hay kỹ sư duyệt.",
+        "capabilities": capabilities,
+        "rule_inventory": matrix.get("runtime_rule_inventory", []),
+        "gates": _gate_ladder(site, matrix),
+        "site": {
+            "profile": site.get("site_id") or site.get("profile_id") or "SITE-UNSPECIFIED",
+            "status": site.get("site_status"),
+            "g0": ((site.get("g0_gate") or {}).get("status")),
+            "unknown_fields": _unknown_fields(site),
+        },
+        "design_basis": {
+            "project_id": basis.get("project_id"), "bridge_name": basis.get("bridge_name"),
+            "standard": (basis.get("governing_standard") or {}).get("code"),
+            "standard_version": (basis.get("governing_standard") or {}).get("version"),
+            "design_life": (basis.get("design_life_years") or {}).get("status"),
+            "exposure_class": (basis.get("exposure_class") or {}).get("status"),
+        },
+        "knowledge": {"cards": len(cards), "by_status": card_counts},
+        "oracle_v1": oracle,
+        "agents": lab_config.get("agents", []),
+        "lab_status": status,
+    }
+
+
+# ---------------------------------------------------------------- catalog & gold cases
+def api_catalog() -> dict:
+    cat = load_catalogs()
+    grammars = {}
+    for grammar_id in ("super_t_simple_v1", "super_t_parametric_v2"):
+        grammar = load_grammar(grammar_id)
+        grammars[grammar_id] = {
+            "grammar_version": grammar.get("grammar_version"),
+            "project_inputs": grammar.get("project_inputs"),
+            "fixed": grammar.get("fixed"),
+            "domains": all_domains(grammar),
+        }
+    registry = load_applicability_registry()
+    anchors = {family: spec.get("anchor_gene") for family, spec in registry.get("families", {}).items()}
+    gold = []
+    descriptions = {}
+    matrix_path = REPO_ROOT / "gold_cases" / "gold_case_matrix.csv"
+    if matrix_path.is_file():
+        with matrix_path.open(encoding="utf-8", newline="") as handle:
+            for row in csv.DictReader(handle):
+                descriptions[row.get("case_file", "")] = row
+    for path in sorted(GOLD_CASES_DIR.glob("GC-*.json")):
+        state = _read_json(path)
+        if isinstance(state, dict):
+            meta = descriptions.get(path.name, {})
+            gold.append({"file": path.name, "state": state, "description": meta.get("description", ""),
+                         "expected_status": meta.get("expected_status"), "expected_feasible": meta.get("expected_feasible")})
+    return {
+        "catalogs_version": cat.get("catalogs_version"),
+        "girder_sections": {k: v for k, v in cat["girder_sections"].items()},
+        "prestress_layouts": cat["prestress_layouts"],
+        "diaphragm_layouts": cat["diaphragm_layouts"],
+        "concretes": cat["concretes"],
+        "prestressing_steels": cat["prestressing_steels"],
+        "rule_profiles": cat["rule_profiles"],
+        "grammars": grammars,
+        "anchor_genes": anchors,
+        "gold_cases": gold,
+    }
+
+
+# ---------------------------------------------------------------- evaluate / section
+def api_evaluate(payload: dict) -> dict:
+    state = payload.get("state") if isinstance(payload, dict) else None
+    if not isinstance(state, dict):
+        raise LabApiError("payload.state phải là BridgeDesignState")
+    result = evaluate_candidate(state)
+    return {"result": result, "repairs": suggest_repairs(state, result)}
+
+
+def _seed_state(payload: dict) -> dict:
+    if isinstance(payload.get("seed_state"), dict):
+        return payload["seed_state"]
+    seed_file = payload.get("seed_file")
+    if isinstance(seed_file, str):
+        if not re.fullmatch(r"GC-[0-9]{2}_[A-Za-z0-9_]+\.json", seed_file):
+            raise LabApiError("seed_file không hợp lệ")
+        state = _read_json(GOLD_CASES_DIR / seed_file)
+        if not isinstance(state, dict):
+            raise LabApiError(f"Không đọc được gold case {seed_file}")
+        return state
+    gene = payload.get("gene")
+    grammar_id = payload.get("grammar_id", "super_t_simple_v1")
+    if isinstance(gene, dict) and isinstance(grammar_id, str):
+        try:
+            return state_from_gene(dict(gene), grammar_id=grammar_id, generation_action="LAB_SEED")
+        except (KeyError, ValueError, TypeError) as exc:
+            raise LabApiError(f"Gene không dựng được state: {exc}") from exc
+    raise LabApiError("Cần seed_state, seed_file hoặc gene + grammar_id")
+
+
+def api_section(payload: dict) -> dict:
+    """Studio tiết diện: L0 + objective giải tích cho một gene (mặc định grammar v2)."""
+    grammar_id = payload.get("grammar_id", "super_t_parametric_v2") if isinstance(payload, dict) else "super_t_parametric_v2"
+    if grammar_id not in ("super_t_simple_v1", "super_t_parametric_v2"):
+        raise LabApiError("grammar_id chỉ nhận super_t_simple_v1 hoặc super_t_parametric_v2")
+    registry = load_applicability_registry()
+    anchor = dict(registry["families"][grammar_id]["anchor_gene"])
+    gene_raw = payload.get("gene")
+    if gene_raw is None:
+        gene_raw = {}
+    if not isinstance(gene_raw, dict):
+        raise LabApiError("gene phải là object {biến: giá trị}")
+    gene = dict(anchor)
+    for key, value in gene_raw.items():
+        if key in gene:
+            gene[key] = value
+    try:
+        state = state_from_gene(dict(gene), grammar_id=grammar_id, generation_action="LAB_SECTION_STUDIO")
+    except (KeyError, ValueError, TypeError) as exc:
+        raise LabApiError(f"Gene không dựng được state: {exc}") from exc
+    schema_errors = validate_design_state(state)
+    out = {"grammar_id": grammar_id, "gene": gene, "schema_errors": schema_errors,
+           "violations": [], "section": None, "polygon": None, "geometry": None, "objectives": None}
+    if schema_errors:
+        return out
+    violations, geom = check_geometry(state)
+    out["violations"] = violations
+    out["geometry"] = {k: geom.get(k) for k in ("span_m", "deck_width_m", "girder_count", "spacing_m",
+                                                 "slab_thickness_m", "overhang_m", "flange_gap_m", "section_source")}
+    if geom.get("section"):
+        out["section"] = geom["section"]
+    if grammar_id == "super_t_parametric_v2":
+        try:
+            out["polygon"] = build_section_polygon({k: gene[k] for k in PARAM_KEYS})
+        except Exception as exc:  # FAB-000 đã được check_geometry báo
+            out["polygon_error"] = str(exc)
+    if geom.get("section") and not any(v.get("severity") == "HARD" for v in violations):
+        out["objectives"] = compute_objectives(state, geom)
+    out["state"] = state
+    return out
+
+
+# ---------------------------------------------------------------- design loop runs
+def api_design_loop(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    seed_state = _seed_state(payload)
+    budget = _int(payload.get("budget", 40), "budget", 0, MAX_BUDGET)
+    policy_raw = payload.get("policy") or {}
+    if not isinstance(policy_raw, dict):
+        raise LabApiError("policy phải là object")
+    allowed = {"objective_key", "utilization_target", "move_policy", "trim_order",
+               "max_iterations", "trim_enabled", "max_trim_probes", "diagnose_top_k"}
+    unknown = sorted(set(policy_raw) - allowed)
+    if unknown:
+        raise LabApiError(f"policy có khoá lạ: {unknown}")
+    try:
+        policy = LoopPolicy(**policy_raw)
+        report = run_design_loop(seed_state, budget=budget, policy=policy)
+    except (DesignLoopError, TypeError) as exc:
+        raise LabApiError(str(exc)) from exc
+    LAB_RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    seed_id = report["seed"]["case_id"] or "seed"
+    name = f"{stamp}_{seed_id}_{report['report_sha256'][:8]}.json"
+    # Ghi BYTES, không dùng write_text: trên Windows write_text đổi "\n" thành
+    # "\r\n" và SHA-256 của file sẽ lệch với hash báo về UI (bài học BRD-024 CRLF).
+    payload_bytes = (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    (LAB_RUNS_DIR / name).write_bytes(payload_bytes)
+    return {"report": report, "saved_as": name,
+            "saved_sha256": hashlib.sha256(payload_bytes).hexdigest()}
+
+
+def _run_summary(path: Path) -> dict | None:
+    report = _read_json(path)
+    if not isinstance(report, dict) or report.get("algorithm_id") != "COMPONENT_DESIGN_LOOP":
+        return None
+    final = report.get("final") or {}
+    return {
+        "name": path.name,
+        "created_utc": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(timespec="seconds"),
+        "grammar_id": report.get("grammar_id"),
+        "seed_case_id": (report.get("seed") or {}).get("case_id"),
+        "final_case_id": final.get("case_id"),
+        "final_feasible": final.get("feasible"),
+        "final_cost": (final.get("objectives") or {}).get("relative_cost"),
+        "final_max_utilization": final.get("max_utilization"),
+        "termination": (report.get("termination") or {}).get("reason"),
+        "solver_calls": ((report.get("counters") or {}).get("evaluator") or {}).get("solver_calls"),
+        "steps": len(report.get("lineage") or []),
+        "claim_level": report.get("claim_level"),
+        "report_sha256": report.get("report_sha256"),
+    }
+
+
+def api_runs() -> dict:
+    runs = []
+    if LAB_RUNS_DIR.is_dir():
+        for path in sorted(LAB_RUNS_DIR.glob("*.json"), reverse=True):
+            summary = _run_summary(path)
+            if summary:
+                runs.append(summary)
+    return {"dir": str(LAB_RUNS_DIR), "runs": runs}
+
+
+def api_run(name: str) -> dict:
+    if not _RUN_NAME_RE.fullmatch(name or ""):
+        raise LabApiError("Tên run không hợp lệ")
+    report = _read_json(LAB_RUNS_DIR / name)
+    if not isinstance(report, dict):
+        raise LabApiError(f"Không có run {name}")
+    return {"name": name, "report": report}
+
+
+# ---------------------------------------------------------------- creative geometry
+def lab_technical_profile() -> tuple[dict, dict]:
+    """Profile kỹ thuật MẶC ĐỊNH CỦA LAB cho MAP-Elites vòm.
+
+    Mọi giá trị nằm trong ``dashboard/lab_creative_profile.json`` và trỏ
+    ``source_ref`` về CHÍNH file đó: đây là giới hạn tìm kiếm của phòng lab,
+    KHÔNG phải điều khoản tiêu chuẩn hay số liệu dự án. clause_id nói rõ điều đó.
+    """
+    raw = _read_json(CREATIVE_PROFILE_PATH)
+    if not isinstance(raw, dict) or not isinstance(raw.get("values"), dict):
+        raise LabApiError("Thiếu dashboard/lab_creative_profile.json hợp lệ")
+    digest = hashlib.sha256(CREATIVE_PROFILE_PATH.read_bytes()).hexdigest()
+    rel = CREATIVE_PROFILE_PATH.relative_to(REPO_ROOT).as_posix()
+    profile = {
+        key: {"value": float(value), "source_ref": rel, "expected_source_sha256": digest,
+              "clause_id": f"LAB-DEFAULT-UNSOURCED-{key}"}
+        for key, value in raw["values"].items()
+    }
+    return profile, {"source_ref": rel, "sha256": digest, "note": raw.get("note", "")}
+
+
+def _trim_check(check: dict) -> dict:
+    keep = ("check_id", "status", "model_kind", "demand", "limit", "clause_id", "reason_vi", "message")
+    return {k: check.get(k) for k in keep if k in check}
+
+
+def _trim_candidate(candidate: dict, quality) -> dict:
+    graph = candidate.get("graph") or {}
+    return {
+        "candidate_id": candidate.get("candidate_id"),
+        "claim_level": candidate.get("claim_level"),
+        "genome": candidate.get("genome"),
+        "descriptors": candidate.get("descriptors"),
+        "screening_status": candidate.get("screening_status"),
+        "all_known_pass": candidate.get("all_known_pass"),
+        "quality_score": quality,
+        "checks": [_trim_check(c) for c in candidate.get("checks", []) if isinstance(c, dict)],
+        "axis_points": candidate.get("axis_points"),
+        "graph": {"topology": graph.get("topology"), "nodes": graph.get("nodes", []), "edges": graph.get("edges", [])},
+        "limitations": candidate.get("limitations", []),
+        "candidate_sha256": candidate.get("candidate_sha256"),
+    }
+
+
+def api_creative_search(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    seed = _int(payload.get("seed", 1), "seed", 0, 10**9)
+    iterations = _int(payload.get("iterations", 40), "iterations", 0, MAX_CREATIVE_ITERATIONS)
+    profile, profile_meta = lab_technical_profile()
+    try:
+        search = creative_shape.run_constrained_map_elites(
+            technical_profile=profile, seed=seed, iterations=iterations)
+    except creative_shape.CreativeShapeError as exc:
+        raise LabApiError(f"MAP-Elites từ chối: {exc}") from exc
+    archive = search.get("archive") if isinstance(search, dict) else None
+    items = list(archive.values()) if isinstance(archive, dict) else list(archive or [])
+    candidates = []
+    for item in items:
+        candidate = item.get("candidate", item) if isinstance(item, dict) else None
+        if isinstance(candidate, dict) and "genome" in candidate:
+            candidates.append(_trim_candidate(candidate, item.get("quality_score") if isinstance(item, dict) else None))
+    candidates.sort(key=lambda c: (-(c["quality_score"] or 0), c["candidate_id"] or ""))
+    scalars = {k: v for k, v in (search.items() if isinstance(search, dict) else [])
+               if isinstance(v, (str, int, float, bool)) or v is None}
+    return {
+        "claim_level": "IDEA",
+        "profile": profile_meta,
+        "seed": seed, "iterations": iterations,
+        "archive_size": len(candidates),
+        "rejected": len(search.get("rejected", [])) if isinstance(search, dict) else 0,
+        "unknown": len(search.get("unknown", [])) if isinstance(search, dict) else 0,
+        "candidates": candidates,
+        "search_meta": scalars,
+    }
+
+
+# ---------------------------------------------------------------- knowledge
+def api_cards() -> dict:
+    return {"cards": load_cards()}
+
+
+def api_knowledge_query(params: dict) -> dict:
+    rules = [r for r in (params.get("rules") or "").split(",") if r]
+    variables = [v for v in (params.get("variables") or "").split(",") if v]
+    text = params.get("text") or None
+    hits = query_knowledge(failed_rules=rules or None, variables=variables or None, text=text, top_k=12)
+    return {"hits": hits}
+
+
+def api_obsidian() -> dict:
+    try:
+        from bridge_evolution.knowledge.obsidian import DEFAULT_MANAGED_FOLDER, resolve_obsidian_vault
+        vault = resolve_obsidian_vault()
+        return {"available": True, "vault": str(vault), "vault_name": vault.name,
+                "managed_folder": DEFAULT_MANAGED_FOLDER}
+    except Exception as exc:
+        return {"available": False, "message": str(exc)}
+
+
+# ---------------------------------------------------------------- MIDAS PSC section (BRD-052)
+def _midas_call(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except (midas_section.MidasSectionError, ValueError, TypeError) as exc:
+        raise LabApiError(str(exc)) from exc
+
+
+def api_midas_presets(params: dict) -> dict:
+    sample = midas_section.normalize_params(midas_section.PRESETS["fcm_tutorial_span"]["params"])
+    return {
+        "module_version": midas_section.MODULE_VERSION,
+        "presets": {k: {"label": v["label"], "source": v["source"], "params": v["params"]}
+                    for k, v in midas_section.PRESETS.items()},
+        "field_order": midas_section.size_arrays(sample)["field_names"],
+        "joints": list(midas_section.JOINTS),
+        "joint_fields": {k: list(v) for k, v in midas_section.JOINT_FIELDS.items()},
+        "all_dims": list(midas_section.ALL_DIMS),
+        "basis": midas_section.load_basis(),
+    }
+
+
+def api_midas_section(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    raw = payload.get("params", payload)
+    return _midas_call(midas_section.export_bundle, raw)
+
+
+def api_midas_family(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    stations = _int(payload.get("stations", 9), "stations", 2, 400)
+    return _midas_call(midas_section.variable_depth_family, payload.get("pier"), payload.get("mid"),
+                       payload.get("length_m"), stations, law=payload.get("law", "parabola"),
+                       exponent=payload.get("exponent", 2.0), name_prefix=str(payload.get("name_prefix", "SEG"))[:12])
+
+
+def api_midas_propose(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    return _midas_call(midas_section.propose_box_from_spans, payload.get("main_span_m"),
+                       payload.get("deck_width_m"), payload.get("side_span_m"))
+
+
+def api_midas_supert_value(payload: dict) -> dict:
+    """Gene Super-T (Studio) → đa giác build_section_polygon → PSC-Value; không mở solver."""
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    res = api_section(payload)
+    if not res.get("polygon"):
+        raise LabApiError("Gene không dựng được biên tiết diện: " + str(res.get("polygon_error") or res.get("schema_errors")))
+    name = str((payload or {}).get("name") or "SUPER_T_V2")[:32]
+    gene = res.get("gene") or {}
+    try:
+        thick = (float(gene.get("top_flange_thickness_mm", 0)) / 1000.0, float(gene.get("web_thickness_mm", 0)) / 1000.0)
+    except (TypeError, ValueError) as exc:
+        raise LabApiError(f"Dày cánh/sườn trong gene không phải số: {exc}") from exc
+    out = _midas_call(midas_section.polygon_to_psc_value, res["polygon"], None, name, 1, thick)
+    out["repo_section"] = res.get("section")
+    out["gene"] = res.get("gene")
+    return out
+
+
+# ---------------------------------------------------------------- HTTP
+GET_ROUTES = {
+    "/api/health": lambda params: {"status": "ok", "lab_version": LAB_VERSION, "software_version": __version__},
+    "/api/live-data": lambda params: get_live_data(),
+    "/api/lab-status": lambda params: api_lab_status(),
+    "/api/lab/overview": lambda params: api_overview(),
+    "/api/catalog": lambda params: api_catalog(),
+    "/api/design-loop/runs": lambda params: api_runs(),
+    "/api/knowledge/cards": lambda params: api_cards(),
+    "/api/knowledge/query": lambda params: api_knowledge_query(params),
+    "/api/obsidian": lambda params: api_obsidian(),
+    "/api/midas/presets": api_midas_presets,
+}
+POST_ROUTES = {
+    "/api/evaluate": api_evaluate,
+    "/api/section": api_section,
+    "/api/design-loop": api_design_loop,
+    "/api/creative-search": api_creative_search,
+    "/api/midas/psc-section": api_midas_section,
+    "/api/midas/psc-family": api_midas_family,
+    "/api/midas/propose": api_midas_propose,
+    "/api/midas/supert-value": api_midas_supert_value,
+}
+
+
+class LabHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(DASHBOARD_DIR), **kwargs)
+
+    def _json(self, status: int, payload) -> None:
+        body = json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):  # noqa: N802
+        parsed = urllib.parse.urlparse(self.path)
+        params = {k: v[0] for k, v in urllib.parse.parse_qs(parsed.query).items()}
+        if parsed.path == "/":
+            self.send_response(302)
+            self.send_header("Location", "/lab.html")
+            self.end_headers()
+            return
+        if parsed.path.startswith("/api/design-loop/runs/"):
+            name = urllib.parse.unquote(parsed.path.rsplit("/", 1)[-1])
+            try:
+                self._json(200, api_run(name))
+            except LabApiError as exc:
+                self._json(404, {"error": str(exc)})
+            return
+        handler = GET_ROUTES.get(parsed.path)
+        if handler is None:
+            if parsed.path.startswith("/api/"):
+                self._json(404, {"error": "không có API này"})
+                return
+            super().do_GET()
+            return
+        try:
+            self._json(200, handler(params))
+        except LabApiError as exc:
+            self._json(400, {"error": str(exc)})
+        except Exception as exc:  # không để một API hỏng làm sập server
+            self._json(500, {"error": f"{type(exc).__name__}: {exc}"})
+
+    def do_POST(self):  # noqa: N802
+        parsed = urllib.parse.urlparse(self.path)
+        handler = POST_ROUTES.get(parsed.path)
+        if handler is None:
+            self._json(404, {"error": "không có API này"})
+            return
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            payload = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+        except (ValueError, UnicodeDecodeError) as exc:
+            self._json(400, {"error": f"body không phải JSON: {exc}"})
+            return
+        try:
+            self._json(200, handler(payload))
+        except LabApiError as exc:
+            self._json(400, {"error": str(exc)})
+        except Exception as exc:
+            self._json(500, {"error": f"{type(exc).__name__}: {exc}"})
+
+    def end_headers(self):  # noqa: D102 - file tĩnh của lab cũng không được cache
+        buffered = b"".join(getattr(self, "_headers_buffer", []) or [])
+        if b"Cache-Control" not in buffered:
+            self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
+    def log_message(self, format, *args):  # noqa: A002
+        sys.stderr.write("[lab] " + (format % args) + "\n")
+
+
+def run_server(port: int = 8790) -> None:
+    httpd = ThreadingHTTPServer(("127.0.0.1", port), LabHandler)
+    print("=" * 64)
+    print(f"  DYLIGHT Lab ({LAB_VERSION}) — http://127.0.0.1:{port}/lab.html")
+    print(f"  Repo: {REPO_ROOT}")
+    print(f"  Run artifacts: {LAB_RUNS_DIR}")
+    print("=" * 64)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.server_close()
+
+
+if __name__ == "__main__":
+    run_server(int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 8790)

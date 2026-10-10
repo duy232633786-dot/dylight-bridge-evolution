@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-045",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "BRD-045 r002 đóng 7 blocker của Claude trong đúng 6 artifact: pin shim và 27 callable native OpenSees; nonce HOST/WORKER; quét origin kể cả alias; persist ISOLATION_BREACH; domain/tag/fixity/wipe/raw-localForce audit cùng positive-control Mz; neo schema/test digest; ép tập ANALYTICAL bằng basis. OpenSees thật sinh 7 case COMPLETE và negative solver -3. Test v2 44/44, chuỗi BRD-044+045 80/80; full suite chỉ còn đúng 5 failure BRD-036 tiền tồn tại.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "experiments/validation/opensees_frame_reference_v2.py",
+      "sha256": "2acd8570fce70362b1d07a6ef8c396298a0397d216bd8613dfebc2a280f1fb72",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd045_benchmarks.json",
+      "sha256": "e0df184e347d926c0e22197e255de03c379d018d14e8c7679dba083e5a582e21",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd045_negative_result.json",
+      "sha256": "15d12e8e13704a9ed57309c26c84cd67607169f517c16f50eba65d2edacf4235",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/opensees_frame_reference_v2.schema.json",
+      "sha256": "ed72f157acc5b93eee896b1685c23cf597d0691219a2e20c389049c0f929fb3d",
+      "kind": "report"
+    },
+    {
+      "path": "docs/design_basis/opensees_frame_reference_v2_basis.json",
+      "sha256": "d60b2d7893e1f0f645c1286a8c492cd204ae942d1d5b06dfd7e11e6fafefbcb8",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference_v2.py",
+      "sha256": "948df8d1de88cf2992f874dc306323475c31a81c53437f0785f92f90d4ff7c86",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Đây chỉ là code-verification đàn hồi tuyến tính 2D; không đại diện tải trọng, sức kháng hay hình học cầu thực."
+  ],
+  "unresolved_risks": [
+    "Backend và Python bị pin theo bytes của một môi trường Windows; tái lập máy khác cần đúng wheel và interpreter.",
+    "Năm drift BRD-036 ngoài scope vẫn làm lab validate và Obsidian sync thất bại."
+  ],
+  "next_action": "Claude review độc lập r002 trên đúng 6 artifact và chạy probe phản chứng cho 7 blocker."
+}

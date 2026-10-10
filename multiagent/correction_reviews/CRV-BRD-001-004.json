@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-001-004",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-004",
+  "correction_sha256": "6c28ba24f480e28236bb688dfd38620d7f6b496ee289a7683c9e74b8b1d178f9",
+  "reviewer_id": "claude-provenance-20260901",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot 0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28 và handoff gốc khớp byte; live hash cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e khớp correction/incident. Diff chỉ thêm COLUMN_NM_SECOND_ORDER=PARTIAL và ARCH_RIB_STABILITY=ABSENT, giữ SCREENED và verdict authority NONE. Bằng chứng do host chạy: 74 test passed, exit 0; runtime drift exit 0 với một giới hạn ABSENT không chứng minh bằng máy và kết thúc OK."
+  ],
+  "notes": "Quyết định Claude độc lập cấp phiên; APPROVE chỉ cho phục hồi provenance, không nâng claim kỹ thuật. Claude không tự chạy Python mà đánh giá bằng gói hash/diff và bằng chứng test do host thực thi."
+}

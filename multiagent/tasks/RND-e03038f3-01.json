@@ -5,9 +5,9 @@
   "research_question": "Dữ liệu đầu vào, nguồn gốc và tiêu chí nào phải khóa trước khi nghiên cứu đề tài này?",
   "workstream": "design_basis",
   "priority": "P0",
-  "status": "REVIEW",
+  "status": "ACCEPTED",
   "owner": "codex-gpt5",
-  "reviewer": null,
+  "reviewer": "claude",
   "dependencies": [],
   "required_gates": [
     "G0"
@@ -27,7 +27,9 @@
   "safety_notes": [
     "Không tự bịa site, tải, địa chất, thủy văn hay thuộc tính vật liệu"
   ],
-  "review_notes": [],
+  "review_notes": [
+    "Review doc lap boi claude (owner la codex-gpt5). Ba tieu chi nghiem thu deu dat. Hai diem manh vuot muc thong le, dang ghi lai: (1) Tam tieu chi bac bo la tu troi minh chu khong phai trang tri - dac biet tieu chi 7 cam tuyen bo da kiem N-M, do manh hay P-Delta khi capability tuong ung chua ton tai, va tieu chi 6 giu dung quy tac so sanh cong bang cua PROTOCOL (cung solver budget, fidelity, seed policy va reference point). Muc ngan sach con noi ro khong duoc dung smoke test de claim superiority. (2) Cach xu ly nguon E-01 la dung: y tuong vong lap den tu mot video TikTok, va thay vi giau nguon do hoac nang no len thanh bang chung ky thuat, tai lieu ghi thang URL, gan nhan SOURCE_OBSERVED va cam dung con so trong video lam du lieu ky thuat. Nguon yeu duoc khai dung la nguon yeu thi khong con la van de. Quyet dinh G0 = PARTIAL / STOP_FOR_ENGINEERING_CLAIMS trong tai lieu la danh gia G0 cua du an chu khong phai cua task; o cap task, ky luat design basis la trung thuc nen G0 PASS - cung cach doc da ap dung cho BRD-001, BRD-002, BRD-020 va BRD-031. LUU Y NGOAI PHAM VI TASK NAY: lab dang valid=false vi bay loi drift provenance do BRD-028 (cung owner codex-gpt5) gay ra va chua ghi correction; vi vay mirror Obsidian cua chinh review nay se o trang thai pending cho toi khi phan do duoc xu ly. Do khong phai loi cua task nay."
+  ],
   "source_brief_id": "RND-20260826-e03038f3",
   "preferred_provider": "claude",
   "preferred_role": "evidence_safety_auditor",

@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dylight.local/contracts/design_loop_report.schema.json",
+  "title": "DesignLoopReport",
+  "description": "Kết quả một lần chạy vòng lặp thiết kế cấu kiện (bridge_evolution.design_loop). Verdict khả thi trong từng record là của independent verifier; vòng lặp không có quyền verdict riêng. Trần claim SCREENED.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "algorithm_id", "algorithm_version", "software_version",
+    "grammar_id", "grammar_version", "catalogs_version", "ruleset_version", "solver_version",
+    "claim_ceiling", "claim_level", "design_verdict_authority", "loop_authority",
+    "policy", "budget_solver_calls", "budget_definition", "seed", "final", "lineage",
+    "iterations", "termination", "counters", "component_audit", "advisories",
+    "basis", "source_digests", "report_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "algorithm_id": {"const": "COMPONENT_DESIGN_LOOP"},
+    "algorithm_version": {"type": "string", "pattern": "^design-loop/[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "software_version": {"type": "string", "minLength": 1},
+    "grammar_id": {"type": "string", "minLength": 1},
+    "grammar_version": {"type": "string", "minLength": 1},
+    "catalogs_version": {"type": "string", "minLength": 1},
+    "ruleset_version": {"type": "string", "minLength": 1},
+    "solver_version": {"type": "string", "minLength": 1},
+    "claim_ceiling": {"const": "SCREENED"},
+    "claim_level": {"enum": ["IDEA", "SCREENED"]},
+    "design_verdict_authority": {"const": "INDEPENDENT_VERIFIER"},
+    "loop_authority": {"const": "NONE"},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective_key", "utilization_target", "move_policy", "trim_order", "max_iterations",
+                   "trim_enabled", "max_trim_probes", "diagnose_top_k"],
+      "properties": {
+        "objective_key": {"enum": ["relative_cost", "material_mass_t", "embodied_carbon_kgCO2e"]},
+        "utilization_target": {"type": "number", "exclusiveMinimum": 0, "maximum": 1.0},
+        "move_policy": {"enum": ["knowledge_priority", "cheapest_first"]},
+        "trim_order": {"enum": ["cheapest_first", "recent_reject_last"]},
+        "max_iterations": {"type": "integer", "minimum": 1},
+        "trim_enabled": {"type": "boolean"},
+        "max_trim_probes": {"type": ["integer", "null"], "minimum": 1},
+        "diagnose_top_k": {"type": "integer", "minimum": 1}
+      }
+    },
+    "budget_solver_calls": {"type": "integer", "minimum": 0},
+    "budget_definition": {"const": "solver.status != NOT_RUN"},
+    "seed": {"$ref": "#/$defs/record_view"},
+    "final": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["case_id", "input_hash", "gene", "status", "solver_status", "solver_call_index",
+                       "feasible", "cv", "max_utilization", "objectives", "violations", "stage",
+                       "stage_label", "meets_target", "rule_utilizations", "design_state"],
+          "properties": {
+            "case_id": {"type": "string", "pattern": "^BT-[0-9a-f]{16}$"},
+            "input_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "gene": {"type": "object"},
+            "status": {"$ref": "#/$defs/status"},
+            "solver_status": {"type": "string"},
+            "solver_call_index": {"type": ["integer", "null"], "minimum": 1},
+            "feasible": {"type": "boolean"},
+            "cv": {"type": ["number", "null"], "minimum": 0},
+            "max_utilization": {"type": ["number", "null"], "minimum": 0},
+            "objectives": {"$ref": "#/$defs/objectives"},
+            "violations": {"type": "array", "items": {"$ref": "#/$defs/violation"}},
+            "stage": {"type": "integer", "minimum": 0, "maximum": 4},
+            "stage_label": {"$ref": "#/$defs/stage_label"},
+            "meets_target": {"type": "boolean"},
+            "rule_utilizations": {
+              "type": ["object", "null"],
+              "additionalProperties": {"type": "number", "minimum": 0}
+            },
+            "design_state": {"type": "object"}
+          }
+        }
+      ]
+    },
+    "lineage": {"type": "array", "items": {"type": "string", "pattern": "^BT-[0-9a-f]{16}$"}},
+    "iterations": {"type": "array", "items": {"$ref": "#/$defs/iteration"}},
+    "termination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "message"],
+      "properties": {
+        "reason": {"enum": ["CONVERGED", "BUDGET_EXHAUSTED", "MAX_ITERATIONS", "NO_IMPROVING_REPAIR",
+                            "TRIM_PROBE_LIMIT", "SEED_REJECTED", "SOLVER_FAILED"]},
+        "message": {"type": "string", "minLength": 1}
+      }
+    },
+    "counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loop", "evaluator"],
+      "properties": {
+        "loop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["iterations", "accepted_moves", "probes", "probes_solver", "probes_l0_rejected",
+                       "solver_failures", "candidates_generated", "skipped_visited", "skipped_l0",
+                       "skipped_not_cheaper"],
+          "properties": {
+            "iterations": {"type": "integer", "minimum": 0},
+            "accepted_moves": {"type": "integer", "minimum": 0},
+            "probes": {"type": "integer", "minimum": 0},
+            "probes_solver": {"type": "integer", "minimum": 0},
+            "probes_l0_rejected": {"type": "integer", "minimum": 0},
+            "solver_failures": {"type": "integer", "minimum": 0},
+            "candidates_generated": {"type": "integer", "minimum": 0},
+            "skipped_visited": {"type": "integer", "minimum": 0},
+            "skipped_l0": {"type": "integer", "minimum": 0},
+            "skipped_not_cheaper": {"type": "integer", "minimum": 0}
+          }
+        },
+        "evaluator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["proposals", "l0_checks", "l0_passed", "l0_rejected", "cache_hits",
+                       "solver_calls", "budget_blocked", "unique_results"],
+          "properties": {
+            "proposals": {"type": "integer", "minimum": 0},
+            "l0_checks": {"type": "integer", "minimum": 0},
+            "l0_passed": {"type": "integer", "minimum": 0},
+            "l0_rejected": {"type": "integer", "minimum": 0},
+            "cache_hits": {"type": "integer", "minimum": 0},
+            "solver_calls": {"type": "integer", "minimum": 0},
+            "budget_blocked": {"type": "integer", "minimum": 0},
+            "unique_results": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "component_audit": {"type": ["object", "null"]},
+    "advisories": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["basis_id", "sha256"],
+      "properties": {
+        "basis_id": {"const": "DESIGN-LOOP-0.1.0"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "source_digests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "status": {"enum": ["SUCCESS", "SCHEMA_INVALID", "GEOMETRY_INVALID", "SOLVER_FAILED", "NOT_EVALUATED"]},
+    "stage_label": {"enum": ["NOT_ANALYSABLE", "L0_INVALID", "INFEASIBLE", "FEASIBLE_OVER_TARGET", "ACCEPTABLE"]},
+    "objectives": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["relative_cost", "material_mass_t", "embodied_carbon_kgCO2e"],
+      "properties": {
+        "relative_cost": {"type": "number", "minimum": 0},
+        "material_mass_t": {"type": "number", "minimum": 0},
+        "embodied_carbon_kgCO2e": {"type": "number", "minimum": 0}
+      }
+    },
+    "violation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "severity", "margin"],
+      "properties": {
+        "rule_id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["HARD", "SOFT"]},
+        "margin": {"type": "number"}
+      }
+    },
+    "move": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variable", "current", "proposed", "rule_id", "rationale", "card_id", "source",
+                   "cheap_objective"],
+      "properties": {
+        "variable": {"type": "string", "minLength": 1},
+        "current": {"type": ["string", "integer", "number"]},
+        "proposed": {"type": ["string", "integer", "number"]},
+        "rule_id": {"type": ["string", "null"]},
+        "rationale": {"type": "string", "minLength": 1},
+        "card_id": {"type": ["string", "null"]},
+        "source": {"enum": ["diagnose", "loop_extra", "neighbor"]},
+        "cheap_objective": {"type": ["number", "null"], "minimum": 0}
+      }
+    },
+    "record_view": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "input_hash", "gene", "status", "solver_status", "solver_call_index",
+                   "feasible", "cv", "max_utilization", "objectives", "violations", "stage", "stage_label"],
+      "properties": {
+        "case_id": {"type": "string", "pattern": "^BT-[0-9a-f]{16}$"},
+        "input_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "gene": {"type": ["object", "null"]},
+        "status": {"$ref": "#/$defs/status"},
+        "solver_status": {"type": "string"},
+        "solver_call_index": {"type": ["integer", "null"], "minimum": 1},
+        "feasible": {"type": "boolean"},
+        "cv": {"type": ["number", "null"], "minimum": 0},
+        "max_utilization": {"type": ["number", "null"], "minimum": 0},
+        "objectives": {"$ref": "#/$defs/objectives"},
+        "violations": {"type": "array", "items": {"$ref": "#/$defs/violation"}},
+        "stage": {"type": "integer", "minimum": 0, "maximum": 4},
+        "stage_label": {"$ref": "#/$defs/stage_label"}
+      }
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "input_hash", "gene", "status", "solver_status", "solver_call_index",
+                   "feasible", "cv", "max_utilization", "objectives", "violations", "stage", "stage_label",
+                   "move", "outcome"],
+      "properties": {
+        "case_id": {"type": "string", "pattern": "^BT-[0-9a-f]{16}$"},
+        "input_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "gene": {"type": "object"},
+        "status": {"$ref": "#/$defs/status"},
+        "solver_status": {"type": "string"},
+        "solver_call_index": {"type": ["integer", "null"], "minimum": 1},
+        "feasible": {"type": "boolean"},
+        "cv": {"type": ["number", "null"], "minimum": 0},
+        "max_utilization": {"type": ["number", "null"], "minimum": 0},
+        "objectives": {"$ref": "#/$defs/objectives"},
+        "violations": {"type": "array", "items": {"$ref": "#/$defs/violation"}},
+        "stage": {"type": "integer", "minimum": 0, "maximum": 4},
+        "stage_label": {"$ref": "#/$defs/stage_label"},
+        "move": {"$ref": "#/$defs/move"},
+        "outcome": {"enum": ["ACCEPTED", "REJECTED_NO_PROGRESS", "REJECTED_INVALID",
+                             "REJECTED_INFEASIBLE", "REJECTED_OVER_TARGET", "SOLVER_FAILED"]}
+      }
+    },
+    "iteration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iteration", "phase", "from_case_id", "from_stage", "candidates", "probes",
+                   "accepted_case_id", "unprobed_candidates"],
+      "properties": {
+        "iteration": {"type": "integer", "minimum": 1},
+        "phase": {"enum": ["REPAIR", "TRIM"]},
+        "from_case_id": {"type": "string", "pattern": "^BT-[0-9a-f]{16}$"},
+        "from_stage": {"$ref": "#/$defs/stage_label"},
+        "candidates": {"type": "array", "items": {"$ref": "#/$defs/move"}},
+        "probes": {"type": "array", "items": {"$ref": "#/$defs/probe"}},
+        "accepted_case_id": {"type": ["string", "null"], "pattern": "^BT-[0-9a-f]{16}$"},
+        "unprobed_candidates": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

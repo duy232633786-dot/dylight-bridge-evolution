@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-030-009",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-009",
+  "correction_sha256": "93f2590ce4196556d503b48b0d216f229e3ee85f13e838b40fe82d897baf25a7",
+  "reviewer_id": "claude-provenance-20260901",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Claude xác minh git diff --no-index snapshot 3ef02cb0→live lab.py 41edf512 là thuần bổ sung 240 dòng, không xóa: thêm runtime_scope, frozen legacy IDs, RUNTIME_SCOPE_POLICIES, _machine_gates_for_task và _task_reachability; claim_task chỉ được thêm schema/reachability guard trước khi set ACTIVE. Capability PRESENT mới cho phép đạt gate; experimental_arch_frame bị chặn vì L0_FABRICATION_RULES=PARTIAL, column bị chặn vì COLUMN_NM_SECOND_ORDER=PARTIAL, các solver arch vẫn ABSENT. Không nới claim ceiling, CLAIM_GATES, review/submit hay PASS/FAIL. Chain/handoff/snapshot/supersedes đã tự băm khớp; host evidence 74/74 test pass và runtime drift exit 0."
+  ],
+  "notes": "APPROVE provenance-only cho COR-BRD-030-009. Reviewer claude-provenance-20260901 độc lập với correction agent codex và handoff agent claude; không sửa file, không gọi lab CLI và không nâng claim kỹ thuật trên SCREENED."
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-049",
+  "agent_id": "codex",
+  "role": "form_inventor",
+  "summary": "R002 khóa stage guards trước downstream, Pareto đa candidate, perturbation floor, common structural comparison fingerprint và blocked evidence tái kiểm; 36 target cùng 217 integration test đều xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_portfolio.py",
+      "sha256": "551e31f0e6646a05439407212ec90d6c7480f625bb73ad10a776ff55f612bc4a",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_portfolio_study.schema.json",
+      "sha256": "70a9f1e0a35fec95ccf5091ce4f2c8b3743e86f9a1c5ce887bf53a902eac11af",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_portfolio_basis.json",
+      "sha256": "181d81caa971edd35a2327b353f6d2f45f7cc07066278d9fafbe697e98e40ccc",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_portfolio.py",
+      "sha256": "7809bc457d9e5e7512a039428da09166e6521610893cf43f4ec3c7ed4d3b4f7f",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Structural-profile factory của caller phải dùng cùng vật liệu, tiết diện và tải trong một comparison group; chỉ candidate bindings được loại khỏi fingerprint.",
+    "RESEARCH_SCREENED chỉ có nghĩa không bị các check F0/F1 hiện có bác bỏ."
+  ],
+  "unresolved_risks": [
+    "Chưa có kiểm sức kháng, ổn định phi tuyến, mỏi, động lực, gió, động đất, địa chất, thủy văn, thi công, durability hoặc tổ hợp tiêu chuẩn.",
+    "Toàn suite còn 5 failure tests/test_collaboration.py do bốn drift provenance BRD-001/030/032/033 cần reviewer thứ ba; không phải hồi quy BRD-049."
+  ],
+  "next_action": "Claude Code review độc lập r002: kiểm hash, stage reachability, Pareto nhiều front, comparison fingerprint, evidence replay và ranh giới IDEA/NONE."
+}

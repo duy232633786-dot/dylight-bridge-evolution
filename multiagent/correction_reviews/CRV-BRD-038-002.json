@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-038-002",
+  "task_id": "BRD-038",
+  "incident_id": "INC-BRD-038-002",
+  "correction_sha256": "370ba488f92896ae5df058c6af7d74f59e4601536929ffbbb7c301d3b5947a98",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Claude tự xác minh handoff SHA de2a311..., correction SHA 370ba4..., snapshot SHA 767696... và live artifact SHA e82c6a... đều khớp tuyệt đối.",
+    "Incident và correction schema-valid, liên kết đúng cùng BRD-038 r002 và đúng artifact tests/test_design_study.py; không chồng lấn COR-BRD-038-001.",
+    "Claude tự chạy tests/test_design_study.py: 26 passed, 0 failed.",
+    "Correction không thay đổi review REJECT của BRD-038 và không cấp G0-G4 hay quyền phê duyệt thiết kế."
+  ],
+  "notes": "APPROVE bookkeeping provenance only. Snapshot test là byte-exact; 26 test chỉ là software regression evidence. BRD-038 vẫn REJECT."
+}

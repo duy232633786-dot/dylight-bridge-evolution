@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-036-004",
+  "task_id": "BRD-036",
+  "incident_id": "INC-BRD-036-004",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Hop thuc hoa be mat export cua goi Revit-family sau cac bo sung SKETCH va ADAPTIVE hau handoff.",
+  "original_handoff_path": "multiagent/handoffs/BRD-036.claude.r001.json",
+  "original_handoff_sha256": "96fdd21d239e965c124bf0ee3bec54e168aafe6333dc9a13e633ebaac8313bd7",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/eef2662f200d12e830f64491e1ff0065217b48e199d51d7aa0241e14b0e2901c.blob",
+    "sha256": "eef2662f200d12e830f64491e1ff0065217b48e199d51d7aa0241e14b0e2901c"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/revit_family/__init__.py",
+    "previous_sha256": "eef2662f200d12e830f64491e1ff0065217b48e199d51d7aa0241e14b0e2901c",
+    "current_sha256": "83b2215d54e6ad4cee2df418d94398efa5cef6b14056a5d9945fb8b265a0a995"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_revit_family.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Chi xac minh chuoi ma Python/C# va cac bat bien fail-closed o muc IDEA; chua thay the kiem tra family truc tiep trong Revit 2026, phan tich ket cau, hay independent verifier."
+  ],
+  "supersedes_correction_sha256": null
+}

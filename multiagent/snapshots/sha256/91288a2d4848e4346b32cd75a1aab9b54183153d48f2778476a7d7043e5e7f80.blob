@@ -1,0 +1,954 @@
+"""Cầu nối mặt cắt MIDAS Civil — PSC-1CELL/2CELL (BRD-052).
+
+Module này sinh HÌNH HỌC và DỮ LIỆU NHẬP cho hộp mặt cắt PSC của MIDAS Civil
+(Properties → Section Properties → PSC → PSC-1CELL, 2CELL) đúng tên trường,
+đúng thứ tự trường như manual MIDAS API ("Section Properties - PSC",
+support.midasuser.com article 35851688190105) và đúng quy ước hình guide của
+PSC Viewer (tutorial chính hãng "05. FCM General", Fig. 4/5):
+
+* kích thước phụ NGOÀI (BO1-1, BO1-2) đo từ MÚT CÁNH hẫng; HO2-1/HO2-2 đo từ
+  mức đáy mút cánh (HO1) xuống; JO3 đo từ GÓC ĐÁY NGOÀI: BO2-1 ngang ra phía
+  cánh, HO3-1 từ đáy lên;
+* kích thước phụ TRONG (BI1-1, BI1-2, BI2-1, BI3-1, BI3-2) đo từ TIM mặt cắt;
+  HI2-1/HI2-2 đo từ mặt trong bản trên (mức HI1) xuống; HI4-1/HI4-2 đo từ mặt
+  trong bản đáy lên; JI1/JI5 là khớp gần tim, JI2/JI4 gần sườn, JI3 trên sườn;
+* H = HO1 + HO2 + HO3 = HI1 + HI2 + HI3 + HI4 + HI5 (lỗ chạm đúng bản đáy);
+  nửa bề rộng đỉnh = BO1 + BO2 + BO3; nửa bề rộng đáy = BO3.
+
+Module KHÔNG kiểm tra chịu lực, không phát PASS/FAIL, không nâng trần claim.
+Đặc trưng tiết diện tính bằng tích phân đa giác chỉ để ĐỐI CHIẾU với
+"Show Calculation Results" của MIDAS. Khối MCT *SECTION cho PSC mang cờ
+``SYNTAX_UNVERIFIED`` cho tới khi được nạp thử thành công trên Civil 2022;
+đường nhập chắc chắn là dialog / Table Input.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+from pathlib import Path
+
+MODULE_VERSION = "midas-section/0.1.0"
+CLAIM_LEVEL = "IDEA"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+BASIS_PATH = REPO_ROOT / "docs" / "design_basis" / "midas_psc_section_basis.json"
+
+# ----------------------------------------------------------------- thứ tự trường MIDAS
+OUTER_HEIGHT = ("HO1", "HO2", "HO2-1", "HO2-2", "HO3", "HO3-1")            # vSIZE_PSC_A
+OUTER_BREADTH = ("BO1", "BO1-1", "BO1-2", "BO2", "BO2-1", "BO3")            # vSIZE_PSC_B
+INNER_HEIGHT = ("HI1", "HI2", "HI2-1", "HI2-2", "HI3", "HI3-1",
+                "HI4", "HI4-1", "HI4-2", "HI5")                            # vSIZE_PSC_C
+INNER_BREADTH_1CEL = ("BI1", "BI1-1", "BI1-2", "BI2-1", "BI3", "BI3-1", "BI3-2")  # vSIZE_PSC_D
+INNER_BREADTH_2CEL = INNER_BREADTH_1CEL + ("BI4",)
+JOINTS = ("JO1", "JO2", "JO3", "JI1", "JI2", "JI3", "JI4", "JI5")           # JOINT
+JOINT_FIELDS = {
+    "JO1": ("BO1-1", "HO2-1"), "JO2": ("BO1-2", "HO2-2"), "JO3": ("BO2-1", "HO3-1"),
+    "JI1": ("BI1-1", "HI2-1"), "JI2": ("BI1-2", "HI2-2"), "JI3": ("BI2-1", "HI3-1"),
+    "JI4": ("BI3-2", "HI4-2"), "JI5": ("BI3-1", "HI4-1"),
+}
+ALL_DIMS = OUTER_HEIGHT + OUTER_BREADTH + INNER_HEIGHT + INNER_BREADTH_2CEL
+CELL_TYPES = ("1CELL", "2CELL")
+SHAPE_CODE = {"1CELL": "1CEL", "2CELL": "2CEL"}
+OFFSET_CODES = ("CT", "CC", "CB", "LT", "LC", "LB", "RT", "RC", "RB")
+SOURCE_REFS = {
+    "field_order": "MIDAS API Online Manual, JSON Manual > Section Properties - PSC "
+                   "(support.midasuser.com/hc/en-us/articles/35851688190105), bảng "
+                   "Dimension Table for PSC Sections + Joint On/Off",
+    "geometry_convention": "MIDAS Civil tutorial '05. FCM General' (Manual/Tutorials), "
+                           "Figure 4/5 Define Center Span / Box Section at Supports — hình guide PSC Viewer",
+    "psc_value": "MIDAS API Online Manual, Section Properties - PSC Value "
+                 "(support.midasuser.com/hc/en-us/articles/39233604772633)",
+    "dbuser_box_verified": "midas-mcp/evidence (dự án chị em, NGOÀI repo): DBUSER shape B nạp thành công trên "
+                           "Civil 2022 qua MCT Command Shell 2026-08-26; file và SHA-256 neo trong basis "
+                           "sources.dbuser_box_verified.files",
+}
+MCT_PSC_STATUS = "SYNTAX_UNVERIFIED"
+_EPS = 1e-9
+
+
+class MidasSectionError(ValueError):
+    """Tham số mặt cắt không hợp lệ."""
+
+
+# ----------------------------------------------------------------- chuẩn hoá tham số
+def _num(value, name: str) -> float:
+    if isinstance(value, bool):
+        raise MidasSectionError(f"{name} phải là số, không phải bool")
+    try:
+        out = float(value)
+    except (TypeError, ValueError):
+        raise MidasSectionError(f"{name} phải là số (m)") from None
+    if not math.isfinite(out):
+        raise MidasSectionError(f"{name} phải hữu hạn")
+    return out
+
+
+def _bool(value, name: str) -> bool:
+    """Bool nghiêm ngặt: chuỗi "false" không được thành True."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)) and value in (0, 1):
+        return bool(value)
+    if isinstance(value, str) and value.strip().lower() in ("true", "false", "on", "off", "yes", "no", "1", "0"):
+        return value.strip().lower() in ("true", "on", "yes", "1")
+    raise MidasSectionError(f"{name} phải là bool (true/false)")
+
+
+def _section_id(value) -> int:
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        raise MidasSectionError("section_id phải là số nguyên ≥ 1")
+    try:
+        out = int(value)
+    except (TypeError, ValueError):
+        raise MidasSectionError("section_id phải là số nguyên ≥ 1") from None
+    if out < 1:
+        raise MidasSectionError("section_id phải ≥ 1")
+    return out
+
+
+def normalize_params(raw: dict) -> dict:
+    """Đưa input tự do về dạng chuẩn: cell_type, joints, dims (m), name, section_id, offset."""
+    if not isinstance(raw, dict):
+        raise MidasSectionError("params phải là object")
+    cell_type = str(raw.get("cell_type", "1CELL")).upper().replace(" ", "")
+    if cell_type in ("1", "1CEL"):
+        cell_type = "1CELL"
+    if cell_type in ("2", "2CEL"):
+        cell_type = "2CELL"
+    if cell_type not in CELL_TYPES:
+        raise MidasSectionError("cell_type chỉ nhận 1CELL hoặc 2CELL")
+    joints_raw = raw.get("joints") or {}
+    if isinstance(joints_raw, (list, tuple)):
+        if len(joints_raw) != len(JOINTS):
+            raise MidasSectionError(f"joints dạng mảng phải có {len(JOINTS)} phần tử theo thứ tự {JOINTS}")
+        joints_raw = dict(zip(JOINTS, joints_raw))
+    if not isinstance(joints_raw, dict):
+        raise MidasSectionError("joints phải là object hoặc mảng 8 bool")
+    unknown = sorted(set(joints_raw) - set(JOINTS))
+    if unknown:
+        raise MidasSectionError(f"joints có khoá lạ: {unknown}")
+    joints = {name: _bool(joints_raw.get(name, False), name) for name in JOINTS}
+    dims_raw = raw.get("dims") or {}
+    if not isinstance(dims_raw, dict):
+        raise MidasSectionError("dims phải là object {tên trường MIDAS: giá trị m}")
+    unknown = sorted(set(dims_raw) - set(ALL_DIMS))
+    if unknown:
+        raise MidasSectionError(f"dims có trường lạ (không phải tên MIDAS): {unknown}")
+    dims = {name: _num(dims_raw.get(name, 0.0), name) for name in ALL_DIMS}
+    name = str(raw.get("name") or "PSC_BOX")[:32]
+    section_id = _section_id(raw.get("section_id", 1))
+    offset = str(raw.get("offset", "CT")).upper()
+    if offset not in OFFSET_CODES:
+        raise MidasSectionError(f"offset chỉ nhận {OFFSET_CODES}")
+    return {"cell_type": cell_type, "joints": joints, "dims": dims, "name": name,
+            "section_id": section_id, "offset": offset}
+
+
+def active_fields(params: dict) -> dict[str, bool]:
+    """Ô nào của dialog đang mở (giống MIDAS làm xám ô của khớp tắt)."""
+    joints = params["joints"]
+    active = {name: True for name in ALL_DIMS}
+    for joint, (b_field, h_field) in JOINT_FIELDS.items():
+        active[b_field] = joints[joint]
+        active[h_field] = joints[joint]
+    active["BI4"] = params["cell_type"] == "2CELL"
+    return active
+
+
+def is_hollow(params: dict) -> bool:
+    d = params["dims"]
+    return any(d[k] > _EPS for k in INNER_HEIGHT + INNER_BREADTH_2CEL)
+
+
+def depth_m(params: dict) -> float:
+    d = params["dims"]
+    return d["HO1"] + d["HO2"] + d["HO3"]
+
+
+# ----------------------------------------------------------------- kiểm tra
+def validate_psc_box(params: dict) -> list[str]:
+    """Trả danh sách lỗi (rỗng = hợp lệ). Chỉ kiểm hình học, không kiểm chịu lực."""
+    d, j = params["dims"], params["joints"]
+    errors: list[str] = []
+    for k, v in d.items():
+        if v < 0:
+            errors.append(f"{k} âm ({v})")
+    for k in ("HO1", "HO3", "BO3"):
+        if d[k] <= _EPS:
+            errors.append(f"{k} phải > 0")
+    # HO2 = 0 (cánh hẫng dày đều), BO1 = 0 (không cánh hẫng), BO2 = 0 (sườn đứng) đều hợp lệ
+    if errors:
+        return errors
+    H = depth_m(params)
+    if j["JO1"] and not (0 < d["BO1-1"] < d["BO1"] - _EPS):
+        errors.append("JO1 bật: cần 0 < BO1-1 < BO1")
+    if j["JO1"] and d["HO2-1"] > d["HO2"] + _EPS:
+        errors.append("JO1 bật: HO2-1 không được vượt HO2")
+    if j["JO2"]:
+        lo = d["BO1-1"] if j["JO1"] else 0.0
+        if not (lo < d["BO1-2"] < d["BO1"] - _EPS):
+            errors.append("JO2 bật: cần BO1-1 < BO1-2 < BO1 (JO2 nằm giữa JO1 và sườn)")
+        if d["HO2-2"] > d["HO2"] + _EPS or (j["JO1"] and d["HO2-2"] + _EPS < d["HO2-1"]):
+            errors.append("JO2 bật: cần HO2-1 ≤ HO2-2 ≤ HO2")
+    if j["JO3"]:
+        if not (0 < d["HO3-1"] < d["HO3"] - _EPS):
+            errors.append("JO3 bật: cần 0 < HO3-1 < HO3")
+        if d["BO2-1"] > d["BO2"] + d["BO1"] + _EPS:
+            errors.append("JO3 bật: BO2-1 vượt quá phạm vi sườn + cánh")
+    hollow = is_hollow(params)
+    if hollow:
+        for k in ("HI1", "HI3", "HI5", "BI1", "BI3"):
+            if d[k] <= _EPS:
+                errors.append(f"Lỗ rỗng: {k} phải > 0")
+        if errors:
+            return errors
+        # Ví dụ chính hãng trong manual có HI1+…+HI5 = 2,30 ≠ H = 2,33, nên MIDAS KHÔNG bắt buộc đẳng thức.
+        # Lab vẽ bản trên theo HI1/HI2 từ đỉnh, bản đáy theo HI5/HI4 từ đáy; băng sườn hiệu dụng là phần còn lại
+        # (lệch với HI3 nhập chỉ là CẢNH BÁO, xem consistency_warnings). Chỉ chặn khi không còn chiều cao sườn.
+        hi3_eff = H - d["HI1"] - d["HI2"] - d["HI4"] - d["HI5"]
+        if hi3_eff <= 1e-6:
+            errors.append(f"Lỗ không còn chiều cao sườn: H − (HI1+HI2+HI4+HI5) = {hi3_eff:.4f} ≤ 0")
+            return errors
+        if j["JI1"] and not (0 < d["BI1-1"] < d["BI1"] - _EPS):
+            errors.append("JI1 bật: cần 0 < BI1-1 < BI1 (đo từ tim)")
+        if j["JI1"] and d["HI2-1"] > d["HI2"] + _EPS:
+            errors.append("JI1 bật: HI2-1 không được vượt HI2")
+        if j["JI2"]:
+            lo = d["BI1-1"] if j["JI1"] else 0.0
+            if not (lo < d["BI1-2"] < d["BI1"] - _EPS):
+                errors.append("JI2 bật: cần BI1-1 < BI1-2 < BI1 (JI2 gần sườn hơn JI1)")
+            if d["HI2-2"] > d["HI2"] + _EPS or (j["JI1"] and d["HI2-2"] + _EPS < d["HI2-1"]):
+                errors.append("JI2 bật: cần HI2-1 ≤ HI2-2 ≤ HI2")
+        if j["JI3"]:
+            if not (0 < d["HI3-1"] < hi3_eff - _EPS):
+                errors.append(f"JI3 bật: cần 0 < HI3-1 < HI3 hiệu dụng = {hi3_eff:.4f}")
+            if d["BI2-1"] <= _EPS:
+                errors.append("JI3 bật: BI2-1 phải > 0 (nửa bề rộng lỗ tại khớp, đo từ tim)")
+        if j["JI5"] and not (0 < d["BI3-1"] < d["BI3"] - _EPS):
+            errors.append("JI5 bật: cần 0 < BI3-1 < BI3 (đo từ tim)")
+        if j["JI5"] and d["HI4-1"] > d["HI4"] + _EPS:
+            errors.append("JI5 bật: HI4-1 không được vượt HI4")
+        if j["JI4"]:
+            lo = d["BI3-1"] if j["JI5"] else 0.0
+            if not (lo < d["BI3-2"] < d["BI3"] - _EPS):
+                errors.append("JI4 bật: cần BI3-1 < BI3-2 < BI3 (JI4 gần sườn hơn JI5)")
+            if d["HI4-2"] > d["HI4"] + _EPS or (j["JI5"] and d["HI4-2"] + _EPS < d["HI4-1"]):
+                errors.append("JI4 bật: cần HI4-1 ≤ HI4-2 ≤ HI4")
+        if params["cell_type"] == "2CELL":
+            if d["BI4"] <= _EPS:
+                errors.append("2CELL: BI4 (nửa dày sườn giữa) phải > 0")
+            for k in ("BI1", "BI3", "BI1-1", "BI1-2", "BI2-1", "BI3-1", "BI3-2"):
+                if d[k] > _EPS and d[k] <= d["BI4"] + _EPS and active_fields(params)[k]:
+                    errors.append(f"2CELL: {k} phải > BI4 để lỗ không chạm sườn giữa")
+        if not errors:
+            errors.extend(_containment_errors(params))
+    return errors
+
+
+def consistency_warnings(params: dict) -> list[str]:
+    """Cảnh báo KHÔNG chặn: MIDAS chấp nhận HI1+…+HI5 ≠ H (ví dụ manual), lab vẽ theo quy ước neo bản đáy."""
+    d = params["dims"]
+    out: list[str] = []
+    if is_hollow(params):
+        hi3_eff = depth_m(params) - d["HI1"] - d["HI2"] - d["HI4"] - d["HI5"]
+        if abs(hi3_eff - d["HI3"]) > 1e-6:
+            out.append(f"HI3 nhập {d['HI3']:.4f} ≠ H − (HI1+HI2+HI4+HI5) = {hi3_eff:.4f}: lab vẽ sườn trong theo bản đáy "
+                       f"HI5 (HI3 hiệu dụng {hi3_eff:.4f}); MIDAS có thể vẽ khác — bấm 'Tự cân HI3' để nhất quán")
+    return out
+
+
+def _containment_errors(params: dict) -> list[str]:
+    polys = build_polygons(params, _skip_validation=True)
+    outer = polys["outer"]
+    errors: list[str] = []
+    d = params["dims"]
+    top_web = (d["BO2"] + d["BO3"]) - d["BI1"]
+    bot_web = d["BO3"] - d["BI3"]
+    if top_web <= 1e-6:
+        errors.append(f"Sườn tại đỉnh lỗ ≤ 0 (BO2+BO3−BI1 = {top_web:.4f})")
+    if bot_web <= 1e-6:
+        errors.append(f"Sườn tại đáy lỗ ≤ 0 (BO3−BI3 = {bot_web:.4f})")
+    if _self_intersects(outer):
+        errors.append("Biên ngoài tự cắt (khớp JO* không nhất quán với kích thước chính)")
+    for hole in polys["inners"]:
+        if _self_intersects(hole):
+            errors.append("Biên lỗ tự cắt (khớp JI* không nhất quán với kích thước chính)")
+        for (y, z) in hole:
+            if not _point_in_polygon(y, z, outer, strict=True):
+                errors.append(f"Đỉnh lỗ ({y:.3f}, {z:.3f}) nằm ngoài hoặc chạm biên ngoài")
+                break
+        # đỉnh nằm trong chưa đủ: cạnh lỗ có thể lọt ra ngoài qua chỗ lõm của biên ngoài (JO3, góc sườn)
+        if _rings_cross(hole, outer):
+            errors.append("Cạnh lỗ cắt biên ngoài dù mọi đỉnh nằm trong (thường do JI3/JO3 hoặc sườn quá mỏng)")
+    if len(polys["inners"]) == 2 and _rings_cross(polys["inners"][0], polys["inners"][1]):
+        errors.append("Hai lỗ 2CELL cắt nhau")
+    return errors
+
+
+def _segments_cross(p1, p2, q1, q2) -> bool:
+    """Giao cắt thật sự của hai đoạn (không tính chạm đầu mút hay trùng đường)."""
+    def orient(a, b, c) -> int:
+        v = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+        return 0 if abs(v) < 1e-12 else (1 if v > 0 else -1)
+    o1, o2 = orient(p1, p2, q1), orient(p1, p2, q2)
+    o3, o4 = orient(q1, q2, p1), orient(q1, q2, p2)
+    return o1 * o2 < 0 and o3 * o4 < 0
+
+
+def _rings_cross(a: list[tuple[float, float]], b: list[tuple[float, float]]) -> bool:
+    for i in range(len(a)):
+        p1, p2 = a[i], a[(i + 1) % len(a)]
+        for j in range(len(b)):
+            if _segments_cross(p1, p2, b[j], b[(j + 1) % len(b)]):
+                return True
+    return False
+
+
+def _self_intersects(ring: list[tuple[float, float]]) -> bool:
+    n = len(ring)
+    for i in range(n):
+        for j in range(i + 2, n):
+            if i == 0 and j == n - 1:
+                continue
+            if _segments_cross(ring[i], ring[(i + 1) % n], ring[j], ring[(j + 1) % n]):
+                return True
+    return False
+
+
+# ----------------------------------------------------------------- hình học
+def _half_outer(params: dict) -> list[tuple[float, float]]:
+    """Nửa phải biên ngoài, đi từ đỉnh tim theo chiều kim đồng hồ tới đáy tim. z âm = sâu."""
+    d, j = params["dims"], params["joints"]
+    H = depth_m(params)
+    wt = d["BO1"] + d["BO2"] + d["BO3"]
+    pts = [(0.0, 0.0), (wt, 0.0), (wt, -d["HO1"])]
+    if j["JO1"]:
+        pts.append((wt - d["BO1-1"], -(d["HO1"] + d["HO2-1"])))
+    if j["JO2"]:
+        pts.append((wt - d["BO1-2"], -(d["HO1"] + d["HO2-2"])))
+    pts.append((d["BO2"] + d["BO3"], -(d["HO1"] + d["HO2"])))
+    if j["JO3"]:
+        pts.append((d["BO3"] + d["BO2-1"], -(H - d["HO3-1"])))
+    pts.append((d["BO3"], -H))
+    pts.append((0.0, -H))
+    return pts
+
+
+def _half_inner(params: dict, y0: float = 0.0) -> list[tuple[float, float]]:
+    """Nửa phải biên lỗ (tim lỗ tại y0 = 0 cho 1CELL, y0 = BI4 cho 2CELL)."""
+    d, j = params["dims"], params["joints"]
+    H = depth_m(params)
+    z_top = -d["HI1"]
+    z_corner_top = -(d["HI1"] + d["HI2"])
+    z_bot = -(H - d["HI5"])            # mặt trong bản đáy neo từ đáy: HI5 = dày bản đáy
+    z_corner_bot = z_bot + d["HI4"]     # góc đáy lỗ; băng sườn hiệu dụng = H − HI1 − HI2 − HI4 − HI5
+    pts = [(y0, z_top)]
+    if j["JI1"]:
+        pts.append((d["BI1-1"], -(d["HI1"] + d["HI2-1"])))
+    if j["JI2"]:
+        pts.append((d["BI1-2"], -(d["HI1"] + d["HI2-2"])))
+    pts.append((d["BI1"], z_corner_top))
+    if j["JI3"]:
+        pts.append((d["BI2-1"], -(d["HI1"] + d["HI2"] + d["HI3-1"])))
+    pts.append((d["BI3"], z_corner_bot))
+    if j["JI4"]:
+        pts.append((d["BI3-2"], z_bot + d["HI4-2"]))
+    if j["JI5"]:
+        pts.append((d["BI3-1"], z_bot + d["HI4-1"]))
+    pts.append((y0, z_bot))
+    return pts
+
+
+def _mirror_close(half: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Ghép nửa phải (đỉnh tim → đáy tim) với ảnh gương để thành đa giác kín theo chiều kim đồng hồ."""
+    left = [(-y, z) for (y, z) in reversed(half)]
+    ring = half + left[1:-1] if len(left) > 2 else half
+    out: list[tuple[float, float]] = []
+    for p in ring:
+        if not out or abs(out[-1][0] - p[0]) > _EPS or abs(out[-1][1] - p[1]) > _EPS:
+            out.append(p)
+    if len(out) > 1 and abs(out[0][0] - out[-1][0]) < _EPS and abs(out[0][1] - out[-1][1]) < _EPS:
+        out.pop()
+    return out
+
+
+def build_polygons(params: dict, _skip_validation: bool = False) -> dict:
+    """Biên ngoài + các lỗ (m, y ngang, z dương lên, mặt đỉnh z = 0), điểm khớp và kích thước bao."""
+    if not _skip_validation:
+        errors = validate_psc_box(params)
+        if errors:
+            raise MidasSectionError("; ".join(errors))
+    d, j = params["dims"], params["joints"]
+    H = depth_m(params)
+    wt = d["BO1"] + d["BO2"] + d["BO3"]
+    outer = _mirror_close(_half_outer(params))
+    inners: list[list[tuple[float, float]]] = []
+    if is_hollow(params):
+        if params["cell_type"] == "1CELL":
+            inners.append(_mirror_close(_half_inner(params, 0.0)))
+        else:
+            right = _half_inner(params, d["BI4"])
+            # lỗ phải: đóng kín theo kim đồng hồ (đỉnh tim lỗ → sườn ngoài → đáy tim lỗ)
+            right_ring = [p for i, p in enumerate(right) if i == 0 or abs(p[0] - right[i - 1][0]) > _EPS or abs(p[1] - right[i - 1][1]) > _EPS]
+            inners.append(right_ring)
+            inners.append([(-y, z) for (y, z) in right_ring])
+    joint_points = {}
+    for name in JOINTS:
+        if j[name]:
+            joint_points[name] = _joint_point(params, name)
+    return {
+        "outer": outer, "inners": inners, "depth_m": H, "top_width_m": 2 * wt,
+        "bottom_width_m": 2 * d["BO3"], "hollow": bool(inners), "joint_points": joint_points,
+        "levels": {
+            "outer_web_top": -(d["HO1"] + d["HO2"]),
+            "inner_top_corner": -(d["HI1"] + d["HI2"]) if inners else None,
+            "inner_bottom_corner": -(H - d["HI5"] - d["HI4"]) if inners else None,
+            "inner_bottom": -(H - d["HI5"]) if inners else None,
+        },
+    }
+
+
+def _joint_point(params: dict, name: str) -> tuple[float, float]:
+    d = params["dims"]
+    H = depth_m(params)
+    wt = d["BO1"] + d["BO2"] + d["BO3"]
+    z_bot_in = -(H - d["HI5"])
+    table = {
+        "JO1": (wt - d["BO1-1"], -(d["HO1"] + d["HO2-1"])),
+        "JO2": (wt - d["BO1-2"], -(d["HO1"] + d["HO2-2"])),
+        "JO3": (d["BO3"] + d["BO2-1"], -(H - d["HO3-1"])),
+        "JI1": (d["BI1-1"], -(d["HI1"] + d["HI2-1"])),
+        "JI2": (d["BI1-2"], -(d["HI1"] + d["HI2-2"])),
+        "JI3": (d["BI2-1"], -(d["HI1"] + d["HI2"] + d["HI3-1"])),
+        "JI4": (d["BI3-2"], z_bot_in + d["HI4-2"]),
+        "JI5": (d["BI3-1"], z_bot_in + d["HI4-1"]),
+    }
+    return table[name]
+
+
+def _point_in_polygon(y: float, z: float, poly: list[tuple[float, float]], strict: bool = False) -> bool:
+    inside = False
+    n = len(poly)
+    for i in range(n):
+        y1, z1 = poly[i]
+        y2, z2 = poly[(i + 1) % n]
+        # trên biên?
+        cross = (y2 - y1) * (z - z1) - (z2 - z1) * (y - y1)
+        if abs(cross) < 1e-9 and min(y1, y2) - 1e-9 <= y <= max(y1, y2) + 1e-9 \
+                and min(z1, z2) - 1e-9 <= z <= max(z1, z2) + 1e-9:
+            return not strict
+        if (z1 > z) != (z2 > z):
+            x_int = y1 + (z - z1) * (y2 - y1) / (z2 - z1)
+            if y < x_int:
+                inside = not inside
+    return inside
+
+
+# ----------------------------------------------------------------- đặc trưng tiết diện
+def _poly_raw(pts: list[tuple[float, float]]) -> dict:
+    """Tổng Green của một đa giác (diện tích dương bất kể chiều vẽ)."""
+    n = len(pts)
+    A = Sy = Sz = Iyy = Izz = Iyz = 0.0
+    peri = 0.0
+    for i in range(n):
+        y1, z1 = pts[i]
+        y2, z2 = pts[(i + 1) % n]
+        c = y1 * z2 - y2 * z1
+        A += c
+        Sy += (y1 + y2) * c
+        Sz += (z1 + z2) * c
+        Iyy += (z1 * z1 + z1 * z2 + z2 * z2) * c        # ∫ z² dA
+        Izz += (y1 * y1 + y1 * y2 + y2 * y2) * c        # ∫ y² dA
+        Iyz += (y1 * z2 + 2 * y1 * z1 + 2 * y2 * z2 + y2 * z1) * c
+        peri += math.hypot(y2 - y1, z2 - z1)
+    sign = 1.0 if A >= 0 else -1.0
+    return {"A": sign * A / 2, "Sy": sign * Sy / 6, "Sz": sign * Sz / 6,
+            "Iyy": sign * Iyy / 12, "Izz": sign * Izz / 12, "Iyz": sign * Iyz / 24, "peri": peri}
+
+
+def section_properties(polys: dict) -> dict:
+    """A, tâm, I quanh trục qua tâm, môđun, chu vi. Không có Ixx xoắn (MIDAS tính bằng lưới)."""
+    outer = _poly_raw(polys["outer"])
+    holes = [_poly_raw(h) for h in polys["inners"]]
+    A = outer["A"] - sum(h["A"] for h in holes)
+    if A <= 0:
+        raise MidasSectionError("Diện tích ≤ 0: lỗ lớn hơn biên ngoài")
+    Sy = outer["Sy"] - sum(h["Sy"] for h in holes)
+    Sz = outer["Sz"] - sum(h["Sz"] for h in holes)
+    Iyy0 = outer["Iyy"] - sum(h["Iyy"] for h in holes)
+    Izz0 = outer["Izz"] - sum(h["Izz"] for h in holes)
+    cy, cz = Sy / A, Sz / A
+    Iyy = Iyy0 - A * cz * cz
+    Izz = Izz0 - A * cy * cy
+    H = polys["depth_m"]
+    ys = [p[0] for p in polys["outer"]]
+    czp = 0.0 - cz            # tâm → thớ trên
+    czm = cz + H              # tâm → thớ dưới
+    cyp = max(ys) - cy
+    cym = cy - min(ys)
+    return {
+        "area_m2": A, "centroid_y_m": cy, "centroid_z_m": cz,
+        "centroid_depth_from_top_m": -cz, "centroid_height_from_bottom_m": H + cz,
+        "Iyy_m4": Iyy, "Izz_m4": Izz,
+        "Cyp_m": cyp, "Cym_m": cym, "Czp_m": czp, "Czm_m": czm,
+        "S_top_m3": Iyy / czp if czp > _EPS else None,
+        "S_bot_m3": Iyy / czm if czm > _EPS else None,
+        "perimeter_out_m": outer["peri"], "perimeter_in_m": sum(h["peri"] for h in holes),
+        "hole_area_m2": sum(h["A"] for h in holes),
+        "depth_m": H, "top_width_m": polys["top_width_m"], "bottom_width_m": polys["bottom_width_m"],
+        "note": "Đặc trưng tính bằng tích phân đa giác của lab để ĐỐI CHIẾU với MIDAS "
+                "'Show Calculation Results'; Ixx (xoắn), Asy/Asz do MIDAS tính bằng lưới.",
+    }
+
+
+def _half_width_at(pts_half: list[tuple[float, float]], z: float) -> float | None:
+    """Nửa bề rộng (y ≥ 0) của một đường nửa phải tại cao độ z: giao tuyến ngang xa tim nhất."""
+    best = None
+    for i in range(len(pts_half) - 1):
+        (y1, z1), (y2, z2) = pts_half[i], pts_half[i + 1]
+        if abs(z2 - z1) < _EPS:
+            if abs(z - z1) < 1e-9:
+                cand = max(y1, y2)
+                best = cand if best is None else max(best, cand)
+            continue
+        if min(z1, z2) - 1e-9 <= z <= max(z1, z2) + 1e-9:
+            cand = y1 + (z - z1) * (y2 - y1) / (z2 - z1)
+            best = cand if best is None else max(best, cand)
+    return best
+
+
+def web_thickness_report(params: dict, polys: dict) -> dict:
+    """Ước lượng vị trí kiểm cắt Z1/Z2/Z3 (đo từ đáy) và tổng dày sườn t1/t2/t3 như tab Shear Check."""
+    if not polys["hollow"]:
+        return {"hollow": False, "note": "Mặt cắt đặc: MIDAS không cần t1..t3"}
+    props = section_properties(polys)
+    H = polys["depth_m"]
+    cz = props["centroid_z_m"]
+    levels = {
+        "Z1": polys["levels"]["inner_top_corner"],
+        "Z2": cz,
+        "Z3": polys["levels"]["inner_bottom_corner"],
+    }
+    half_out = _half_outer(params)
+    half_in = _half_inner(params, params["dims"]["BI4"] if params["cell_type"] == "2CELL" else 0.0)
+    n_webs = 2 if params["cell_type"] == "1CELL" else 3
+    out = {"hollow": True, "webs": n_webs, "positions_from_bottom_m": {}, "web_thickness_sum_m": {},
+           "torsion_min_thickness_m": None,
+           "note": "Z đo từ thớ đáy như MIDAS hiển thị; t = tổng dày sườn ngang tại cao độ đó (lab ước lượng, "
+                   "MIDAS Auto có thể chọn cao độ hơi khác)."}
+    t_values = []
+    for key, z in levels.items():
+        eps = 1e-6 if key == "Z1" else (-1e-6 if key == "Z3" else 0.0)
+        yo = _half_width_at(half_out, z - eps)
+        yi = _half_width_at(half_in, z - eps)
+        out["positions_from_bottom_m"][key] = round(H + z, 6)
+        if yo is None or yi is None:
+            out["web_thickness_sum_m"][key] = None
+            continue
+        t_each = max(0.0, yo - yi)
+        total = 2 * t_each
+        if params["cell_type"] == "2CELL":
+            total += 2 * params["dims"]["BI4"]
+        out["web_thickness_sum_m"][key] = round(total, 6)
+        t_values.append(t_each)
+    if t_values:
+        out["torsion_min_thickness_m"] = round(min(t_values + [params["dims"]["HI1"], params["dims"]["HI5"]]), 6)
+    return out
+
+
+# ----------------------------------------------------------------- xuất
+def size_arrays(params: dict) -> dict:
+    d = params["dims"]
+    # Ví dụ chính hãng (manual API, PSC-1CELL) xuất vSIZE_PSC_D 8 phần tử kể cả với 1CEL (BI4 = 0)
+    breadth_in = INNER_BREADTH_2CEL
+    two_cell = params["cell_type"] == "2CELL"
+    return {
+        "vSIZE_PSC_A": [d[k] for k in OUTER_HEIGHT],
+        "vSIZE_PSC_B": [d[k] for k in OUTER_BREADTH],
+        "vSIZE_PSC_C": [d[k] for k in INNER_HEIGHT],
+        "vSIZE_PSC_D": [d[k] if (k != "BI4" or two_cell) else 0.0 for k in breadth_in],
+        "JOINT": [params["joints"][k] for k in JOINTS],
+        "field_names": {"vSIZE_PSC_A": list(OUTER_HEIGHT), "vSIZE_PSC_B": list(OUTER_BREADTH),
+                        "vSIZE_PSC_C": list(INNER_HEIGHT), "vSIZE_PSC_D": list(breadth_in),
+                        "JOINT": list(JOINTS)},
+    }
+
+
+def to_dialog_table(params: dict) -> list[dict]:
+    """Từng ô của dialog Section Data → PSC theo thứ tự hiển thị, kèm trạng thái mở/xám."""
+    active = active_fields(params)
+    d = params["dims"]
+    rows: list[dict] = [{"group": "Section Type", "field": "Section Type", "value": params["cell_type"], "active": True}]
+    for name in JOINTS:
+        rows.append({"group": "Joint On/Off", "field": name, "value": params["joints"][name], "active": True})
+    for group, names in (("Outer", OUTER_HEIGHT + OUTER_BREADTH), ("Inner", INNER_HEIGHT + INNER_BREADTH_2CEL)):
+        for name in names:
+            rows.append({"group": group, "field": name, "value": d[name], "unit": "m", "active": active[name]})
+    rows.append({"group": "Offset", "field": "Offset", "value": params["offset"], "active": True})
+    return rows
+
+
+def to_table_input_tsv(params: dict) -> str:
+    """Một dòng dạng bảng (dán vào Table Input / Excel): tên trường ở dòng 1, giá trị ở dòng 2."""
+    arrays = size_arrays(params)
+    names = ["Section ID", "Name", "Type", "Offset"] + list(JOINTS) + arrays["field_names"]["vSIZE_PSC_A"] \
+        + arrays["field_names"]["vSIZE_PSC_B"] + arrays["field_names"]["vSIZE_PSC_C"] + arrays["field_names"]["vSIZE_PSC_D"]
+    values = [str(params["section_id"]), params["name"], SHAPE_CODE[params["cell_type"]], params["offset"]] \
+        + ["ON" if v else "OFF" for v in arrays["JOINT"]] \
+        + [_fmt(v) for v in arrays["vSIZE_PSC_A"] + arrays["vSIZE_PSC_B"] + arrays["vSIZE_PSC_C"] + arrays["vSIZE_PSC_D"]]
+    return "\t".join(names) + "\n" + "\t".join(values) + "\n"
+
+
+def to_midas_api_json(params: dict, basis: dict | None = None) -> dict:
+    """Thân JSON theo cấu trúc db/SECT của MIDAS API (CIVIL NX). Civil 2022 không có API: chỉ để tham chiếu.
+
+    Các khoá tuỳ chọn (OFFSET_*, USE_*, PSC_OPT1/2) lấy từ ``midas_api_json_defaults`` trong basis —
+    đó là MẶC ĐỊNH của lab để thân JSON đủ khoá bắt buộc, không phải quyết định kỹ thuật.
+    """
+    basis = basis or load_basis()
+    defaults = {k: v for k, v in basis.get("midas_api_json_defaults", {}).items() if k != "note"}
+    arrays = size_arrays(params)
+    sect_before = {"OFFSET_PT": params["offset"]}
+    for key in ("OFFSET_CENTER", "USER_OFFSET_REF", "HORZ_OFFSET_OPT", "USERDEF_OFFSET_YI",
+                "VERT_OFFSET_OPT", "USERDEF_OFFSET_ZI", "USE_SHEAR_DEFORM", "USE_WARPING_EFFECT"):
+        sect_before[key] = defaults.get(key)
+    sect_i = {k: arrays[k] for k in ("vSIZE_PSC_A", "vSIZE_PSC_B", "vSIZE_PSC_C", "vSIZE_PSC_D")}
+    sect_i["SWIDTH"] = arrays["vSIZE_PSC_A"][0]        # manual: "Others • Index 0 of vSIZE_PSC_A"
+    zeros6 = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+    # Thứ tự và tập khoá bám đúng ví dụ PSC-1CELL trong manual (Assign 401)
+    sect_before.update({
+        "SHAPE": SHAPE_CODE[params["cell_type"]],
+        "SECT_I": sect_i,
+        "WARPING_CHK_AUTO_I": defaults.get("WARPING_CHK_AUTO_I", True),
+        "WARPING_CHK_AUTO_J": defaults.get("WARPING_CHK_AUTO_J", True),
+        "WARPING_CHK_POS_I": defaults.get("WARPING_CHK_POS_I", zeros6),
+        "WARPING_CHK_POS_J": defaults.get("WARPING_CHK_POS_J", zeros6),
+        "USE_WEB_THICK": defaults.get("USE_WEB_THICK", [False, False]),
+        "WEB_THICK": defaults.get("WEB_THICK", [0, 0]),
+        "USE_WEB_THICK_SHEAR": defaults.get("USE_WEB_THICK_SHEAR", [[False, False, False], [False, False, False]]),
+        "WEB_THICK_SHEAR": defaults.get("WEB_THICK_SHEAR", [[0, 0, 0], [0, 0, 0]]),
+        "USE_SYMMETRIC": defaults.get("USE_SYMMETRIC", True),
+        "USE_SMALL_HOLE": defaults.get("USE_SMALL_HOLE", False),
+        "USE_USER_DEF_MESHSIZE": defaults.get("USE_USER_DEF_MESHSIZE", False),
+        "USE_USER_INTPUT_STIFF": defaults.get("USE_USER_INTPUT_STIFF", False),
+        "PSC_OPT1": defaults.get("PSC_OPT1", ""),
+        "PSC_OPT2": defaults.get("PSC_OPT2", ""),
+        "JOINT": arrays["JOINT"],
+    })
+    flag = basis["verification_flags"]["midas_api_json"]
+    return {
+        "Assign": {str(params["section_id"]): {"SECTTYPE": "PSC", "SECT_NAME": params["name"], "SECT_BEFORE": sect_before}},
+        "status": flag["status"],
+        "defaults_source": "docs/design_basis/midas_psc_section_basis.json#midas_api_json_defaults",
+        "_lab_note": flag["note"] + " Khoá Common theo trang Common của manual; kiểm lại trên CIVIL NX trước khi POST.",
+    }
+
+
+def _fmt(v: float) -> str:
+    s = f"{v:.6f}".rstrip("0").rstrip(".")
+    return s if s not in ("", "-0") else "0"
+
+
+def to_mct_psc(params: dict) -> dict:
+    """Khối *SECTION PSC 1CEL/2CEL (định dạng SUY ĐOÁN theo thứ tự trường của manual API)."""
+    a = size_arrays(params)
+    yn = ["YES" if v else "NO" for v in a["JOINT"]]
+    lines = [
+        "*SECTION    ; Section",
+        f"; [{MCT_PSC_STATUS}] Dòng PSC dưới đây do lab sinh theo THỨ TỰ TRƯỜNG của manual API "
+        "(vSIZE_PSC_A, B, C, D, JOINT); chưa nạp thử trên Civil 2022. Nếu Command Shell báo lỗi: "
+        "xuất một MCT mẫu từ MIDAS (File > Export > MIDAS Civil MCT) có sẵn mặt cắt PSC để đối chiếu.",
+        "; iSEC, TYPE, SNAME, OFFSET, iCENT, iREF, iHORZ, HUSER, iVERT, VUSER, bSD, bWE, SHAPE, iREPLA, JO1, JO2, JO3, JI1, JI2, JI3, JI4, JI5",
+        f" {params['section_id']}, PSC, {params['name']}, {params['offset']}, 0, 0, 0, 0, 0, 0, YES, NO, "
+        f"{SHAPE_CODE[params['cell_type']]}, 1, " + ", ".join(yn),
+        ";       " + ", ".join(a["field_names"]["vSIZE_PSC_A"] + a["field_names"]["vSIZE_PSC_B"]),
+        "       " + ", ".join(_fmt(v) for v in a["vSIZE_PSC_A"] + a["vSIZE_PSC_B"]),
+        ";       " + ", ".join(a["field_names"]["vSIZE_PSC_C"] + a["field_names"]["vSIZE_PSC_D"]),
+        "       " + ", ".join(_fmt(v) for v in a["vSIZE_PSC_C"] + a["vSIZE_PSC_D"]),
+        ";       bSHEAR_AUTO_Z1, Z1, bSHEAR_AUTO_Z3, Z3, bWEB_AUTO_T1, T1, bWEB_AUTO_T2, T2, bWEB_AUTO_T3, T3, bTOR_AUTO, T   (Auto = YES)",
+        "       YES, 0, YES, 0, YES, 0, YES, 0, YES, 0, YES, 0",
+    ]
+    return {"status": MCT_PSC_STATUS, "text": "\n".join(lines) + "\n",
+            "verified_on": None,
+            "how_to_verify": "Tools > MCT Command Shell trong mô hình trống → dán → Run; hoặc dùng midas-mcp "
+                             "midas_validate_mct + midas_ui_stage_mct."}
+
+
+def to_mct_dbuser_box(params: dict) -> dict:
+    """Đường dự phòng ĐÃ KIỂM CHỨNG: DB/User shape B (hộp lý tưởng, không vút, không khớp)."""
+    d = params["dims"]
+    polys = build_polygons(params)
+    H = polys["depth_m"]
+    hollow = polys["hollow"]
+    tw = ((d["BO2"] + d["BO3"]) - d["BI1"]) if hollow else d["BO3"]
+    top_t = d["HI1"] if hollow else H / 2
+    bot_t = d["HI5"] if hollow else H / 2
+    line = (f" {params['section_id']}, DBUSER, {params['name']}, {params['offset']}, 0, 0, 0, 0, 0, 0, YES, NO, B, 2, "
+            f"{_fmt(H)}, {_fmt(polys['top_width_m'])}, {_fmt(top_t)}, {_fmt(tw)}, {_fmt(polys['bottom_width_m'])}, {_fmt(bot_t)}, 0, 0, 0, 0, 0")
+    basis = load_basis()
+    evidence = basis["sources"]["dbuser_box_verified"]
+    return {
+        "status": basis["verification_flags"]["mct_dbuser_box"]["status"],
+        "source": SOURCE_REFS["dbuser_box_verified"],
+        "evidence": {"external_root": evidence.get("external_root"), "files": evidence.get("files", []),
+                     "note": "bằng chứng nằm ngoài repo (midas-mcp); neo bằng SHA-256 trong basis"},
+        "text": "*SECTION    ; Section\n; DBUSER Box (B) theo đúng thứ tự tham số midas-mcp đã nạp thành công: H, B_top, t_top, t_web, B_bottom, t_bottom\n" + line + "\n",
+        "idealisation": {"depth_m": H, "top_width_m": polys["top_width_m"], "top_slab_m": top_t,
+                         "web_m": tw, "bottom_width_m": polys["bottom_width_m"], "bottom_slab_m": bot_t},
+        "note": "Hộp lý tưởng hoá: mất vút, khớp nối và độ nghiêng sườn — chỉ dùng để dựng mô hình phân tích sơ bộ.",
+    }
+
+
+def export_bundle(raw: dict) -> dict:
+    """Toàn bộ đầu ra cho một mặt cắt: hình học, đặc trưng, bảng dialog, TSV, JSON API, MCT, hash."""
+    params = normalize_params(raw)
+    errors = validate_psc_box(params)
+    if errors:
+        raise MidasSectionError("; ".join(errors))
+    basis = load_basis()
+    polys = build_polygons(params)
+    props = section_properties(polys)
+    props["status"] = basis["verification_flags"]["section_properties"]["status"]
+    shear = web_thickness_report(params, polys)
+    bundle = {
+        "module_version": MODULE_VERSION, "claim_level": CLAIM_LEVEL,
+        "params": params, "active_fields": active_fields(params),
+        "geometry": polys, "properties": props, "shear_check": shear,
+        "dialog_table": to_dialog_table(params), "table_input_tsv": to_table_input_tsv(params),
+        "midas_api_json": to_midas_api_json(params, basis), "mct_psc": to_mct_psc(params),
+        "mct_dbuser_box": to_mct_dbuser_box(params),
+        "verification_flags": basis["verification_flags"],
+        "warnings": consistency_warnings(params),
+        "sources": SOURCE_REFS,
+        "honesty": "Chỉ hình học và dữ liệu nhập MIDAS. Không có kết luận chịu lực. Đặc trưng để đối chiếu.",
+    }
+    bundle["bundle_sha256"] = hashlib.sha256(
+        json.dumps({k: v for k, v in bundle.items() if k != "bundle_sha256"}, sort_keys=True, ensure_ascii=False,
+                   default=str).encode("utf-8")).hexdigest()
+    return bundle
+
+
+# ----------------------------------------------------------------- họ mặt cắt biến thiên (đúc hẫng)
+def variable_depth_family(pier_raw: dict, mid_raw: dict, length_m: float, stations: int,
+                          law: str = "parabola", exponent: float = 2.0, name_prefix: str = "SEG") -> dict:
+    """Nội suy chiều cao từ mặt cắt TRỤ (x = 0) về GIỮA NHỊP (x = L).
+
+    Trọng số f(x) = ((L − x)/L)^n (parabola đỉnh tại giữa nhịp; n = 1 là tuyến tính). MỌI kích thước
+    được nội suy d(x) = d_mid + (d_pier − d_mid)·f, nên H(x) = H_mid + (H_pier − H_mid)·f, hai đầu trả
+    đúng nguyên mặt cắt trụ/nhịp (sườn, cánh, bản đáy, khớp) và đẳng thức chiều cao trong = H được giữ.
+    Hai mặt cắt phải cùng loại cell và cùng bộ khớp nối.
+    """
+    pier = normalize_params(pier_raw)
+    mid = normalize_params(mid_raw)
+    for label, p in (("trụ", pier), ("giữa nhịp", mid)):
+        errs = validate_psc_box(p)
+        if errs:
+            raise MidasSectionError(f"Mặt cắt {label}: " + "; ".join(errs))
+    if pier["cell_type"] != mid["cell_type"]:
+        raise MidasSectionError("Hai mặt cắt phải cùng loại 1CELL/2CELL")
+    L = _num(length_m, "length_m")
+    if L <= 0:
+        raise MidasSectionError("length_m phải > 0")
+    stations = int(stations)
+    if not 2 <= stations <= 400:
+        raise MidasSectionError("stations phải trong [2, 400]")
+    if law not in ("parabola", "linear"):
+        raise MidasSectionError("law chỉ nhận parabola hoặc linear")
+    n = 1.0 if law == "linear" else _num(exponent, "exponent")
+    if n <= 0:
+        raise MidasSectionError("exponent phải > 0")
+    if pier["joints"] != mid["joints"]:
+        raise MidasSectionError("Hai mặt cắt phải bật cùng bộ khớp nối (JOINT) thì mới nội suy được")
+    Hp, Hm = depth_m(pier), depth_m(mid)
+    if Hp < Hm:
+        raise MidasSectionError("Chiều cao tại trụ phải ≥ giữa nhịp")
+    dp, dm = pier["dims"], mid["dims"]
+    sections = []
+    for i in range(stations):
+        x = L * i / (stations - 1)
+        f = ((L - x) / L) ** n
+        # Nội suy MỌI kích thước với cùng trọng số f: x = 0 trả đúng mặt cắt trụ, x = L trả đúng
+        # mặt cắt nhịp (kể cả sườn, cánh, khớp), H(x) = Hm + (Hp − Hm)·f và tổng chiều cao trong
+        # luôn bằng H vì đẳng thức tuyến tính được bảo toàn qua phép nội suy.
+        if i == 0:
+            d = dict(dp)
+        elif i == stations - 1:
+            d = dict(dm)
+        else:
+            d = {k: dm[k] + (dp[k] - dm[k]) * f for k in ALL_DIMS}
+        H = d["HO1"] + d["HO2"] + d["HO3"]
+        raw = {"cell_type": pier["cell_type"], "joints": dict(pier["joints"]), "dims": d,
+               "name": f"{name_prefix}{i + 1:03d}", "section_id": pier["section_id"] + i, "offset": pier["offset"]}
+        p = normalize_params(raw)
+        errs = validate_psc_box(p)
+        if errs:
+            raise MidasSectionError(f"Trạm {i + 1} (x = {x:.3f} m) không hợp lệ: " + "; ".join(errs))
+        polys = build_polygons(p)
+        props = section_properties(polys)
+        sections.append({"index": i + 1, "station_m": round(x, 6), "depth_m": round(H, 6),
+                         "params": p, "area_m2": props["area_m2"], "Iyy_m4": props["Iyy_m4"],
+                         "centroid_depth_from_top_m": props["centroid_depth_from_top_m"]})
+    depths = [s["depth_m"] for s in sections]
+    tapered_pairs = [{"element": i + 1, "section_i": sections[i]["params"]["name"], "section_j": sections[i + 1]["params"]["name"],
+                      "length_m": round(sections[i + 1]["station_m"] - sections[i]["station_m"], 6)}
+                     for i in range(len(sections) - 1)]
+    mct = ["*SECTION    ; Section", f"; [{MCT_PSC_STATUS}] họ mặt cắt biến thiên — xem to_mct_psc"]
+    for s in sections:
+        mct.extend(to_mct_psc(s["params"])["text"].splitlines()[3:])
+    return {
+        "module_version": MODULE_VERSION, "claim_level": CLAIM_LEVEL,
+        "law": law, "exponent": n, "length_m": L, "stations": stations,
+        "depth_pier_m": Hp, "depth_mid_m": Hm, "monotonic_non_increasing": all(depths[i] >= depths[i + 1] - 1e-9 for i in range(len(depths) - 1)),
+        "sections": sections, "tapered_pairs": tapered_pairs,
+        "mct_psc_all": {"status": MCT_PSC_STATUS, "text": "\n".join(mct) + "\n"},
+        "note": "Mỗi phần tử dầm hẫng dùng Tapered Section (Size-I = trạm i, Size-J = trạm i+1, y/z Variation Linear) "
+                "như tutorial FCM; hoặc gán từng mặt cắt trạm cho từng phần tử 1 m như midas-mcp.",
+    }
+
+
+# ----------------------------------------------------------------- đề xuất từ nhịp (heuristic, IDEA)
+def load_basis() -> dict:
+    return json.loads(BASIS_PATH.read_text(encoding="utf-8"))
+
+
+def propose_box_from_spans(main_span_m: float, deck_width_m: float, side_span_m: float | None = None,
+                           basis: dict | None = None) -> dict:
+    """Đề xuất tham số PSC-1CELL tại trụ và giữa nhịp từ bảng heuristic trong basis (claim IDEA)."""
+    L = _num(main_span_m, "main_span_m")
+    W = _num(deck_width_m, "deck_width_m")
+    if L <= 0 or W <= 0:
+        raise MidasSectionError("main_span_m và deck_width_m phải > 0")
+    basis = basis or load_basis()
+    h = {k: v["value"] for k, v in basis["heuristics"].items()}
+    clauses = {k: v["clause_id"] for k, v in basis["heuristics"].items()}
+    H_pier = L / h["depth_ratio_pier"]
+    H_mid = max(L / h["depth_ratio_mid"], h["depth_min_mid_m"])
+    cantilever = min(h["cantilever_max_m"], h["cantilever_ratio_of_width"] * W)
+    half_top = W / 2
+    bottom_half = max(h["bottom_width_ratio"] * W / 2, half_top - cantilever - h["web_run_max_m"])
+    web_run = max(0.0, half_top - cantilever - bottom_half)
+    web_mid, web_pier = h["web_thickness_mid_m"], h["web_thickness_pier_m"]
+    top_slab = max(h["top_slab_min_m"], h["top_slab_ratio_of_spacing"] * (W - 2 * cantilever))
+    tip = h["cantilever_tip_thickness_m"]
+    bot_mid = h["bottom_slab_mid_m"]
+    bot_pier = max(h["bottom_slab_pier_ratio_of_depth"] * H_pier, h["bottom_slab_pier_min_m"])
+    haunch_w, haunch_d = h["haunch_width_m"], h["haunch_depth_m"]
+
+    def section(H: float, web: float, bot: float, name: str, sid: int) -> dict:
+        ho2 = haunch_d + (top_slab - tip)
+        hi1, hi2 = top_slab, haunch_d
+        hi4, hi5 = haunch_d, bot
+        hi3 = H - hi1 - hi2 - hi4 - hi5
+        bi1 = web_run + bottom_half - web
+        slope = web_run / (H - tip - ho2) if (H - tip - ho2) > _EPS else 0.0
+        bi3 = bi1 - slope * hi3
+        dims = {"HO1": tip, "HO2": ho2, "HO3": H - tip - ho2, "BO1": cantilever, "BO1-2": max(0.05, cantilever - haunch_w),
+                "HO2-2": ho2 - haunch_d, "BO2": web_run, "BO3": bottom_half,
+                "HI1": hi1, "HI2": hi2, "HI3": hi3, "HI4": hi4, "HI5": hi5,
+                "BI1": bi1, "BI1-1": max(0.05, bi1 - haunch_w), "BI3": bi3, "BI3-1": max(0.05, bi3 - haunch_w)}
+        raw = {"cell_type": "1CELL", "joints": {"JO2": True, "JI1": True, "JI5": True}, "dims": dims,
+               "name": name, "section_id": sid, "offset": "CT"}
+        p = normalize_params(raw)
+        errs = validate_psc_box(p)
+        if errs:
+            raise MidasSectionError(f"Heuristic sinh mặt cắt {name} không hợp lệ: " + "; ".join(errs))
+        return p
+
+    pier = section(H_pier, web_pier, bot_pier, "PIER", 1)
+    mid = section(H_mid, web_mid, bot_mid, "MID", 2)
+    return {
+        "claim_level": CLAIM_LEVEL, "module_version": MODULE_VERSION,
+        "inputs": {"main_span_m": L, "deck_width_m": W, "side_span_m": side_span_m},
+        "derived": {"depth_pier_m": H_pier, "depth_mid_m": H_mid, "cantilever_m": cantilever,
+                    "bottom_width_m": 2 * bottom_half, "web_run_m": web_run},
+        "pier": pier, "mid": mid,
+        "heuristics_used": clauses, "basis_id": basis.get("basis_id"),
+        "warning": "Đề xuất từ bảng heuristic chưa có nguồn (LAB-HEURISTIC-UNSOURCED-*). Đây là điểm xuất phát "
+                   "để nhập MIDAS rồi phân tích, không phải thiết kế. Kỹ sư phải rà lại từng số.",
+    }
+
+
+# ----------------------------------------------------------------- Super-T → PSC-Value
+PSC_VALUE_VERTEX_KEY = "VERTEX"     # JSON Schema của trang PSC Value dùng "VERTEX" (bảng mô tả viết "Vertex")
+PSC_VALUE_SHAPE = "VALU"
+
+
+def polygon_to_psc_value(outer_pts_m: list, inner_rings_m: list | None = None, name: str = "SUPER_T",
+                         section_id: int = 1, design_thickness_m: tuple | None = None) -> dict:
+    """Đa giác bất kỳ (m, y ngang, z lên) → cấu trúc PSC-Value (OUTER_POLYGON/INNER_POLYGON) + đặc trưng.
+
+    ``vSIZE = [HT, BT, T1, T2]`` (tham số thiết kế bắt buộc của manual): HT, BT lấy từ hộp bao đa giác;
+    T1 (dày cánh trên), T2 (dày sườn) lấy từ ``design_thickness_m`` nếu có, không thì 0 và ghi chú.
+    """
+    outer = [(float(p[0]), float(p[1])) for p in outer_pts_m]
+    if len(outer) < 3:
+        raise MidasSectionError("Đa giác ngoài cần ≥ 3 đỉnh")
+    inners = [[(float(p[0]), float(p[1])) for p in ring] for ring in (inner_rings_m or [])]
+    zs = [p[1] for p in outer]
+    H = max(zs) - min(zs)
+    shift = max(zs)
+    polys = {"outer": [(y, z - shift) for (y, z) in outer], "inners": [[(y, z - shift) for (y, z) in r] for r in inners],
+             "depth_m": H, "top_width_m": max(p[0] for p in outer) - min(p[0] for p in outer),
+             "bottom_width_m": None, "hollow": bool(inners)}
+    props = section_properties(polys)
+    props["status"] = "LAB_CROSS_CHECK"
+    t1, t2 = (float(design_thickness_m[0]), float(design_thickness_m[1])) if design_thickness_m else (0.0, 0.0)
+    vertex = lambda ring: [{"X": round(y, 6), "Y": round(z, 6)} for (y, z) in ring]  # noqa: E731
+    return {
+        "claim_level": CLAIM_LEVEL, "status": MCT_PSC_STATUS,
+        "psc_value": {
+            "Assign": {str(section_id): {"SECTTYPE": "PSC", "SECT_NAME": name, "SECT_BEFORE": {
+                "OFFSET_PT": "CT", "SHAPE": PSC_VALUE_SHAPE,
+                "SECT_I": {
+                    "vSIZE": [round(H, 6), round(polys["top_width_m"], 6), round(t1, 6), round(t2, 6)],
+                    "OUTER_POLYGON": [{PSC_VALUE_VERTEX_KEY: vertex(outer)}],
+                    "INNER_POLYGON": [{PSC_VALUE_VERTEX_KEY: vertex(r)} for r in inners],
+                }}}},
+            "_lab_note": "Toạ độ X = y ngang, Y = z đứng (m), gốc tại tim-đỉnh; vSIZE = [HT, BT, T1, T2] với T1/T2 = "
+                         + ("dày cánh trên / sườn từ gene" if design_thickness_m else "0 (chưa cung cấp)")
+                         + "; khoá đỉnh VERTEX theo JSON Schema của manual; kiểm lại chiều trục và mã SHAPE trong MIDAS.",
+        },
+        "properties": props,
+        "vertices_csv": "X_m,Y_m\n" + "\n".join(f"{y:.6f},{z:.6f}" for (y, z) in outer) + "\n",
+        "source": SOURCE_REFS["psc_value"],
+    }
+
+
+# ----------------------------------------------------------------- mẫu
+PRESETS = {
+    "fcm_tutorial_span": {
+        "label": "MIDAS tutorial FCM — mặt cắt nhịp (Fig. 4)", "source": SOURCE_REFS["geometry_convention"],
+        "params": {"cell_type": "1CELL", "name": "Span", "section_id": 2, "offset": "CT",
+                   "joints": {"JO1": True, "JI1": True, "JI5": True},
+                   "dims": {"HO1": 0.25, "HO2": 0.35, "HO3": 2.1, "BO1": 2.8, "BO1-1": 1.05, "BO3": 3.55,
+                            "HI1": 0.275, "HI2": 0.325, "HI3": 1.59, "HI4": 0.25, "HI5": 0.26,
+                            "BI1": 3.1, "BI1-1": 1.35, "BI3": 3.1, "BI3-1": 1.85}},
+    },
+    "fcm_tutorial_support": {
+        "label": "MIDAS tutorial FCM — mặt cắt trụ (Fig. 5)", "source": SOURCE_REFS["geometry_convention"],
+        "params": {"cell_type": "1CELL", "name": "Support", "section_id": 3, "offset": "CT",
+                   "joints": {"JO1": True, "JI1": True, "JI5": True},
+                   "dims": {"HO1": 0.25, "HO2": 0.35, "HO3": 6.4, "BO1": 2.8, "BO1-1": 1.05, "BO3": 3.55,
+                            "HI1": 0.275, "HI2": 0.325, "HI3": 5.3, "HI4": 0.25, "HI5": 0.85,
+                            "BI1": 3.1, "BI1-1": 1.35, "BI3": 3.1, "BI3-1": 1.85}},
+    },
+    "midas_api_example_1cell": {
+        "label": "MIDAS API manual — ví dụ PSC-1CELL (Assign 401, 8 khớp bật)", "source": SOURCE_REFS["field_order"],
+        "params": {"cell_type": "1CELL", "name": "PSC-1CELL", "section_id": 401, "offset": "CC",
+                   "joints": {k: True for k in JOINTS},
+                   "dims": {"HO1": 0.23, "HO2": 0.42, "HO2-1": 0.055, "HO2-2": 0.18, "HO3": 1.68, "HO3-1": 0.23,
+                            "BO1": 1.23, "BO1-1": 0.44, "BO1-2": 0.9, "BO2": 0.6, "BO2-1": 0.02, "BO3": 1.8,
+                            "HI1": 0.22, "HI2": 0.44, "HI2-1": 0.05, "HI2-2": 0.14, "HI3": 1.23, "HI3-1": 0.88,
+                            "HI4": 0.2, "HI4-1": 0.025, "HI4-2": 0.09, "HI5": 0.21,
+                            "BI1": 1.91, "BI1-1": 0.89, "BI1-2": 1.56, "BI2-1": 1.69,
+                            "BI3": 1.48, "BI3-1": 0.57, "BI3-2": 1.1}},
+    },
+    "user_screenshot_pier_solid": {
+        "label": "Ảnh anh gửi — 'MC Sat tru' đặc (PSC-1CELL, JO2/JI2/JI4 bật, lỗ = 0)",
+        "source": "ảnh chụp dialog MIDAS của người dùng 2026-09-03",
+        "params": {"cell_type": "1CELL", "name": "MC_Sat_tru", "section_id": 4, "offset": "CC",
+                   "joints": {"JO2": True, "JI2": True, "JI4": True},
+                   "dims": {"HO1": 0.25, "HO2": 0.75, "HO2-2": 0.25, "HO3": 5.0, "BO1": 2.5, "BO1-2": 2.0,
+                            "BO2": 1.0, "BO3": 2.5}},
+    },
+}

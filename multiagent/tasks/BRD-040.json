@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-040",
+  "title": "F1 linear-elastic 2D frame/truss kernel with fail-closed provenance",
+  "research_question": "Có thể xây một kernel phương pháp độ cứng trực tiếp độc lập để phân tích graph khung-giàn 2D, tự phát hiện cơ cấu và kiểm cân bằng/năng lượng, nhưng không biến kết quả đàn hồi tuyến tính thành verdict thiết kế hay không?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/frame_f1.py",
+    "contracts/frame_f1_model.schema.json",
+    "contracts/frame_f1_result.schema.json",
+    "docs/design_basis/frame_f1_basis.json",
+    "tests/test_frame_f1.py"
+  ],
+  "acceptance_criteria": [
+    "Kernel lắp ma trận độ cứng FRAME_2D Euler-Bernoulli và TRUSS_2D trong hệ kN-m-GPa, mỗi nút có ux/uy/rz",
+    "Mô hình buộc khai vật liệu, tiết diện, gối và tải nút; source_ref của vật liệu, tiết diện và load case phải tồn tại trong repo và được băm theo bytes",
+    "Zero-length, ID trùng, tham chiếu mồ côi, NaN/Infinity, tải trên DOF không có độ cứng và cơ cấu đều bị chặn trước hoặc trong solve",
+    "Mỗi load case báo chuyển vị nút, phản lực, nội lực đầu phần tử, condition number, rank, residual cân bằng và residual năng lượng",
+    "Benchmark khớp nghiệm giải tích thanh kéo, console chịu lực ngang và dầm giản đơn chịu lực giữa nhịp",
+    "Output deterministic, additionalProperties=false, claim_level=IDEA, design_verdict_authority=NONE và không có feasible/verified",
+    "Basis ghi rõ linear small-displacement không có P-Delta/corotational, shear deformation, buckling, dynamics, fatigue, connection, soil-foundation hoặc construction staging",
+    "Không import creative_shape, không sửa geometry_experimental, evaluate.py, fe_adapter production hoặc lab.py trong task này"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/frame_f1.py",
+    "contracts/frame_f1_model.schema.json",
+    "contracts/frame_f1_result.schema.json",
+    "docs/design_basis/frame_f1_basis.json",
+    "tests/test_frame_f1.py"
+  ],
+  "safety_notes": [
+    "Fidelity F1 là mô hình đàn hồi tuyến tính 2D, không phải kiểm định thiết kế cầu",
+    "Không có capacity hoặc tổ hợp tiêu chuẩn nên tuyệt đối không xuất feasible/verified/pass-design",
+    "Hồ sơ nguồn tồn tại và có hash vẫn cần kỹ sư xác nhận applicability",
+    "Adapter từ creative candidate sang F1 model phải là task riêng sau review"
+  ],
+  "review_notes": [
+    "Review độc lập Claude: 5/5 hash khớp và lõi ma trận F1 đúng, nhưng guard nuốt cơ cấu không mang tải, condition number chưa scale không bất biến và result chưa neo source solver. Yêu cầu sửa guard/provenance, thêm regression tests rồi resubmit r002.",
+    "Review r002 độc lập: bốn lỗi r001 đã đóng; còn lỗ hổng HIGH do Jacobi scaling che khuất gần-cơ-cấu và thiếu guard miền chuyển vị nhỏ.",
+    "Review doc lap r003 (claude). Tu bam lai 5/5 artifact khop handoff. Tu chay pytest tests/test_creative_shape.py tests/test_frame_f1.py -q: 66 passed. Khong tin test khai san: tu do lai tung dai luong. Finding HIGH cua r002 (cond Jacobi mu voi suy bien nam tren duong cheo) da bit dung cach - unit_scale chia rieng DOF xoay cho characteristic_length thay vi chia cho can bac hai duong cheo, nen giu duoc tuong phan do cung. V-truss N1(0,0)-N2(5,h)-N3(10,0) hai dau co dinh Fy=-10 kN: h=0.5 cond=1.000000e+02 CONVERGED; h=0.05 cond=1.000000e+04 CONVERGED; h=0.005 cond=1.000000e+06 MODEL_LIMIT_EXCEEDED; h=5e-6 cond=1.000000e+12 MODEL_LIMIT_EXCEEDED. r002 cho cond=1.0 khong doi o ca bon va gan CONVERGED toan PASS. Khong con ca nao CONVERGED-toan-PASS. De co lap cond khoi guard chuyen vi, toi tang A giu ty so chuyen vi 1.25e-4 va CONVERGED: cond van di 1e2-1e4-1e6-1e8 khi h giam, chung to check co rang that chu khong bi F1-SMALL-DISPLACEMENT che. Bat bien dong dang o scale 0.01, 1, 100 voi A->s^2A va I->s^4I: console phang cond=1.267591879244e+04 giong het ba lan, V-truss cond=1.000000000000e+04 giong het ba lan - bat bien theo ti le VA nhay voi gan-co-cau cung dung. Co cau khong hoi quy: B2 va B deu UNSTABLE_MODEL; tam giac truss thieu goi (moi duong cheo duong) bi kiem hang bat o rank=3. Benchmark tu tinh trung nghiem dong den ~10 chu so, phan luc 12.5/12.5. solver_source_digests khop bytes that va doi khi source drift. validate_frame_result tai tinh result_sha256 tren toan payload nen chan het chin phep gia mao gom lat F1-SMALL-DISPLACEMENT FAIL->PASS va MODEL_LIMIT_EXCEEDED->CONVERGED. Schema 0 lan feasible/verified/design_pass, claim IDEA, design_verdict_authority NONE. Basis khai trung thuc cond thuoc ma tran da phi thu nguyen hoa va nguong 0.05 la bien applicability nghien cuu. Full suite chi con 5 loi provenance BRD-036 tien ton tai, khong lien quan task nay. APPROVE."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_frame_f1.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

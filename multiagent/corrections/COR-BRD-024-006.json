@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-024-006",
+  "task_id": "BRD-024",
+  "incident_id": "INC-BRD-024-006",
+  "agent_id": "opencode",
+  "role": "evidence_safety_auditor",
+  "summary": "Provenance correction cho docs/runtime_capability_matrix.md: ban cu (hash da ky) duoc snapshot bat bien; trang thai hien tai la ket qua cong viec da accept tiep theo.",
+  "original_handoff_path": "multiagent/handoffs/BRD-024.codex.r001.json",
+  "original_handoff_sha256": "8f5c687b189e5d90304e6445871d90ea8e91b76f4e60ea9da6c75d902c4e3ce2",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f.blob",
+    "sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f"
+  },
+  "corrected_artifact": {
+    "path": "docs/runtime_capability_matrix.md",
+    "previous_sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f",
+    "current_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [],
+  "supersedes_correction_sha256": null
+}

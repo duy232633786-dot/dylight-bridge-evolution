@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "handoff_sha256": "a1cd9c0a0a6401c5ce639a8d94fc28b519885aa62acc8b5a9a27a25c7a4a8443",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Geometry khong bao dam containment, family khong khop endpoint/do doc suon, va UI co the sao chep output stale; do do topology va du lieu fabrication L0 chua trung thuc."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task o claim IDEA/production_l0_only, khong mo solver va khong phat verdict chiu luc; G2 khong phai required gate."
+    }
+  ],
+  "notes": "Independent review tren live bytes: REVISE. Hash 10/10 khop handoff. Hai lenh pytest deu NOT_RUN vi lenh python khong ton tai; day khong duoc tinh la test fail. Viec gop UI vao tab Hop PSC kieu MIDAS la chap nhan duoc va claim van IDEA, nhung G1 chua dat. | Ky thuat: CX-052-01 MAJOR: Containment chi kiem dinh. Mot input duoc chap nhan co inner edge tai z=-1.75, y=3.19545 trong khi outer boundary y=2.1, du moi dinh lo nam trong va web dinh/day deu 0.1 m.; CX-052-02 MAJOR: variable_depth_family khong bao toan endpoint nhip va khong giu do doc suon. Luong propose-to-family da loi vi web tru 0.60 m, web nhip 0.45 m lam BI1 khac nhau nhung family giu BI1 cua tru.; CX-052-03 MAJOR: JSON db/SECT thieu PSC_OPT1/PSC_OPT2 bat buoc, dong thoi tu dat USE_SHEAR_DEFORM, USE_WARPING_EFFECT, USE_SYMMETRIC va cac Auto flags ma khong co input/design-basis. Xem [MIDAS PSC manual](https://support.midasuser.com/hc/en-us/articles/35851688190105-Section-Properties-PSC).; CX-052-04 MAJOR: Output/UI gan VERIFIED_LOADS_IN_CIVIL_2022 nhung hai evidence duoc dan khong ton tai trong repo, khong co hash trong handoff; cac flag REFERENCE_ONLY va LAB_CROSS_CHECK cung khong co trong output.; CX-052-05 MAJOR: PSC-Value khong dung payload chinh thuc: code, UI va test khoa chat key Vertex va bo sung khong co vSIZE, trong khi schema/example dung VERTEX va vSIZE la required. Xem [MIDAS PSC-Value manual](https://support.midasuser.com/hc/en-us/articles/39233604772633-Section-Properties-PSC-Value).; CX-052-06 MAJOR: Khi input moi khong hop le, UI van de viewer va cac khoi copy cua lan thanh cong truoc; request khong co sequence/abort nen response cu co the ghi de input moi.; CX-052-07 MAJOR: Test mang ten route chi goi ham wrapper; xoa HTTP route mapping van co the giu test xanh. Cac regression cho hai loi hinh hoc chinh cung vang mat.; CX-052-08 MINOR: normalize_params dung bool(value), nen chuoi false thanh True; mot so ValueError nhu section_id sai kieu co the thoat khoi LabApiError.; CX-052-09 MINOR: Handoff bao 1080 pass, 0 skip tu log bi cat; log dang tai tao da hien thi it nhat 4 skip o moc 42%, nen con so khai bao khong dung. | hash_verified=True tests_run_by_reviewer=NOT_RUN | Chi tiet: .tmp/lab-review/codex_BRD-052_review_findings.json"
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "registry_version": "DYLIGHT-MODEL-APPLICABILITY-1.0.0",
+  "claim_ceiling": "SCREENED",
+  "objective_keys": [
+    "relative_cost",
+    "material_mass_t",
+    "embodied_carbon_kgCO2e"
+  ],
+  "families": {
+    "super_t_simple_v1": {
+      "allowed_study_levels": ["L0_GEOMETRY", "L1_STRUCTURAL"],
+      "allowed_analysis": [
+        { "fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1" }
+      ],
+      "anchor_gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2350,
+        "deck_slab_thickness_mm": 180,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42"
+      },
+      "section_material_kind": "PRESTRESSED_CONCRETE",
+      "domain": {
+        "span_m": { "min": 6.0, "max": 73.0 },
+        "alignment_types": ["STRAIGHT"],
+        "skew_abs_max_deg": 0,
+        "distribution": {
+          "formula_id": "TCVN11823-4_AASHTO4.6.2.2_TYPE_K_INTERIOR",
+          "spacing_mm": { "min": 1100, "max": 4900 },
+          "slab_thickness_mm": { "min": 110, "max": 300 },
+          "girder_count": { "min": 4, "max": 20 },
+          "kg_mm4": { "min": 4000000000, "max": 3000000000000 }
+        }
+      },
+      "required_site_rule_groups": ["HYDRO", "SEIS", "WIND", "GEO", "DUR"],
+      "limitations": [
+        "Chỉ dầm trong giản đơn thẳng; chưa xét dầm biên, cong, xiên hoặc xoắn.",
+        "Mất mát dự ứng lực dùng tỷ lệ gộp; chưa có phân tích theo giai đoạn."
+      ]
+    },
+    "super_t_parametric_v2": {
+      "allowed_study_levels": ["L0_GEOMETRY", "L1_STRUCTURAL"],
+      "allowed_analysis": [
+        { "fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1" }
+      ],
+      "anchor_gene": {
+        "girder_catalog_id": "ST-PARAM",
+        "girder_count": 5,
+        "girder_spacing_mm": 2400,
+        "deck_slab_thickness_mm": 200,
+        "girder_concrete_id": "C50",
+        "deck_concrete_id": "C35",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42",
+        "girder_depth_mm": 1750,
+        "top_flange_width_mm": 2050,
+        "top_flange_thickness_mm": 120,
+        "web_thickness_mm": 110,
+        "bottom_bulb_width_mm": 350,
+        "bottom_bulb_height_mm": 350
+      },
+      "section_material_kind": "PRESTRESSED_CONCRETE",
+      "domain": {
+        "span_m": { "min": 6.0, "max": 73.0 },
+        "alignment_types": ["STRAIGHT"],
+        "skew_abs_max_deg": 0,
+        "distribution": {
+          "formula_id": "TCVN11823-4_AASHTO4.6.2.2_TYPE_K_INTERIOR",
+          "spacing_mm": { "min": 1100, "max": 4900 },
+          "slab_thickness_mm": { "min": 110, "max": 300 },
+          "girder_count": { "min": 4, "max": 20 },
+          "kg_mm4": { "min": 4000000000, "max": 3000000000000 }
+        }
+      },
+      "required_site_rule_groups": ["HYDRO", "SEIS", "WIND", "GEO", "DUR"],
+      "limitations": [
+        "Miền tham số tiết diện phải qua FAB và L0 trước khi dùng công thức phân bố.",
+        "Chưa xét truyền lực, cẩu lắp, vận chuyển và mất ổn định ngang."
+      ]
+    },
+    "i_girder_parametric_v1": {
+      "allowed_study_levels": ["L0_GEOMETRY", "L1_STRUCTURAL"],
+      "allowed_analysis": [
+        { "fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1" }
+      ],
+      "anchor_gene": {
+        "girder_catalog_id": "I-PARAM",
+        "girder_count": 5,
+        "girder_spacing_mm": 2400,
+        "deck_slab_thickness_mm": 200,
+        "girder_concrete_id": "C50",
+        "deck_concrete_id": "C35",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42",
+        "girder_depth_mm": 1800,
+        "top_flange_width_mm": 1000,
+        "top_flange_thickness_mm": 180,
+        "web_thickness_mm": 200,
+        "bottom_flange_width_mm": 650,
+        "bottom_flange_thickness_mm": 300
+      },
+      "section_material_kind": "PRESTRESSED_CONCRETE",
+      "domain": {
+        "span_m": { "min": 6.0, "max": 73.0 },
+        "alignment_types": ["STRAIGHT"],
+        "skew_abs_max_deg": 0,
+        "distribution": {
+          "formula_id": "TCVN11823-4_AASHTO4.6.2.2_TYPE_K_INTERIOR",
+          "spacing_mm": { "min": 1100, "max": 4900 },
+          "slab_thickness_mm": { "min": 110, "max": 300 },
+          "girder_count": { "min": 4, "max": 20 },
+          "kg_mm4": { "min": 4000000000, "max": 3000000000000 }
+        }
+      },
+      "required_site_rule_groups": ["HYDRO", "SEIS", "WIND", "GEO", "DUR"],
+      "limitations": [
+        "Chỉ dùng công thức dầm trong loại k trong miền registry khai báo.",
+        "Chưa kiểm vùng đầu dầm, truyền lực, nâng hạ và ổn định ngang."
+      ]
+    },
+    "box_girder_parametric_v1": {
+      "allowed_study_levels": ["L0_GEOMETRY"],
+      "allowed_analysis": [],
+      "anchor_gene": {
+        "girder_catalog_id": "BOX-PARAM",
+        "girder_count": 1,
+        "girder_spacing_mm": 12000,
+        "deck_slab_thickness_mm": 250,
+        "girder_concrete_id": "C50",
+        "deck_concrete_id": "C35",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42",
+        "box_web_height_mm": 2400,
+        "box_bottom_width_mm": 6500,
+        "box_bottom_slab_mm": 250,
+        "box_web_thickness_mm": 450
+      },
+      "section_material_kind": "PRESTRESSED_CONCRETE",
+      "domain": {
+        "span_m": { "min": 6.0, "max": 73.0 },
+        "alignment_types": ["STRAIGHT"],
+        "skew_abs_max_deg": 0,
+        "distribution": null
+      },
+      "required_site_rule_groups": [],
+      "limitations": [
+        "BUILTIN_L1 không mô hình xoắn hộp, bản hộp và phân bố ngang của hộp kín.",
+        "Chỉ được nghiên cứu hình học L0 cho đến khi có grillage hoặc shell được kiểm chứng."
+      ]
+    },
+    "composite_i_girder_parametric_v1": {
+      "allowed_study_levels": ["L0_GEOMETRY"],
+      "allowed_analysis": [],
+      "anchor_gene": {
+        "girder_catalog_id": "CI-PARAM",
+        "girder_count": 5,
+        "girder_spacing_mm": 2400,
+        "deck_slab_thickness_mm": 250,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C35",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-34",
+        "steel_depth_mm": 2000,
+        "steel_top_flange_width_mm": 500,
+        "steel_top_flange_thickness_mm": 30,
+        "steel_web_thickness_mm": 20,
+        "steel_bottom_flange_width_mm": 700,
+        "steel_bottom_flange_thickness_mm": 50
+      },
+      "section_material_kind": "STEEL_COMPOSITE",
+      "domain": {
+        "span_m": { "min": 6.0, "max": 73.0 },
+        "alignment_types": ["STRAIGHT"],
+        "skew_abs_max_deg": 0,
+        "distribution": null
+      },
+      "required_site_rule_groups": [],
+      "limitations": [
+        "BUILTIN_L1 dùng sức kháng BTCT-DUL và không hợp lệ cho dầm thép liên hợp.",
+        "Chỉ được nghiên cứu hình học L0 cho đến khi có solver composite theo giai đoạn."
+      ]
+    }
+  }
+}

@@ -1,0 +1,540 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-054",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "SAGE-EvoBridge P0 audit and additive B1 evaluator/intervention slice reusing frame_f1; 1943 passed and 6 skipped; five real evidence packages; no production guard fix, memory/transfer or engineering approval claim",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/evobridge.py",
+      "sha256": "5ac2c9e59ef1a60c7aff40b6ee5dd0a1d0b34f7a41f9662079d6dce2a1abf8da",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_evobridge.py",
+      "sha256": "1f14496ee99a8b96bc258e906f4c69855e8ea8940b4c7532c15f9d1f4128ac53",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/beam_contract.json",
+      "sha256": "d134dad5aea64412b754c22056b176a52fafea6e742fcdc0dc34fd25fec7fd6a",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/BENCHMARK_BASIS.md",
+      "sha256": "49542ae5b6aeccaaebc1502f88a97de36e96513cb6556c887274bef2ade887e7",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/budget_contract.json",
+      "sha256": "e3211a7328709ec1e7a50b354a6c4309c07ef6df0845056af7853f8f1664c6e7",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/collateral_contract.json",
+      "sha256": "48d6930d19b677b2e1e405eca1ab700e941e97dce6b8091ecbdcd960da7dba43",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/CURRENT_CAPABILITY_AUDIT.md",
+      "sha256": "e4028612c20ec1b5bfae5434fa69a0693d6d670cb81e59d09464bbd357370304",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/DESIGN_RECONCILIATION.md",
+      "sha256": "a13543561c173ccf914c5cf854baa51e6fc1eb7a44f59100a5454dcb245f3c23",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/LITERATURE_REGISTER.md",
+      "sha256": "3a56ba63634e45e15f41a6eee891d23cb80e45cacebaf823498d029bdfedc866",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/REPRODUCE.md",
+      "sha256": "e22a3600c0583f0448966e5c0534a9c972469f91ac68fb96980bbe2a1b968b82",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/REQUIREMENT_TRACEABILITY.md",
+      "sha256": "e22b6008ceaa138f8b7c01e097514529f40083d23b0479cc3b5ef91954419ecd",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/ROLE_INSTRUCTIONS.md",
+      "sha256": "17fb5217bf8e4b6703387bb92c50c55ea2e7ec5340c4df8dc2324849f51a935c",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/TEST_MATRIX.md",
+      "sha256": "98e3535d3738c06560c03ac80533708c08134b35b42b85e1072ab7ca90fcd20a",
+      "kind": "report"
+    },
+    {
+      "path": "docs/sage_evobridge/unsupported_contract.json",
+      "sha256": "12376245c3c196612b8b1605e6fc2f62f81f030c124e3b549b60739e51cf7f12",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/01_design_basis_and_evidence.md",
+      "sha256": "b3b2da3bc5ecb2163e748302e6ffadcc223289db74032ca8f4602b2c343acce8",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/checkpoint_20260923_0028.json",
+      "sha256": "02045a000a9ca22d52ca026080e064ee8291b2712aa6df6b921d6772fcd62115",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/checkpoint_20260923_003004.json",
+      "sha256": "3bd644221cc4b55d46c23a7280cca38b276d242d73cc85b93e37369144ddb8e8",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/checkpoint_20260923_003004.md",
+      "sha256": "d34fd4c2210b18edaf4a0345e25a3ce5770d84c1984d932233d956bc967eec54",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/bootstrap_failures.json",
+      "sha256": "e313418c14e5b18f0c228f094f3ad818519fc3637302d3d4a26e156b8a482db3",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/contract.json",
+      "sha256": "fe7cc89433493f959567a4868370b1b5ae5918c7e06680f559a4ad0c66fc2675",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/E0_model.json",
+      "sha256": "5eae403e109b9fd258bdccc5d2626b9d9925c91ab2e2549c467cfe248543b353",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/E0_solver_raw.json",
+      "sha256": "5659ba34c7f53ef77aca7ac5d61d217ab3fe867d4c36ab0af07525753176c2f3",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/E1_model.json",
+      "sha256": "424a8ee1c344d692debd2726268ece3fe2cabf5a323adbafafce3fee388bc9a2",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/E1_solver_raw.json",
+      "sha256": "7ee3966915b1a1f42ad15a64fe9392e16a9c81a93df5b9463beefc8b7506ec11",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/environment.json",
+      "sha256": "5c1a890017b5257fe60a100599929d1888b9bc332fca4af9c703d84f583c22fa",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/manifest.json",
+      "sha256": "6bff0f2f600c48d59e63c903d70efedac7a912630bb7e4de6bda58d41bdef7ba",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/trajectory.json",
+      "sha256": "aca211a6869096225a30c4ac55365c381cb09239b6475424aa619bb3825b168b",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/budget_exhausted.stdout.log",
+      "sha256": "f80034c9b083f85ce33477d4e2be23ee56b2c55b725d1fb1bd1654ff2b5180f3",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/contract.json",
+      "sha256": "8e456b4f9c836ecbde35068250ac98ad788cdb0f41848a92b85cecf2741a0660",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/E0_model.json",
+      "sha256": "0c1ecdf71d195eb473f7ab20e1f34ef6a06589e394eb3bef1301e3d441cc1588",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/E0_solver_raw.json",
+      "sha256": "01549fd78a2d6298ab347c7964f1f02333fd6c41e676bface3905a89a0267fcd",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/E1_model.json",
+      "sha256": "f7eface56e7181d305d6000baf7e68742e450a67b0d88e64996bfa65e1cd0e6d",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/E1_solver_raw.json",
+      "sha256": "2a0e4d636e3ecace21a27196d2924742b4078da1f34dec1865a7d9bf1425f75d",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/environment.json",
+      "sha256": "5c1a890017b5257fe60a100599929d1888b9bc332fca4af9c703d84f583c22fa",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/manifest.json",
+      "sha256": "5e73e7092187f50a9ee6b9ad15097ab0c067494e87f13d52bfa545cdb6794f31",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral/trajectory.json",
+      "sha256": "2044f4815159d59c06f092ca61e80ad712a9ce7c353d7989c362158ae6fcd1bc",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/collateral.stdout.log",
+      "sha256": "c447ea3bb099f2cd3bd1565d5def3874cf5908d1b51861d3ceb7fef6eb031560",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/commands.json",
+      "sha256": "082ca7b149e7f65aab530a7740371f051d1d9a282dee81cb6df1cbc5fd3a4897",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/contract.json",
+      "sha256": "ec3b2e339093fadaaa7507590f155c44881cfb84c444c349eff282b77deb4794",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/E0_model.json",
+      "sha256": "f1fc28c5a27178a32654eaefdff7c645eb94c88e31a59d73e6ed2147a9c1298f",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/E0_solver_raw.json",
+      "sha256": "c74208babe02993e18a4ffc9632b8d98f788130616cdb2a807805794cbcfd39f",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/E1_model.json",
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/E1_solver_raw.json",
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/environment.json",
+      "sha256": "5c1a890017b5257fe60a100599929d1888b9bc332fca4af9c703d84f583c22fa",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/manifest.json",
+      "sha256": "f417783815768285111865f175249eae9f150466211abc505502d06fa904a386",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/trajectory.json",
+      "sha256": "d7651c12ddbe7885e1b5423ee2a1572c3abbb628b5110e11e2364f0a4c17b0ca",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe.stdout.log",
+      "sha256": "6b4e00e0049204c2b6cf1a76fa098f0fb3a6dd39a7ae31bf6e31f4f38153226c",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/legacy_output_guard_probe.json",
+      "sha256": "77a0d51722cfb258bc9d01a2e162df223d07aaa98fd94683be7b2122cc3122b6",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/restart_verification.json",
+      "sha256": "44e019f04abc390d4114a4f7d4799b86d96a819923239eae7de146173c441123",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/amendment.log",
+      "sha256": "a504d774579d87381a70343b7facd5cea040bd771d9f8bd77e48e9e7bdb74ab8",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/amendment_changes.json",
+      "sha256": "4f4b3ed0e93a4a9d1aee883034f87e0698b6074fb31afc869bae55064909b8b6",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/baseline_exit.txt",
+      "sha256": "cf24cebe066d6fc14449d3afcfcbc2e9da129f2a2229521490cc982d7ea32fb8",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/baseline_tests.log",
+      "sha256": "24ce9c17cd6994941ccbe1bee52278d4947e726f41bc2230ed636054f5579f9d",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/claim.json",
+      "sha256": "027bfb96a344f55c2a03977294566404cc322f49c2567517c2b61d39949da972",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop.json",
+      "sha256": "842b0421aff1f2ca76e8ab566f8c9658afabd04d9372df51b8a8aebdbc7873d5",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop.log",
+      "sha256": "248c8978430cb762396a1ce78fdcd8d02c332d1d82c90c15950c73101fbc7ae1",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop_exit.txt",
+      "sha256": "c1e97067c5f479a44a6f57297a0a8f87a59d181c3c529910f8bf059094bc3abb",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_solver_failure.json",
+      "sha256": "3f970867b8caa15b17790af4956f50f86f1215d7094d0e8a0bb43e5a6ec6e9b1",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_solver_failure_exit.txt",
+      "sha256": "cf24cebe066d6fc14449d3afcfcbc2e9da129f2a2229521490cc982d7ea32fb8",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_01.log",
+      "sha256": "f11f13ea28971a7349b29b24a15ddfce1d6760b772b29a796198f4b676383eff",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_02.log",
+      "sha256": "fb093438148a5832e757bb521ab1d94ab451155e51440f937ec068f00cbf39b0",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_03.log",
+      "sha256": "a3e0e68eab8d092351c69bcb5a7d5f454b636671edace0399ef09cea08bc33a7",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/git_status_before.txt",
+      "sha256": "fa5d4637bb48d5da8a86e77e654317e18d29f4950f86611cfc33c7e2d95244af",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/intake.json",
+      "sha256": "425388900ca3a50a69c6e11399c7b2931c6c69a8508f5a38f734043d4aa5ecd8",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/lab_validate_pre_handoff.json",
+      "sha256": "3beb66242479929040d99fbbb9bb062502deca16fd71ab739a5ed0276d44e1f2",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/path_diagnostic.log",
+      "sha256": "420148db9e0b69209165e34674193ac580cc29b79b121aeba98eef98d79c0cbe",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/regression_exit.txt",
+      "sha256": "c1e97067c5f479a44a6f57297a0a8f87a59d181c3c529910f8bf059094bc3abb",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/regression_tests.log",
+      "sha256": "a41c11dd3b8799de01ca9710794c3fdb6f6f23b6828188fded8ac85c2a34bb8e",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/session_logs/tracked_before.patch",
+      "sha256": "142f952a3f5c66d6271f7e4392ee727e59a0968eabfc647e8adf7bbdb2cb5f2a",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/104754afdcb4d29daec64d4359bfe74e57661f65620d1c129aa0cfe969311dd9.blob",
+      "sha256": "104754afdcb4d29daec64d4359bfe74e57661f65620d1c129aa0cfe969311dd9",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/15bce3cbf61e934ff995ee30e6d2a625eb9662a90213bc3a25600b5ef60caa30.blob",
+      "sha256": "15bce3cbf61e934ff995ee30e6d2a625eb9662a90213bc3a25600b5ef60caa30",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/1ebbd5defb47b58eb5eb9171d28c52b1db721c10c2fbfefe083f86fba756720c.blob",
+      "sha256": "1ebbd5defb47b58eb5eb9171d28c52b1db721c10c2fbfefe083f86fba756720c",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/49542ae5b6aeccaaebc1502f88a97de36e96513cb6556c887274bef2ade887e7.blob",
+      "sha256": "49542ae5b6aeccaaebc1502f88a97de36e96513cb6556c887274bef2ade887e7",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/5ac2c9e59ef1a60c7aff40b6ee5dd0a1d0b34f7a41f9662079d6dce2a1abf8da.blob",
+      "sha256": "5ac2c9e59ef1a60c7aff40b6ee5dd0a1d0b34f7a41f9662079d6dce2a1abf8da",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/dec3fd14dba159818bd2a0bd73bec9d7acf57cd04b8d2bc3d7dbcab6dc73ed80.blob",
+      "sha256": "dec3fd14dba159818bd2a0bd73bec9d7acf57cd04b8d2bc3d7dbcab6dc73ed80",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/e6095806298ef81dbac7544895a624000342faa33db959d0f629167063ed1597.blob",
+      "sha256": "e6095806298ef81dbac7544895a624000342faa33db959d0f629167063ed1597",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/source_snapshots/index.json",
+      "sha256": "054002c292ed38bd0c072bbc8e2369b03414af387268801a107f91fe38081aac",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/contract.json",
+      "sha256": "ec3b2e339093fadaaa7507590f155c44881cfb84c444c349eff282b77deb4794",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/E0_model.json",
+      "sha256": "f1fc28c5a27178a32654eaefdff7c645eb94c88e31a59d73e6ed2147a9c1298f",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/E0_solver_raw.json",
+      "sha256": "c74208babe02993e18a4ffc9632b8d98f788130616cdb2a807805794cbcfd39f",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/E1_model.json",
+      "sha256": "97e62e4688f6d6530d0a758db065454374e0f4d3c02892ac47abc3738617b04d",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/E1_solver_raw.json",
+      "sha256": "312ca02cee3699b9cd5547564f69a0f3e7a800357f1e06026959e6a448f87ecc",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/E2_model.json",
+      "sha256": "b76864dacf95ddd9c5ac13359a0fcae4c79f223f00bb12aeacbf04768453feff",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/E2_solver_raw.json",
+      "sha256": "97bc0d108cbc30fa34a00a66cd2a445ba96b3f29cc19fd656dea0220c1111e90",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/environment.json",
+      "sha256": "5c1a890017b5257fe60a100599929d1888b9bc332fca4af9c703d84f583c22fa",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/manifest.json",
+      "sha256": "217e4ac9d5ab3c0528df49ca03e1046fdd29e2731d9e9f48cfc01efc307759c3",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success/trajectory.json",
+      "sha256": "d1a2c9919df955603d6b96942aacc286c102fba183779764048f0480b70ff749",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/success.stdout.log",
+      "sha256": "568cc31e38e03fc1ff0fcffa40f8f05782c48af307b0c647071361e7cbd2a641",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported/contract.json",
+      "sha256": "fbcfcaa8269ac6fcd9382baa8c91f854038e8b8fd0d9c7de2095daf53a280572",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported/E0_model.json",
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported/E0_solver_raw.json",
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported/environment.json",
+      "sha256": "5c1a890017b5257fe60a100599929d1888b9bc332fca4af9c703d84f583c22fa",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported/manifest.json",
+      "sha256": "4a8e3c061bf25c58da9fa7faf7ab74ec8621f77555fc1f84eaf43d03b2570ab3",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported/trajectory.json",
+      "sha256": "dd8aa61d1207c144e65e4deb96cd9882525c92c75f1d63b379f29728b3b520e5",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/evidence/unsupported.stdout.log",
+      "sha256": "ee14f5bfa380cbb91b7181ca05b0dfd4e74af46d47a730cd41a3b7bb52481fc3",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/independent_review.md",
+      "sha256": "6e72c55d12d3b77d5918ebb2102c11b49ee35cfd390290d65dea8283d302b1e1",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/MASTER_PROMPT.md",
+      "sha256": "45f7654c6839dfbb0ad002e079b0511517b537a6d6e01b19d15a47219e6be794",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/session_metadata.json",
+      "sha256": "556fac1c088139a814f64e7652aae0ce925d4df689eaee15cb6eea2b8a11827e",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260922-74117064/session_manifest.json",
+      "sha256": "2f963a4308cdee0e2b66bc76e6efc3f6d46449e84e7104713330669ce6770c48",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "All limits and material inputs in B1 are invented BENCHMARK_CONSTRAINT research data; linear 2D nodal self weight only"
+  ],
+  "unresolved_risks": [
+    "Original production evaluate_candidate still has confirmed invalid-output false-feasible gap; two proposal sources missing; A/B gate and memory/transfer pending; six tests skipped"
+  ],
+  "next_action": "Independent software evidence review; then provenance-safe central production output guard and existing design_loop integration"
+}

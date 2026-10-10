@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-01",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "r003 tích hợp đề bài DOCX 6 trang, phân lớp dữ liệu học thuật và giữ G0 FAIL cho hybrid 650 m",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260901-00fd963d/01_design_basis_and_evidence.md",
+      "sha256": "9aa77cda74dad84e9bd1418bf78deabb62f6af3b6d495094628883e90ba54ad6",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Đề bài PSC 45+75+45 m là benchmark học thuật tách biệt, không phải design basis của hybrid 650 m"
+  ],
+  "unresolved_risks": [
+    "Site, tĩnh không được duyệt, tải/tổ hợp, động đất, khảo sát, vật liệu hybrid và solver phù hợp vẫn thiếu"
+  ],
+  "next_action": "Codex independent review r003; sau đó tiếp tục F0 load-path và hình học theo lineage hybrid riêng"
+}

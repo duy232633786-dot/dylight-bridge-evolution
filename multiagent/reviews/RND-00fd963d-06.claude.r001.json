@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-06",
+  "handoff_sha256": "1c8f85afaa0e1a57d7aafce4e0548eff3d5f08e63686cff2d11887ea655f5cbd",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Design basis hybrid 650 m chưa khóa; chuỗi khẩu độ 1440/1490/1940 m còn mâu thuẫn; datum, MNTK, khổ luồng, địa chất và tải đều MISSING_INPUT."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Không có hình học tuyệt đối, fabrication rules, dung sai hoặc access model; graph r001 còn thiếu node/cạnh gối-mố-trụ xuống ground ở nhịp phía đất liền."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Không chạy solver; ARCH_RIB_STABILITY, GRILLAGE_3D, SOLVER_OPENSEESPY, SOLVER_MIDAS_CIVIL và STAGED_PRESTRESS_EFFECTS đều ABSENT."
+    }
+  ],
+  "notes": "Claude independent review REVISE: CL-R06-01 bắt buộc bổ sung AB/PIER/BEARING và cạnh DK-LAND→support→ground cho B/D hoặc hạ connectivity; đồng thời khóa cùng chain/gối cho control D, thống nhất mốc landward tại saddle, sửa nhãn λ_AC và đăng ký các cao độ; kế thừa G0=FAIL thay vì chỉ NOT_CLAIMED."
+}

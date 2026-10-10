@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-038",
+  "handoff_sha256": "de2a31103db09814d22bc776cf580c8fb8b57f34e2a87ff5e382995cfb213e54",
+  "reviewer_id": "claude",
+  "decision": "REJECT",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Cả năm họ đều có domain_evidence PARTIAL/UNVERIFIED; probe L1 trả APP-EVIDENCE-001 trước evaluator và SITE-UNSPECIFIED tiếp tục chặn site."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Module chỉ điều phối check_geometry, chưa chứng minh đầy đủ chế tạo/vận chuyển/lắp dựng; finding r001 về mất SOLVER-* đã được sửa bằng deferred_blockers ở L0 và BLOCKED ở L1."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Registry authority neo đúng SHA-256; evaluator contract khóa schema/case/input/solver status và số liệu; site source khóa path/hash/locator; literal replay bị chặn và objective dùng mean+z*s. Claude tự chạy 15/15 test cùng khoảng 30 probe đối kháng."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Module không tự kiểm trạng thái giới hạn; evaluate_candidate và fidelity cao hơn vẫn chịu trách nhiệm."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Chưa có blind recalculation bằng analyst/solver thứ hai cho một phương án cầu thật."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có thử nghiệm vật lý hoặc calibration."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu vật liệu, suy giảm hoặc vận hành thực."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Output tối đa SCREENED, không có quyền phát hành kỹ thuật."
+    }
+  ],
+  "notes": "Claude Code Opus independent review: 4/4 artifact hashes matched, 15/15 target tests and approximately 30 adversarial probes passed; implementation is sound only as IDEA and G2 PASS, while G0/G1 genuinely FAIL. Claude initially judged the IDEA code acceptable, but canonical review_handoff correctly refused APPROVE because BRD-038 contract requires G0/G1. On explicit reconciliation Claude chose REJECT, not REVISE: the lineage contract is structurally mismatched and cannot honestly close without nonexistent design-basis/geometry evidence. Preserve r002 unchanged; carry sound code into a new IDEA lineage and open separate G0 design-basis plus guarded integration tasks."
+}

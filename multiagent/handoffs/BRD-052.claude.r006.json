@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "agent_id": "claude",
+  "role": "bim_fem_integrator",
+  "summary": "r006 BRD-052 (sau REVISE r005: 7/8 tieu chi da MET; xu ly 3 finding con lai + mot phat hien nguon moi). CX-052-16 (BLOCKER, LOI QUY TRINH CUA OWNER): owner da sua 4 artifact TRONG LUC codex dang review r005, gay drift hash. Khac phuc dung protocol, khong sua lich su: (1) dung script dao nguoc tung sua doi de dung lai DUNG bytes r005, xac minh bang SHA-256 khop ca 4 file (c662299d…, 67f887b7…, c713c7dc…, 83a768c4…); (2) ghi bytes r005 tro lai repo; (3) chay lab review de ghi quyet dinh REVISE cua codex — _ensure_artifact_snapshot chup thanh cong dung bytes recorded (may TU CHAN neu bytes sai, khong co bytes gia nao vao lich su); (4) lab validate tro lai valid: true; (5) moi dat lai ban cai tien nay thanh r006. Cam ket: khong sua artifact khi task o trang thai REVIEW. CX-052-17: NHAN trang thai MCT giu nguyen SYNTAX_UNVERIFIED dung nhu tieu chi nghiem thu (chua nap thu Civil 2022); cai tien duoc tach thanh truong RIENG syntax_provenance = OFFICIAL_MCT_HEADER_7_0_1, phat kem trong to_mct_psc va trong comment cua khoi MCT — khong con lan lon giua 'da kiem chung' va 'nguon cau truc'. CX-052-18: so lieu test lan nay dem tu log day du CUA CHINH BO BYTE r006 kem sha256. PHAT HIEN NGUON MOI (khong den tu review, do owner tu tim): ban cai MIDAS Civil tren may co san file MCT do CHINH MIDAS xuat 'C:/Program Files/MIDAS/midas Civil/Tutorial/18 LRB for non- linear_Structural Model.mct' (MCT 7.0.1, sha256 87eedea6…), dau khoi *SECTION la BANG CU PHAP day du. Khoi PSC gom 8 DONG: (1) iSEC, TYPE, SNAME, [OFFSET]7, bSD, [bWE], SHAPE; (2) OPT1, OPT2, [JOINT]8; (3) bSHEARCHK, [SCHK]4, [WT]8, WIDTH, bSYM, bSIDEHOLE; (4) bUSERDEFMESHSIZE, MESHSIZE, bUSERINPSTIFF; (5-8) [SIZE-A]6, [SIZE-B]6, [SIZE-C]10, [SIZE-D]8. So phan tu 6/6/10/8 va JOINT 8 TRUNG KHIT 4 mang vSIZE_PSC_A..D cua API va WIDTH chinh la SWIDTH — hai nguon doc lap xac nhan lan nhau. to_mct_psc da viet lai theo dung cau truc nay (dinh dang cu la suy doan va SAI); dong 1 dung bien the Civil 2022 (them bWE, suy tu file DBUSER da nap thanh cong that) va ghi kem dong 1 thay the cho 7.0.1 trong comment de doi dung mot dong neu Command Shell bao loi. Them ca kiem chuan doc lap: mo hinh chinh hang '14 PSC Design (AASHTO)_completed model.mcb' (sha256 74222933…) chua mat cat 'Span' SHAPE 1CEL; 30 float64 tai byte 31032 giai ma DUNG theo [SIZE-A]6+[SIZE-B]6+[SIZE-C]10+[SIZE-D]8: H = 0.2+0.3+2.5 = 3.00 m = HI1+..+HI5, rong dinh 8.5 m, day 4.5 m, khop JO1/JI1/JI3/JI5 — preset midas_tutorial14_psc_aashto, la ca DUY NHAT co JI3 that (suon trong thang dung tu BI1 2.2 xuong JI3 roi vat toi BI3 1.932). Test moi: test_official_mcb_reference_section_with_real_ji3 (tai lap 4 mang + diem khop) va test_mct_psc_block_follows_official_midas_header (kiem sha256 file MCT nguon, dung 8 dong du lieu, dem truong [13, 10, 16, 3, 6, 6, 10, 8], WIDTH = vSIZE_PSC_A[0], dong thay the 7.0.1 thieu dung 1 truong, ca 2CELL). Full suite: 1884 pass, 4 skip, 0 fail, pytest exit 0 (dem tu log day du .tmp/lab-review/full_suite_r006.txt, sha256 900462efe10e40f0a05d3b1c14bd304ae57a9cd19c8bcc181fd1dd14eaa2d092).",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G1"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/midas_section.py",
+      "sha256": "0fd9cd400f24cd631e03de42567570521b9fed42e0244b29f654de6e3b4fae03",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/midas_psc_section.schema.json",
+      "sha256": "06571a5c778d77108cd988422cec67a8ff3f7abdbe5b365fa68db853f5560e03",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/midas_psc_section_basis.json",
+      "sha256": "aa9e21e23c055f7cae2e2cea9a697d94bdebefac6836825b81cc54bcf43395d7",
+      "kind": "code"
+    },
+    {
+      "path": "docs/08_midas_section_bridge.md",
+      "sha256": "f7a72f29b2e3d1298d143fdcec57afdea18732d93b1f20bbab43dfae910b6a2c",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_midas_section.py",
+      "sha256": "7bd6c55ac71c4f5c6dbb0fa5c8fbb8f0b219284d53ad4da6500b3d4b3bcc9276",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/midas_section.html",
+      "sha256": "74d740868e8c08847925e0ec0d42dcd4d1d6111f59757dd532e5388670e8f670",
+      "kind": "code"
+    },
+    {
+      "path": "scripts/serve_lab.py",
+      "sha256": "e8c1e9ea123ef44076dfff23a1e6a6b653b74b019b126c56a08a3221dc2463f3",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/lab.html",
+      "sha256": "6f225e4cdaeb14a9ef30cb7b97d90f9d3260a7c471b4dc70ec428f412410e63d",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/lab.js",
+      "sha256": "647feabb4d508a7e3d15f2baf2c9d977f5b6f4d98e963117918a2963d106a4c0",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/lab.css",
+      "sha256": "9de200a585559828b2c4baadcf23027f4b294eea5e556a0bfc0497b1f6c3664f",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Cau truc 8 dong cua khoi MCT PSC lay tu bang cu phap MIDAS tu ghi (MCT 7.0.1) — khong con suy doan; nhung dong 1 bien the Civil 2022 (them bWE) la SUY LUAN tu delta giua file 7.0.1 va file DBUSER da nap thanh cong tren Civil 2022",
+    "Bo tham so mat cat 'Span' doc tu .mcb bang giai ma float64 tai offset co dinh — dung cho ca kiem chuan hinh hoc, khong dung de suy ra dinh dang file .mcb",
+    "Quy uoc huong do kich thuoc phu van theo hinh guide PSC Viewer trong tutorial chinh hang; 2CELL (BI4 = nua day suon giua) van la gia dinh",
+    "Khi HI1+..+HI5 khac H, lab ve/tinh/xuat deu dung HI3 hieu dung; HI3 go vao giu trong params.dims va bao hi3_adjusted"
+  ],
+  "unresolved_risks": [
+    "Khoi MCT PSC VAN CHUA duoc nap thu tren Civil 2022: nhan van la SYNTAX_UNVERIFIED. Chi cau truc dong la co nguon chinh hang",
+    "Module chi sinh hinh hoc va du lieu nhap; khong kiem chiu luc, khong cap DUL/cot thep/giai doan thi cong; de xuat tham so la IDEA trong mien 40-250 m x 6-16 m",
+    "Bon file dung chung voi BRD-051 (serve_lab.py, lab.html, lab.js, lab.css) duoc bam o day; BRD-051 khi nop se bam cung bytes",
+    "Bai hoc quy trinh da ghi vao memory: khong sua artifact khi task dang o REVIEW; neu lo tay thi dung lai bytes cu va xac minh bang SHA-256 truoc khi ghi review"
+  ],
+  "next_action": "Independent review r006 by codex; sau do nguoi dung dan khoi MCT PSC vao Tools > MCT Command Shell (mo hinh trong) tren Civil 2022 de dua co tu SYNTAX_UNVERIFIED len VERIFIED"
+}

@@ -1,0 +1,712 @@
+"""Kernel F1 khung/giàn phẳng đàn hồi tuyến tính bằng độ cứng trực tiếp.
+
+Đây là công cụ phân tích nghiên cứu, không phải verifier thiết kế. Kernel chỉ
+giải mô hình chuyển vị nhỏ 2D với phần tử khung Euler-Bernoulli và thanh giàn
+chịu dọc trục. Không có P-Delta, mất ổn định, vật liệu phi tuyến, tải động, mỏi,
+liên kết, móng hoặc giai đoạn thi công. Output luôn ``claim_level=IDEA`` và
+``design_verdict_authority=NONE``; schema cố ý không có ``feasible``.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+from copy import deepcopy
+from pathlib import Path
+
+import jsonschema
+import numpy as np
+
+from . import CONTRACTS_DIR, REPO_ROOT
+
+
+SOLVER_ID = "DIRECT_STIFFNESS_2D"
+SOLVER_VERSION = "frame-f1/0.2.0"
+ANALYSIS_FIDELITY = "F1_LINEAR_ELASTIC_2D"
+CLAIM_LEVEL = "IDEA"
+DESIGN_VERDICT_AUTHORITY = "NONE"
+
+_MODEL_SCHEMA = CONTRACTS_DIR / "frame_f1_model.schema.json"
+_RESULT_SCHEMA = CONTRACTS_DIR / "frame_f1_result.schema.json"
+_BASIS_PATH = REPO_ROOT / "docs" / "design_basis" / "frame_f1_basis.json"
+_DOF_NAMES = ("ux", "uy", "rz")
+_SOLVER_SOURCE_PATHS = (
+    ("bridge_evolution/frame_f1.py", Path(__file__).resolve()),
+    ("bridge_evolution/__init__.py", Path(__file__).resolve().parent / "__init__.py"),
+)
+
+
+class FrameF1Error(ValueError):
+    """Mô hình hoặc kết quả F1 vi phạm contract/provenance."""
+
+
+def _canonical(value: object) -> str:
+    try:
+        return json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as exc:
+        raise FrameF1Error(f"Dữ liệu không thể canonical JSON: {exc}") from exc
+
+
+def _sha256_json(value: object) -> str:
+    return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
+
+
+def _solver_source_digests() -> list[dict]:
+    """Neo đúng bytes của các module cục bộ quyết định kernel và đường dẫn dữ liệu."""
+    digests = []
+    for label, path in _SOLVER_SOURCE_PATHS:
+        if not path.is_file():
+            raise FrameF1Error(f"Không tìm thấy source của solver: {label}")
+        digests.append({"path": label, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return digests
+
+
+def _solver_source_sha256() -> str:
+    return _sha256_json(_solver_source_digests())
+
+
+def _read_json(path: Path, label: str) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise FrameF1Error(f"Không đọc được {label}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise FrameF1Error(f"{label} phải là JSON object")
+    return value
+
+
+def load_frame_basis() -> dict:
+    basis = _read_json(_BASIS_PATH, "frame F1 basis")
+    if basis.get("solver_version") != SOLVER_VERSION:
+        raise FrameF1Error("solver_version trong basis không khớp runtime")
+    if basis.get("claim_ceiling") != CLAIM_LEVEL:
+        raise FrameF1Error("Basis không được nâng claim khỏi IDEA")
+    if basis.get("analysis_fidelity") != ANALYSIS_FIDELITY:
+        raise FrameF1Error("analysis_fidelity trong basis không khớp runtime")
+    if basis.get("design_verdict_authority") != DESIGN_VERDICT_AUTHORITY:
+        raise FrameF1Error("Basis phải khai design_verdict_authority=NONE")
+    guards = basis.get("numerical_guards")
+    required_guards = {
+        "loaded_unmodeled_dof_relative_tolerance",
+        "max_scaled_condition_number",
+        "equilibrium_relative_tolerance",
+        "energy_relative_tolerance",
+        "minimum_element_length_m",
+    }
+    if not isinstance(guards, dict) or set(guards) != required_guards:
+        raise FrameF1Error("numerical_guards trong basis thiếu hoặc thừa khóa")
+    if any(
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or value <= 0.0
+        for value in guards.values()
+    ):
+        raise FrameF1Error("Mọi numerical guard phải hữu hạn và > 0")
+    limitations = basis.get("explicit_limitations")
+    if not isinstance(limitations, list) or not limitations or not all(
+        isinstance(item, str) and item.strip() for item in limitations
+    ):
+        raise FrameF1Error("Basis phải có explicit_limitations không rỗng")
+    expected_sources = [label for label, _path in _SOLVER_SOURCE_PATHS]
+    if basis.get("solver_source_files") != expected_sources:
+        raise FrameF1Error("solver_source_files trong basis không khớp runtime")
+    observed_solver_sha256 = _solver_source_sha256()
+    if basis.get("solver_source_sha256") != observed_solver_sha256:
+        raise FrameF1Error(
+            "solver_source_sha256 trong basis không khớp bytes runtime: "
+            f"expected={basis.get('solver_source_sha256')}, observed={observed_solver_sha256}")
+    return basis
+
+
+def _source_path(source_ref: object) -> Path | None:
+    if not isinstance(source_ref, str) or not source_ref.strip():
+        return None
+    supplied = Path(source_ref.split("#", 1)[0])
+    if supplied.is_absolute():
+        return None
+    resolved = (REPO_ROOT / supplied).resolve(strict=False)
+    try:
+        resolved.relative_to(REPO_ROOT.resolve())
+    except ValueError:
+        return None
+    return resolved if resolved.is_file() else None
+
+
+def _source_digests(model: dict) -> list[dict]:
+    refs = {
+        item["source_ref"] for item in model.get("materials", []) if isinstance(item, dict) and "source_ref" in item
+    }
+    refs.update(
+        item["source_ref"] for item in model.get("sections", []) if isinstance(item, dict) and "source_ref" in item
+    )
+    refs.update(
+        item["source_ref"] for item in model.get("load_cases", []) if isinstance(item, dict) and "source_ref" in item
+    )
+    digests = []
+    for source_ref in sorted(refs):
+        path = _source_path(source_ref)
+        if path is None:
+            raise FrameF1Error(f"source_ref không tồn tại trong repo hoặc vượt biên: {source_ref}")
+        digests.append({
+            "source_ref": source_ref,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        })
+    return digests
+
+
+def _schema_errors(instance: dict, schema_path: Path) -> list[str]:
+    schema = _read_json(schema_path, schema_path.name)
+    jsonschema.Draft202012Validator.check_schema(schema)
+    errors = sorted(
+        jsonschema.Draft202012Validator(schema).iter_errors(instance),
+        key=lambda error: list(error.absolute_path),
+    )
+    return [
+        f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+        for error in errors
+    ]
+
+
+def _unique_index(items: list[dict], label: str) -> dict[str, dict]:
+    result: dict[str, dict] = {}
+    for item in items:
+        item_id = item["id"]
+        if item_id in result:
+            raise FrameF1Error(f"{label} trùng id: {item_id}")
+        result[item_id] = item
+    return result
+
+
+def _loaded_nodes_reach_support(model: dict, nodes: dict[str, dict]) -> None:
+    adjacency = {node_id: set() for node_id in nodes}
+    for element in model["elements"]:
+        adjacency[element["node_i"]].add(element["node_j"])
+        adjacency[element["node_j"]].add(element["node_i"])
+    supports = {support["node_id"] for support in model["supports"]}
+    reached = set(supports)
+    frontier = list(supports)
+    while frontier:
+        current = frontier.pop()
+        for neighbour in adjacency[current] - reached:
+            reached.add(neighbour)
+            frontier.append(neighbour)
+    for case in model["load_cases"]:
+        loaded = {
+            load["node_id"] for load in case["nodal_loads"]
+            if any(abs(float(load[key])) > 0.0 for key in ("fx_kN", "fy_kN", "mz_kNm"))
+        }
+        if not loaded:
+            raise FrameF1Error(f"Load case {case['id']} không có tải khác 0")
+        missing = sorted(loaded - reached)
+        if missing:
+            raise FrameF1Error(
+                f"Load case {case['id']}: nút tải không có đường tới gối: {missing}")
+
+
+def validate_frame_model(model: dict) -> list[dict]:
+    """Kiểm schema, topology và provenance; trả source digests nếu hợp lệ."""
+    if not isinstance(model, dict):
+        raise FrameF1Error("Frame F1 model phải là object")
+    _canonical(model)  # từ chối NaN/Infinity trước jsonschema
+    errors = _schema_errors(model, _MODEL_SCHEMA)
+    if errors:
+        raise FrameF1Error("Frame F1 model sai schema: " + "; ".join(errors[:16]))
+
+    nodes = _unique_index(model["nodes"], "node")
+    materials = _unique_index(model["materials"], "material")
+    sections = _unique_index(model["sections"], "section")
+    _unique_index(model["elements"], "element")
+    load_cases = _unique_index(model["load_cases"], "load_case")
+    del load_cases
+
+    support_nodes: set[str] = set()
+    for support in model["supports"]:
+        node_id = support["node_id"]
+        if node_id not in nodes:
+            raise FrameF1Error(f"Support tham chiếu node không tồn tại: {node_id}")
+        if node_id in support_nodes:
+            raise FrameF1Error(f"Support trùng node_id: {node_id}")
+        support_nodes.add(node_id)
+
+    basis = load_frame_basis()
+    min_length = float(basis["numerical_guards"]["minimum_element_length_m"])
+    for element in model["elements"]:
+        node_i, node_j = element["node_i"], element["node_j"]
+        if node_i not in nodes or node_j not in nodes:
+            raise FrameF1Error(f"Element {element['id']} tham chiếu node mồ côi")
+        if element["material_id"] not in materials:
+            raise FrameF1Error(f"Element {element['id']} tham chiếu material mồ côi")
+        if element["section_id"] not in sections:
+            raise FrameF1Error(f"Element {element['id']} tham chiếu section mồ côi")
+        dx = float(nodes[node_j]["x_m"]) - float(nodes[node_i]["x_m"])
+        dy = float(nodes[node_j]["y_m"]) - float(nodes[node_i]["y_m"])
+        if math.hypot(dx, dy) <= min_length:
+            raise FrameF1Error(f"Element {element['id']} zero-length hoặc quá ngắn")
+
+    for case in model["load_cases"]:
+        seen_load_nodes: set[str] = set()
+        for load in case["nodal_loads"]:
+            node_id = load["node_id"]
+            if node_id not in nodes:
+                raise FrameF1Error(f"Load case {case['id']} tham chiếu node mồ côi: {node_id}")
+            if node_id in seen_load_nodes:
+                raise FrameF1Error(f"Load case {case['id']} lặp nodal load tại {node_id}")
+            seen_load_nodes.add(node_id)
+
+    _loaded_nodes_reach_support(model, nodes)
+    return _source_digests(model)
+
+
+def _frame_local_stiffness(E_kN_m2: float, area_m2: float, inertia_m4: float,
+                           length_m: float) -> np.ndarray:
+    axial = E_kN_m2 * area_m2 / length_m
+    b = 12.0 * E_kN_m2 * inertia_m4 / length_m ** 3
+    c = 6.0 * E_kN_m2 * inertia_m4 / length_m ** 2
+    d = 4.0 * E_kN_m2 * inertia_m4 / length_m
+    e = 2.0 * E_kN_m2 * inertia_m4 / length_m
+    return np.array([
+        [axial, 0.0, 0.0, -axial, 0.0, 0.0],
+        [0.0, b, c, 0.0, -b, c],
+        [0.0, c, d, 0.0, -c, e],
+        [-axial, 0.0, 0.0, axial, 0.0, 0.0],
+        [0.0, -b, -c, 0.0, b, -c],
+        [0.0, c, e, 0.0, -c, d],
+    ], dtype=float)
+
+
+def _truss_local_stiffness(E_kN_m2: float, area_m2: float, length_m: float) -> np.ndarray:
+    axial = E_kN_m2 * area_m2 / length_m
+    stiffness = np.zeros((6, 6), dtype=float)
+    stiffness[0, 0] = axial
+    stiffness[0, 3] = -axial
+    stiffness[3, 0] = -axial
+    stiffness[3, 3] = axial
+    return stiffness
+
+
+def _transformation(cosine: float, sine: float) -> np.ndarray:
+    return np.array([
+        [cosine, sine, 0.0, 0.0, 0.0, 0.0],
+        [-sine, cosine, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, cosine, sine, 0.0],
+        [0.0, 0.0, 0.0, -sine, cosine, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    ], dtype=float)
+
+
+def _assemble(model: dict) -> tuple[np.ndarray, list[dict], dict[str, int]]:
+    nodes = {node["id"]: node for node in model["nodes"]}
+    materials = {item["id"]: item for item in model["materials"]}
+    sections = {item["id"]: item for item in model["sections"]}
+    node_order = {node["id"]: index for index, node in enumerate(model["nodes"])}
+    stiffness = np.zeros((3 * len(nodes), 3 * len(nodes)), dtype=float)
+    element_cache: list[dict] = []
+
+    for element in model["elements"]:
+        i_index, j_index = node_order[element["node_i"]], node_order[element["node_j"]]
+        node_i, node_j = nodes[element["node_i"]], nodes[element["node_j"]]
+        dx = float(node_j["x_m"]) - float(node_i["x_m"])
+        dy = float(node_j["y_m"]) - float(node_i["y_m"])
+        length = math.hypot(dx, dy)
+        cosine, sine = dx / length, dy / length
+        material = materials[element["material_id"]]
+        section = sections[element["section_id"]]
+        E_kN_m2 = float(material["elastic_modulus_GPa"]) * 1_000_000.0
+        if element["kind"] == "FRAME_2D":
+            local = _frame_local_stiffness(
+                E_kN_m2, float(section["area_m2"]), float(section["inertia_m4"]), length)
+        else:
+            local = _truss_local_stiffness(E_kN_m2, float(section["area_m2"]), length)
+        transform = _transformation(cosine, sine)
+        global_element = transform.T @ local @ transform
+        dofs = np.array([
+            3 * i_index, 3 * i_index + 1, 3 * i_index + 2,
+            3 * j_index, 3 * j_index + 1, 3 * j_index + 2,
+        ], dtype=int)
+        stiffness[np.ix_(dofs, dofs)] += global_element
+        element_cache.append({
+            "element": element,
+            "dofs": dofs,
+            "local_stiffness": local,
+            "transform": transform,
+        })
+    return stiffness, element_cache, node_order
+
+
+def _constraint_mask(model: dict, node_order: dict[str, int]) -> np.ndarray:
+    constrained = np.zeros(3 * len(node_order), dtype=bool)
+    for support in model["supports"]:
+        base = 3 * node_order[support["node_id"]]
+        for offset, name in enumerate(_DOF_NAMES):
+            if support[name]:
+                constrained[base + offset] = True
+    return constrained
+
+
+def _modeled_dof_mask(model: dict, node_order: dict[str, int]) -> tuple[np.ndarray, list[dict]]:
+    """Xác định DOF thuộc formulation, không suy từ độ lớn hàng ma trận.
+
+    Mọi chuyển vị tịnh tiến đều là DOF vật lý và phải đi qua kiểm hạng, kể cả
+    khi hàng độ cứng bằng 0 do cơ cấu. Chỉ ``rz`` tại nút thuần TRUSS_2D là
+    DOF không tồn tại trong formulation và được loại có lý do tường minh.
+    """
+    modeled = np.zeros(3 * len(node_order), dtype=bool)
+    for index in range(len(node_order)):
+        modeled[3 * index] = True
+        modeled[3 * index + 1] = True
+    frame_nodes = {
+        node_id
+        for element in model["elements"] if element["kind"] == "FRAME_2D"
+        for node_id in (element["node_i"], element["node_j"])
+    }
+    for node_id in frame_nodes:
+        modeled[3 * node_order[node_id] + 2] = True
+    inverse_order = {index: node_id for node_id, index in node_order.items()}
+    excluded = [
+        {
+            "dof_index": 3 * index + 2,
+            "node_id": inverse_order[index],
+            "dof": "rz",
+            "reason": "TRUSS_ONLY_NODE_HAS_NO_ROTATIONAL_DOF",
+        }
+        for index in range(len(node_order))
+        if not modeled[3 * index + 2]
+    ]
+    return modeled, excluded
+
+
+def _load_vector(model: dict, load_case: dict, node_order: dict[str, int]) -> np.ndarray:
+    force = np.zeros(3 * len(node_order), dtype=float)
+    for load in load_case["nodal_loads"]:
+        base = 3 * node_order[load["node_id"]]
+        force[base] += float(load["fx_kN"])
+        force[base + 1] += float(load["fy_kN"])
+        force[base + 2] += float(load["mz_kNm"])
+    return force
+
+
+def _check(check_id: str, value: float | None, limit: float | None,
+           passed: bool | None, message: str) -> dict:
+    return {
+        "check_id": check_id,
+        "status": "NOT_RUN" if passed is None else "PASS" if passed else "FAIL",
+        "value": value,
+        "limit": limit,
+        "message": message,
+    }
+
+
+def _empty_diagnostics(active_count: int, free_active_count: int,
+                       condition_number: float | None = None,
+                       rank: int | None = None,
+                       excluded_dofs: list[dict] | None = None) -> dict:
+    return {
+        "condition_number": condition_number,
+        "rank": rank,
+        "active_dof_count": active_count,
+        "free_active_dof_count": free_active_count,
+        "free_residual_relative": None,
+        "force_equilibrium_relative": None,
+        "moment_equilibrium_relative": None,
+        "energy_identity_relative": None,
+        "excluded_dofs": list(excluded_dofs or []),
+    }
+
+
+def _unstable_case(load_case_id: str, issue: str, active_count: int,
+                   free_active_count: int, condition_number: float | None = None,
+                   rank: int | None = None,
+                   excluded_dofs: list[dict] | None = None) -> dict:
+    return {
+        "load_case_id": load_case_id,
+        "status": "UNSTABLE_MODEL",
+        "nodal_displacements": [],
+        "reactions": [],
+        "element_end_forces": [],
+        "max_translation_m": None,
+        "max_rotation_rad": None,
+        "diagnostics": _empty_diagnostics(
+            active_count, free_active_count, condition_number, rank, excluded_dofs),
+        "checks": [
+            _check("F1-STABILITY", condition_number, None, False, issue),
+        ],
+        "issues": [issue],
+    }
+
+
+def _equilibrium_metrics(model: dict, force: np.ndarray, reactions: np.ndarray,
+                         node_order: dict[str, int]) -> tuple[float, float]:
+    force_x = force_y = moment = 0.0
+    force_scale = moment_scale = 0.0
+    for node in model["nodes"]:
+        base = 3 * node_order[node["id"]]
+        x_m, y_m = float(node["x_m"]), float(node["y_m"])
+        fx = float(force[base] + reactions[base])
+        fy = float(force[base + 1] + reactions[base + 1])
+        mz = float(force[base + 2] + reactions[base + 2])
+        force_x += fx
+        force_y += fy
+        moment += mz + x_m * fy - y_m * fx
+        applied_fx, applied_fy, applied_mz = map(float, force[base:base + 3])
+        force_scale += abs(applied_fx) + abs(applied_fy)
+        moment_scale += abs(applied_mz) + abs(x_m * applied_fy) + abs(y_m * applied_fx)
+    force_relative = max(abs(force_x), abs(force_y)) / max(1.0, force_scale)
+    moment_relative = abs(moment) / max(1.0, moment_scale)
+    return force_relative, moment_relative
+
+
+def _solve_case(model: dict, load_case: dict, stiffness: np.ndarray,
+                element_cache: list[dict], node_order: dict[str, int],
+                constrained: np.ndarray, basis: dict) -> dict:
+    guards = basis["numerical_guards"]
+    force = _load_vector(model, load_case, node_order)
+    modeled, excluded_dofs = _modeled_dof_mask(model, node_order)
+    free_modeled = modeled & ~constrained
+    active_count = int(np.count_nonzero(modeled))
+    free_active_count = int(np.count_nonzero(free_modeled))
+    translational_dofs = np.array([
+        dof for dof in range(force.size) if dof % 3 in (0, 1)
+    ], dtype=int)
+    rotational_dofs = np.array([
+        dof for dof in range(force.size) if dof % 3 == 2
+    ], dtype=int)
+    force_scale = max(1.0, float(np.max(np.abs(force[translational_dofs]))))
+    x_values = [float(node["x_m"]) for node in model["nodes"]]
+    y_values = [float(node["y_m"]) for node in model["nodes"]]
+    characteristic_length = max(
+        1.0, max(x_values) - min(x_values), max(y_values) - min(y_values))
+    moment_scale = max(
+        1.0,
+        float(np.max(np.abs(force[rotational_dofs]))),
+        force_scale * characteristic_length,
+    )
+    inactive_tolerance = float(guards["loaded_unmodeled_dof_relative_tolerance"])
+    loaded_inactive = np.array([
+        dof for dof in np.flatnonzero(~modeled)
+        if abs(float(force[dof])) > (
+            force_scale if dof % 3 in (0, 1) else moment_scale
+        ) * inactive_tolerance
+    ], dtype=int)
+    if loaded_inactive.size:
+        issue = f"Tải đặt lên DOF tự do không có độ cứng: {loaded_inactive.tolist()}"
+        return _unstable_case(
+            load_case["id"], issue, active_count, free_active_count,
+            excluded_dofs=excluded_dofs)
+
+    free_indices = np.flatnonzero(free_modeled)
+    displacement = np.zeros_like(force)
+    condition_number = 1.0
+    rank = 0
+    if free_indices.size:
+        reduced = stiffness[np.ix_(free_indices, free_indices)]
+        diagonal = np.diag(reduced)
+        if np.any(diagonal <= 0.0) or not np.all(np.isfinite(diagonal)):
+            issue = "Ma trận độ cứng có DOF tự do không có độ cứng dương; mô hình là cơ cấu"
+            return _unstable_case(
+                load_case["id"], issue, active_count, free_active_count,
+                excluded_dofs=excluded_dofs)
+        jacobi = np.sqrt(diagonal)
+        scaled = reduced / np.outer(jacobi, jacobi)
+        singular_values = np.linalg.svd(scaled, compute_uv=False)
+        tolerance = max(scaled.shape) * np.finfo(float).eps * singular_values[0]
+        rank = int(np.count_nonzero(singular_values > tolerance))
+        if rank < scaled.shape[0] or singular_values[-1] <= 0.0:
+            issue = f"Ma trận độ cứng đã scale suy biến: rank={rank}/{scaled.shape[0]}"
+            return _unstable_case(
+                load_case["id"], issue, active_count, free_active_count, None, rank,
+                excluded_dofs)
+        condition_number = float(singular_values[0] / singular_values[-1])
+        if not math.isfinite(condition_number) or condition_number > float(guards["max_scaled_condition_number"]):
+            issue = (
+                f"Ma trận độ cứng Jacobi-scaled kém điều kiện: cond={condition_number:.6g} > "
+                f"{guards['max_scaled_condition_number']:.6g}")
+            return _unstable_case(
+                load_case["id"], issue, active_count, free_active_count,
+                condition_number if math.isfinite(condition_number) else None, rank,
+                excluded_dofs)
+        try:
+            displacement[free_indices] = np.linalg.solve(reduced, force[free_indices])
+        except np.linalg.LinAlgError as exc:
+            issue = f"Không giải được hệ tuyến tính: {exc}"
+            return _unstable_case(
+                load_case["id"], issue, active_count, free_active_count, condition_number, rank,
+                excluded_dofs)
+
+    residual = stiffness @ displacement - force
+    reactions = np.zeros_like(force)
+    reactions[constrained] = residual[constrained]
+    free_translation = [
+        dof for dof in np.flatnonzero(~constrained) if dof % 3 in (0, 1)
+    ]
+    free_rotation = [dof for dof in free_indices if dof % 3 == 2]
+    translation_residual = (
+        float(np.max(np.abs(residual[free_translation]))) / force_scale
+        if free_translation else 0.0
+    )
+    rotation_residual = (
+        float(np.max(np.abs(residual[free_rotation]))) / moment_scale
+        if free_rotation else 0.0
+    )
+    free_residual = max(translation_residual, rotation_residual)
+    force_equilibrium, moment_equilibrium = _equilibrium_metrics(model, force, reactions, node_order)
+    strain_twice = float(displacement @ stiffness @ displacement)
+    external_work = float(displacement @ force)
+    energy_relative = abs(strain_twice - external_work) / max(
+        1.0, abs(strain_twice), abs(external_work))
+    equilibrium_limit = float(guards["equilibrium_relative_tolerance"])
+    energy_limit = float(guards["energy_relative_tolerance"])
+
+    checks = [
+        _check("F1-STABILITY", condition_number, float(guards["max_scaled_condition_number"]), True,
+               "Ma trận độ cứng giảm Jacobi-scaled có đủ hạng"),
+        _check("F1-CONDITION", condition_number, float(guards["max_scaled_condition_number"]),
+               condition_number <= float(guards["max_scaled_condition_number"]),
+               "Condition number của ma trận độ cứng giảm Jacobi-scaled"),
+        _check("F1-FREE-RESIDUAL", free_residual, equilibrium_limit,
+               free_residual <= equilibrium_limit, "Residual tại DOF tự do"),
+        _check("F1-FORCE-EQUILIBRIUM", force_equilibrium, equilibrium_limit,
+               force_equilibrium <= equilibrium_limit, "Cân bằng tổng lực toàn cục"),
+        _check("F1-MOMENT-EQUILIBRIUM", moment_equilibrium, equilibrium_limit,
+               moment_equilibrium <= equilibrium_limit, "Cân bằng tổng mômen quanh gốc tọa độ"),
+        _check("F1-ENERGY-IDENTITY", energy_relative, energy_limit,
+               energy_relative <= energy_limit, "Đồng nhất 2U = F.u cho hệ tuyến tính"),
+    ]
+    status = "CONVERGED" if all(check["status"] == "PASS" for check in checks) else "NUMERICAL_FAILURE"
+    issues = [] if status == "CONVERGED" else [
+        check["message"] for check in checks if check["status"] == "FAIL"
+    ]
+
+    inverse_order = {index: node_id for node_id, index in node_order.items()}
+    nodal_displacements = []
+    for index in range(len(node_order)):
+        base = 3 * index
+        nodal_displacements.append({
+            "node_id": inverse_order[index],
+            "ux_m": float(displacement[base]),
+            "uy_m": float(displacement[base + 1]),
+            "rz_rad": float(displacement[base + 2]),
+        })
+    support_ids = {support["node_id"] for support in model["supports"]}
+    reactions_output = []
+    for node_id in model["nodes"]:
+        if node_id["id"] not in support_ids:
+            continue
+        base = 3 * node_order[node_id["id"]]
+        reactions_output.append({
+            "node_id": node_id["id"],
+            "fx_kN": float(reactions[base]),
+            "fy_kN": float(reactions[base + 1]),
+            "mz_kNm": float(reactions[base + 2]),
+        })
+    element_forces = []
+    for cached in element_cache:
+        global_displacement = displacement[cached["dofs"]]
+        local_displacement = cached["transform"] @ global_displacement
+        local_force = cached["local_stiffness"] @ local_displacement
+        element_forces.append({
+            "element_id": cached["element"]["id"],
+            "axial_i_kN": float(local_force[0]),
+            "shear_i_kN": float(local_force[1]),
+            "moment_i_kNm": float(local_force[2]),
+            "axial_j_kN": float(local_force[3]),
+            "shear_j_kN": float(local_force[4]),
+            "moment_j_kNm": float(local_force[5]),
+        })
+
+    translations = [math.hypot(item["ux_m"], item["uy_m"]) for item in nodal_displacements]
+    rotations = [abs(item["rz_rad"]) for item in nodal_displacements]
+    return {
+        "load_case_id": load_case["id"],
+        "status": status,
+        "nodal_displacements": nodal_displacements,
+        "reactions": reactions_output,
+        "element_end_forces": element_forces,
+        "max_translation_m": max(translations),
+        "max_rotation_rad": max(rotations),
+        "diagnostics": {
+            "condition_number": condition_number,
+            "rank": rank,
+            "active_dof_count": active_count,
+            "free_active_dof_count": free_active_count,
+            "free_residual_relative": free_residual,
+            "force_equilibrium_relative": force_equilibrium,
+            "moment_equilibrium_relative": moment_equilibrium,
+            "energy_identity_relative": energy_relative,
+            "excluded_dofs": excluded_dofs,
+        },
+        "checks": checks,
+        "issues": issues,
+    }
+
+
+def validate_frame_result(result: dict) -> None:
+    if not isinstance(result, dict):
+        raise FrameF1Error("Frame F1 result phải là object")
+    _canonical(result)
+    errors = _schema_errors(result, _RESULT_SCHEMA)
+    if errors:
+        raise FrameF1Error("Frame F1 result sai schema: " + "; ".join(errors[:16]))
+    payload = deepcopy(result)
+    claimed = payload.pop("result_sha256")
+    actual = _sha256_json(payload)
+    if claimed != actual:
+        raise FrameF1Error(f"result_sha256 không khớp: expected={actual}, actual={claimed}")
+
+
+def analyze_frame_model(model: dict) -> dict:
+    """Phân tích các load case độc lập; không sinh verdict thiết kế."""
+    source_digests = validate_frame_model(model)
+    basis = load_frame_basis()
+    solver_source_digests = _solver_source_digests()
+    solver_sha256 = _sha256_json(solver_source_digests)
+    model_fingerprint = {"model": model, "source_digests": source_digests}
+    stiffness, element_cache, node_order = _assemble(model)
+    constrained = _constraint_mask(model, node_order)
+    case_results = [
+        _solve_case(
+            model, load_case, stiffness, element_cache, node_order, constrained, basis)
+        for load_case in model["load_cases"]
+    ]
+    statuses = {case["status"] for case in case_results}
+    if "UNSTABLE_MODEL" in statuses:
+        status = "UNSTABLE_MODEL"
+    elif "NUMERICAL_FAILURE" in statuses:
+        status = "NUMERICAL_FAILURE"
+    else:
+        status = "CONVERGED"
+    issues = [
+        f"{case['load_case_id']}: {issue}"
+        for case in case_results for issue in case["issues"]
+    ]
+    result = {
+        "schema_version": "1.0",
+        "model_id": model["model_id"],
+        "model_sha256": _sha256_json(model_fingerprint),
+        "basis_sha256": hashlib.sha256(_BASIS_PATH.read_bytes()).hexdigest(),
+        "solver_sha256": solver_sha256,
+        "solver_source_digests": solver_source_digests,
+        "solver": {
+            "id": SOLVER_ID,
+            "version": SOLVER_VERSION,
+            "formulation": "LINEAR_EULER_BERNOULLI_FRAME_AND_AXIAL_TRUSS",
+        },
+        "analysis_fidelity": ANALYSIS_FIDELITY,
+        "claim_level": CLAIM_LEVEL,
+        "design_verdict_authority": DESIGN_VERDICT_AUTHORITY,
+        "status": status,
+        "source_digests": source_digests,
+        "load_case_results": case_results,
+        "issues": issues,
+        "limitations": list(basis["explicit_limitations"]),
+    }
+    result["result_sha256"] = _sha256_json(result)
+    validate_frame_result(result)
+    return result

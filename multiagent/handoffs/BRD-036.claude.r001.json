@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-036",
+  "agent_id": "claude",
+  "role": "bim_fem_integrator",
+  "summary": "PHA 1 khao sat 12 moi truong family tren Revit 2026 that: phat hien Revit co HAI THE GIOI dung hinh ROI NHAU (SKETCH dung FamilyItemFactory, ADAPTIVE/MASSING dung Form + diem thich ung) va chung LOAI TRU nhau — NewExtrusion nem InvalidOperationException trong family adaptive, NewReferencePoint nem FamilyContextException trong family thuong. Mo duoc 12/12 template. PHA 2 dung 4 family bang 4 phep khac nhau, kiem doc lap bang cach mo lai: DotVanhVom (SweptBlend path CONG, Structural Framing), ThanTruThuon (Blend, Structural Columns, 163.000 m3 khop cong thuc prismatoid den tung chu so), BeMong (Extrusion + void, Structural Foundations), AdaptiveHaiDiem (SweptBlendForm, FLEX dat). PHA 3 sinh 74 family theo tiet dien roi lap 621 instance adaptive thanh cau hoan chinh; bao cua ban FAMILY TRUNG KHIT ban DirectShape doi chieu: x -34..214, y -22..22, z -30..67.23. Kem thu vien bridge_evolution/revit_family/ ma hoa moi rang buoc DA DO thanh kiem tra fail-closed, 212 test xanh, chay duoc khi Revit tat.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "docs/revit_family_capability.md",
+      "sha256": "4476e328468899e76ef28ded4ba9f307b85a3363265756fbb9f56f730bfb93a4",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/revit_family/worlds.py",
+      "sha256": "a620047bcf0c02e001fb826dea6ff7a78bae8ff6807417f085162f89adf52483",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/revit_family/csharp.py",
+      "sha256": "b2ca50a6b6768823e57fa28198dd889787282ffda3167e2aee3bcb34937e9fe3",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/revit_family/sketch_family.py",
+      "sha256": "2227b0a4199d9271458e4662977f5b4bff7765ed6de33b4bf36a076eb3d432bd",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/revit_family/adaptive_family.py",
+      "sha256": "ed4454437bad848e0b8358d855bfbf8fa460910309e3d799556bada829f538e8",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/revit_family/__init__.py",
+      "sha256": "eef2662f200d12e830f64491e1ff0065217b48e199d51d7aa0241e14b0e2901c",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_revit_family.py",
+      "sha256": "d1f0c7fff65d1e9327f938d404c9d0cb36327f5d5079523ccb1fa756e991fe42",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Moi ket qua do tren Revit 2026.4 May nay, template he met trong C:\\ProgramData\\Autodesk\\RVT 2026\\Family Templates\\English. Chua kiem tren phien ban Revit khac hay may khac.",
+    "Toa do lay tu tmp/arch_massing/bars.json (621 thanh, 24 nhom, sha16 186eefc7502ac274) — do la KHOI HINH THAI F0 IDEA, khong phai thiet ke. Family dep va tham so hoa KHONG nang muc claim.",
+    "74 family duoc key theo (rong, cao). Tiet dien co dinh moi family; bien thien tiet dien doc theo mot cau kien chua duoc tham so hoa theo instance."
+  ],
+  "unresolved_risks": [
+    "VOID trong the gioi SKETCH KHONG tu cat va HONG IM LANG [S2]: NewExtrusion(false,...) tra ve doi tuong binh thuong, void nam trong file, nhung khoi khong bi khoet — chi DO THE TICH moi lo ra (200.000 dung bang 10x8x2.5). SolidSolidCutUtils tu choi hoat dong trong family SKETCH. Cach lam void cat duoc o do CHUA DO.",
+    "Template family SHIP SAN hinh hoc [S3]: Structural Framing mang theo mot Extrusion 0.150 m3. Dem GenericForm ma khong xoa truoc la dem ca rac cua template.",
+    "Family adaptive 4 DIEM CHUA DO. Skill cua chu du an ghi lai panel 4 diem dat tu dong tung bi MEO va phai lui ve DirectShape; ket qua [A5] chi ap cho 2 diem.",
+    "NewSweptBlendForm trong the gioi MASSING (Metric Mass) va NewRevolveForm CHUA DO. Muc CHUA DO trong tai lieu liet ke 7 nhom; thu vien raise NotMeasuredError cho tat ca."
+  ],
+  "next_action": "Review doc lap boi codex hoac opencode; sau do can tham so hoa tiet dien theo instance de bo di 74 family rieng le"
+}

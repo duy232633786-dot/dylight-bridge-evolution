@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-044",
+  "title": "Benchmark OpenSees độc lập cho khung vòm sáng tạo F1",
+  "research_question": "Có thể chạy cùng mô hình khung/giàn vòm sáng tạo bằng OpenSeesPy trong tiến trình độc lập, neo provenance binary/runtime và so toàn bộ response với frame_f1 bằng dung sai đăng ký trước mà không nâng claim hoặc phát hành verdict thiết kế hay không?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "BACKLOG",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "BRD-041",
+    "BRD-042",
+    "BRD-043"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "experiments/validation/opensees_frame_reference.py",
+    "experiments/validation/opensees_brd044_benchmarks.json",
+    "contracts/opensees_frame_reference.schema.json",
+    "docs/design_basis/opensees_frame_reference_basis.json",
+    "tests/test_opensees_frame_reference.py"
+  ],
+  "acceptance_criteria": [
+    "Worker OpenSees chạy trong tiến trình Python riêng và không import frame_f1, creative_shape, creative_frame_adapter, arch_action_f1 hoặc funicular_reference; chỉ nhận model JSON đóng theo contract F1 và tự kiểm ID, tham chiếu, độ dài, tải, gối cùng số hữu hạn trước khi solve",
+    "Ánh xạ đơn vị phải khóa m-kN-kN_m-GPa-m2-m4; FRAME_2D dùng elasticBeamColumn 2D Euler-Bernoulli với Linear geometric transformation, TRUSS_2D dùng Truss + Elastic uniaxial material, và mọi nút thuần truss phải khóa DOF quay không thuộc formulation",
+    "Mỗi load case phải dựng lại domain OpenSees sạch, chạy static Linear đúng một bước và trả rõ CONVERGED, SOLVER_FAILED hoặc BACKEND_UNAVAILABLE; mọi trạng thái khác CONVERGED không được có nhãn agreement",
+    "Provenance phải neo SHA-256 của worker source, Python executable, OpenSees binary, model canonical, basis và raw result; version Python, package và OpenSees engine phải xuất hiện trong artifact",
+    "Comparator phải tự chạy lại frame_f1 từ model đã khóa, so theo đúng ID toàn bộ ux/uy/rz, phản lực Fx/Fy/Mz và local end forces N/V/M hai đầu; cấm so theo vị trí mảng hoặc bỏ qua trường bằng 0",
+    "Dung sai phải đăng ký trước trong basis và dùng chuẩn hỗn hợp abs+rel abs(a-b)/(atol+rtol*max(abs(a),abs(b))); cấm percentage thuần cho giá trị gần 0, cấm thay tolerance sau khi xem kết quả",
+    "Phải tự tính cân bằng tổng thể OpenSees từ tải và phản lực theo Fx, Fy, Mz; sai khác hoặc residual vượt ngưỡng chỉ được báo DISCREPANCY_REQUIRES_RECONCILIATION, không được lấy trung bình hai solver hoặc tự chọn kết quả thuận lợi",
+    "Artifact benchmark phải chứa ít nhất thanh kéo, console, dầm giản đơn và ba topology DECK_ARCH, THROUGH_ARCH, NETWORK_ARCH sinh từ pipeline BRD-039/041; mỗi case giữ model, hai kết quả, comparison và lineage hashes",
+    "Validator phải phát hiện model/output/comparison/source/basis tamper kể cả khi outer hash được tính lại; backend rerun phải tái tạo đúng artifact số trong tolerance nhưng không phụ thuộc đường dẫn tuyệt đối được ghi trong artifact",
+    "Schema phải additionalProperties=false ở mọi object do task sở hữu, claim_level const IDEA, design_verdict_authority const NONE, technical_scope phủ định L2/design/capacity/safety và cấm feasible, verified, design_pass, utilization, safety_factor",
+    "Test phải phủ backend unavailable, worker import isolation, ba benchmark giải tích, ba topology, mixed zero/nonzero response, unstable model, solver nonzero return, ID permutation, unit/model/source tamper, tolerance tamper, raw output tamper, deterministic canonical hash và artifact drift BRD-039/040/041/042/043"
+  ],
+  "required_artifacts": [
+    "experiments/validation/opensees_frame_reference.py",
+    "experiments/validation/opensees_brd044_benchmarks.json",
+    "contracts/opensees_frame_reference.schema.json",
+    "docs/design_basis/opensees_frame_reference_basis.json",
+    "tests/test_opensees_frame_reference.py"
+  ],
+  "safety_notes": [
+    "Đây là code-verification cho mô hình đàn hồi tuyến tính 2D cùng giả thiết, không phải F2/L2, không kiểm sức kháng và không chứng minh thiết kế an toàn",
+    "Agreement giữa hai implementation không loại trừ sai chung về design basis, tải, điều kiện biên, formulation hoặc mô hình vật lý bị bỏ sót",
+    "OpenSeesPy hiện chỉ chạy được qua Python 3.12 đúng ABI; Python 3.14 phải báo BACKEND_UNAVAILABLE thay vì fallback sang frame_f1",
+    "G4 của phương án cầu chỉ có thể được xem xét sau blind review bởi analyst khác, reconciliation mọi sai khác và kiểm định phạm vi mô hình; task này không tự đánh dấu G4 PASS",
+    "Không sửa production solver, verifier, lab.py, runtime capability matrix hoặc bất kỳ artifact BRD-036 nào"
+  ],
+  "review_notes": [],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_opensees_frame_reference.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "tests/test_creative_frame_adapter.py",
+      "tests/test_arch_action_f1.py",
+      "tests/test_funicular_reference.py",
+      "tests/test_opensees_frame_reference.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

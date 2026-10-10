@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-039",
+  "handoff_sha256": "5a2875ac5b14886228f54b50dcaf17c9207a23f365003f8ae836d694f8c8f63a",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task IDEA, required_gates rỗng. Claude xác minh 4/4 hash r002 khớp và 56 regression tests đạt."
+    },
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "Các false-pass hình học r001 đã đóng: chân tied arch hợp nhất, không edge zero-length/nút trùng, transfer edge đúng DECK-ARCH, tĩnh không toàn trục và L/depth mọi edge."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Hồi quy r002: NOT_APPLICABLE được coi pass-like nhưng không bị khóa theo check_id/topology khi validate_candidate không nhận technical_profile. Claude đổi một CQD-L0-06 FAIL thành NOT_APPLICABLE, cập nhật summary state và candidate vẫn qua Python/schema để thành L0_PASSED. Domain cũng chưa biện minh exemption tied arch; API trực tiếp còn KeyError kind lạ và bỏ transfer cho DECK nằm tại x biên."
+    }
+  ],
+  "notes": "Review r002 độc lập: các lỗi hình học r001 đã đóng; còn lỗ hổng HIGH cho phép rửa FAIL thành NOT_APPLICABLE, cùng các yêu cầu fail-closed và minh bạch applicability trong findings."
+}

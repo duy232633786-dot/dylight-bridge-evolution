@@ -1,0 +1,661 @@
+"""Kiểm chứng cổng năng lực family Revit — BRD-036 Pha 2.
+
+Thư viện ``bridge_evolution.revit_family`` chỉ có MỘT lời hứa:
+**không thể sinh ra C# mà ta đã ĐO là hỏng.** File này kiểm đúng lời hứa đó,
+theo năm lớp:
+
+  1. BẢNG   — hai bảng dữ liệu khớp ``docs/revit_family_capability.md``
+              (RFC-1.1.0) từng ô, kể cả cái bẫy ``Mass.isAdaptive = False``.
+  2. CỔNG   — ``require_operation`` RAISE đúng loại lỗi cho từng cặp
+              (phép × thế giới): đã đo hỏng -> ``UnsupportedInWorldError``,
+              chưa đo -> ``NotMeasuredError``.
+  3. THÔNG ĐIỆP — lỗi phải nói được VÌ SAO và trỏ về tài liệu nguồn. Một cổng
+              chặn mà không giải thích thì người ta sẽ vòng qua nó.
+  4. SỐ     — hoán vị trục cầu -> Revit và hệ số feet, đúng từng chữ số.
+  5. MÃ C#  — bốn bất biến đã đo được kiểm TRÊN CHÍNH chuỗi sinh ra, không
+              phải bằng lời khẳng định trong docstring.
+
+Không test nào ở đây cần Revit chạy. Test duy nhất chạm đĩa (template có thật
+không) tự bỏ qua khi không ở trên máy đã đo.
+"""
+import math
+import os
+import re
+
+import pytest
+
+from bridge_evolution.revit_family import (
+    ALLOWED_CLAIM_LEVELS,
+    CAPABILITY_DOC,
+    CLAIM_LEVEL_PARAM,
+    CLAIM_STATEMENT_PARAM,
+    FT,
+    NOT_MEASURED_OPERATIONS,
+    OPERATION_ALIASES,
+    OPERATIONS,
+    TEMPLATE_ALIASES,
+    TEMPLATE_ROOT,
+    TEMPLATES,
+    ClaimCeilingError,
+    CSharpBuilder,
+    CSharpStructureError,
+    FamilyWorld,
+    ForbiddenCSharpError,
+    MeasuredStatus,
+    NonAsciiCSharpError,
+    NotMeasuredError,
+    RevitFamilyCapabilityError,
+    UnknownOperationError,
+    UnknownTemplateError,
+    UnsupportedInWorldError,
+    capability_table,
+    claim_parameters_cs,
+    cs_string,
+    family_scaffold,
+    guarded_family_scaffold,
+    m_to_ft,
+    operation_spec,
+    operation_status,
+    operations_ok_in,
+    require_operation,
+    require_operations,
+    template_exists,
+    template_path,
+    template_spec,
+    templates_in_world,
+    world_of,
+    xyz,
+)
+
+SKETCH_KEYS = (
+    "generic_model",
+    "structural_framing",
+    "structural_column",
+    "structural_foundation",
+    "generic_model_line_based",
+    "generic_model_face_based",
+)
+ADAPTIVE_KEYS = ("adaptive", "pattern_based", "curtain_panel_pattern_based")
+MASSING_KEYS = ("mass",)
+TWO_D_KEYS = ("profile_hosted", "detail_item")
+
+#: RFC-1.1.0 §1 — ánh xạ template -> thế giới, chép tay từ tài liệu.
+RFC_WORLD_MAP = {
+    **{k: FamilyWorld.SKETCH for k in SKETCH_KEYS},
+    **{k: FamilyWorld.ADAPTIVE for k in ADAPTIVE_KEYS},
+    **{k: FamilyWorld.MASSING for k in MASSING_KEYS},
+    **{k: FamilyWorld.TWO_D for k in TWO_D_KEYS},
+}
+
+#: RFC-1.1.0 §1 — category ĐO ĐƯỢC sau khi mở template.
+RFC_CATEGORY = {
+    "generic_model": "Generic Models",
+    "structural_framing": "Structural Framing",
+    "structural_column": "Structural Columns",
+    "structural_foundation": "Structural Foundations",
+    "generic_model_line_based": "Generic Models",
+    "generic_model_face_based": "Generic Models",
+    "adaptive": "Generic Models",
+    "pattern_based": "Curtain Panels",
+    "curtain_panel_pattern_based": "Curtain Panels",
+    "mass": "Mass",
+    "profile_hosted": "Profiles",
+    "detail_item": "Detail Items",
+}
+
+ALL_KEYS = tuple(RFC_WORLD_MAP)
+
+
+# =========================================================================
+# 1. BẢNG — khớp RFC-1.1.0 từng ô
+# =========================================================================
+
+def test_dung_12_template_da_do():
+    assert set(TEMPLATES) == set(ALL_KEYS)
+    assert len(TEMPLATES) == 12
+
+
+@pytest.mark.parametrize("key", ALL_KEYS)
+def test_the_gioi_va_category_khop_rfc(key):
+    assert world_of(key) is RFC_WORLD_MAP[key]
+    assert template_spec(key).category == RFC_CATEGORY[key]
+
+
+@pytest.mark.parametrize("key", ALL_KEYS)
+def test_duong_dan_template_dung_khuon_windows(key):
+    path = template_path(key)
+    assert path.startswith(TEMPLATE_ROOT + "\\")
+    assert path.lower().endswith(".rft")
+    assert "/" not in path, "đường dẫn Revit phải dùng '\\'"
+
+
+def test_mass_la_bay_isadaptive_false_nhung_van_thuoc_the_gioi_massing():
+    """Cái bẫy đắt nhất của RFC-1.1.0 §1: cờ adaptive KHÔNG đoán được thế giới."""
+    mass = template_spec("mass")
+    assert mass.is_adaptive_family is False
+    assert mass.world is FamilyWorld.MASSING
+    # và Mass vẫn dựng được form + điểm, y như thế giới ADAPTIVE
+    require_operation("NewReferencePoint", "mass")
+    require_operation("NewLoftForm", "mass")
+    require_operation("NewExtrusionForm", "mass")
+
+
+@pytest.mark.parametrize("key", ALL_KEYS)
+def test_co_adaptive_khop_rfc(key):
+    expect_true = key in ("adaptive", "pattern_based", "curtain_panel_pattern_based")
+    assert template_spec(key).is_adaptive_family is expect_true
+
+
+def test_templates_in_world_phan_hoach_du_12():
+    gom = []
+    for world in FamilyWorld:
+        gom.extend(templates_in_world(world))
+    assert sorted(gom) == sorted(ALL_KEYS)
+    assert set(templates_in_world(FamilyWorld.SKETCH)) == set(SKETCH_KEYS)
+    assert set(templates_in_world(FamilyWorld.ADAPTIVE)) == set(ADAPTIVE_KEYS)
+    assert set(templates_in_world(FamilyWorld.TWO_D)) == set(TWO_D_KEYS)
+
+
+@pytest.mark.skipif(not os.path.isdir(TEMPLATE_ROOT),
+                    reason="không ở trên máy đã đo (không có thư mục template Revit 2026)")
+@pytest.mark.parametrize("key", ALL_KEYS)
+def test_12_template_co_that_tren_dia(key):
+    """Trên máy đã đo thì 12/12 phải có thật — bảng không được chứa đường dẫn ma."""
+    assert template_exists(key), template_path(key)
+    assert template_path(key, must_exist=True)
+
+
+def test_moi_phep_ghi_du_bon_the_gioi():
+    """Không để trạng thái mặc định ngầm: thiếu một ô là thiếu một phép đo."""
+    for name, op in OPERATIONS.items():
+        assert set(op.by_world) == set(FamilyWorld), name
+
+
+def test_measured_fail_luon_kem_loi_nguyen_van():
+    for name, op in OPERATIONS.items():
+        if MeasuredStatus.MEASURED_FAIL in op.by_world.values():
+            assert op.revit_error.strip(), name
+
+
+def test_not_measured_luon_kem_ly_do():
+    for name, op in OPERATIONS.items():
+        if MeasuredStatus.NOT_MEASURED in op.by_world.values():
+            assert op.not_measured_reason.strip(), name
+
+
+def test_bi_danh_phep_va_template_deu_tro_toi_khoa_that():
+    for alias, target in OPERATION_ALIASES.items():
+        assert target in OPERATIONS
+        assert operation_spec(alias) is OPERATIONS[target]
+    for alias, target in TEMPLATE_ALIASES.items():
+        assert target in TEMPLATES
+        assert template_spec(alias) is TEMPLATES[target]
+
+
+def test_capability_table_la_du_lieu_thuan():
+    rows = capability_table()
+    assert len(rows) == len(OPERATIONS)
+    row = {r["operation"]: r for r in rows}["NewExtrusion"]
+    assert row["status_by_world"]["SKETCH"] == "MEASURED_OK"
+    assert row["status_by_world"]["ADAPTIVE"] == "MEASURED_FAIL"
+    assert row["status_by_world"]["2D"] == "MEASURED_FAIL"
+
+
+# =========================================================================
+# 2. CỔNG — require_operation raise đúng loại
+# =========================================================================
+
+def test_require_operation_tra_none_khong_tra_bool():
+    """RAISE chứ không trả bool: giá trị trả về có thể bị quên kiểm, exception thì không."""
+    assert require_operation("NewExtrusion", "generic_model") is None
+
+
+@pytest.mark.parametrize("key", SKETCH_KEYS)
+def test_newextrusion_chay_duoc_trong_moi_template_sketch(key):
+    require_operation("NewExtrusion", key)
+
+
+@pytest.mark.parametrize("key", ADAPTIVE_KEYS + MASSING_KEYS + TWO_D_KEYS)
+def test_newextrusion_bi_chan_ngoai_the_gioi_sketch(key):
+    with pytest.raises(UnsupportedInWorldError):
+        require_operation("NewExtrusion", key)
+
+
+@pytest.mark.parametrize("key", SKETCH_KEYS + TWO_D_KEYS)
+def test_newreferencepoint_bi_chan_trong_sketch_va_2d(key):
+    with pytest.raises(UnsupportedInWorldError):
+        require_operation("NewReferencePoint", key)
+
+
+@pytest.mark.parametrize("key", ADAPTIVE_KEYS + MASSING_KEYS)
+def test_newreferencepoint_chay_duoc_trong_adaptive_va_massing(key):
+    require_operation("NewReferencePoint", key)
+
+
+@pytest.mark.parametrize("op", ["NewLoftForm", "NewExtrusionForm"])
+@pytest.mark.parametrize("key", SKETCH_KEYS + TWO_D_KEYS)
+def test_form_bi_chan_ngoai_the_gioi_diem(op, key):
+    with pytest.raises(UnsupportedInWorldError):
+        require_operation(op, key)
+
+
+@pytest.mark.parametrize("op", ["NewBlend", "NewSweep", "NewSweptBlend",
+                                "NewRevolution", "NewModelCurve",
+                                "ChangeToReferenceLine", "NewReferencePlane",
+                                "NewModelText", "InclinedWorkPlane",
+                                "LoadFamily", "AddParameter", "SaveAs"])
+def test_bo_cong_cu_sketch_chay_duoc_trong_sketch(op):
+    require_operation(op, "generic_model")
+
+
+@pytest.mark.parametrize("op", sorted(NOT_MEASURED_OPERATIONS))
+@pytest.mark.parametrize("key", ["generic_model", "adaptive", "mass", "detail_item"])
+def test_phep_chua_do_bi_chan_o_moi_the_gioi(op, key):
+    with pytest.raises(NotMeasuredError):
+        require_operation(op, key)
+
+
+def test_danh_sach_chua_do_dung_bang_muc_5_cua_rfc():
+    """Mục '5. CHƯA ĐO' + NewSweptBlendForm (§3/§4) — không thiếu, không thừa.
+
+    ``HostedPointOnCurve`` nằm đây vì §3 đo được HÀNH VI của điểm hosted
+    ([A3], [A5]) nhưng KHÔNG ghi lại TÊN API tạo ra nó — đúng cái bẫy [A2].
+    """
+    assert NOT_MEASURED_OPERATIONS == frozenset({
+        "NewSweptBlendForm",
+        "NewRevolveForm",
+        "NonPlanarProfileForm",
+        "CreateAdaptiveComponentInstance",
+        "SetInstancePlacementPointElementRefIds",
+        "GetPlacementPoints",
+        "HostedPointOnCurve",
+        "NewOpening",
+        "NewModelGroup",
+        "AdaptiveComponent4Point",
+    })
+
+
+def test_newsweptblendform_la_chua_do_chu_khong_phai_absent():
+    """RFC-1.1.0 §4: đã thử và hỏng NHƯNG chưa loại trừ lỗi người gọi."""
+    with pytest.raises(NotMeasuredError) as exc:
+        require_operation("NewSweptBlendForm", "adaptive")
+    msg = str(exc.value)
+    assert "Cannot create swept blend form" in msg
+    assert "chưa loại trừ lỗi người gọi" in msg.lower() or "CHƯA loại trừ" in msg
+
+
+def test_addparameter_chua_do_trong_adaptive():
+    """Phát hiện của Pha 2: dấu claim BẮT BUỘC chưa đo được trong family adaptive."""
+    require_operation("AddParameter", "generic_model")
+    with pytest.raises(NotMeasuredError):
+        require_operation("AddParameter", "adaptive")
+
+
+def test_moi_loi_cong_deu_la_valueerror():
+    for exc_type in (UnsupportedInWorldError, NotMeasuredError,
+                     UnknownTemplateError, UnknownOperationError,
+                     RevitFamilyCapabilityError):
+        assert issubclass(exc_type, ValueError)
+
+
+def test_template_va_phep_la_thi_raise_khong_doan_mo():
+    with pytest.raises(UnknownTemplateError):
+        require_operation("NewExtrusion", "metric generic model")
+    with pytest.raises(UnknownOperationError):
+        require_operation("NewMagicSolid", "generic_model")
+    with pytest.raises(UnknownTemplateError):
+        template_spec(None)
+
+
+def test_require_operations_chan_danh_sach_rong():
+    require_operations(["NewExtrusion", "AddParameter"], "generic_model")
+    with pytest.raises(RevitFamilyCapabilityError):
+        require_operations([], "generic_model")
+    with pytest.raises(UnsupportedInWorldError):
+        require_operations(["NewReferencePoint", "NewExtrusion"], "adaptive")
+
+
+def test_operation_status_khong_raise_theo_trang_thai():
+    assert operation_status("NewExtrusion", "adaptive") is MeasuredStatus.MEASURED_FAIL
+    assert operation_status("NewLoftForm", "adaptive") is MeasuredStatus.MEASURED_OK
+    assert operation_status("NewRevolveForm", "mass") is MeasuredStatus.NOT_MEASURED
+
+
+def test_operations_ok_in_khop_voi_require_operation():
+    for key in ALL_KEYS:
+        oks = operations_ok_in(key)
+        for name in OPERATIONS:
+            if name in oks:
+                require_operation(name, key)
+            else:
+                with pytest.raises((UnsupportedInWorldError, NotMeasuredError)):
+                    require_operation(name, key)
+
+
+def test_the_gioi_2d_khong_dung_khoi_duoc():
+    for key in TWO_D_KEYS:
+        assert "NewExtrusion" not in operations_ok_in(key)
+        assert "NewLoftForm" not in operations_ok_in(key)
+
+
+# =========================================================================
+# 3. THÔNG ĐIỆP — cổng phải giải thích, nếu không người ta sẽ vòng qua
+# =========================================================================
+
+def test_loi_sai_the_gioi_dan_loi_revit_nguyen_van():
+    with pytest.raises(UnsupportedInWorldError) as exc:
+        require_operation("NewExtrusion", "adaptive")
+    msg = str(exc.value)
+    assert "not permitted in this type of family" in msg
+    assert "MEASURED_FAIL" in msg
+    assert "SKETCH" in msg
+    assert "generic_model" in msg, "phải gợi ý template thay thế"
+
+
+def test_loi_newreferencepoint_trong_sketch_dan_ten_ngoai_le():
+    with pytest.raises(UnsupportedInWorldError) as exc:
+        require_operation("NewReferencePoint", "structural_column")
+    assert "FamilyContextException" in str(exc.value)
+
+
+@pytest.mark.parametrize("op", sorted(NOT_MEASURED_OPERATIONS))
+def test_loi_chua_do_noi_ro_chua_do_va_tro_ve_tai_lieu(op):
+    with pytest.raises(NotMeasuredError) as exc:
+        require_operation(op, "adaptive")
+    msg = str(exc.value)
+    assert "CHƯA ĐO" in msg
+    assert "KHÔNG BIẾT" in msg
+    assert "Không phải 'không tồn tại'" in msg
+    assert CAPABILITY_DOC in msg
+
+
+def test_loi_template_la_liet_ke_khoa_hop_le():
+    with pytest.raises(UnknownTemplateError) as exc:
+        template_spec("khong_co_template_nay")
+    msg = str(exc.value)
+    for key in ALL_KEYS:
+        assert key in msg
+
+
+@pytest.mark.parametrize("op,dau", [
+    ("NewSweptBlend", "[S1]"),
+    ("NewBlend", "[B1]"),
+    ("NewRevolution", "[R1]"),
+    ("IsAdaptiveComponentFamily", "[A1]"),
+    ("GetPlacementPoints", "[A2]"),
+])
+def test_rang_buoc_bat_buoc_duoc_ma_hoa_thanh_du_lieu(op, dau):
+    spec = operation_spec(op)
+    blob = " ".join(spec.constraints) + " " + spec.not_measured_reason
+    assert dau in blob, f"{op} thiếu ràng buộc {dau}"
+
+
+def test_s1_noi_ro_phai_di_qua_modelcurve_reference():
+    text = " ".join(operation_spec("NewSweptBlend").constraints)
+    assert "Reference" in text and "Curve" in text
+    assert "GeometryCurve.Reference" in text
+    assert "Arc" in text, "phải ghi lại là path CONG ĐƯỢC (một đốt vòm = một phép)"
+
+
+def test_b1_va_r1_noi_ro_cai_gi_lam_hong():
+    assert "CAO ĐỘ KHÁC NHAU" in " ".join(operation_spec("NewBlend").constraints)
+    assert "trục" in " ".join(operation_spec("NewRevolution").constraints).lower()
+
+
+# =========================================================================
+# 4. SỐ — hoán vị trục và hệ số feet
+# =========================================================================
+
+def test_hang_doi_feet():
+    assert FT == 3.280839895013
+    assert m_to_ft(1.0) == FT
+    assert m_to_ft(0.0) == 0.0
+    assert math.isclose(m_to_ft(2.5), 2.5 * FT, rel_tol=0, abs_tol=0)
+
+
+def test_xyz_hoan_vi_dung_va_doi_feet():
+    """(x, y, z)_cầu -> new XYZ(x_ft, z_ft, y_ft): Revit lấy Z làm cao độ."""
+    got = xyz(1, 2, 3)
+    assert got == "new XYZ(3.280839895, 9.842519685, 6.56167979)"
+    nums = [float(v) for v in re.findall(r"-?\d+\.\d+", got)]
+    # in ra 9 chữ số thập phân: sai lệch <= 1e-9 ft ~ 0.3 nm
+    assert math.isclose(nums[0], 1 * FT, rel_tol=0, abs_tol=1e-9)
+    assert math.isclose(nums[1], 3 * FT, rel_tol=0, abs_tol=1e-9), "số giữa là NGANG cầu (z)"
+    assert math.isclose(nums[2], 2 * FT, rel_tol=0, abs_tol=1e-9), "số cuối là CAO ĐỘ (y)"
+
+
+def test_xyz_khong_doi_xung_nen_hoan_vi_sai_la_lo_ngay():
+    assert xyz(1, 2, 3) != xyz(1, 3, 2)
+    assert xyz(0, 0, 0) == "new XYZ(0.0, 0.0, 0.0)"
+
+
+def test_xyz_chan_nan_va_inf():
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError):
+            xyz(bad, 0, 0)
+        with pytest.raises(ValueError):
+            m_to_ft(bad)
+
+
+def test_so_khong_bao_gio_ra_ky_hieu_mu():
+    """C# không đọc được '1e-07' như Python in ra — literal phải là thập phân."""
+    for value in (1e-7, 1e-9, 123456.789, -0.0001):
+        text = xyz(value, value, value)
+        assert "e" not in text.lower().replace("new xyz", "")
+
+
+def test_cs_string_verbatim_va_nhan_doi_nhay():
+    assert cs_string(r"C:\a b\c.rft") == '@"C:\\a b\\c.rft"'
+    assert cs_string('say "hi"') == '@"say ""hi"""'
+    with pytest.raises(ValueError):
+        cs_string("hai\ndong")
+    with pytest.raises(NonAsciiCSharpError):
+        cs_string("có dấu")
+
+
+# =========================================================================
+# 5. MÃ C# — bốn bất biến, kiểm trên chính chuỗi sinh ra
+# =========================================================================
+
+def test_builder_thut_le_va_dong_ngoac():
+    b = CSharpBuilder()
+    b.line("int n = 0;")
+    with b.block("if (n == 0)"):
+        b.line("n = 1;")
+    code = b.build()
+    assert code == "int n = 0;\nif (n == 0)\n{\n    n = 1;\n}\n"
+
+
+def test_builder_chan_transaction_tren_document_cua_host():
+    b = CSharpBuilder()
+    with pytest.raises(ForbiddenCSharpError) as exc:
+        b.line('using (Transaction t = new Transaction(document, "x"))')
+    assert "InvalidOperationException" in str(exc.value)
+
+
+def test_builder_chan_guid_ngau_nhien():
+    with pytest.raises(ForbiddenCSharpError):
+        CSharpBuilder().line("ds.ApplicationDataId = Guid.NewGuid().ToString();")
+
+
+def test_builder_chan_dong_document_cua_host():
+    with pytest.raises(ForbiddenCSharpError):
+        CSharpBuilder().line("document.Close(false);")
+
+
+def test_builder_chan_ky_tu_co_dau():
+    with pytest.raises(NonAsciiCSharpError):
+        CSharpBuilder().line("// dựng khối")
+
+
+def test_builder_chan_nhieu_dong_trong_mot_lan_goi():
+    with pytest.raises(ValueError):
+        CSharpBuilder().line("a;\nb;")
+
+
+def test_builder_chan_ngoac_lech():
+    b = CSharpBuilder()
+    b.line("{")
+    with pytest.raises(CSharpStructureError):
+        b.build()
+
+
+def test_ngoac_trong_chuoi_hang_khong_bi_dem():
+    b = CSharpBuilder()
+    b.line('string s = "{ khong phai ngoac }";')
+    assert b.build().strip().endswith(';')
+
+
+# ------------------------------------------------------------------ scaffold
+
+TPL = template_path("generic_model")
+OUT = r"C:\Temp\dylight_test.rfa"
+BODY = ["// dung hinh o day", "double h = 1.0;"]
+
+
+def test_scaffold_mo_transaction_tren_fd_khong_phai_document():
+    """Bất biến 1 — self-check (f) của hợp đồng BRD-036."""
+    code = family_scaffold(TPL, OUT, BODY)
+    assert "new Transaction(fd" in code
+    assert "new Transaction(document" not in code
+    assert not re.search(r"new\s+Transaction\s*\(\s*document\b", code)
+
+
+def test_scaffold_regenerate_nam_trong_transaction():
+    """Bất biến 3 — Regenerate sau Commit thì Revit ném InvalidOperationException."""
+    code = family_scaffold(TPL, OUT, BODY)
+    i_regen = code.index("fd.Regenerate();")
+    i_commit = code.index("tx.Commit();")
+    i_saveas = code.index("fd.SaveAs(")
+    assert i_regen < i_commit < i_saveas
+
+
+def test_scaffold_co_du_khuon_da_kiem_chung():
+    code = family_scaffold(TPL, OUT, BODY, "DYLIGHT test")
+    for moc in ("app.NewFamilyDocument(tplPath)",
+                "SaveAsOptions",
+                "so.OverwriteExistingFile = true;",
+                "fd.Close(false);",
+                "catch (Exception ex)",
+                "System.IO.File.Exists(tplPath)",
+                "System.IO.FileInfo(outRfa)"):
+        assert moc in code, moc
+    assert code.count("fd.Close(false);") >= 2, "phải đóng cả ở nhánh catch"
+    for line in BODY:
+        assert line in code
+
+
+def test_scaffold_la_ascii_thuan():
+    """Bất biến 4 — mã đi qua MCP và console cp1252 trên máy này."""
+    code = family_scaffold(TPL, OUT, BODY)
+    code.encode("ascii")
+
+
+def test_scaffold_xac_dinh_lai_duoc():
+    assert family_scaffold(TPL, OUT, BODY) == family_scaffold(TPL, OUT, BODY)
+
+
+def test_scaffold_chan_than_ma_rong():
+    with pytest.raises(CSharpStructureError):
+        family_scaffold(TPL, OUT, [])
+
+
+def test_scaffold_chan_duoi_file_sai():
+    with pytest.raises(ValueError):
+        family_scaffold(TPL, r"C:\Temp\x.rvt", BODY)
+    with pytest.raises(ValueError):
+        family_scaffold(r"C:\Temp\x.rvt", OUT, BODY)
+
+
+def test_scaffold_chan_than_ma_gianh_transaction():
+    for xau in ("tx.Commit();", "tx.Start();", "fd.SaveAs(p, o);",
+                "fd.Regenerate();"):
+        with pytest.raises(ForbiddenCSharpError):
+            family_scaffold(TPL, OUT, ["double h = 1.0;", xau])
+
+
+def test_scaffold_chan_than_ma_mo_transaction_tren_host():
+    with pytest.raises(ForbiddenCSharpError):
+        family_scaffold(TPL, OUT, ['var t = new Transaction(document, "x");'])
+
+
+def test_scaffold_ngoac_can_bang():
+    code = family_scaffold(TPL, OUT, BODY)
+    clean = re.sub(r'"(?:[^"]|"")*"', "", code)
+    clean = "\n".join(l.split("//")[0] for l in clean.splitlines())
+    assert clean.count("{") == clean.count("}")
+
+
+# ------------------------------------------------------------------ claim
+
+def test_claim_parameters_doc_duoc_trong_revit():
+    lines = claim_parameters_cs()
+    blob = "\n".join(lines)
+    assert CLAIM_LEVEL_PARAM in blob
+    assert CLAIM_STATEMENT_PARAM in blob
+    assert "F0_IDEA" in blob
+    assert "fm.AddParameter" in blob
+    assert "fm.Set(" in blob
+    blob.encode("ascii")
+
+
+def test_claim_khong_nang_duoc_muc():
+    assert ALLOWED_CLAIM_LEVELS == frozenset({"F0_IDEA"})
+    for muc in ("F1_SCREENED", "SCREENED", "ENGINEERING_CANDIDATE", "F0-IDEA", ""):
+        with pytest.raises(ClaimCeilingError):
+            claim_parameters_cs(muc, "bat ky")
+
+
+def test_claim_chan_cau_rong():
+    with pytest.raises(ValueError):
+        claim_parameters_cs("F0_IDEA", "   ")
+
+
+def test_claim_nhan_doi_dau_nhay_khong_vo_chuoi_c_sharp():
+    blob = "\n".join(claim_parameters_cs("F0_IDEA", 'muc "F0"'))
+    assert '@"muc ""F0"""' in blob
+
+
+def test_claim_co_cong_chan_theo_template():
+    claim_parameters_cs(template_key="generic_model")
+    with pytest.raises(NotMeasuredError):
+        claim_parameters_cs(template_key="adaptive")
+
+
+# ------------------------------------------------------------------ guarded
+
+def test_guarded_sinh_duoc_family_sketch_kem_dau_claim():
+    code = guarded_family_scaffold(
+        "structural_foundation", OUT,
+        ["NewExtrusion", "AddParameter"],
+        ["// NewExtrusion o day"],
+        "DYLIGHT mong F0 IDEA")
+    assert "Metric Structural Foundation.rft" in code
+    assert CLAIM_LEVEL_PARAM in code
+    assert "new Transaction(fd" in code
+    code.encode("ascii")
+
+
+def test_guarded_chan_phep_sai_the_gioi_truoc_khi_phat_dong_nao():
+    with pytest.raises(UnsupportedInWorldError):
+        guarded_family_scaffold("adaptive", OUT, ["NewExtrusion"], ["// x"])
+
+
+def test_guarded_chan_phep_chua_do():
+    with pytest.raises(NotMeasuredError):
+        guarded_family_scaffold("adaptive", OUT, ["NewSweptBlendForm"], ["// x"])
+
+
+def test_guarded_chan_danh_sach_phep_rong():
+    with pytest.raises(RevitFamilyCapabilityError):
+        guarded_family_scaffold("generic_model", OUT, [], ["// x"])
+
+
+def test_guarded_hien_chan_ca_the_gioi_adaptive_vi_addparameter_chua_do():
+    """Chặn THẬT, không phải thiếu sót: dấu claim bắt buộc mà AddParameter
+    trong adaptive chưa ai đo. Mở khoá bằng cách ĐO, không bằng cách nới cổng."""
+    with pytest.raises(NotMeasuredError) as exc:
+        guarded_family_scaffold("adaptive", OUT,
+                                ["NewReferencePoint", "NewLoftForm"],
+                                ["// loft form o day"])
+    assert "AddParameter" in str(exc.value)

@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "frame_f1_result.schema.json",
+  "title": "FrameF1LinearElastic2DResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_id",
+    "model_sha256",
+    "basis_sha256",
+    "solver_sha256",
+    "solver_source_digests",
+    "result_sha256",
+    "solver",
+    "analysis_fidelity",
+    "claim_level",
+    "design_verdict_authority",
+    "status",
+    "source_digests",
+    "load_case_results",
+    "issues",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "model_id": { "type": "string", "pattern": "^F1M-[A-Za-z0-9._-]{1,64}$" },
+    "model_sha256": { "$ref": "#/$defs/sha256" },
+    "basis_sha256": { "$ref": "#/$defs/sha256" },
+    "solver_sha256": { "$ref": "#/$defs/sha256" },
+    "solver_source_digests": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/solver_source_digest" }
+    },
+    "result_sha256": { "$ref": "#/$defs/sha256" },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "formulation"],
+      "properties": {
+        "id": { "const": "DIRECT_STIFFNESS_2D" },
+        "version": { "const": "frame-f1/0.2.0" },
+        "formulation": { "const": "LINEAR_EULER_BERNOULLI_FRAME_AND_AXIAL_TRUSS" }
+      }
+    },
+    "analysis_fidelity": { "const": "F1_LINEAR_ELASTIC_2D" },
+    "claim_level": { "const": "IDEA" },
+    "design_verdict_authority": { "const": "NONE" },
+    "status": { "enum": ["CONVERGED", "UNSTABLE_MODEL", "NUMERICAL_FAILURE"] },
+    "source_digests": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source_digest" }
+    },
+    "load_case_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/load_case_result" }
+    },
+    "issues": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nullable_number": { "type": ["number", "null"] },
+    "source_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ref", "sha256"],
+      "properties": {
+        "source_ref": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "solver_source_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^bridge_evolution/[A-Za-z0-9_./-]+\\.py$" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "nodal_displacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "ux_m", "uy_m", "rz_rad"],
+      "properties": {
+        "node_id": { "type": "string", "minLength": 1 },
+        "ux_m": { "type": "number" },
+        "uy_m": { "type": "number" },
+        "rz_rad": { "type": "number" }
+      }
+    },
+    "reaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "fx_kN", "fy_kN", "mz_kNm"],
+      "properties": {
+        "node_id": { "type": "string", "minLength": 1 },
+        "fx_kN": { "type": "number" },
+        "fy_kN": { "type": "number" },
+        "mz_kNm": { "type": "number" }
+      }
+    },
+    "element_end_force": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "element_id",
+        "axial_i_kN",
+        "shear_i_kN",
+        "moment_i_kNm",
+        "axial_j_kN",
+        "shear_j_kN",
+        "moment_j_kNm"
+      ],
+      "properties": {
+        "element_id": { "type": "string", "minLength": 1 },
+        "axial_i_kN": { "type": "number" },
+        "shear_i_kN": { "type": "number" },
+        "moment_i_kNm": { "type": "number" },
+        "axial_j_kN": { "type": "number" },
+        "shear_j_kN": { "type": "number" },
+        "moment_j_kNm": { "type": "number" }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition_number",
+        "rank",
+        "active_dof_count",
+        "free_active_dof_count",
+        "free_residual_relative",
+        "force_equilibrium_relative",
+        "moment_equilibrium_relative",
+        "energy_identity_relative",
+        "excluded_dofs"
+      ],
+      "properties": {
+        "condition_number": { "$ref": "#/$defs/nullable_number" },
+        "rank": { "type": ["integer", "null"], "minimum": 0 },
+        "active_dof_count": { "type": "integer", "minimum": 0 },
+        "free_active_dof_count": { "type": "integer", "minimum": 0 },
+        "free_residual_relative": { "$ref": "#/$defs/nullable_number" },
+        "force_equilibrium_relative": { "$ref": "#/$defs/nullable_number" },
+        "moment_equilibrium_relative": { "$ref": "#/$defs/nullable_number" },
+        "energy_identity_relative": { "$ref": "#/$defs/nullable_number" },
+        "excluded_dofs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/excluded_dof" }
+        }
+      }
+    },
+    "excluded_dof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dof_index", "node_id", "dof", "reason"],
+      "properties": {
+        "dof_index": { "type": "integer", "minimum": 0 },
+        "node_id": { "type": "string", "minLength": 1 },
+        "dof": { "const": "rz" },
+        "reason": { "const": "TRUSS_ONLY_NODE_HAS_NO_ROTATIONAL_DOF" }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_id", "status", "value", "limit", "message"],
+      "properties": {
+        "check_id": { "type": "string", "pattern": "^F1-[A-Z0-9_-]+$" },
+        "status": { "enum": ["PASS", "FAIL", "NOT_RUN"] },
+        "value": { "$ref": "#/$defs/nullable_number" },
+        "limit": { "$ref": "#/$defs/nullable_number" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "load_case_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "status",
+        "nodal_displacements",
+        "reactions",
+        "element_end_forces",
+        "max_translation_m",
+        "max_rotation_rad",
+        "diagnostics",
+        "checks",
+        "issues"
+      ],
+      "properties": {
+        "load_case_id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["CONVERGED", "UNSTABLE_MODEL", "NUMERICAL_FAILURE"] },
+        "nodal_displacements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nodal_displacement" }
+        },
+        "reactions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reaction" }
+        },
+        "element_end_forces": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/element_end_force" }
+        },
+        "max_translation_m": { "$ref": "#/$defs/nullable_number" },
+        "max_rotation_rad": { "$ref": "#/$defs/nullable_number" },
+        "diagnostics": { "$ref": "#/$defs/diagnostics" },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/check" }
+        },
+        "issues": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-036",
+  "handoff_sha256": "96fdd21d239e965c124bf0ee3bec54e168aafe6333dc9a13e633ebaac8313bd7",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Handoff r001 khai đã dựng AdaptiveHaiDiem bằng NewSweptBlendForm và lắp 621 adaptive instance, nhưng artifact chuẩn tự ghi CreateAdaptiveComponentInstance + SetInstancePlacementPointElementRefIds CHƯA ĐO, NewRevolveForm CHƯA ĐO, FamilyManager.AddParameter trong ADAPTIVE/MASSING CHƯA ĐO; bridge_evolution/revit_family/__init__.py còn chặn xuất mọi .rfa adaptive. Vì vậy Pha 2 adaptive và Pha 3 chưa có bằng chứng tái lập phù hợp với acceptance criteria."
+    }
+  ],
+  "notes": "5 provenance correction da duoc OpenCode review APPROVE va 624 test Revit-family xanh. Tuy nhien handoff r001 vuot qua bang chung: Pha 2 adaptive/Pha 3 lap 621 instance mau thuan voi chinh capability matrix va runtime fail-closed. Can chay probe Revit 2026 that cho API lap adaptive, AddParameter trong adaptive/massing va NewRevolveForm; hoa giai trang thai NewSweptBlendForm; luu-mo lai .rfa/.rvt, dem solid/instance va do bao truoc khi nop r002. Gioi han van la IDEA, khong phai kiem toan ket cau cau."
+}

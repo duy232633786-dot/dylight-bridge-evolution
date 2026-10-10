@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-051",
+  "title": "Phòng lab hướng 1: giao diện cục bộ đọc dữ liệu sống của lab, chạy vòng lặp thiết kế, studio tiết diện v2, danh mục hình thái MAP-Elites và bảng bằng chứng/cổng",
+  "research_question": "Có thể dựng một giao diện phòng lab cục bộ cho hướng 'sáng tạo hình học và chất lượng cấu kiện' chỉ bằng lớp đọc/gọi mỏng lên các contract sẵn có (evaluate_candidate, design_loop, check_geometry, MAP-Elites, lab_status, knowledge), sao cho mọi số hiển thị đều mang fidelity, claim và cổng đúng như runtime, không tự tính và không nâng trần hay không?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": ["BRD-050"],
+  "required_gates": ["G1", "G2"],
+  "claim_ceiling": "SCREENED",
+  "runtime_scope": {
+    "structural_families": ["super_t_simple_v1", "super_t_parametric_v2"],
+    "runtime_domain": "production_line_girder_l1"
+  },
+  "write_scope": [
+    "scripts/serve_lab.py",
+    "dashboard/lab.html",
+    "dashboard/lab.css",
+    "dashboard/lab.js",
+    "dashboard/inspector.html",
+    "dashboard/lab_creative_profile.json",
+    "docs/07_lab_ui.md",
+    "tests/test_lab_api.py"
+  ],
+  "acceptance_criteria": [
+    "Máy chủ chỉ lắng nghe 127.0.0.1; mọi API là lớp gọi mỏng: evaluate_candidate/suggest_repairs, run_design_loop, check_geometry/compute_objectives, run_constrained_map_elites, load_cards/query_knowledge, lab_status/validate_lab; không có công thức sức kháng hay verdict trong scripts/serve_lab.py",
+    "Report vòng lặp chạy từ UI được lưu vào artifacts/design_loop với SHA-256 và tuân contracts/design_loop_report.schema.json; ngân sách bị chặn ≤ 400 solver call",
+    "Studio tiết diện v2 chỉ trả L0 + objective giải tích + biên build_section_polygon; không mở solver",
+    "MAP-Elites chạy với profile mặc định của lab có clause_id LAB-DEFAULT-UNSOURCED-* trỏ về dashboard/lab_creative_profile.json; output giữ claim IDEA và không chứa khoá feasible/verified/design_pass",
+    "Màn Tổng quan và Bằng chứng hiển thị trần claim SCREENED, thang cổng G0–G7 với G0 BLOCKED (site UNKNOWN) và G3–G7 ABSENT, ma trận năng lực đúng docs/runtime_capability_matrix.json, oracle vét cạn v1 làm mốc so sánh",
+    "Giao diện chỉ đọc quy trình lab (task/handoff/review); không có nút nào thay đổi trạng thái task ngoài CLI lab claim/submit/review",
+    "Component Inspector (dashboard/inspector.html) nhận report qua postMessage từ lab, dựng 3D, lineage, kiểm tra, mặt cắt, khối lượng và đọc IFC; RVT có hướng dẫn xuất IFC",
+    "tests/test_lab_api.py phủ overview, catalog, section studio (anchor L0 sạch, grammar lạ bị từ chối), design loop (lưu hash, từ chối seed_file trái phép/ngân sách quá trần/policy sai), creative search (profile chưa có nguồn, IDEA), knowledge/lab endpoints"
+  ],
+  "required_artifacts": [
+    "scripts/serve_lab.py",
+    "dashboard/lab.html",
+    "dashboard/lab.css",
+    "dashboard/lab.js",
+    "dashboard/inspector.html",
+    "dashboard/lab_creative_profile.json",
+    "docs/07_lab_ui.md",
+    "tests/test_lab_api.py"
+  ],
+  "safety_notes": [
+    "Phòng lab không nâng trần claim: mọi số là SCREENED tối đa; G0 site chưa có, không L2/L3, không thí nghiệm, không kỹ sư duyệt — lab phải hiển thị điều này ở mọi màn",
+    "Profile MAP-Elites mặc định là giới hạn tìm kiếm của lab, không phải điều khoản tiêu chuẩn; kết quả hình thái là IDEA và chưa có nguồn",
+    "Không sửa evaluate.py, verifier, design_loop.py, lab.py, capability matrix hay artifact đã neo hash của task khác; dashboard cũ (index.html, app.js, data.js, 3d_viewer.html) giữ nguyên",
+    "Reviewer độc lập là codex hoặc opencode; owner không tự review"
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "codex",
+  "test_commands": [
+    ["python", "-m", "pytest", "tests/test_lab_api.py", "-q"],
+    ["python", "-m", "pytest", "tests/test_lab_api.py", "tests/test_design_loop.py", "tests/test_creative_shape.py", "-q"]
+  ],
+  "human_gate": false
+}

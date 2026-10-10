@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-039",
+  "title": "Constrained MAP-Elites sáng tạo hình thái vòm-giàn nhưng không vượt ranh giới kỹ thuật",
+  "research_question": "Làm sao sinh các trục vòm và topology treo/khoang đặc biệt, giữ được đa dạng hình thái, nhưng mọi kết quả vẫn khóa điều kiện biên, đường truyền lực, độ cong, độ mảnh, logistics và proxy tải trọng trước khi vào archive; đồng thời không giả trang proxy thành kiểm chứng kết cấu?",
+  "workstream": "geometry",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/creative_shape.py",
+    "contracts/creative_shape_candidate.schema.json",
+    "docs/design_basis/creative_shape_domain.json",
+    "tests/test_creative_shape.py"
+  ],
+  "acceptance_criteria": [
+    "Genome liên tục sinh trục vòm đặc biệt nhưng hai đầu luôn đúng gối, x tăng đơn điệu và chiều cao đỉnh đúng rise_ratio đã khai",
+    "Hỗ trợ tối thiểu DECK_ARCH, THROUGH_ARCH và NETWORK_ARCH bằng graph nút-thanh có đường từ mọi nút mặt cầu tới gối",
+    "Kiểm độ dốc, bán kính cong, chiều dài panel, độ mảnh, tĩnh không và proxy lực xô đều lấy ngưỡng có source_ref; thiếu ngưỡng trả UNKNOWN_INPUT_MISSING",
+    "Proxy lực xô/ứng suất ghi rõ SCREENING_PROXY, không tạo feasible=true và không nâng claim khỏi IDEA",
+    "MAP-Elites chia ô theo topology, rise ratio, curvature complexity và asymmetry; chỉ candidate all-known-pass mới vào archive",
+    "Cùng seed/domain/profile sinh output deterministic; candidate và profile có SHA-256 canonical",
+    "Schema output additionalProperties=false và cấm ngầm trường feasible/verified",
+    "Test âm phủ NaN, hệ số ngoài miền, graph bị ngắt, source_ref không tồn tại, thiếu threshold, proxy quá tải và candidate lạ nhưng không kỹ thuật"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/creative_shape.py",
+    "docs/design_basis/creative_shape_domain.json",
+    "tests/test_creative_shape.py"
+  ],
+  "safety_notes": [
+    "Thuật toán chỉ sáng tạo và sàng F0; chưa có solver vòm/giàn nên không được gọi kết quả là thiết kế khả thi",
+    "Độ mới, thẩm mỹ hoặc novelty không được bù một check FAIL/UNKNOWN",
+    "Không import hoặc sửa bridge_evolution/geometry_experimental vì BRD-004 đang ACTIVE và sở hữu scope đó",
+    "Không đưa module vào evaluate.py/CLI production trước review độc lập và trước khi có capability gate",
+    "Các ngưỡng kỹ thuật phải do người gọi cung cấp kèm nguồn; file domain chỉ là biên tìm kiếm nghiên cứu"
+  ],
+  "review_notes": [
+    "Review độc lập Claude: 4/4 hash khớp, 37 test xanh nhưng phát hiện false PASS ở tĩnh không, độ mảnh, END_POST zero-length, topology hanger và candidate tamper. Yêu cầu sửa toàn bộ trong write_scope, thêm negative tests rồi resubmit r002.",
+    "Review r002 độc lập: các lỗi hình học r001 đã đóng; còn lỗ hổng HIGH cho phép rửa FAIL thành NOT_APPLICABLE, cùng các yêu cầu fail-closed và minh bạch applicability trong findings.",
+    "Review doc lap r003 (claude). Tu bam lai 4/4 artifact khop handoff. Tu chay pytest tests/test_creative_shape.py tests/test_frame_f1.py -q: 66 passed. Khong tin test khai san: tu do lai tung bat bien. Finding HIGH cua r002 da bit that su - dan nhan NOT_APPLICABLE cho CQD-L0-06 dang FAIL (demand 1.3494 m vs limit 8.0 m) va TU TINH LAI candidate_sha256 van bi CHAN boi CA runtime LAN JSON Schema, ke ca khi khong truyen technical_profile. DECK_ARCH khong the mang NOT_APPLICABLE. Tied arch chi chap nhan dung mot CQD-L0-07 N/A voi model_kind, message va bay truong null chinh xac; sau bien the lam sai lech deu bi chan hai tang. candidate_sha256 phu toan payload; limitations gan theo topology; clause_id bat buoc va source_ref POSIX kem expected hash. Ba finding LOW cua r002 deu dong: kind canh la nay nem CreativeShapeError, describe_shape bat topology lech, nut DECK o bien khong co transfer nay lam load_path_connected tra False. Domain co khoi not_applicable_justifications neu ro ly do va hau qua rang THROUGH/NETWORK hien khong co sang loc co hoc F0. Khong hoi quy: chan vom van hop nhat, tinh khong toan truc 1.349370 m, L/depth moi edge 24.875531, determinism byte-level, archive thuan, claim tran IDEA. Ranh gioi con lai la co y: khong truyen technical_profile thi moi truong SO cua check deu khong tai lap duoc nhu nhau, nhung moi truong STATUS van kiem duoc va profile_sha256 ghim profile. Full suite chi con 5 loi provenance BRD-036 tien ton tai, khong lien quan task nay. APPROVE."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "form_inventor",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

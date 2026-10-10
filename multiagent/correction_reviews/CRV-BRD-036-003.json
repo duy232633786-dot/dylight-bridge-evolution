@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-036-003",
+  "task_id": "BRD-036",
+  "incident_id": "INC-BRD-036-003",
+  "correction_sha256": "b81ee9ccb15265419802482066383c42d7088237133404bf3bdf8b9cce5b2d39",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "COR-003 adaptive_family.py: diff snapshot ed445443 -> live 63379573 adds required regenerated_before gate on GetCoordinateSystem ([A3]), two-stage member build with pre_regen_lines, honest VOID_OPS/SECTION_PLANE_OPS membership, DECLARED_OVERLOADS NewLoftForm, and GIA DINH OVERLOAD marker; claim ceiling unchanged (F0_IDEA only).",
+    "Hash chain: handoff 96fdd21d ok; snapshot blob byte-exact ed445443; live artifact equals recorded current_sha256; verify_brd036_provenance.py PASS (read-only).",
+    "pytest tests/test_revit_family.py: 624 passed."
+  ],
+  "notes": "Reviewer opencode is independent (not codex, not claude). Scope: IDEA claim level only; string-level self-checks are not proof a family ran in real Revit; this is not a structural-bridge audit. Approve correction."
+}

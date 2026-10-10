@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-c73ae3b65fe34c26",
+  "amendment_sha256": "4681187d8517efa0a40eebc9600887c0684532dd84cb678732ab02bdc6677619",
+  "created_at": "2026-09-23T18:34:11.393132Z",
+  "task_id": "RND-bb1589ca-02",
+  "authorized_by": "project_owner",
+  "reason": "Apply the user research-only scope and requested fictional bridge sources; defer unrelated invention work.",
+  "pre_task_sha256": "9863898d26158f48be15d7631471678b87aa1d2a4a0b085d61ab737a15631a95",
+  "post_task_sha256": "b574fe1fcfb3a17a8cbfced08a0dcecb02f50e14950880d031ea11e490ccf570",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/9863898d26158f48be15d7631471678b87aa1d2a4a0b085d61ab737a15631a95.json",
+    "sha256": "9863898d26158f48be15d7631471678b87aa1d2a4a0b085d61ab737a15631a95"
+  },
+  "changes": [
+    {
+      "field": "safety_notes",
+      "before": [
+        "Hình đẹp không phải bằng chứng chịu lực; vật liệu mới không vào production catalog"
+      ],
+      "after": [
+        "Hình đẹp không phải bằng chứng chịu lực; vật liệu mới không vào production catalog",
+        "Deferred: user authorized literature/inspiration collection only; do not execute invention or screening tasks without a later request."
+      ]
+    },
+    {
+      "field": "status",
+      "before": "READY",
+      "after": "BACKLOG"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "BACKLOG",
+  "run_id": "RUN-20260923-bb1589ca"
+}

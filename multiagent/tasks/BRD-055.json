@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-055",
+  "title": "International SAGE-EvoBridge research corpus and Obsidian publication",
+  "research_question": "Which primary standards, bridge precedents, construction and materials research, computational geometry and AI studies can form a traceable literature corpus with explicit reading and applicability limits?",
+  "workstream": "knowledge",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "codex_research_reviewer",
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260923-1472cd05/"
+  ],
+  "acceptance_criteria": [
+    "Source records have actual primary URLs, observed access and reading depth, concise Vietnamese findings and explicit limits; no invented bibliography or clause.",
+    "Cover international standards, bridge forms and cases, materials and construction, computational geometry, AI and reproducible datasets; link existing library and deduplicate sources.",
+    "Publish a reviewed additive collection into the existing authorized Obsidian vault, verify hashes and links, and preserve existing notes and runtime engineering rules."
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260923-1472cd05/corpus.json",
+    "research/orchestration/RND-20260923-1472cd05/README.md",
+    "research/orchestration/RND-20260923-1472cd05/qa_report.json"
+  ],
+  "safety_notes": [
+    "Canonical intake RND-20260923-1472cd05 is the authorization basis; fixed planner task write scopes remain unchanged.",
+    "User explicitly deferred invention and algorithm implementation and authorized research plus Obsidian publication; no scheduled progress saving is re-enabled.",
+    "All new literature remains UNVERIFIED_REFERENCE; standard editions and jurisdiction are separated; partial and abstract-only reading never become full-text claims.",
+    "No previous handed-off artifacts or existing user notes are overwritten."
+  ],
+  "review_notes": [
+    "Independent review by a separate same-platform Codex agent, not the author and not a Claude/cross-vendor review. APPROVE covers documentation integrity, explicit evidence boundaries and the authorized additive Obsidian publication only. Live vault contains exactly 133 matching files; publication code rejects existing differing files and receipt records zero overwrites. No invention algorithm, runtime, solver, Family integration, experimental result, engineering compliance or global novelty was validated. All three editorial findings from the earlier review were corrected; immutable handed-off artifacts were not modified."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "orchestrator",
+  "review_provider": "claude"
+}

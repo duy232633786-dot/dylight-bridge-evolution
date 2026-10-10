@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-06",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Revision r002 xử lý toàn bộ Claude review r001: bổ sung AB/PIER/BRG và ground paths cho B/D, khóa cùng span/support graph cho control, thống nhất landward theo saddle, sửa λ_AC/cao độ provenance và kế thừa G0=FAIL.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260901-00fd963d/03a_normalized_geometry_prescreen.md",
+      "sha256": "3598328437c9d96307a6a21dc4509c7a544d77434eccb1cdc2a91498203da52c",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "HGB-B/HGB-D vẫn chỉ là graph hypotheses F0; support counts and locations remain MISSING_INPUT.",
+    "Cáp chủ neo đất liên tục; landward stay fans là hệ riêng và dùng saddle làm mốc no-inward-stay."
+  ],
+  "unresolved_risks": [
+    "Chuỗi span canonical, support layout, central-arch role và navigation data vẫn chờ người dùng/site.",
+    "G0=FAIL; G1/G2 không được claim và solver hybrid/arch vẫn ABSENT."
+  ],
+  "next_action": "Claude re-review độc lập revision r002, đối chiếu trực tiếp CL-R06-01..05."
+}

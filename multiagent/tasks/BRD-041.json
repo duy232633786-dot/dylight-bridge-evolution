@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-041",
+  "title": "Adapter fail-closed từ hình thái MAP-Elites sang mô hình khung-giàn F1",
+  "research_question": "Làm sao chuyển một candidate vòm đã qua sàng F0 thành mô hình FRAME_2D/TRUSS_2D có bảo toàn hình học, tải và provenance, xử lý đúng nút trùng tại chân vòm, nhưng không biến hội tụ số F1 thành kết luận thiết kế?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-039",
+    "BRD-040"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/creative_frame_adapter.py",
+    "contracts/creative_frame_profile.schema.json",
+    "contracts/creative_frame_analysis.schema.json",
+    "docs/design_basis/creative_frame_adapter_basis.json",
+    "tests/test_creative_frame_adapter.py"
+  ],
+  "acceptance_criteria": [
+    "Adapter chỉ nhận candidate được tái tạo byte-canonical từ genome, domain và technical_profile; candidate FAIL, UNKNOWN, bị sửa geometry/hash hoặc không all_known_pass phải bị chặn trước solver",
+    "THROUGH_ARCH và NETWORK_ARCH phải hợp nhất đúng cặp nút đồng tọa độ D0-A0 và Dn-An, bỏ END_POST zero-length; mọi phần tử zero-length khác phải bị từ chối",
+    "Ánh xạ edge kind là tường minh: ARCH_RIB, DECK, SPANDREL và END_POST hữu hạn sang FRAME_2D; HANGER và NETWORK_HANGER sang TRUSS_2D; kind lạ fail-closed",
+    "Vật liệu và tiết diện được người gọi cấp riêng theo edge kind, có source_ref tồn tại và hash bytes; adapter không tự bịa E, A, I hoặc capacity",
+    "Chỉ hỗ trợ policy gối được khai trong basis; mô hình hai khớp dùng chân trái khóa ux-uy, chân phải khóa uy và không khóa rz",
+    "Tải đường đều trên mặt cầu được quy đổi về tải nút theo chiều dài tributary; tổng tải nút phải bằng q nhân tổng chiều dài mặt cầu trong tolerance đã khai",
+    "Manifest đầu ra giữ candidate_id, geometry_sha256, candidate profile hash, structural profile hash, model_sha256, basis hashes và source digests",
+    "CONVERGED chỉ có nghĩa nghiệm tuyến tính F1 hội tụ; output giữ claim_level=IDEA, design_verdict_authority=NONE và schema cấm feasible, verified, design_pass",
+    "Cùng input cho output deterministic; test âm phủ candidate bị sửa, source drift, profile thiếu kind, gối không ổn định, tải không bảo toàn, nút trùng ngoài chân vòm, graph ngắt và trường verdict cấm",
+    "Không sửa creative_shape.py, frame_f1.py, evaluate.py, geometry_experimental.py, fe_adapter production hoặc lab.py"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/creative_frame_adapter.py",
+    "docs/design_basis/creative_frame_adapter_basis.json",
+    "tests/test_creative_frame_adapter.py"
+  ],
+  "safety_notes": [
+    "BRD-041 không được claim hoặc triển khai trước khi BRD-039 và BRD-040 được reviewer độc lập APPROVE",
+    "FRAME_2D giả định liên kết cứng tại nút; HANGER/TRUSS_2D chỉ chịu dọc trục; đây là lý tưởng hóa nghiên cứu cần ghi rõ",
+    "Không có tự trọng tự sinh, prestress, P-Delta, buckling, dynamic, fatigue, connection, soil-foundation, construction staging hoặc tổ hợp/capacity theo tiêu chuẩn",
+    "Không dùng novelty, thẩm mỹ, chi phí hoặc trạng thái CONVERGED để bù một blocker hình học/provenance"
+  ],
+  "review_notes": [
+    "Review doc lap r001 (claude). Tu bam lai 5/5 artifact khop handoff. Tu chay hai lenh test: tests/test_creative_frame_adapter.py -q = 30 passed; ba file gop lai = 96 passed. Khong tin ket qua khai trong handoff, moi ket luan duoi day la phep do cua rieng toi. Cong chan truoc solver bit kin: candidate FAIL, candidate UNKNOWN, sua toa do axis co va khong reseal candidate_sha256, xoa het HANGER lam dut graph, nut trung toa do, them goi thu ba, bo het goi, edge kind la CABLE, ep all_known_pass=false - ca 10 deu bi chan truoc khi cham solver. Chan vom: THROUGH_ARCH va NETWORK_ARCH dung nut ARCH_DECK da hop nhat, 0 END_POST, Lmin 10.408776667 m, khong nut trung toa do; DECK_ARCH giu 2 END_POST voi Lmin 6.5 m. Anh xa sau edge kind dung tuong minh: ARCH_RIB/DECK/SPANDREL/END_POST -> FRAME_2D, HANGER/NETWORK_HANGER -> TRUSS_2D. Goi dung policy: trai khoa ux-uy, phai chi khoa uy, ca hai khong khoa rz. Bao toan tai: tu tinh tong chieu dai DECK = 145.000000000 m cho ca ba topology, q x L = 3625.000000000 kN va tong tai nut cung 3625.000000000 kN, sai so tuong doi 0.000e+00, moi tai co fx=0 va mz=0. Provenance: 15 ca pha hoai profile deu bi chan gom expected sha sai mo phong source drift, source_ref khong ton tai, backslash, traversal, tuyet doi, thieu clause_id, clause_id rong, thieu edge kind, sai support_policy, khong bind candidate. Toan ven: sua manifest, frame_model, tai, load_conservation, frame_result, status, candidate, structural_profile, basis_hashes, adapter_source_digests, limitations roi TU TINH LAI analysis_sha256 - ca 18 phep van bi validator phat hien, ban goc thi LOT dung nhu mong doi. Deterministic byte-canonical, adapter_source_digests neo dung bytes ba file, basis_hashes khop ba nguon. Schema giu claim_level=IDEA, design_verdict_authority=NONE, 0 lan feasible/verified/design_pass; basis khai ro CONVERGED chi nghia he tuyen tinh F1 hoi tu chu khong phai thiet ke dat. Ve limitation con lan: do doc lap cho thay phan luc ngang bang 0 tuyet doi o ca ba topology, phan luc 1812.5/1812.5 kN dung bang dam gian don, tuc DECK_ARCH khong co tac dung vom - va basis da khai dung dieu do bang chu, dong limitation ay duoc hash bao ve nen bo di thi validator chan. Day la ghi nhan LOW khong chan duyet, de nghi vong sau dua tri so phan luc ngang vao output. Full suite chi con 5 loi tests/test_collaboration.py do drift provenance BRD-036 tien ton tai, khong co loi moi do BRD-041; 9 artifact BRD-039/040 r003 van khop hash nen AC#10 dat. Khong finding HIGH hay MEDIUM. APPROVE."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_frame_adapter.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "tests/test_creative_frame_adapter.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

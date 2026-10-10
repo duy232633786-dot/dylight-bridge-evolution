@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-038-001",
+  "task_id": "BRD-038",
+  "detected_at_utc": "2026-08-30T10:50:30.874099Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-038.codex.r002.json",
+  "original_handoff_sha256": "de2a31103db09814d22bc776cf580c8fb8b57f34e2a87ff5e382995cfb213e54",
+  "artifact_path": "bridge_evolution/design_study.py",
+  "recorded_sha256": "cca6542948c57d4021e2802064cb0d88383043f4266427f680e5e94453bde790",
+  "observed_sha256": "2c6b6c50790136f12d9ad3f5a539faaa3304eb2fa1a510ceba7bd3829ba81b78",
+  "reason": "BRD-047 tiếp tục harden authority sau khi BRD-038 r002 bị REJECT; artifact lịch sử vì vậy drift có chủ đích và cần snapshot byte-exact.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

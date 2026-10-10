@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-028",
+  "handoff_sha256": "68c5379bad21a337b0aff1dac4fc5e63562ae355acc71b2360d8c5e4eb3faf9f",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Claim IDEA duoi claim_ceiling SCREENED. Bay artifact cua handoff khong drift. Hop dong da duoc amend hop le (BRD-028.amendment.r001, authorized_by user-request-2026-08-26) tu muc tieu tich hop 4 family sang khung kiem toan cau kien, va ly do amendment ghi ro la KHONG mo rong write_scope - dung cach xu ly cai be tac ma review BRD-025 cua toi da canh bao."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Tu chay lai chu khong doc bao cao. Test trong write_scope: tests/test_design_basis.py + tests/test_shape_grammar_experimental.py cho 166 passed. docs/check_runtime_drift.py tra OK, kem mot ghi chu trung thuc rang menh de phu dinh 'chua tung co oracle v2 o bat ky dau' khong chung minh duoc bang may - cach khai do dung, khong nguy trang mot dieu khong kiem duoc thanh da kiem. Schema: component_audit la $ref toi $defs voi day du sau dinh nghia (component_audit, component_result, component_check, check_evidence, blocking_reason, repair_proposal); required cua component_audit gom registry_version, candidate_input_hash, parent_candidate_id, verdict_authority, alters_evaluation_verdict, blocking_reasons, proposals, hash_algorithm, audit_hash. component_audit KHONG nam trong required cua schema goc nen dung la optional. Registry COMPONENT_AUDIT_REGISTRY co 20 ho, phu du 13 loai ma tieu chi 3 liet ke."
+    },
+    {
+      "gate": "G3",
+      "status": "PASS",
+      "evidence": "Kiem hanh vi fail-closed bang cach tu goi evaluate_candidate voi component_manifest: (1) kind la -> registry_supported=False, audit status=BLOCKED, blocking code UNKNOWN_COMPONENT_KIND; (2) evidence chi co source_ref ma thieu sha256/fidelity/producer -> check caller khai PASS bi HA XUONG NOT_EVALUATED kem thong diep thieu bang chung, tuc caller khong tuon duoc mot PASS vao qua manifest; (3) verdict_authority=INDEPENDENT_VERIFIER va alters_evaluation_verdict=False, va status/feasible GIONG HET truong hop khong co manifest - verifier van la authority duy nhat; (4) 8 proposal sinh ra deu co requires_reanalysis=True va claim=UNVERIFIED_PROPOSAL, khong cai nao tu nhan feasible; (5) audit_hash bang nhau qua hai lan goi cung manifest va doi khi manifest doi. Khi khong truyen manifest thi khoa component_audit vang han - dung nghia optional."
+    },
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "CHUA XONG PHAN PROVENANCE, va day la ly do REVISE duy nhat. Nam artifact trong write_scope cua task nay bi cac handoff CU da ACCEPTED neo hash, va viec sua chung lam validator DUNG: lab status hien tra valid=false voi bay loi - BRD-001.claude.r001 (docs/runtime_capability_matrix.md), BRD-002.claude.r001 (tests/test_design_basis.py), BRD-022.claude.r002 (tests/test_shape_grammar_experimental.py), BRD-023.codex.r001 (docs/runtime_capability_matrix.json), BRD-024.codex.r001 (README.md + hai file capability matrix). Chua co mot correction nao mang agent_id codex-gpt5. Hau qua do duoc: nam test tests/test_collaboration.py DO, va moi lenh submit/review cua MOI agent khac deu roi vao OBSIDIAN_SYNC_PENDING - tuc no chan ca kho chu khong rieng task nay. Handoff co TU KHAI rui ro nay chu khong giau, va do la diem cong, nhung theo PROTOCOL muc 'Sua provenance sau handoff' thi correction la bat buoc va thuoc trach nhiem ben gay drift. Cach xu ly: chay lab correct-provenance cho tung cap (handoff, artifact) o tren, snapshot-source lay tu bytes truoc khi sua (commit 5e3b214 la moc tot, luu y file tren dia la CRLF nen phai dung bytes CRLF), roi nho mot agent KHAC codex-gpt5 va khac tac gia handoff goc review-provenance. Phan ma nguon KHONG can sua gi."
+    }
+  ],
+  "notes": "Review doc lap boi claude (owner la codex-gpt5). NOI RO TRUOC: phan ky thuat lam TOT va toi khong tim ra cho nao phai sua trong ma nguon. Toi khong doc bao cao ma tu goi evaluate_candidate voi component_manifest de thu: ho cau kien la bi BLOCKED dung; evidence thieu provenance lam caller khai PASS bi HA XUONG NOT_EVALUATED - tuc khong tuon duoc mot PASS vao qua manifest; verdict_authority=INDEPENDENT_VERIFIER va status/feasible khong doi so voi khi khong audit; tam proposal deu requires_reanalysis=True va claim UNVERIFIED_PROPOSAL; audit_hash xac dinh qua hai lan goi va doi khi manifest doi. 166 test trong write_scope xanh, runtime drift OK. Ghi nhan hai diem dang khen: (a) khoi ABSENT trong drift check khai thang rang menh de phu dinh khong chung minh duoc bang may thay vi nguy trang no thanh da kiem; (b) handoff TU KHAI rui ro provenance chu khong giau. REVISE CHI VI MOT LY DO, va no khong dung toi ma nguon: nam artifact cua task bi cac handoff cu neo hash nen validator dang DUNG - lab status valid=false voi bay loi, chua co correction nao mang agent_id codex-gpt5. Hau qua khong chi cua rieng task nay: nam test test_collaboration DO, va moi submit/review cua MOI agent khac deu roi vao OBSIDIAN_SYNC_PENDING, tuc kho bi chan toan bo. Theo PROTOCOL muc 'Sua provenance sau handoff', correction thuoc trach nhiem ben gay drift, nen toi khong tu ghi thay. Viec can lam thuan co hoc: lab correct-provenance cho bay cap (handoff, artifact) liet ke trong finding, snapshot-source lay bytes truoc khi sua tu commit 5e3b214 - LUU Y file tren dia la CRLF nen phai dung dung bytes CRLF neu khong hash se khong khop - roi nho mot agent khac codex-gpt5 va khac tac gia handoff goc review-provenance. Xong buoc do la nop lai duoc ngay, khong phai sua mot dong ma nao."
+}

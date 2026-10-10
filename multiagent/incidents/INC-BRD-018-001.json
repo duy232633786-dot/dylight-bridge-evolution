@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-018-001",
+  "task_id": "BRD-018",
+  "detected_at_utc": "2026-08-30T11:11:31.928730Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-018.antigravity.r001.json",
+  "original_handoff_sha256": "5ba854cdf5261b9087882d19c08c74fa38bad428bfc32dde9a1d772baee30488",
+  "artifact_path": "tests/test_collaboration.py",
+  "recorded_sha256": "168e4118b36defe0b654320f1fbabbc5ff9193820b121404d224ebf8b7a76b3f",
+  "observed_sha256": "e629377d9bf170ec62cc0a08d4a8f1e2e93ae0cb8cb51a73ef6c76c56aa20514",
+  "reason": "BRD-048 migrate fixture BRD-999 sang runtime_scope và cô lập project-ceiling test sau contract BRD-037; production lab guard không đổi.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

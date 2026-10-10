@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-029-003",
+  "task_id": "BRD-029",
+  "detected_at_utc": "2026-08-26T10:52:11.016148Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-029.claude.r001.json",
+  "original_handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "artifact_path": "contracts/bridge_design_state.schema.json",
+  "recorded_sha256": "4ddda1d898327f64d01dcb25b0bfebf0e6bb00551b5e9e2912b05b9ed93fed94",
+  "observed_sha256": "ec924f3126892f1fd2400133f0bada9ceb65b8b294262bade5968049061a9510",
+  "reason": "Task BRD-035 co contracts/bridge_design_state.schema.json trong write_scope va phai sua no de ba ho cau moi qua duoc hop dong; handoff cu cua BRD-029 neo hash file nay nen drift la he qua bat buoc, khong phai sua lich su.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

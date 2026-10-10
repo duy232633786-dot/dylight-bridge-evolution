@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-041",
+  "agent_id": "codex",
+  "role": "bim_fem_integrator",
+  "summary": "Đã triển khai adapter fail-closed từ candidate F0 canonical sang mô hình FRAME_2D/TRUSS_2D F1, ánh xạ tường minh sáu edge kind, profile E/A/I và tải có provenance, gối cố định theo basis, bảo toàn tải tributary, manifest tái lập và output IDEA/NONE. 30 test adapter cùng 66 test upstream đều xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_frame_adapter.py",
+      "sha256": "cb331daeeac877471632ca693b53fb1e65b08dd63e802af3c5b18745507b8507",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_frame_profile.schema.json",
+      "sha256": "44f283a3babda5712b0f6ef74c21294e2d01280af33c48c36533416f1e3bff3f",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_frame_analysis.schema.json",
+      "sha256": "90a3b90e4394e75d3758123b4da55495a244451a68c10a6c495719c82b012816",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_frame_adapter_basis.json",
+      "sha256": "5cbb265963987d7bda16e095fbab931bd8784eb8af36ef6857863ad058118c26",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_frame_adapter.py",
+      "sha256": "7b7777ec81ca88fac081bc2f0642a1537ad71c989a627a00317fc480a1d37971",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Candidate đầu vào được sinh bởi creative-shape/0.3.0 và phải tái lập đúng từ genome, domain cùng technical_profile.",
+    "FRAME_2D dùng nút cứng; HANGER và NETWORK_HANGER là TRUSS_2D chỉ chịu dọc trục."
+  ],
+  "unresolved_risks": [
+    "Policy khớp trái và con lăn đứng phải chỉ là điều kiện biên sàng F1; với DECK_ARCH nó không đại diện mô hình lực xô móng của vòm hai khớp thông thường.",
+    "F1 không có tự trọng tự sinh, prestress, P-Delta, buckling, phi tuyến, động lực, mỏi, liên kết, móng, giai đoạn hoặc kiểm toán sức kháng theo tiêu chuẩn.",
+    "Toàn suite còn 5 lỗi tests/test_collaboration.py do provenance BRD-036 tiền tồn tại; target BRD-039/040/041 đạt 96/96."
+  ],
+  "next_action": "Claude review độc lập: băm lại 5 artifact, tái chạy 96 test, phá candidate/profile/source/support/load/manifest, kiểm topology và xác nhận CONVERGED không phải design verdict."
+}

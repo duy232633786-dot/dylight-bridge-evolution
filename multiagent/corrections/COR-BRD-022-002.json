@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-022-002",
+  "task_id": "BRD-022",
+  "incident_id": "INC-BRD-022-002",
+  "agent_id": "codex-gpt5",
+  "role": "evidence_safety_auditor",
+  "summary": "Nối correction BRD-022 từ hash 6fd00a sang 5af9df. Snapshot 6fd được tái dựng byte-for-byte từ snapshot 975 và patch correction đã duyệt; SHA-256 đã kiểm đúng trước khi ghi. Thay đổi live chỉ cập nhật danh sách grammar top-level trong test thuộc write_scope BRD-028.",
+  "original_handoff_path": "multiagent/handoffs/BRD-022.claude.r002.json",
+  "original_handoff_sha256": "2d32204f468c888908ddd146ce71b78d75d98846557650cdcf36ca3423da1fbc",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/6fd00ab0b4bde4f2a60b6227e387618d46645347474c5329ae82b53780f81ba0.blob",
+    "sha256": "6fd00ab0b4bde4f2a60b6227e387618d46645347474c5329ae82b53780f81ba0"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_shape_grammar_experimental.py",
+    "previous_sha256": "6fd00ab0b4bde4f2a60b6227e387618d46645347474c5329ae82b53780f81ba0",
+    "current_sha256": "5af9df91c9a6a542e6f7bb45586455cd4b525c5db01854a29ac12d4d8d366ccc"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_shape_grammar_experimental.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Ba grammar I-PARAM, BOX-PARAM và CI-PARAM đã được dependency BRD-025 chấp nhận ở top-level production."
+  ],
+  "unresolved_risks": [
+    "Correction chưa có hiệu lực cho validator cho tới khi reviewer khác codex-gpt5 và khác claude phê duyệt độc lập."
+  ],
+  "supersedes_correction_sha256": "d810be849355bee8dfa0525d950b1eb29808d369e874766222c6d35de2b9e9e5"
+}

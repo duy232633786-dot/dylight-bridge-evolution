@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-032-005",
+  "task_id": "BRD-032",
+  "incident_id": "INC-BRD-032-005",
+  "correction_sha256": "4f187b0fa4e3d0d6ede462b2009b8c51ffd3440af8a8c878f17a9902c16eaa41",
+  "reviewer_id": "claude-provenance-20260901",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Claude tự tính: handoff BRD-032 r002=5fe75ef9..., snapshot=3ef02cb0..., predecessor COR-BRD-032-004=ae54cbd2..., live lab.py=41edf512...; tất cả khớp correction/incident và supersede chain. Mắt xích 004 đã REVISE nên 005 nối lại đúng previous_sha256=3ef02cb0, không đi qua current 0495f233 đã vô hiệu. Diff snapshot→live chỉ bổ sung schema/reachability/runtime-scope guard fail-closed, không xóa hoặc nới physics gate; capability matrix vẫn SCREENED với solver/arch capability ABSENT hoặc PARTIAL. Host evidence 74/74 test pass và runtime drift exit 0."
+  ],
+  "notes": "APPROVE chỉ phục hồi provenance cho lab.py. Reviewer claude-provenance-20260901 khác correction agent codex và handoff agent claude; tự kiểm hash/diff/ledger, không chạy lab CLI. Không nâng claim kỹ thuật trên SCREENED."
+}

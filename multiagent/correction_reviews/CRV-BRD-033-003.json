@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-033-003",
+  "task_id": "BRD-033",
+  "incident_id": "INC-BRD-033-003",
+  "correction_sha256": "ca99a61c5b1099f08ff5e378d20c48dff590b288e273278d5c3356fe4cc57e86",
+  "reviewer_id": "claude-provenance-20260901",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Claude tự tính: handoff BRD-033 r002=101c6bb4..., snapshot=3ef02cb0..., predecessor COR-BRD-033-002=04f83873..., live lab.py=41edf512...; tất cả khớp correction/incident và supersede chain. Vì 002 đã REVISE, 003 nối lại đúng anchor approved 3ef02cb0 và bỏ nhánh 0495f233 vô hiệu. Diff snapshot→live chỉ thêm runtime-scope policy, _machine_gates_for_task, _task_reachability và claim-time fail-closed; không làm yếu correction ledger hoặc nâng claim. Capability matrix vẫn giữ PARTIAL/ABSENT; host evidence 74/74 test pass và runtime drift exit 0."
+  ],
+  "notes": "APPROVE chỉ phục hồi provenance hash của lab.py. Reviewer độc lập cấp phiên, không sửa file hay gọi lab CLI; không xác nhận hình học/solver và không nâng claim trên SCREENED."
+}

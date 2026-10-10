@@ -1,0 +1,360 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "MIDAS-PSC-SECTION-BASIS-0.1",
+  "module": "bridge_evolution/midas_section.py",
+  "module_version": "midas-section/0.1.0",
+  "claim_level": "IDEA",
+  "purpose": "Ghi nguồn, quy ước hình học và cờ kiểm chứng cho cầu nối mặt cắt PSC-1CELL/2CELL của MIDAS Civil. Module chỉ sinh hình học và dữ liệu nhập; không kiểm tra chịu lực.",
+  "sources": {
+    "field_order": {
+      "ref": "MIDAS API Online Manual > JSON Manual > Section Properties - PSC",
+      "url": "https://support.midasuser.com/hc/en-us/articles/35851688190105",
+      "accessed": "2026-09-03",
+      "what": "Bảng 'Dimension Table for PSC Sections' (vSIZE_PSC_A/B/C/D theo shape 1CEL/2CEL) và bảng 'Joint On/Off' (JOINT index 0..7 = JO1, JO2, JO3, JI1, JI2, JI3, JI4, JI5)"
+    },
+    "geometry_convention": {
+      "ref": "MIDAS Civil Manual/Tutorials/05. FCM General.pdf, Figure 4 (Define Center Span Section) và Figure 5 (Define Box Section at Supports), hình guide PSC Viewer",
+      "local_path": "C:/Program Files/MIDAS/midas Civil/Manual/Tutorials/05. FCM General.pdf",
+      "what": "Ví dụ số thật: Span HO1 0.25, HO2 0.35, HO3 2.1, BO1 2.8, BO1-1 1.05, BO3 3.55, HI1 0.275, HI2 0.325, HI3 1.59, HI4 0.25, HI5 0.26, BI1 3.1, BI1-1 1.35, BI3 3.1, BI3-1 1.85; Support giống nhưng HO3 6.4, HI3 5.3, HI5 0.85; JO1/JI1/JI5 bật; Offset Center-Top"
+    },
+    "psc_value": {
+      "ref": "MIDAS API Online Manual > Section Properties - PSC Value",
+      "url": "https://support.midasuser.com/hc/en-us/articles/39233604772633",
+      "what": "OUTER_POLYGON / INNER_POLYGON: Array[{VERTEX: [{X, Y}]}] — JSON Schema của trang dùng khoá VERTEX (bảng mô tả viết 'Vertex'); vSIZE = [HT, BT, T1, T2] bắt buộc; PERIIN/PERIOUT tuỳ chọn; ví dụ PSC-Value trong manual dùng SHAPE = \"VALU\""
+    },
+    "dialog_semantics": {
+      "ref": "MIDAS Civil Online Help_CIVIL NX > Section Properties - PSC",
+      "url": "https://support.midasuser.com/hc/en-us/articles/17616321981465-Section-Properties-PSC",
+      "what": "Joint On/Off, Section Type 1 Cell/2 Cell, Shear Check Z1/Z2/Z3 (Auto), Web Thick t1/t2/t3 và t xoắn, Table Input, PSC Viewer"
+    },
+    "dbuser_box_verified": {
+      "ref": "midas-mcp (dự án chị em, ngoài repo này): DBUSER shape B nạp thành công trên Civil 2022 qua MCT Command Shell 2026-08-26",
+      "external_root": "D:/BIM  CIM/DỰ ÁN NCKH 2 2026/midas-mcp/evidence",
+      "files": [
+        {
+          "path": "revit-to-midas-psc-box-live-verification.json",
+          "bytes": 2173,
+          "sha256": "d986b16b2d361487c303068a0b0c9d14ba0ae3ca74567c3626ca3ed5ba830b9d"
+        },
+        {
+          "path": "revit-to-midas-psc-box-generation.json",
+          "bytes": 2268,
+          "sha256": "a802cd035a1f48ae78c4387bc498a38d317cce39283376335cb56aada381fb97"
+        },
+        {
+          "path": "psc-box-probe.png",
+          "bytes": 90417,
+          "sha256": "a370f231b20a1fbd772085e89317e5c618fab5fb63926b4e7abec1847a483abe"
+        }
+      ],
+      "what": "Thứ tự tham số H, B_top, t_top, t_web, B_bottom, t_bottom theo boxSectionLine trong midas-mcp/src/revit-bridge.js; bằng chứng nằm ngoài repo nên được neo bằng SHA-256 ở đây"
+    },
+    "midas_api_example_1cell": {
+      "ref": "MIDAS API Online Manual > Section Properties - PSC > Examples > PSC-1CELL (Assign 401)",
+      "url": "https://support.midasuser.com/hc/en-us/articles/35851688190105",
+      "vSIZE_PSC_A": [
+        0.23,
+        0.42,
+        0.055,
+        0.18,
+        1.68,
+        0.23
+      ],
+      "vSIZE_PSC_B": [
+        1.23,
+        0.44,
+        0.9,
+        0.6,
+        0.02,
+        1.8
+      ],
+      "vSIZE_PSC_C": [
+        0.22,
+        0.44,
+        0.05,
+        0.14,
+        1.23,
+        0.88,
+        0.2,
+        0.025,
+        0.09,
+        0.21
+      ],
+      "vSIZE_PSC_D": [
+        1.91,
+        0.89,
+        1.56,
+        1.69,
+        1.48,
+        0.57,
+        1.1,
+        0
+      ],
+      "SWIDTH": 0.23,
+      "JOINT": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "PSC_OPT1": "",
+      "PSC_OPT2": "",
+      "what": "1CEL vẫn xuất 8 phần tử vSIZE_PSC_D (BI4 = 0) và SWIDTH = vSIZE_PSC_A[0]; HI1+HI2+HI3+HI4+HI5 = 2,30 ≠ H = 2,33 → MIDAS không bắt buộc đẳng thức chiều cao trong"
+    }
+  },
+  "geometry_conventions": {
+    "axes": "y ngang (dương phải), z đứng (dương lên), mặt đỉnh z = 0, đối xứng qua y = 0; đơn vị m",
+    "depth": "H = HO1 + HO2 + HO3. Lỗ: bản trên theo HI1 (từ đỉnh) và vút HI2; bản đáy theo HI5 (từ đáy) và vút HI4; băng sườn hiệu dụng = H − HI1 − HI2 − HI4 − HI5. MIDAS không bắt buộc HI1+…+HI5 = H (ví dụ manual lệch 0,03 m); lệch với HI3 nhập chỉ là cảnh báo (consistency_warnings), chặn khi băng sườn ≤ 0",
+    "widths": "nửa bề rộng đỉnh = BO1 + BO2 + BO3; nửa bề rộng đáy = BO3; BO2 = độ chạy ngang của sườn ngoài",
+    "outer_sub_dims": "BO1-1 (JO1), BO1-2 (JO2) đo từ MÚT cánh hẫng; HO2-1, HO2-2 đo từ mức đáy mút cánh (sau HO1) xuống; JO3: BO2-1 đo từ góc đáy ngoài ra phía cánh, HO3-1 đo từ đáy lên",
+    "inner_sub_dims": "BI1-1 (JI1), BI1-2 (JI2), BI2-1 (JI3), BI3-1 (JI5), BI3-2 (JI4) đo từ TIM; HI2-1/HI2-2 đo từ mặt trong bản trên (mức HI1) xuống; HI3-1 đo từ góc trên lỗ xuống; HI4-1 (JI5), HI4-2 (JI4) đo từ mặt trong bản đáy lên",
+    "joint_order_around_void": "JI1 (bản trên, gần tim) → JI2 (bản trên, gần sườn) → JI3 (sườn) → JI4 (bản đáy, gần sườn) → JI5 (bản đáy, gần tim)",
+    "two_cell_assumption": "2CELL: BI4 = nửa dày sườn giữa; hai lỗ đối xứng, khớp chỉ ở sườn ngoài — GIẢ ĐỊNH, chưa đối chiếu hình guide 2CELL",
+    "shear_positions": "Z đo từ thớ đáy như MIDAS hiển thị; Z1 = mức góc trên lỗ, Z2 = tâm, Z3 = mức góc đáy lỗ (lab ước lượng; MIDAS Auto có thể lấy hơi khác)"
+  },
+  "verification_flags": {
+    "mct_psc_1cel_2cel": {
+      "status": "SYNTAX_UNVERIFIED",
+      "note": "Dòng *SECTION PSC do lab sinh theo thứ tự trường manual API; chưa nạp thử trên Civil 2022. Cách kiểm: MCT Command Shell trong mô hình trống, hoặc xuất MCT mẫu từ MIDAS có sẵn mặt cắt PSC để đối chiếu rồi cập nhật to_mct_psc và gỡ cờ."
+    },
+    "mct_dbuser_box": {
+      "status": "VERIFIED_BY_EXTERNAL_EVIDENCE",
+      "note": "Chỉ hộp lý tưởng hoá (không vút/khớp/sườn nghiêng); bằng chứng ngoài repo, neo SHA-256 trong sources.dbuser_box_verified"
+    },
+    "midas_api_json": {
+      "status": "REFERENCE_ONLY",
+      "note": "Civil 2022 không có REST API; cấu trúc theo manual CIVIL NX"
+    },
+    "psc_value_polygon": {
+      "status": "SYNTAX_UNVERIFIED",
+      "note": "Khoá VERTEX, vSIZE và SHAPE VALU theo JSON Schema/ví dụ của manual; chiều trục X/Y và gốc toạ độ cần kiểm trong MIDAS; vSIZE = [HT, BT, T1, T2] là 'Param. for Design' của MIDAS — lab gán HT/BT từ hộp bao và T1/T2 từ gene Super-T (dày cánh trên/sườn) chỉ là GIẢ ĐỊNH ánh xạ, kỹ sư xác nhận theo trang Param for Design"
+    },
+    "section_properties": {
+      "status": "LAB_CROSS_CHECK",
+      "note": "Tích phân đa giác của lab; đối chiếu 'Show Calculation Results'; Ixx xoắn và Asy/Asz MIDAS tính bằng lưới"
+    }
+  },
+  "heuristics": {
+    "depth_ratio_pier": {
+      "value": 17.0,
+      "unit": "L/H",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-depth_ratio_pier",
+      "note": "H tại trụ ≈ L/16–L/20 cho hộp đúc hẫng"
+    },
+    "depth_ratio_mid": {
+      "value": 45.0,
+      "unit": "L/H",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-depth_ratio_mid",
+      "note": "H giữa nhịp ≈ L/40–L/50"
+    },
+    "depth_min_mid_m": {
+      "value": 2.2,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-depth_min_mid_m",
+      "note": "đủ không gian trong hộp để thi công/kiểm tra"
+    },
+    "cantilever_max_m": {
+      "value": 3.0,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-cantilever_max_m",
+      "note": "cánh hẫng bản mặt cầu"
+    },
+    "cantilever_ratio_of_width": {
+      "value": 0.22,
+      "unit": "-",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-cantilever_ratio_of_width",
+      "note": "cánh hẫng ≈ 0.2–0.25 bề rộng"
+    },
+    "bottom_width_ratio": {
+      "value": 0.45,
+      "unit": "-",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-bottom_width_ratio",
+      "note": "bề rộng đáy ≈ 0.4–0.5 bề rộng mặt cầu"
+    },
+    "web_run_max_m": {
+      "value": 1.5,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-web_run_max_m",
+      "note": "độ chạy ngang tối đa của sườn nghiêng"
+    },
+    "web_thickness_mid_m": {
+      "value": 0.45,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-web_thickness_mid_m",
+      "note": "sườn 0.40–0.50 m ở nhịp (đủ đặt ống cáp + đổ bê tông)"
+    },
+    "web_thickness_pier_m": {
+      "value": 0.6,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-web_thickness_pier_m",
+      "note": "sườn dày hơn gần trụ do cắt"
+    },
+    "top_slab_min_m": {
+      "value": 0.25,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-top_slab_min_m",
+      "note": "bản mặt cầu tối thiểu"
+    },
+    "top_slab_ratio_of_spacing": {
+      "value": 0.04,
+      "unit": "-",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-top_slab_ratio_of_spacing",
+      "note": "≈ 1/25 khoảng cách sườn"
+    },
+    "cantilever_tip_thickness_m": {
+      "value": 0.25,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-cantilever_tip_thickness_m",
+      "note": "đầu cánh hẫng"
+    },
+    "bottom_slab_mid_m": {
+      "value": 0.25,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-bottom_slab_mid_m",
+      "note": "bản đáy giữa nhịp"
+    },
+    "bottom_slab_pier_ratio_of_depth": {
+      "value": 0.13,
+      "unit": "-",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-bottom_slab_pier_ratio_of_depth",
+      "note": "bản đáy tại trụ dày để chịu nén âm"
+    },
+    "bottom_slab_pier_min_m": {
+      "value": 0.6,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-bottom_slab_pier_min_m",
+      "note": "tối thiểu tại trụ"
+    },
+    "haunch_width_m": {
+      "value": 1.0,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-haunch_width_m",
+      "note": "vút bản-sườn"
+    },
+    "haunch_depth_m": {
+      "value": 0.3,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-haunch_depth_m",
+      "note": "vút bản-sườn"
+    },
+    "min_sub_dim_m": {
+      "value": 0.05,
+      "unit": "m",
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-min_sub_dim_m",
+      "note": "sàn hình học cho kích thước phụ (BO1-2, BI1-1, BI3-1) khi vút dài hơn cánh/lỗ; chỉ để đa giác hợp lệ, không phải cấu tạo"
+    }
+  },
+  "heuristics_note": "Mọi giá trị trên là kinh nghiệm thiết kế sơ bộ cầu hộp BTDƯL đúc hẫng, CHƯA dẫn điều khoản tiêu chuẩn hay tài liệu cụ thể. Đề xuất sinh ra là IDEA; kỹ sư chịu trách nhiệm rà từng số trước khi phân tích trong MIDAS.",
+  "not_claimed": [
+    "Không có kiểm tra cường độ, sử dụng, ổn định, mỏi, độ bền",
+    "Không có bố trí cáp DƯL, cốt thép thường, giai đoạn thi công",
+    "Không thay 'Show Calculation Results' của MIDAS"
+  ],
+  "midas_api_json_defaults": {
+    "note": "Giá trị MẶC ĐỊNH do lab đặt cho các khoá tuỳ chọn của db/SECT, bám tập khoá của ví dụ PSC-1CELL trong manual (USE_SYMMETRIC true như ví dụ); không phải quyết định kỹ thuật; MIDAS ghi đè theo dialog.",
+    "PSC_OPT1": "",
+    "PSC_OPT2": "",
+    "USE_SHEAR_DEFORM": true,
+    "USE_WARPING_EFFECT": false,
+    "USE_WEB_THICK": [
+      false,
+      false
+    ],
+    "USE_WEB_THICK_SHEAR": [
+      [
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false
+      ]
+    ],
+    "USE_SYMMETRIC": true,
+    "OFFSET_CENTER": 0,
+    "USER_OFFSET_REF": 0,
+    "HORZ_OFFSET_OPT": 0,
+    "USERDEF_OFFSET_YI": 0,
+    "VERT_OFFSET_OPT": 0,
+    "USERDEF_OFFSET_ZI": 0,
+    "WARPING_CHK_AUTO_I": true,
+    "WARPING_CHK_AUTO_J": true,
+    "WARPING_CHK_POS_I": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "WARPING_CHK_POS_J": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "WEB_THICK": [
+      0,
+      0
+    ],
+    "WEB_THICK_SHEAR": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "USE_SMALL_HOLE": false,
+    "USE_USER_DEF_MESHSIZE": false,
+    "USE_USER_INTPUT_STIFF": false
+  },
+  "family_law": "Họ mặt cắt biến thiên: trọng số f(x) = ((L − x)/L)^n; các kích thước độc lập d(x) = d_mid + (d_pier − d_mid)·f; x = 0 trả đúng mặt cắt trụ, x = L trả đúng mặt cắt nhịp; nếu cả hai mặt cắt đầu có sườn trong song song sườn ngoài (và JI3 tắt) thì BI3 ở trạm giữa được SUY từ độ dốc sườn ngoài BO2/HO3 để giữ dày sườn không đổi (web_parallel_preserved = true), ngược lại nội suy tuyến tính và phát family_warnings; hai mặt cắt phải cùng cell và cùng JOINT",
+  "applicability": {
+    "note": "Miền áp dụng của bảng heuristic đề xuất; ngoài miền thì propose_box_from_spans từ chối thay vì sinh cặp trụ/nhịp mà họ mặt cắt không nhận",
+    "main_span_m": {
+      "min": 40.0,
+      "max": 250.0,
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-applicability_main_span_m",
+      "note": "dưới 40 m thì H trụ ≈ L/17 < H nhịp tối thiểu 2,2 m → không còn là bài toán đúc hẫng; trên 250 m ngoài kinh nghiệm bảng"
+    },
+    "deck_width_m": {
+      "min": 6.0,
+      "max": 30.0,
+      "clause_id": "LAB-HEURISTIC-UNSOURCED-applicability_deck_width_m",
+      "note": "một hộp 1 ngăn; rộng hơn cần 2CELL/2 hộp"
+    }
+  }
+}

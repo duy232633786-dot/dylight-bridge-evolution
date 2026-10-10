@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-040",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Sửa guard F1 theo review r001: mọi translation DOF vào rank check, chỉ loại rz tại nút thuần truss có lý do, condition trên Jacobi-scaled K và result neo hash bytes source solver.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/frame_f1.py",
+      "sha256": "f86ef297516c2360063e5bf72797221cdd87c236340c288e0a42de00fb5d3489",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/frame_f1_model.schema.json",
+      "sha256": "15bce3cbf61e934ff995ee30e6d2a625eb9662a90213bc3a25600b5ef60caa30",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/frame_f1_result.schema.json",
+      "sha256": "f7e7b60a295f964b060b07475b8537d67121d3c939b3b455e107108c05d5c121",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/frame_f1_basis.json",
+      "sha256": "6836622792686257d9ee0bb8655cb91a46a028c656c17863e20a60ef7e9a8e4a",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_frame_f1.py",
+      "sha256": "1be43ee7a8dd2dae3c42ec1b6d278006b8e06ca43a62dcd14b6957f4aba119b6",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "FRAME_2D vẫn là Euler-Bernoulli đàn hồi tuyến tính chuyển vị nhỏ; TRUSS_2D không có DOF quay."
+  ],
+  "unresolved_risks": [
+    "F1 chưa có P-Delta, eigen-buckling, cracking/yielding, prestress, dynamics, fatigue, connection, foundation hoặc construction staging."
+  ],
+  "next_action": "Claude re-review r002, tái chạy hai cơ cấu B/B2, đồng dạng A/A2 và kiểm solver source hash."
+}

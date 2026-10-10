@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-018-001",
+  "task_id": "BRD-018",
+  "incident_id": "INC-BRD-018-001",
+  "correction_sha256": "f7741eb981a6cfeec0a51406f37c8d6b484fb2c9f16183cc1da7fd8504201208",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Claude tự xác minh correction SHA f7741e..., handoff gốc SHA 5ba854..., snapshot byte-exact 168e4118... và live artifact e629377d... đều khớp.",
+    "Incident/correction schema-valid, link kín; handoff và review BRD-018 lịch sử không bị sửa.",
+    "Snapshot còn trùng bytes commit HEAD trước drift; correction không phải snapshot dựng sau để hợp thức hóa.",
+    "Claude tự chạy verification command: 21 passed; đây chỉ là governance software evidence."
+  ],
+  "notes": "APPROVE provenance bookkeeping. Correction nối lineage BRD-018 sang migration BRD-048, không thay đổi phán quyết BRD-018 và không tạo bằng chứng kỹ thuật cầu."
+}

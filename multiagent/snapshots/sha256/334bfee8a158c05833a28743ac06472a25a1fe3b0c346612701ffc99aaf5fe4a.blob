@@ -1,0 +1,380 @@
+"""BRD-038 — tìm kiếm mạnh hơn nhưng fail-closed ngoài miền mô hình."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from bridge_evolution.design_study import (
+    ApplicabilityRegistryError,
+    assess_candidate,
+    check_model_applicability,
+    load_applicability_registry,
+    robust_pareto,
+    stratified_genes,
+    stratified_multifamily,
+)
+from bridge_evolution.geometry import check_geometry
+from bridge_evolution.state import state_from_gene
+
+
+def _gene(family: str) -> dict:
+    genes = {
+        "i_girder_parametric_v1": {
+            "girder_catalog_id": "I-PARAM",
+            "girder_count": 5,
+            "girder_spacing_mm": 2400,
+            "deck_slab_thickness_mm": 200,
+            "girder_concrete_id": "C50",
+            "deck_concrete_id": "C35",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-42",
+            "girder_depth_mm": 1800,
+            "top_flange_width_mm": 1000,
+            "top_flange_thickness_mm": 180,
+            "web_thickness_mm": 200,
+            "bottom_flange_width_mm": 650,
+            "bottom_flange_thickness_mm": 300,
+        },
+        "box_girder_parametric_v1": {
+            "girder_catalog_id": "BOX-PARAM",
+            "girder_count": 1,
+            "girder_spacing_mm": 12000,
+            "deck_slab_thickness_mm": 250,
+            "girder_concrete_id": "C50",
+            "deck_concrete_id": "C35",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-42",
+            "box_web_height_mm": 2400,
+            "box_bottom_width_mm": 6500,
+            "box_bottom_slab_mm": 250,
+            "box_web_thickness_mm": 450,
+        },
+        "composite_i_girder_parametric_v1": {
+            "girder_catalog_id": "CI-PARAM",
+            "girder_count": 5,
+            "girder_spacing_mm": 2400,
+            "deck_slab_thickness_mm": 250,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C35",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-34",
+            "steel_depth_mm": 2000,
+            "steel_top_flange_width_mm": 500,
+            "steel_top_flange_thickness_mm": 30,
+            "steel_web_thickness_mm": 20,
+            "steel_bottom_flange_width_mm": 700,
+            "steel_bottom_flange_thickness_mm": 50,
+        },
+    }
+    return dict(genes[family])
+
+
+def _state(family: str) -> dict:
+    return state_from_gene(_gene(family), grammar_id=family)
+
+
+def _known(value):
+    return {
+        "status": "KNOWN",
+        "value": value,
+        "source_ref": "docs/design_basis/DB-SUPERT-38M.json",
+    }
+
+
+def _complete_site() -> dict:
+    return {
+        "site_id": "TEST-SITE",
+        "site_status": "SPECIFIED",
+        "site_status_note": "Hồ sơ tổng hợp dùng để kiểm thử contract.",
+        "schema_version": "1.1",
+        "coordinate_reference_system": {
+            "horizontal_crs": _known("EPSG:3405"),
+            "vertical_datum": _known("HONDAU"),
+        },
+        "hydrology_scour": {
+            "design_flood_frequency_years": _known(100),
+            "design_water_level_m": _known(8.0),
+            "estimated_scour_depth_m": _known(2.0),
+            "tidal_range_m": _known(0.5),
+            "navigation_clearance": _known("NOT_REQUIRED"),
+        },
+        "seismic_hazard": {
+            "pga_g": _known(0.12),
+            "site_class": _known("D_STIFF_SOIL"),
+            "seismic_performance_zone": _known(2),
+        },
+        "wind_hazard": {
+            "basic_wind_speed_m_s": _known(45.0),
+            "gust_effect_factor": _known(1.1),
+            "aerodynamic_risk_level": _known("LOW"),
+        },
+        "geographic_location": {
+            "latitude": _known(21.0),
+            "longitude": _known(105.8),
+            "terrain_category": _known("B_SUBURBAN"),
+        },
+        "geotechnical_category": _known("DEEP_ALLUVIAL"),
+        "geotechnical_investigation": {
+            "investigation_status": "COMPLETE",
+            "report_ref": "docs/design_basis/DB-SUPERT-38M.json",
+        },
+        "corrosion_exposure": _known("COASTAL_SPRAY"),
+        "g0_gate": {
+            "gate": "G0",
+            "status": "PASSED",
+            "assessed_by": "test engineer",
+            "blocking_items": [],
+        },
+        "document_provenance": {
+            "task_id": "TEST",
+            "prepared_by": "test fixture",
+            "review_status": "ENGINEER_APPROVED",
+            "claim_ceiling": "SCREENED",
+        },
+    }
+
+
+def test_registry_is_schema_valid_and_semantically_ordered(tmp_path):
+    registry = load_applicability_registry()
+    assert registry["claim_ceiling"] == "SCREENED"
+    assert set(registry["families"]) >= {
+        "super_t_parametric_v2", "i_girder_parametric_v1",
+        "box_girder_parametric_v1", "composite_i_girder_parametric_v1",
+    }
+
+    bad = json.loads(json.dumps(registry))
+    bad["families"]["i_girder_parametric_v1"]["domain"]["span_m"] = {
+        "min": 80, "max": 10,
+    }
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(bad), encoding="utf-8")
+    with pytest.raises(ApplicabilityRegistryError, match="span_m min > max"):
+        load_applicability_registry(path)
+
+
+def test_stratified_sampling_is_deterministic_balanced_and_multifamily_round_robin():
+    a = stratified_genes("i_girder_parametric_v1", 12, seed=41)
+    b = stratified_genes("i_girder_parametric_v1", 12, seed=41)
+    c = stratified_genes("i_girder_parametric_v1", 12, seed=42)
+    assert a == b
+    assert a != c
+    assert len(a) == 12
+    registry = load_applicability_registry()
+    assert a[0] == registry["families"]["i_girder_parametric_v1"]["anchor_gene"]
+    assert len({row["girder_depth_mm"] for row in a}) >= 11
+    # Miền 3 giá trị phải được phủ gần cân bằng, kể cả anchor bắt buộc.
+    counts = {n: sum(row["girder_count"] == n for row in a) for n in (4, 5, 6)}
+    assert max(counts.values()) - min(counts.values()) <= 1
+
+    families = ["i_girder_parametric_v1", "box_girder_parametric_v1"]
+    proposals = stratified_multifamily(families, 3, seed=7)
+    assert [p["family"] for p in proposals] == families * 3
+    assert [p["sample_index"] for p in proposals] == [0, 0, 1, 1, 2, 2]
+
+
+def test_box_l1_is_blocked_before_evaluator_and_l0_is_allowed():
+    calls = []
+
+    def evaluator(state):
+        calls.append(state)
+        raise AssertionError("evaluator không được gọi")
+
+    state = _state("box_girder_parametric_v1")
+    blocked = assess_candidate(
+        state, study_level="L1_STRUCTURAL", site_profile=_complete_site(),
+        evaluator=evaluator,
+    )
+    assert blocked["status"] == "BLOCKED"
+    assert {b["code"] for b in blocked["blockers"]} >= {"APP-LEVEL-001", "APP-SOLVER-001"}
+    assert calls == []
+
+    l0 = assess_candidate(state, study_level="L0_GEOMETRY", evaluator=evaluator)
+    assert l0["status"] == "L0_SCREENED"
+    assert l0["claim_level"] == "IDEA"
+    assert calls == []
+
+
+def test_composite_geometry_can_be_studied_but_builtin_l1_never_runs():
+    calls = []
+
+    def evaluator(state):
+        calls.append(state)
+        raise AssertionError("evaluator không được gọi")
+
+    state = _state("composite_i_girder_parametric_v1")
+    l0 = assess_candidate(state, study_level="L0_GEOMETRY", evaluator=evaluator)
+    assert l0["status"] == "L0_SCREENED"
+    l1 = assess_candidate(
+        state, study_level="L1_STRUCTURAL", site_profile=_complete_site(),
+        evaluator=evaluator,
+    )
+    assert l1["status"] == "REJECTED"
+    assert any(b["rule_id"] == "SOLVER-COMPOSITE-001" for b in l1["blockers"])
+    assert calls == []
+
+
+def test_skew_span_and_distribution_domain_fail_closed():
+    state = _state("i_girder_parametric_v1")
+    violations, geom = check_geometry(state)
+    assert not [v for v in violations if v["severity"] == "HARD"]
+
+    skewed = json.loads(json.dumps(state))
+    skewed["project_inputs"]["skew_deg"] = 10
+    blockers = check_model_applicability(
+        skewed, geom, study_level="L1_STRUCTURAL", site_profile=_complete_site())
+    assert "APP-SKEW-001" in {b["code"] for b in blockers}
+
+    long_span = json.loads(json.dumps(state))
+    long_span["project_inputs"]["span_length_m"] = 90
+    blockers = check_model_applicability(
+        long_span, geom, study_level="L1_STRUCTURAL", site_profile=_complete_site())
+    assert "APP-SPAN-001" in {b["code"] for b in blockers}
+
+    outside = json.loads(json.dumps(geom))
+    outside["spacing_m"] = 6.0
+    blockers = check_model_applicability(
+        state, outside, study_level="L1_STRUCTURAL", site_profile=_complete_site())
+    assert any(b["code"] == "APP-DF-001" and b["field"] == "distribution/spacing_mm"
+               for b in blockers)
+
+
+def test_missing_site_blocks_before_evaluator_but_complete_site_can_promote():
+    state = _state("i_girder_parametric_v1")
+    calls = []
+
+    def evaluator(candidate):
+        calls.append(candidate)
+        return {
+            "case_id": "BT-test",
+            "status": "SUCCESS",
+            "feasible": True,
+            "violations": [],
+            "objectives": {
+                "relative_cost": 100.0,
+                "material_mass_t": 200.0,
+                "embodied_carbon_kgCO2e": 300.0,
+            },
+            "responses": {"max_utilization": 0.8},
+        }
+
+    missing = assess_candidate(state, site_profile=None, evaluator=evaluator)
+    assert missing["status"] == "BLOCKED"
+    assert "SITE-001" in {b["code"] for b in missing["blockers"]}
+    assert calls == []
+
+    passed = assess_candidate(state, site_profile=_complete_site(), evaluator=evaluator)
+    assert passed["status"] == "SCREENED"
+    assert passed["claim_level"] == "SCREENED"
+    assert len(calls) == 1
+
+
+def test_site_known_labels_do_not_pass_without_real_sources_and_engineer_gate():
+    state = _state("i_girder_parametric_v1")
+    _, geom = check_geometry(state)
+
+    missing_source = _complete_site()
+    missing_source["wind_hazard"]["basic_wind_speed_m_s"]["source_ref"] = \
+        "research/nonexistent-wind-report.pdf"
+    blockers = check_model_applicability(
+        state, geom, study_level="L1_STRUCTURAL", site_profile=missing_source)
+    assert "SITE-SOURCE-001" in {b["code"] for b in blockers}
+
+    unreviewed = _complete_site()
+    unreviewed["document_provenance"]["review_status"] = "AGENT_REVIEWED"
+    unreviewed["g0_gate"] = {
+        "gate": "G0",
+        "status": "BLOCKED",
+        "assessed_by": "agent",
+        "blocking_items": ["Chưa có kiểm tra độc lập"],
+    }
+    blockers = check_model_applicability(
+        state, geom, study_level="L1_STRUCTURAL", site_profile=unreviewed)
+    assert {"SITE-G0-001", "SITE-REVIEW-001"} <= {b["code"] for b in blockers}
+
+
+def test_canonical_unspecified_site_blocks_the_real_project_before_evaluator():
+    site_path = Path(__file__).resolve().parents[1] / "docs" / "design_basis" / "SITE-UNSPECIFIED.json"
+    site = json.loads(site_path.read_text(encoding="utf-8"))
+    calls = []
+
+    def evaluator(candidate):
+        calls.append(candidate)
+        raise AssertionError("site G0 BLOCKED không được mở evaluator")
+
+    result = assess_candidate(
+        _state("i_girder_parametric_v1"), site_profile=site, evaluator=evaluator)
+    assert result["status"] == "BLOCKED"
+    codes = {b["code"] for b in result["blockers"]}
+    assert {"SITE-STATUS-001", "SITE-G0-001", "SITE-REVIEW-001", "SITE-001"} <= codes
+    assert calls == []
+
+
+def test_malformed_site_fails_closed_without_crashing_or_calling_evaluator():
+    calls = []
+    result = assess_candidate(
+        _state("i_girder_parametric_v1"),
+        site_profile={"site_id": "BROKEN"},
+        evaluator=lambda state: calls.append(state),
+    )
+    assert result["status"] == "BLOCKED"
+    assert "SITE-SCHEMA-001" in {b["code"] for b in result["blockers"]}
+    assert calls == []
+
+
+def _sample(cost, mass, carbon, utilization):
+    return {
+        "objectives": {
+            "relative_cost": cost,
+            "material_mass_t": mass,
+            "embodied_carbon_kgCO2e": carbon,
+        },
+        "max_utilization": utilization,
+    }
+
+
+def test_robust_pareto_uses_ucb_worst_case_and_blocks_weak_evidence():
+    studies = [
+        {"case_id": "A", "status": "SCREENED", "samples": [
+            _sample(100, 100, 100, 0.80),
+            _sample(102, 101, 103, 0.85),
+            _sample(98, 99, 97, 0.90),
+        ]},
+        {"case_id": "B", "status": "SCREENED", "samples": [
+            _sample(110, 88, 90, 0.82),
+            _sample(112, 90, 92, 0.84),
+            _sample(108, 92, 88, 0.86),
+        ]},
+        {"case_id": "C", "status": "SCREENED", "samples": [
+            _sample(130, 130, 130, 0.70),
+            _sample(132, 132, 132, 0.72),
+            _sample(128, 128, 128, 0.74),
+        ]},
+        {"case_id": "D", "status": "SCREENED", "samples": [
+            _sample(80, 80, 80, 0.60),
+        ]},
+        {"case_id": "E", "status": "SCREENED", "samples": [
+            _sample(70, 70, 70, 0.90),
+            _sample(72, 72, 72, 1.02),
+            _sample(68, 68, 68, 0.95),
+        ]},
+    ]
+    result = robust_pareto(studies, min_samples=3)
+    assert {item["case_id"] for item in result["front"]} == {"A", "B"}
+    assert {item["case_id"] for item in result["eligible"]} == {"A", "B", "C"}
+    assert {item["code"] for item in result["blocked"]} == {
+        "ROBUST-SAMPLES-001", "ROBUST-UTIL-001",
+    }
+    a = next(item for item in result["eligible"] if item["case_id"] == "A")
+    assert a["robust_objectives"]["relative_cost"] > 100.0
+    assert a["worst_case_utilization"] == 0.90
+    assert len(a["source_digest"]) == 64
+
+
+def test_robust_pareto_rejects_duplicate_case_ids():
+    candidate = {"case_id": "X", "status": "SCREENED", "samples": [
+        _sample(1, 1, 1, 0.5), _sample(1, 1, 1, 0.5), _sample(1, 1, 1, 0.5),
+    ]}
+    with pytest.raises(ValueError, match="Trùng case_id"):
+        robust_pareto([candidate, candidate])

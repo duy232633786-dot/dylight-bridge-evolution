@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-042",
+  "title": "Chẩn đoán tác dụng vòm F1 theo topology với điều kiện gối đúng bản chất",
+  "research_question": "Có thể dẫn xuất một nghiên cứu điều kiện biên từ analysis BRD-041 để DECK_ARCH biểu diễn lực xô móng bằng hai chân khóa chuyển vị, còn THROUGH_ARCH và NETWORK_ARCH biểu diễn đường truyền lực khép kín qua tie, đồng thời fail-closed và không biến chẩn đoán F1 thành verdict thiết kế hay không?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "BACKLOG",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "BRD-041"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/arch_action_f1.py",
+    "contracts/arch_action_f1_study.schema.json",
+    "docs/design_basis/arch_action_f1_basis.json",
+    "tests/test_arch_action_f1.py"
+  ],
+  "acceptance_criteria": [
+    "Chỉ nhận creative-frame analysis BRD-041 tái lập hợp lệ, status CONVERGED, claim_level IDEA và design_verdict_authority NONE; mọi parent tamper hoặc source drift phải bị chặn trước study solver",
+    "Support policy được khóa theo topology trong basis: DECK_ARCH dùng cả hai chân khóa ux-uy và thả rz; THROUGH_ARCH và NETWORK_ARCH giữ chân trái khóa ux-uy, chân phải chỉ khóa uy và cả hai thả rz",
+    "Study model chỉ được dẫn xuất từ parent frame_model bằng thay support và model_id; node, material, section, element, load case cùng source_ref phải giữ nguyên byte-canonical",
+    "Mỗi load case báo phản lực ngang hai chân, tổng phản lực đứng, residual cân bằng, horizontal thrust magnitude, signed axial-force envelope của ARCH_RIB và DECK, cùng trạng thái chẩn đoán topology-specific",
+    "DECK_ARCH canonical phải có cặp phản lực ngang cân bằng khác 0 và lực nén ARCH_RIB; tied arch canonical phải có phản lực ngang ngoài gần 0, lực nén ARCH_RIB và lực kéo DECK/tie khác 0 trong tolerance số đã khai",
+    "Nếu tác dụng cơ học kỳ vọng không xuất hiện, output phải dùng EXPECTED_ACTION_NOT_DETECTED hoặc NOT_EVALUABLE; không được im lặng coi solver CONVERGED là đạt",
+    "Manifest phải giữ parent analysis hash, candidate/hash/profile hashes, study model/result hashes, basis hash và source digests của module BRD-042 cùng ba runtime upstream",
+    "Output deterministic, additionalProperties=false, claim_level IDEA, design_verdict_authority NONE và không có feasible, verified, design_pass hoặc capacity verdict",
+    "Test âm phải phủ parent bị sửa và reseal hash ngoài, topology/support mismatch, model drift, phản lực/nội lực bị sửa rồi reseal outer hash, basis/source drift và trường verdict cấm",
+    "Không sửa bất kỳ artifact BRD-039, BRD-040 hoặc BRD-041; không sửa evaluate.py, geometry_experimental.py, fe_adapter production hoặc lab.py"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/arch_action_f1.py",
+    "contracts/arch_action_f1_study.schema.json",
+    "docs/design_basis/arch_action_f1_basis.json",
+    "tests/test_arch_action_f1.py"
+  ],
+  "safety_notes": [
+    "Hai chân khóa ux-uy là lý tưởng hóa gối/mố cho nghiên cứu tác dụng vòm 2D, không thay kiểm tra tương tác đất-móng, độ cứng mố hoặc cấu tạo gối thật",
+    "Signed axial force được suy ra từ quy ước lực đầu phần tử F1; đây là diagnostic đường truyền lực, không phải sức kháng hay utilization",
+    "Không có tự trọng tự sinh, prestress, P-Delta, buckling, phi tuyến, tải động, gió, động đất, mỏi, liên kết, móng, giai đoạn hoặc tổ hợp tiêu chuẩn",
+    "Không dùng novelty, hình thức đẹp hoặc trạng thái CONVERGED để bù EXPECTED_ACTION_NOT_DETECTED"
+  ],
+  "review_notes": [],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_arch_action_f1.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "tests/test_creative_frame_adapter.py",
+      "tests/test_arch_action_f1.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

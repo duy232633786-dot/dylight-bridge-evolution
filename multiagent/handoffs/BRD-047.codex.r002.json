@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-047",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Safe Design Study authority r002: NaN/Infinity/cycle fail-closed, L0 giữ deferred solver blockers, authority schema và solver identity được pin; provenance BRD-038 đã có hai correction byte-exact được Claude APPROVE.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/design_study.py",
+      "sha256": "2c6b6c50790136f12d9ad3f5a539faaa3304eb2fa1a510ceba7bd3829ba81b78",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/model_applicability.schema.json",
+      "sha256": "48fdb628349006c017b68094b766d47741d566baca63f5ce9d9be23b4fd2ff4c",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/model_applicability.json",
+      "sha256": "10bb58dbd992319b1325fd2bab2d33ffbb92e860f31730a8acc6f4539665e2fb",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_design_study.py",
+      "sha256": "e82c6a05d54e1bcfdb075865d79b385b6f155da70e1353cc65ef47a7a80dfcf9",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Canonical site và domain_evidence vẫn chủ động chặn L1; task này không nâng VERIFIED.",
+    "26/26 test mục tiêu và 86/86 test tích hợp là bằng chứng phần mềm, không phải kiểm toán thiết kế cầu."
+  ],
+  "unresolved_risks": [
+    "Robust sample metadata đã tái tính digest nhưng chưa được ràng buộc end-to-end với một run assess_candidate và solver provenance thật.",
+    "source_ref hash-locator chứng minh bytes của file, chưa tự chứng minh locator trỏ đúng ngữ nghĩa; vẫn cần human audit/canonical citation.",
+    "Zero-variance guard chỉ chặn khi cả ba objective bằng zero variance tuyệt đối; near-zero hoặc partial-zero variance cần task thống kê riêng.",
+    "Public check_model_applicability chưa trả authority digests và output authority chưa có JSON schema riêng.",
+    "Caller CLI/optimization legacy chưa được route qua authority; không được diễn giải feasible thấp tầng thành SCREENED.",
+    "Full suite còn 7 lỗi nền: 5 do 9 drift provenance lịch sử và 2 do fixture BRD-999 thiếu runtime_scope; không failure nào thuộc test BRD-047."
+  ],
+  "next_action": "Claude Code review độc lập r002 ở mức IDEA; sau đó mở task tích hợp route optimization và task riêng sửa fixture collaboration."
+}

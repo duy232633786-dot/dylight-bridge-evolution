@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-037",
+  "handoff_sha256": "048d2c30a7c985c96eab4ab07e8d309a0bc5072d08b7eb51337e8a0d2308bacf",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task là hạ tầng governance, không tạo design basis kỹ thuật."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task không tạo hoặc kiểm hình học cầu."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Còn bypass task SCREENED với required_gates rỗng; orchestrator chưa phát runtime_scope nên intake mới sẽ chết tại claim; policy còn capability ID không tồn tại."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có kiểm trạng thái giới hạn kết cấu."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không phải independent design verification."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có bằng chứng chế tạo hay thử nghiệm."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu nghiệm thu hoặc vận hành."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có quyền phát hành kỹ thuật."
+    }
+  ],
+  "notes": "Claude Opus review chỉ đọc: hash 3/3 khớp; REVISE vì required_gates rỗng còn bypass claim SCREENED, orchestrator chưa phát runtime_scope nên intake mới bị khóa, runtime_scope chưa amendable và policy có capability ID chưa khai. Bộ mục tiêu chung đã được Codex chạy lại, 49/49 test xanh nhưng chưa phủ các đường lỗi này."
+}

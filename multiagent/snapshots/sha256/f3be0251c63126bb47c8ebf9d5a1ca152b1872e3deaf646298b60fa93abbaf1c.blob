@@ -1,0 +1,213 @@
+{
+  "schema_version": "2.0",
+  "record_type": "NEGATIVE_RESULT",
+  "record_id": "OSR2-NEG-8ef0fdec14f24ade",
+  "claim_level": "IDEA",
+  "design_verdict_authority": "NONE",
+  "technical_scope": "HARDENED_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT",
+  "gates_completed": [],
+  "status": "NEGATIVE_RESULT_RECORDED",
+  "failure_status": "SOLVER_FAILED",
+  "basis_sha256": "a450dcde93bd04e41364b30de701e3ad4f032acb987bca9cdea370031c48ebca",
+  "reference_source_sha256": "20e46da3d9c3dad42a97585e5408965f9145dc5689140983197f4f2cde7a005a",
+  "reference_source_digests": [
+    {
+      "path": "experiments/validation/opensees_frame_reference_v2.py",
+      "sha256": "4229f1258bcd604bde80c69b418f5d89394e485b0b4754a6dc693e75824453b1"
+    },
+    {
+      "path": "experiments/validation/opensees_frame_reference.py",
+      "sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915"
+    },
+    {
+      "path": "bridge_evolution/creative_shape.py",
+      "sha256": "f8e1b393ce0bd76b97b3af69053c8fe72d2902de7b6fab8d88e3879e26646e10"
+    },
+    {
+      "path": "bridge_evolution/frame_f1.py",
+      "sha256": "1ebbd5defb47b58eb5eb9171d28c52b1db721c10c2fbfefe083f86fba756720c"
+    },
+    {
+      "path": "bridge_evolution/creative_frame_adapter.py",
+      "sha256": "cb331daeeac877471632ca693b53fb1e65b08dd63e802af3c5b18745507b8507"
+    },
+    {
+      "path": "bridge_evolution/arch_action_f1.py",
+      "sha256": "9ef18b029ad021d1ccfd696c96cc4a9a295c552663e28a5332f925220b76bace"
+    },
+    {
+      "path": "bridge_evolution/funicular_reference.py",
+      "sha256": "0483ea7383e5ba5821c34d064b74f7927768c152000e242b789f95772f0342de"
+    }
+  ],
+  "upstream_brd044_artifacts": [
+    {
+      "path": "experiments/validation/opensees_frame_reference.py",
+      "sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915"
+    },
+    {
+      "path": "experiments/validation/opensees_brd044_benchmarks.json",
+      "sha256": "d4031a4d704f6acbc7d3c3895fe62f977e4cbcf725c905858cca4db96bbc5ef2"
+    },
+    {
+      "path": "contracts/opensees_frame_reference.schema.json",
+      "sha256": "f573c6471447c4ec45c1589bb0ee65af0a2e33b653a2919e4657ce5a7b7799d7"
+    },
+    {
+      "path": "docs/design_basis/opensees_frame_reference_basis.json",
+      "sha256": "c90f857b0d81c8f1d2c210a4eaf192d6b033b3e72c4f1713daedeffe0c02c594"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference.py",
+      "sha256": "62c3446e63db82b905ddbdd56762749f1a1bee71b91ea9a4b5b1a4c81cd45193"
+    }
+  ],
+  "model": {
+    "schema_version": "1.0",
+    "model_id": "F1M-BRD045-unstable-negative",
+    "analysis_type": "LINEAR_ELASTIC_2D_SMALL_DISPLACEMENT",
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "moment": "kN_m",
+      "elastic_modulus": "GPa",
+      "area": "m2",
+      "inertia": "m4"
+    },
+    "nodes": [
+      {
+        "id": "N1",
+        "x_m": 0.0,
+        "y_m": 0.0
+      },
+      {
+        "id": "N2",
+        "x_m": 2.0,
+        "y_m": 0.0
+      }
+    ],
+    "materials": [
+      {
+        "id": "MAT1",
+        "elastic_modulus_GPa": 200.0,
+        "source_ref": "docs/design_basis/opensees_frame_reference_v2_basis.json"
+      }
+    ],
+    "sections": [
+      {
+        "id": "SEC1",
+        "area_m2": 0.02,
+        "inertia_m4": 0.002,
+        "source_ref": "docs/design_basis/opensees_frame_reference_v2_basis.json"
+      }
+    ],
+    "elements": [
+      {
+        "id": "E1",
+        "kind": "TRUSS_2D",
+        "node_i": "N1",
+        "node_j": "N2",
+        "material_id": "MAT1",
+        "section_id": "SEC1"
+      }
+    ],
+    "supports": [
+      {
+        "node_id": "N1",
+        "ux": true,
+        "uy": true,
+        "rz": true
+      }
+    ],
+    "load_cases": [
+      {
+        "id": "LC1",
+        "combination_status": "RESEARCH_BENCHMARK",
+        "source_ref": "docs/design_basis/opensees_frame_reference_v2_basis.json",
+        "nodal_loads": [
+          {
+            "node_id": "N2",
+            "fx_kN": 0.0,
+            "fy_kN": -1.0,
+            "mz_kNm": 0.0
+          }
+        ]
+      }
+    ]
+  },
+  "input_capture": {
+    "capture_kind": "CANONICAL_JSON",
+    "payload_text": "{\"analysis_type\":\"LINEAR_ELASTIC_2D_SMALL_DISPLACEMENT\",\"elements\":[{\"id\":\"E1\",\"kind\":\"TRUSS_2D\",\"material_id\":\"MAT1\",\"node_i\":\"N1\",\"node_j\":\"N2\",\"section_id\":\"SEC1\"}],\"load_cases\":[{\"combination_status\":\"RESEARCH_BENCHMARK\",\"id\":\"LC1\",\"nodal_loads\":[{\"fx_kN\":0.0,\"fy_kN\":-1.0,\"mz_kNm\":0.0,\"node_id\":\"N2\"}],\"source_ref\":\"docs/design_basis/opensees_frame_reference_v2_basis.json\"}],\"materials\":[{\"elastic_modulus_GPa\":200.0,\"id\":\"MAT1\",\"source_ref\":\"docs/design_basis/opensees_frame_reference_v2_basis.json\"}],\"model_id\":\"F1M-BRD045-unstable-negative\",\"nodes\":[{\"id\":\"N1\",\"x_m\":0.0,\"y_m\":0.0},{\"id\":\"N2\",\"x_m\":2.0,\"y_m\":0.0}],\"schema_version\":\"1.0\",\"sections\":[{\"area_m2\":0.02,\"id\":\"SEC1\",\"inertia_m4\":0.002,\"source_ref\":\"docs/design_basis/opensees_frame_reference_v2_basis.json\"}],\"supports\":[{\"node_id\":\"N1\",\"rz\":true,\"ux\":true,\"uy\":true}],\"units\":{\"area\":\"m2\",\"elastic_modulus\":\"GPa\",\"force\":\"kN\",\"inertia\":\"m4\",\"length\":\"m\",\"moment\":\"kN_m\"}}",
+    "payload_sha256": "ba6cd118a5cdf4eaef1aaeec49f792328499c649611257ace129c197efed2d64"
+  },
+  "model_payload_sha256": "ba6cd118a5cdf4eaef1aaeec49f792328499c649611257ace129c197efed2d64",
+  "worker_envelope": {
+    "hardening_audit": {
+      "artificial_rotation_audits": [
+        {
+          "artificial_rotation_reactions": [],
+          "load_case_id": "LC1"
+        }
+      ],
+      "base_worker_source_sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915",
+      "binary_owner_module": "openseespywin.opensees",
+      "loaded_forbidden_modules": [],
+      "site_packages_policy": "APPEND_AFTER_EXISTING_PATHS",
+      "worker_isolation_verified": true,
+      "worker_v2_source_sha256": "4229f1258bcd604bde80c69b418f5d89394e485b0b4754a6dc693e75824453b1"
+    },
+    "raw_result": {
+      "engine": {
+        "binary_file_name": "opensees.pyd",
+        "binary_sha256": "25ba42e1672526137d765d9c3631d1403e091f54f5afcdb9242f9243c63c3a96",
+        "engine_version": "3.8.0",
+        "name": "OpenSees",
+        "package_name": "openseespywin",
+        "package_version": "3.8.0.0",
+        "python_executable_sha256": "d8e3f0adf246db00358c0c4ed349cf714898178f9558fb0e944f79f5c07f8eaa",
+        "python_implementation": "CPython",
+        "python_version": "3.12.13",
+        "worker_source_sha256": "4229f1258bcd604bde80c69b418f5d89394e485b0b4754a6dc693e75824453b1"
+      },
+      "issues": [
+        "OpenSees analyze trả mã -3"
+      ],
+      "load_case_results": [
+        {
+          "analyze_return_code": -3,
+          "element_end_forces": [],
+          "issues": [
+            "OpenSees analyze trả mã -3"
+          ],
+          "load_case_id": "LC1",
+          "max_rotation_rad": null,
+          "max_translation_m": null,
+          "nodal_displacements": [],
+          "reactions": [],
+          "status": "SOLVER_FAILED"
+        }
+      ],
+      "model_id": "F1M-BRD045-unstable-negative",
+      "model_payload_sha256": "ba6cd118a5cdf4eaef1aaeec49f792328499c649611257ace129c197efed2d64",
+      "raw_result_sha256": "32c1b5b0b514b180be0b924420c13bbb9ece41ba0f792a66a94fca25bd8fbcc2",
+      "schema_version": "1.0",
+      "status": "SOLVER_FAILED"
+    },
+    "status": "SOLVER_FAILED",
+    "worker_envelope_sha256": "8220b11e530d51bc8a69e13ae38c74fd968374b6b01c6f7af1aab87f2dc4fb8b"
+  },
+  "issues": [
+    "OpenSees analyze trả mã -3"
+  ],
+  "limitations": [
+    "This is an immutable hardening layer over BRD-044, not a replacement or mutation of the accepted BRD-044 evidence.",
+    "This artifact compares linear-elastic 2D implementations sharing idealized geometry, sections, loads and boundary conditions; agreement cannot validate omitted physics.",
+    "This is not F2 or L2: no 3D grillage, shell or solid model, moving-load analysis, mesh convergence, bearing-foundation-soil interaction or bridge-code load combination is present.",
+    "No strength, serviceability, stability, fatigue, robustness, durability, construction-stage or hazard capacity is calculated; no safe, feasible, verified, design-pass or utilization verdict is permitted.",
+    "The backend identity is pinned to one Python executable and OpenSees binary. Trust remains bounded by the operator-selected executable and site-packages directory, whose bytes are recorded and checked but whose publisher authenticity is not established here.",
+    "site-packages is appended after existing interpreter paths. Any bridge_evolution module loaded in the worker is a structured failure; no fallback to frame_f1 is permitted.",
+    "The absolute-plus-relative tolerances are deterministic code-verification tolerances, not acceptance limits from a bridge design standard.",
+    "G2 and G4 are not passed: model-quality and independent-design gates require a real bridge design basis, higher-fidelity model, blind reproduction and discrepancy reconciliation."
+  ],
+  "record_sha256": "8dab5c4614e177800416e64c5f8a671a68368940ec0a69030d1299efa3bec502"
+}

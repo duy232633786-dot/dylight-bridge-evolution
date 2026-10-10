@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-68d23c9cfca74454",
+  "amendment_sha256": "bf130cd4ed150026a3afe4649c5ef537b6a24fa383f3e308d9f7c607cba577a9",
+  "created_at": "2026-08-29T09:37:01.917319Z",
+  "task_id": "BRD-042",
+  "authorized_by": "project_owner",
+  "reason": "BRD-041 đã được Claude review độc lập APPROVE; task kế tiếp có dependency đã ACCEPTED và write_scope tách biệt.",
+  "pre_task_sha256": "04a1e945c1a77de9dffb83abd97c36f47ab2a771ed665e8ed15c146922a1ffce",
+  "post_task_sha256": "64accf3269718bbcb4cc43c68baac5d9f4caba3fecbb39c4b2a005f5b6dc3219",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/04a1e945c1a77de9dffb83abd97c36f47ab2a771ed665e8ed15c146922a1ffce.json",
+    "sha256": "04a1e945c1a77de9dffb83abd97c36f47ab2a771ed665e8ed15c146922a1ffce"
+  },
+  "changes": [
+    {
+      "field": "status",
+      "before": "BACKLOG",
+      "after": "READY"
+    }
+  ],
+  "previous_status": "BACKLOG",
+  "next_status": "READY"
+}

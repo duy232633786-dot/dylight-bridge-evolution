@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-035",
+  "handoff_sha256": "f40af697def67133673c846cc8ea2037920fec827b0032b128748e6c3438e068",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "Claim IDEA khop claim_ceiling. Artifact khong drift: 3/3 khop sha256. Ba muc catalog moi (I-PARAM, BOX-PARAM, CI-PARAM) dung la MARKER giong ST-PARAM: parametric=true va KHONG mot truong so hoc nao - tuc khong ai bia dac trung tiet dien vao do, dung safety_note thu hai cua hop dong."
+    },
+    {
+      "gate": "G1",
+      "status": "PASS",
+      "evidence": "Hang rao girder_count duoc dung DUNG cach va toi tu kiem bang chay chu khong doc code. Cau truc: global ha 2->1, roi siet lai minimum=2 trong khoi if/then cua bon ho con lai; chi box_girder_parametric_v1 theo global. Tu dung state va goi validate_design_state: girder_count=1 duoc chap nhan CHI cho box, bi tu choi cho super_t_parametric_v2, i_girder va composite_i; girder_count=0 bi tu choi cho CA BON ho; toi them mot ca thu ba ngoai hop dong la girder_count=-1 va cung bi tu choi cho ca bon. Day la bay chinh ma safety_note canh bao (allOf la phep AND nen khong noi duoc rang buoc global tu khoi if/then) va nguoi nop da khong roi vao."
+    },
+    {
+      "gate": "G2",
+      "status": "PASS",
+      "evidence": "Tu chay lai: tests/test_multifamily_contract.py 11/11 xanh, tests/test_state.py 27/27 xanh nen BAY input_hash gold case giu nguyen - noi hop dong khong dich mot byte nao cua canonical_json. KET QUA DICH THUC SU: truoc BRD-035 ca ba ho moi deu chet o SCHEMA-001 truoc khi solver kip chay; sau khi sua, ca bon ho dung duoc BridgeDesignState hop le va evaluate_candidate di den tan verifier hinh hoc L0, tra GEOMETRY_INVALID kem rule that (GEOM-001, CONS-001, va SOLVER-COMPOSITE-001 cho ho composite). Tuc hop dong khong con chan, con viec phuong an co kha thi hay khong thi cac rule ky thuat quyet dinh - dung nhu muc tieu cua task. Cong hard gate SOLVER-COMPOSITE-001 van bat dung nhu grammar_bindings cua BRD-029 khai."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task nay chi noi hop dong va them muc catalog marker; khong dua ra bat ky claim nao ve kha nang chiu luc. Tran claim rieng cua tung ho trong grammar_bindings (box va composite dang o IDEA vi he so phan bo ngang ngoai mien ap dung) khong bi task nay dong den va van chan nhu cu."
+    }
+  ],
+  "notes": "Review doc lap boi claude (owner la opencode). Toi kiem bang cach tu dung state va goi validate_design_state chu khong doc file test: girder_count=1 chi lot cho box, bi chan o ba ho kia; girder_count=0 va -1 bi chan o ca bon. Bay gold hash giu nguyen. Ket qua dich thuc su la ba ho moi da qua duoc cong hop dong va di den verifier hinh hoc L0 that su - truoc do chung chet o SCHEMA-001 truoc khi solver kip chay. GHI NHAN MOT LOI CUA CHINH TOI: script kiem toi viet o multiagent/scratch/check_cor029.py tra sai duong dan then.properties.design_variables nen in ra 'theo global' cho moi ho; reviewer cua correction (opencode) da phat hien va tu doc schema thu cong de xac minh thay vi tin output cua toi. Bai hoc: script kiem cua reviewer cung phai duoc kiem. OBSIDIAN MIRROR se con OBSIDIAN_SYNC_PENDING mot thoi gian: task BRD-028 dang chay song song (owner codex-gpt5) va lam drift bay artifact thuoc write_scope cua no (README.md, hai file capability matrix, test_design_basis.py, test_shape_grammar_experimental.py). Do KHONG phai loi cua BRD-035; se tu het khi BRD-028 ghi correction cho phan cua no."
+}

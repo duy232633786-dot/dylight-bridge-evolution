@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-028",
+  "handoff_sha256": "2ed1dd5c3950c82f7aed7f187f678c7dba4175e47107c11eabec658cf0410f2d",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "PASS",
+      "evidence": "All 7 artifacts in BRD-028 r002 are byte-identical to r001 and live hashes match. The sole r001 blocker is resolved through COR-BRD-001-003, COR-BRD-002-003, COR-BRD-023-002, COR-BRD-024-004/005/006 and COR-BRD-022-002, each independently reviewed APPROVE. Lab status shows zero BRD-028 drift errors; the five remaining BRD-036 Revit errors are outside BRD-028 write_scope."
+    }
+  ],
+  "notes": "Independent re-review: previous Claude r001 review already confirmed fail-closed audit behavior, verifier authority, schema, deterministic hash, and 166 scoped tests; no code changes were required. r002 accurately records the seven approved provenance corrections. Claim remains IDEA and no unauthorized promotion occurred. Claude CLI was unavailable because its local login had expired, so an allowed independent reviewer different from owner codex-gpt5 performed this read-only re-review."
+}

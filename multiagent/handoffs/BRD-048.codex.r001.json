@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-048",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Migration fixture BRD-999 sang runtime_scope; project claim-ceiling test dùng policy test-only để cô lập guard, production reachability policy không đổi.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "tests/test_collaboration.py",
+      "sha256": "e629377d9bf170ec62cc0a08d4a8f1e2e93ae0cb8cb51a73ef6c76c56aa20514",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "runtime_scope fixture dùng super_t_simple_v1 và production_line_girder_l1 chỉ để test contract; không đại diện một dự án cầu thật."
+  ],
+  "unresolved_risks": [
+    "Toàn file collaboration còn 5 failure phụ thuộc 10 drift provenance canonical (gồm correction BRD-018 đang chờ review), không phải failure của migration fixture.",
+    "Policy G3/G4 được monkeypatch chỉ trong đúng test project-ceiling; nếu rò ra ngoài process test thì phải REJECT."
+  ],
+  "next_action": "Claude Code review đồng thời correction BRD-018 và handoff BRD-048; xác minh 21 targeted tests và production policy bất biến."
+}

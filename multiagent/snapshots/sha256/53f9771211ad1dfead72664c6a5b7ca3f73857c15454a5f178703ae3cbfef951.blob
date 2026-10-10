@@ -1,0 +1,375 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from copy import deepcopy
+
+import pytest
+
+from bridge_evolution import (
+    arch_action_f1,
+    creative_frame_adapter,
+    creative_portfolio,
+    creative_shape,
+    frame_f1,
+    funicular_reference,
+)
+from bridge_evolution.creative_portfolio import (
+    CreativePortfolioError,
+    run_creative_portfolio,
+    validate_creative_portfolio,
+)
+
+
+EDGE_KINDS = (
+    "ARCH_RIB",
+    "DECK",
+    "SPANDREL",
+    "END_POST",
+    "HANGER",
+    "NETWORK_HANGER",
+)
+
+
+def _canonical_sha256(value: object) -> str:
+    return hashlib.sha256(json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")).hexdigest()
+
+
+def _reseal(study: dict) -> None:
+    payload = deepcopy(study)
+    payload.pop("study_sha256", None)
+    study["study_sha256"] = _canonical_sha256(payload)
+
+
+def _walk_keys(value: object):
+    if isinstance(value, dict):
+        yield from value
+        for child in value.values():
+            yield from _walk_keys(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _walk_keys(child)
+
+
+@pytest.fixture
+def portfolio_environment(tmp_path, monkeypatch) -> dict:
+    # Các module source/basis vẫn neo vào __file__ thật. Chỉ evidence do caller
+    # cung cấp được chuyển vào sandbox tạm để kiểm source-ref contract.
+    monkeypatch.setattr(creative_shape, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(creative_frame_adapter, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(frame_f1, "REPO_ROOT", tmp_path)
+
+    technical_bytes = b'{"kind":"portfolio-technical-test"}'
+    structural_bytes = b'{"kind":"portfolio-structural-test"}'
+    (tmp_path / "technical-evidence.json").write_bytes(technical_bytes)
+    (tmp_path / "structural-evidence.json").write_bytes(structural_bytes)
+    technical_digest = hashlib.sha256(technical_bytes).hexdigest()
+    structural_digest = hashlib.sha256(structural_bytes).hexdigest()
+
+    def sourced(value: float) -> dict:
+        return {
+            "value": value,
+            "source_ref": "technical-evidence.json",
+            "expected_source_sha256": technical_digest,
+            "clause_id": "TEST-ONLY-PORTFOLIO",
+        }
+
+    technical_profile = {
+        "max_abs_slope": sourced(3.0),
+        "min_curvature_radius_m": sourced(0.5),
+        "max_member_length_m": sourced(120.0),
+        "max_member_slenderness": sourced(250.0),
+        "deck_member_depth_m": sourced(2.0),
+        "spandrel_member_depth_m": sourced(1.0),
+        "end_post_member_depth_m": sourced(1.0),
+        "hanger_member_depth_m": sourced(0.5),
+        "min_deck_arch_separation_m": sourced(0.25),
+        "min_through_arch_clearance_m": sourced(0.25),
+        "distributed_load_kN_m": sourced(20.0),
+        "rib_area_m2": sourced(3.0),
+        "allowable_compression_MPa": sourced(150.0),
+    }
+
+    def structural_profile(candidate: dict) -> dict:
+        def material() -> dict:
+            return {
+                "elastic_modulus_GPa": 200.0,
+                "source_ref": "structural-evidence.json",
+                "expected_source_sha256": structural_digest,
+                "clause_id": "TEST-ONLY-E",
+            }
+
+        def section() -> dict:
+            return {
+                "area_m2": 6.0,
+                "inertia_m4": 150.0,
+                "source_ref": "structural-evidence.json",
+                "expected_source_sha256": structural_digest,
+                "clause_id": "TEST-ONLY-A-I",
+            }
+
+        return {
+            "schema_version": "1.0",
+            "profile_id": "CFP-PORTFOLIO-TEST",
+            "candidate_id": candidate["candidate_id"],
+            "candidate_profile_sha256": candidate["profile_sha256"],
+            "support_policy": "LEFT_PIN_RIGHT_VERTICAL_ROLLER",
+            "edge_properties": {
+                kind: {"material": material(), "section": section()}
+                for kind in EDGE_KINDS
+            },
+            "deck_line_load": {
+                "q_kN_m": 1.0,
+                "direction": "GLOBAL_NEGATIVE_Y",
+                "source_ref": "structural-evidence.json",
+                "expected_source_sha256": structural_digest,
+                "clause_id": "TEST-ONLY-DECK-UDL",
+            },
+        }
+
+    return {
+        "technical_profile": technical_profile,
+        "structural_profile": structural_profile,
+    }
+
+
+@pytest.fixture
+def screened_study(portfolio_environment) -> dict:
+    result = run_creative_portfolio(
+        technical_profile=portfolio_environment["technical_profile"],
+        structural_profile_factory=portfolio_environment["structural_profile"],
+        seed=31,
+        iterations=0,
+        max_candidates=1,
+        robustness_samples=3,
+        perturbation_fraction=0.002,
+    )
+    assert result["archive"], result["blocked_candidates"]
+    return result
+
+
+def test_portfolio_is_deterministic_diverse_safe_and_reproducible(
+    portfolio_environment, screened_study,
+):
+    repeated = run_creative_portfolio(
+        technical_profile=portfolio_environment["technical_profile"],
+        structural_profile_factory=portfolio_environment["structural_profile"],
+        seed=31,
+        iterations=0,
+        max_candidates=1,
+        robustness_samples=3,
+        perturbation_fraction=0.002,
+    )
+    assert repeated == screened_study
+    validate_creative_portfolio(screened_study)
+    assert screened_study["claim_level"] == "IDEA"
+    assert screened_study["design_verdict_authority"] == "NONE"
+    assert not ({"feasible", "verified", "design_pass"} & set(_walk_keys(screened_study)))
+    assert screened_study["statistics"] == {
+        "map_elites_evaluated": 3,
+        "map_elites_occupied_cells": 3,
+        "selected_for_chain": 1,
+        "research_screened": 1,
+        "blocked": 0,
+        "pareto_front": 1,
+    }
+    entry = screened_study["archive"][0]
+    assert entry["pareto_rank"] == 0
+    assert entry["pareto_front"] is True
+    assert len(entry["robustness_samples"]) == 3
+    assert len({s["input_digest"] for s in entry["robustness_samples"]}) == 3
+    assert all(s["status"] == "RESEARCH_SCREENED" for s in entry["robustness_samples"])
+
+
+@pytest.mark.parametrize("target", ["metric", "lineage", "sample", "verdict"])
+def test_tamper_and_reseal_cannot_change_screened_evidence(screened_study, target):
+    tampered = deepcopy(screened_study)
+    entry = tampered["archive"][0]
+    if target == "metric":
+        entry["robust_metrics"]["worst_translation_ratio"] *= 0.1
+    elif target == "lineage":
+        entry["lineage"]["frame_result_sha256"] = "0" * 64
+    elif target == "sample":
+        entry["robustness_samples"][0]["sample_seed"] += 1
+    else:
+        entry["base_reference"]["feasible"] = True
+    _reseal(tampered)
+    with pytest.raises(CreativePortfolioError):
+        validate_creative_portfolio(tampered)
+
+
+def test_sample_replay_is_rejected_even_after_outer_hash_is_resealed(screened_study):
+    tampered = deepcopy(screened_study)
+    samples = tampered["archive"][0]["robustness_samples"]
+    samples[1] = deepcopy(samples[0])
+    _reseal(tampered)
+    with pytest.raises(CreativePortfolioError, match="sample 1|replay|duplicate"):
+        validate_creative_portfolio(tampered)
+
+
+def test_profile_factory_failure_is_a_blocked_record_not_a_false_success(
+    portfolio_environment,
+):
+    def broken_factory(_candidate):
+        raise RuntimeError("không có tiết diện đã phê duyệt")
+
+    result = run_creative_portfolio(
+        technical_profile=portfolio_environment["technical_profile"],
+        structural_profile_factory=broken_factory,
+        seed=7,
+        iterations=0,
+        max_candidates=1,
+        robustness_samples=3,
+        perturbation_fraction=0.002,
+    )
+    assert result["archive"] == []
+    assert result["statistics"]["blocked"] == 1
+    blocker = result["blocked_candidates"][0]
+    assert blocker["stage"] == "BASE_CHAIN"
+    assert blocker["blockers"][0]["code"] == "CP-PROFILE-001"
+    validate_creative_portfolio(result)
+
+
+def test_a_failed_perturbation_blocks_the_whole_parent(portfolio_environment):
+    valid_factory = portfolio_environment["structural_profile"]
+
+    def baseline_only(candidate):
+        if any(abs(float(value)) > 0.0 for value in candidate["genome"]["shape_coefficients"]):
+            raise RuntimeError("perturbed geometry chưa có structural profile")
+        return valid_factory(candidate)
+
+    result = run_creative_portfolio(
+        technical_profile=portfolio_environment["technical_profile"],
+        structural_profile_factory=baseline_only,
+        seed=11,
+        iterations=0,
+        max_candidates=1,
+        robustness_samples=3,
+        perturbation_fraction=0.002,
+    )
+    assert result["archive"] == []
+    assert result["blocked_candidates"][0]["stage"] == "ROBUSTNESS"
+    assert result["blocked_candidates"][0]["blockers"][0]["code"] == "CP-PERTURB-002"
+    validate_creative_portfolio(result)
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"seed": True},
+        {"iterations": -1},
+        {"max_candidates": 0},
+        {"robustness_samples": 2},
+        {"perturbation_fraction": float("nan")},
+        {"perturbation_fraction": 0.11},
+    ],
+)
+def test_invalid_run_policy_is_fail_closed(portfolio_environment, overrides):
+    kwargs = {
+        "technical_profile": portfolio_environment["technical_profile"],
+        "structural_profile_factory": portfolio_environment["structural_profile"],
+        "seed": 3,
+        "iterations": 0,
+        "max_candidates": 1,
+        "robustness_samples": 3,
+        "perturbation_fraction": 0.002,
+    }
+    kwargs.update(overrides)
+    with pytest.raises(CreativePortfolioError):
+        run_creative_portfolio(**kwargs)
+
+
+def test_upstream_failure_is_kept_as_blocker(portfolio_environment, monkeypatch):
+    def fail_action(_analysis):
+        raise arch_action_f1.ArchActionF1Error("cơ chế không xác định")
+
+    monkeypatch.setattr(arch_action_f1, "run_arch_action_study", fail_action)
+    result = run_creative_portfolio(
+        technical_profile=portfolio_environment["technical_profile"],
+        structural_profile_factory=portfolio_environment["structural_profile"],
+        seed=9,
+        iterations=0,
+        max_candidates=1,
+        robustness_samples=3,
+        perturbation_fraction=0.002,
+    )
+    assert result["archive"] == []
+    assert result["blocked_candidates"][0]["blockers"][0]["code"] == "CP-ACTION-001"
+
+
+def test_source_drift_is_blocked_before_search(portfolio_environment, tmp_path, monkeypatch):
+    drifted = tmp_path / "creative_portfolio.py"
+    drifted.write_text("# drift", encoding="utf-8")
+    paths = list(creative_portfolio._SOURCE_PATHS)
+    paths[0] = (paths[0][0], drifted)
+    monkeypatch.setattr(creative_portfolio, "_SOURCE_PATHS", tuple(paths))
+    with pytest.raises(CreativePortfolioError, match="drift"):
+        run_creative_portfolio(
+            technical_profile=portfolio_environment["technical_profile"],
+            structural_profile_factory=portfolio_environment["structural_profile"],
+            seed=3,
+            iterations=0,
+            max_candidates=1,
+            robustness_samples=3,
+            perturbation_fraction=0.002,
+        )
+
+
+def test_schema_drift_is_blocked_before_search(portfolio_environment, tmp_path, monkeypatch):
+    drifted = tmp_path / "creative_portfolio.schema.json"
+    drifted.write_text('{"type":"object"}', encoding="utf-8")
+    monkeypatch.setattr(creative_portfolio, "_SCHEMA_PATH", drifted)
+    with pytest.raises(CreativePortfolioError, match="schema.*drift"):
+        run_creative_portfolio(
+            technical_profile=portfolio_environment["technical_profile"],
+            structural_profile_factory=portfolio_environment["structural_profile"],
+            seed=3,
+            iterations=0,
+            max_candidates=1,
+            robustness_samples=3,
+            perturbation_fraction=0.002,
+        )
+
+
+def test_nondeterministic_profile_factory_is_blocked(portfolio_environment):
+    valid_factory = portfolio_environment["structural_profile"]
+    calls = 0
+
+    def alternating(candidate):
+        nonlocal calls
+        calls += 1
+        profile = valid_factory(candidate)
+        profile["deck_line_load"]["q_kN_m"] = 1.0 if calls % 2 else 1.1
+        return profile
+
+    result = run_creative_portfolio(
+        technical_profile=portfolio_environment["technical_profile"],
+        structural_profile_factory=alternating,
+        seed=4,
+        iterations=0,
+        max_candidates=1,
+        robustness_samples=3,
+        perturbation_fraction=0.002,
+    )
+    assert result["archive"] == []
+    assert result["blocked_candidates"][0]["blockers"][0]["code"] == "CP-PROFILE-003"
+    validate_creative_portfolio(result)
+
+
+def test_wrong_profile_factory_type_is_rejected(portfolio_environment):
+    with pytest.raises(CreativePortfolioError, match="callable"):
+        run_creative_portfolio(
+            technical_profile=portfolio_environment["technical_profile"],
+            structural_profile_factory=None,
+            seed=3,
+            iterations=0,
+            max_candidates=1,
+            robustness_samples=3,
+            perturbation_fraction=0.002,
+        )

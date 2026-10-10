@@ -7,7 +7,7 @@
   "priority": "P1",
   "status": "ACTIVE",
   "owner": "claude",
-  "reviewer": null,
+  "reviewer": "codex",
   "dependencies": [],
   "required_gates": [],
   "claim_ceiling": "IDEA",
@@ -50,7 +50,8 @@
     "TIỀN LỆ ADAPTIVE ĐÃ CÓ TRÊN MÁY NÀY: bộ skill dựng cầu của chủ dự án đã dùng adaptive component cho dầm chủ, gờ lan can adaptive 2 điểm, và lan can thép adaptive 2 điểm trên dự án THẬT. Tức môi trường adaptive không phải thử nghiệm mới mà là môi trường chính của dự án. Một skill cũng ghi lại bài học ngược: family panel adaptive 4 điểm đặt tự động bị MÉO nên đã phải lùi về khối DirectShape cho dầm ngang — probe phải làm rõ ranh giới đó thay vì lặp lại",
     "Ba nghi vấn cần probe làm rõ trước tiên: NewSweptBlend có thể chỉ nhận MỘT đường cong làm path; form adaptive có thể kén profile không phẳng; và family adaptive có thể dựng đúng hình mà KHÔNG flex theo điểm",
     "Toạ độ sẵn cho PHA 3: tmp/arch_massing/bars.json (621 thanh, 24 nhóm, sha16 186eefc7502ac274) và tmp/arch_massing/arch_assembly_coords.json (kèm 8 mâu thuẫn đã ghi)",
-    "Ba mâu thuẫn chọc khối MT-4, MT-5, MT-8 nên xử lý TRƯỚC hoặc TRONG pha 3: family có phân loại thật sẽ làm chúng lộ thành clash chứ không ẩn như với DirectShape"
+    "Ba mâu thuẫn chọc khối MT-4, MT-5, MT-8 nên xử lý TRƯỚC hoặc TRONG pha 3: family có phân loại thật sẽ làm chúng lộ thành clash chứ không ẩn như với DirectShape",
+    "5 provenance correction da duoc OpenCode review APPROVE va 624 test Revit-family xanh. Tuy nhien handoff r001 vuot qua bang chung: Pha 2 adaptive/Pha 3 lap 621 instance mau thuan voi chinh capability matrix va runtime fail-closed. Can chay probe Revit 2026 that cho API lap adaptive, AddParameter trong adaptive/massing va NewRevolveForm; hoa giai trang thai NewSweptBlendForm; luu-mo lai .rfa/.rvt, dem solid/instance va do bao truoc khi nop r002. Gioi han van la IDEA, khong phai kiem toan ket cau cau."
   ],
   "preferred_provider": "claude",
   "preferred_role": "bim_fem_integrator",

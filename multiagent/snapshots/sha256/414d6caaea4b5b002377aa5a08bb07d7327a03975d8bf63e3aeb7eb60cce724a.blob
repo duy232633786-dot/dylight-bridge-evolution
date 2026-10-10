@@ -1,0 +1,653 @@
+"""Tìm kiếm phương án cầu có hàng rào applicability và bất định.
+
+Module này là lớp điều phối screening, KHÔNG phải solver kết cấu. Nó giải ba
+vấn đề mà một thuật toán tối ưu thuần túy không tự giải được:
+
+* phủ không gian thiết kế rời rạc bằng lấy mẫu phân tầng, thay vì phụ thuộc hoàn
+  toàn vào random search;
+* chặn trước solver khi họ cầu, fidelity, solver, hình học hoặc miền công thức
+  không khớp registry đã duyệt;
+* xếp hạng Pareto trên upper-confidence objectives và worst-case utilization,
+  không để một giá trị trung bình đẹp che mất mẫu bất lợi.
+
+Mọi trạng thái thiếu bằng chứng đều fail-closed thành ``BLOCKED``. Kết quả cao
+nhất của module là ``SCREENED``; kỹ sư và mô hình fidelity cao hơn vẫn là cổng
+bắt buộc trước thiết kế kỹ thuật.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import random
+import statistics
+from copy import deepcopy
+from pathlib import Path
+from typing import Callable, Iterable
+
+import jsonschema
+
+from . import CONTRACTS_DIR, REPO_ROOT
+from .catalogs import all_domains, load_catalogs, load_grammar
+from .geometry import check_geometry
+from .objectives import OBJECTIVE_KEYS
+from .site.spec import check_site_readiness, required_site_fields
+from .state import make_case_id, validate_design_state
+
+STUDY_LEVELS = ("L0_GEOMETRY", "L1_STRUCTURAL")
+_DEFAULT_REGISTRY = REPO_ROOT / "docs" / "design_basis" / "model_applicability.json"
+_REGISTRY_SCHEMA = CONTRACTS_DIR / "model_applicability.schema.json"
+_SITE_SCHEMA = CONTRACTS_DIR / "site_hazard_profile.schema.json"
+
+
+class ApplicabilityRegistryError(ValueError):
+    """Registry thiếu, sai schema hoặc tự mâu thuẫn."""
+
+
+def _canonical(value: object) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def load_applicability_registry(path: str | Path | None = None) -> dict:
+    """Đọc và kiểm registry trước khi dùng; không có fallback ngầm."""
+    source = Path(path) if path is not None else _DEFAULT_REGISTRY
+    if not source.is_file():
+        raise ApplicabilityRegistryError(f"Không tìm thấy model applicability registry: {source}")
+    try:
+        registry = json.loads(source.read_text(encoding="utf-8"))
+        schema = json.loads(_REGISTRY_SCHEMA.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ApplicabilityRegistryError(f"Không đọc được applicability registry/schema: {exc}") from exc
+
+    errors = sorted(
+        jsonschema.Draft202012Validator(schema).iter_errors(registry),
+        key=lambda err: list(err.absolute_path),
+    )
+    if errors:
+        details = "; ".join(
+            f"{'/'.join(str(p) for p in err.absolute_path) or '<root>'}: {err.message}"
+            for err in errors
+        )
+        raise ApplicabilityRegistryError(f"Applicability registry sai contract: {details}")
+
+    for family, spec in registry["families"].items():
+        try:
+            domains = all_domains(load_grammar(family))
+        except Exception as exc:
+            raise ApplicabilityRegistryError(
+                f"{family}: không nạp được production grammar: {exc}") from exc
+        anchor = spec["anchor_gene"]
+        if set(anchor) != set(domains):
+            missing = sorted(set(domains) - set(anchor))
+            extra = sorted(set(anchor) - set(domains))
+            raise ApplicabilityRegistryError(
+                f"{family}: anchor_gene sai khóa; missing={missing}, extra={extra}")
+        invalid = [name for name, value in anchor.items() if value not in domains[name]]
+        if invalid:
+            raise ApplicabilityRegistryError(
+                f"{family}: anchor_gene có giá trị ngoài grammar tại {invalid}")
+        span = spec["domain"]["span_m"]
+        if span["min"] > span["max"]:
+            raise ApplicabilityRegistryError(f"{family}: span_m min > max")
+        distribution = spec["domain"]["distribution"]
+        if distribution is not None:
+            for name in ("spacing_mm", "slab_thickness_mm", "girder_count", "kg_mm4"):
+                bounds = distribution[name]
+                if bounds["min"] > bounds["max"]:
+                    raise ApplicabilityRegistryError(f"{family}/{name}: min > max")
+        if "L1_STRUCTURAL" in spec["allowed_study_levels"]:
+            if not spec["allowed_analysis"]:
+                raise ApplicabilityRegistryError(
+                    f"{family}: cho L1_STRUCTURAL nhưng không khai fidelity/solver")
+            if spec["domain"]["distribution"] is None:
+                raise ApplicabilityRegistryError(
+                    f"{family}: cho L1_STRUCTURAL nhưng không có miền phân bố ngang")
+    return registry
+
+
+def _blocker(code: str, message: str, *, field: str | None = None,
+             value: object = None, allowed: object = None) -> dict:
+    item = {"code": code, "severity": "HARD", "message": message}
+    if field is not None:
+        item["field"] = field
+        item["value"] = value
+        item["allowed"] = allowed
+    return item
+
+
+def _outside(value: float, bounds: dict) -> bool:
+    return value < float(bounds["min"]) or value > float(bounds["max"])
+
+
+def _longitudinal_stiffness_parameter_mm4(state: dict, geom: dict) -> float:
+    """Kg của công thức type-k, cùng định nghĩa với solver L1 nhưng chỉ để gate."""
+    cat = load_catalogs()
+    mats = state["materials"]
+    eg = cat["concretes"][mats["girder_concrete_id"]]["E_GPa"]
+    ed = cat["concretes"][mats["deck_concrete_id"]]["E_GPa"]
+    sec = geom["section"]
+    ts = geom["slab_thickness_m"]
+    eccentricity = (sec["depth_m"] - sec["y_bottom_m"]) + ts / 2.0
+    return (eg / ed) * (
+        sec["I_m4"] + sec["area_m2"] * eccentricity ** 2
+    ) * 1e12
+
+
+def _node_at(profile: dict, pointer: str) -> object | None:
+    node: object = profile
+    for part in pointer.split("/"):
+        if not isinstance(node, dict) or part not in node:
+            return None
+        node = node[part]
+    return node
+
+
+def _source_paths(value: object) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list) and all(isinstance(item, str) for item in value):
+        return list(value)
+    return []
+
+
+def _site_contract_blockers(profile: dict | None, rule_groups: list[str]) -> list[dict]:
+    """Schema + G0 + review + tệp nguồn thật; không chỉ tin nhãn KNOWN."""
+    if profile is None:
+        return []  # check_site_readiness sẽ phát SITE-001 đầy đủ hơn.
+    try:
+        schema = json.loads(_SITE_SCHEMA.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return [_blocker("SITE-SCHEMA-000", f"Không đọc được site schema: {exc}")]
+    errors = sorted(
+        jsonschema.Draft202012Validator(schema).iter_errors(profile),
+        key=lambda err: list(err.absolute_path),
+    )
+    if errors:
+        summary = "; ".join(
+            f"{'/'.join(str(p) for p in err.absolute_path) or '<root>'}: {err.message}"
+            for err in errors[:8]
+        )
+        return [_blocker("SITE-SCHEMA-001", f"Hồ sơ site sai contract: {summary}")]
+
+    blockers: list[dict] = []
+    if profile.get("site_status") != "SPECIFIED":
+        blockers.append(_blocker(
+            "SITE-STATUS-001", "L1 chỉ chạy với site_status=SPECIFIED",
+            field="site_status", value=profile.get("site_status"), allowed="SPECIFIED"))
+    gate = profile.get("g0_gate")
+    if not isinstance(gate, dict) or gate.get("status") != "PASSED":
+        blockers.append(_blocker(
+            "SITE-G0-001", "Hồ sơ site chưa có G0 PASSED",
+            field="g0_gate/status",
+            value=gate.get("status") if isinstance(gate, dict) else None,
+            allowed="PASSED"))
+    provenance = profile.get("document_provenance")
+    if not isinstance(provenance, dict) or provenance.get("review_status") != "ENGINEER_APPROVED":
+        blockers.append(_blocker(
+            "SITE-REVIEW-001", "Hồ sơ site chưa được kỹ sư duyệt",
+            field="document_provenance/review_status",
+            value=provenance.get("review_status") if isinstance(provenance, dict) else None,
+            allowed="ENGINEER_APPROVED"))
+
+    for pointer in required_site_fields(rule_groups):
+        node = _node_at(profile, pointer)
+        refs: list[str] = []
+        if isinstance(node, dict) and node.get("status") == "KNOWN":
+            refs = _source_paths(node.get("source_ref"))
+        elif pointer == "geotechnical_investigation/investigation_status":
+            investigation = profile.get("geotechnical_investigation", {})
+            if isinstance(investigation, dict) and investigation.get("investigation_status") == "COMPLETE":
+                refs = _source_paths(investigation.get("report_ref"))
+                if not refs:
+                    blockers.append(_blocker(
+                        "SITE-SOURCE-001",
+                        "Khảo sát địa kỹ thuật COMPLETE nhưng không có report_ref",
+                        field=pointer, value=None, allowed="existing evidence file"))
+        for ref in refs:
+            raw_path = ref.split("#", 1)[0]
+            source = Path(raw_path)
+            if source.is_absolute() or ".." in source.parts:
+                blockers.append(_blocker(
+                    "SITE-SOURCE-001", f"source_ref không phải đường dẫn repo an toàn: {ref}",
+                    field=pointer, value=ref, allowed="relative path inside repository"))
+                continue
+            resolved = (REPO_ROOT / source).resolve()
+            try:
+                resolved.relative_to(REPO_ROOT.resolve())
+            except ValueError:
+                blockers.append(_blocker(
+                    "SITE-SOURCE-001", f"source_ref thoát khỏi repo: {ref}",
+                    field=pointer, value=ref, allowed="relative path inside repository"))
+                continue
+            if not resolved.is_file():
+                blockers.append(_blocker(
+                    "SITE-SOURCE-001", f"source_ref không tồn tại: {ref}",
+                    field=pointer, value=ref, allowed="existing evidence file"))
+    return blockers
+
+
+def _readiness_profile(profile: dict | None) -> dict | None:
+    """Bridge adapter cho investigation_status dạng enum của schema 1.2.
+
+    ``site.spec.evidence`` đọc evidence_field, trong khi schema địa kỹ thuật giữ
+    investigation_status là enum. Adapter chỉ dùng nội bộ để kiểm readiness;
+    hồ sơ gốc vẫn phải qua schema và không bị sửa.
+    """
+    if profile is None:
+        return None
+    ready = deepcopy(profile)
+    investigation = ready.get("geotechnical_investigation")
+    if isinstance(investigation, dict) and isinstance(investigation.get("investigation_status"), str):
+        status = investigation["investigation_status"]
+        investigation["investigation_status"] = {
+            "status": "KNOWN" if status == "COMPLETE" else "UNKNOWN",
+            "value": status if status == "COMPLETE" else None,
+        }
+    return ready
+
+
+def check_model_applicability(
+    state: dict,
+    geom: dict,
+    *,
+    study_level: str,
+    site_profile: dict | None,
+    registry: dict | None = None,
+) -> list[dict]:
+    """Kiểm miền phần mềm trước evaluator; trả blocker HARD, không sửa state."""
+    registry = registry or load_applicability_registry()
+    if study_level not in STUDY_LEVELS:
+        return [_blocker(
+            "APP-STUDY-001", f"study_level không hỗ trợ: {study_level!r}",
+            field="study_level", value=study_level, allowed=list(STUDY_LEVELS))]
+
+    family = state.get("family")
+    spec = registry["families"].get(family)
+    if spec is None:
+        return [_blocker(
+            "APP-FAMILY-001", f"Họ cầu {family!r} chưa có model applicability đã duyệt",
+            field="family", value=family, allowed=sorted(registry["families"]))]
+
+    blockers: list[dict] = []
+    if study_level not in spec["allowed_study_levels"]:
+        blockers.append(_blocker(
+            "APP-LEVEL-001",
+            f"{family} không được chạy {study_level}; chỉ cho {spec['allowed_study_levels']}",
+            field="study_level", value=study_level,
+            allowed=spec["allowed_study_levels"],
+        ))
+
+    project = state.get("project_inputs", {})
+    domain = spec["domain"]
+    span = float(project.get("span_length_m", math.nan))
+    if not math.isfinite(span) or _outside(span, domain["span_m"]):
+        blockers.append(_blocker(
+            "APP-SPAN-001", f"Nhịp {span} m ngoài miền phần mềm của {family}",
+            field="project_inputs/span_length_m", value=span,
+            allowed=domain["span_m"],
+        ))
+    alignment = project.get("alignment_type")
+    if alignment not in domain["alignment_types"]:
+        blockers.append(_blocker(
+            "APP-ALIGN-001", f"Tuyến {alignment!r} chưa được mô hình này hỗ trợ",
+            field="project_inputs/alignment_type", value=alignment,
+            allowed=domain["alignment_types"],
+        ))
+    skew = project.get("skew_deg")
+    if not isinstance(skew, (int, float)) or abs(float(skew)) > domain["skew_abs_max_deg"]:
+        blockers.append(_blocker(
+            "APP-SKEW-001", f"Độ xiên {skew!r}° vượt miền |skew| <= {domain['skew_abs_max_deg']}°",
+            field="project_inputs/skew_deg", value=skew,
+            allowed={"abs_max": domain["skew_abs_max_deg"]},
+        ))
+
+    section_kind = geom.get("section", {}).get("material_kind", "PRESTRESSED_CONCRETE")
+    if section_kind == "STEEL":
+        section_kind = "STEEL_COMPOSITE"
+    if section_kind != spec["section_material_kind"]:
+        blockers.append(_blocker(
+            "APP-MATERIAL-001",
+            f"Vật liệu section {section_kind!r} không khớp registry {spec['section_material_kind']!r}",
+            field="geometry/section/material_kind", value=section_kind,
+            allowed=spec["section_material_kind"],
+        ))
+
+    if study_level == "L1_STRUCTURAL":
+        analysis = state.get("analysis", {})
+        pair = {"fidelity": analysis.get("fidelity"), "solver": analysis.get("solver")}
+        if pair not in spec["allowed_analysis"]:
+            blockers.append(_blocker(
+                "APP-SOLVER-001",
+                f"Cặp fidelity/solver {pair} chưa được duyệt cho {family}",
+                field="analysis", value=pair, allowed=spec["allowed_analysis"],
+            ))
+
+        dist = domain["distribution"]
+        if dist is None:
+            blockers.append(_blocker(
+                "APP-DF-000", f"{family} chưa có mô hình phân bố ngang được duyệt"))
+        else:
+            values = {
+                "girder_count": float(geom["girder_count"]),
+                "spacing_mm": float(geom["spacing_m"]) * 1000.0,
+                "slab_thickness_mm": float(geom["slab_thickness_m"]) * 1000.0,
+                "kg_mm4": _longitudinal_stiffness_parameter_mm4(state, geom),
+            }
+            for name, value in values.items():
+                bounds = dist[name]
+                if _outside(value, bounds):
+                    blockers.append(_blocker(
+                        "APP-DF-001",
+                        f"{name}={value:.6g} ngoài miền {dist['formula_id']}",
+                        field=f"distribution/{name}", value=value, allowed=bounds,
+                    ))
+
+        site_contract = _site_contract_blockers(
+            site_profile, spec["required_site_rule_groups"])
+        blockers.extend(site_contract)
+        if not any(item["code"].startswith("SITE-SCHEMA-") for item in site_contract):
+            site_violations = check_site_readiness(
+                _readiness_profile(site_profile), spec["required_site_rule_groups"])
+            blockers.extend(_blocker(
+                violation["rule_id"], violation["message"], field="site_profile",
+                value=None, allowed="KNOWN evidence for every required field",
+            ) for violation in site_violations)
+    return blockers
+
+
+def assess_candidate(
+    state: dict,
+    *,
+    study_level: str = "L1_STRUCTURAL",
+    site_profile: dict | None = None,
+    evaluator: Callable[[dict], dict] | None = None,
+    registry: dict | None = None,
+) -> dict:
+    """Đánh giá một candidate theo thứ tự schema → L0 → applicability → solver."""
+    registry = registry or load_applicability_registry()
+    case_id = make_case_id(state)
+    common = {
+        "case_id": case_id,
+        "family": state.get("family"),
+        "study_level": study_level,
+        "registry_version": registry["registry_version"],
+    }
+
+    schema_errors = validate_design_state(state)
+    if schema_errors:
+        return {
+            **common,
+            "status": "REJECTED",
+            "claim_level": "IDEA",
+            "blockers": [_blocker("SCHEMA-001", err) for err in schema_errors],
+            "evaluation": None,
+        }
+
+    try:
+        violations, geom = check_geometry(state)
+    except (KeyError, TypeError, ValueError) as exc:
+        return {
+            **common,
+            "status": "REJECTED",
+            "claim_level": "IDEA",
+            "blockers": [_blocker("GEOMETRY-ERROR", str(exc))],
+            "evaluation": None,
+        }
+    hard = [v for v in violations if v.get("severity") == "HARD"]
+    # Một gate SOLVER-* không làm hình học L0 sai. L0 không mở evaluator nên
+    # được phép ghi nhận hình học composite; lên L1 gate này lại là HARD như cũ.
+    if study_level == "L0_GEOMETRY":
+        hard = [v for v in hard if not str(v.get("rule_id", "")).startswith("SOLVER-")]
+    if hard:
+        return {
+            **common,
+            "status": "REJECTED",
+            "claim_level": "IDEA",
+            "blockers": hard,
+            "evaluation": None,
+        }
+
+    blockers = check_model_applicability(
+        state, geom, study_level=study_level, site_profile=site_profile,
+        registry=registry,
+    )
+    if blockers:
+        return {
+            **common,
+            "status": "BLOCKED",
+            "claim_level": "IDEA",
+            "blockers": blockers,
+            "evaluation": None,
+        }
+
+    if study_level == "L0_GEOMETRY":
+        return {
+            **common,
+            "status": "L0_SCREENED",
+            "claim_level": "IDEA",
+            "blockers": [],
+            "evaluation": None,
+            "geometry_summary": {
+                "span_m": geom["span_m"],
+                "deck_width_m": geom["deck_width_m"],
+                "girder_count": geom["girder_count"],
+                "section_source": geom["section_source"],
+            },
+        }
+
+    if evaluator is None:
+        from .evaluate import evaluate_candidate
+        evaluator = evaluate_candidate
+    try:
+        evaluation = evaluator(state)
+    except Exception as exc:  # evaluator ngoài có thể lỗi; không được giả thành reject sạch
+        return {
+            **common,
+            "status": "BLOCKED",
+            "claim_level": "IDEA",
+            "blockers": [_blocker("EVALUATOR-001", f"Evaluator thất bại: {exc}")],
+            "evaluation": None,
+        }
+    screened = evaluation.get("status") == "SUCCESS" and evaluation.get("feasible") is True
+    return {
+        **common,
+        "status": "SCREENED" if screened else "REJECTED",
+        "claim_level": registry["claim_ceiling"] if screened else "IDEA",
+        "blockers": [] if screened else list(evaluation.get("violations", [])),
+        "evaluation": evaluation,
+    }
+
+
+def _dimension_rng(seed: int, grammar_id: str, variable: str) -> random.Random:
+    digest = hashlib.sha256(f"{seed}:{grammar_id}:{variable}".encode("utf-8")).digest()
+    return random.Random(int.from_bytes(digest[:8], "big"))
+
+
+def stratified_genes(grammar_id: str, sample_count: int, *, seed: int = 0) -> list[dict]:
+    """Anchor hợp lệ + Latin-hypercube rời rạc, kết quả xác định.
+
+    Anchor được registry và grammar cùng kiểm nên mỗi họ luôn có ít nhất một
+    điểm đối chứng đã biết trước khi thuật toán thăm dò vùng rời rạc còn lại.
+    """
+    if not isinstance(sample_count, int) or sample_count <= 0:
+        raise ValueError("sample_count phải là số nguyên dương")
+    domains = all_domains(load_grammar(grammar_id))
+    registry = load_applicability_registry()
+    if grammar_id not in registry["families"]:
+        raise ApplicabilityRegistryError(
+            f"{grammar_id}: chưa có anchor/applicability trong registry")
+    anchor = dict(registry["families"][grammar_id]["anchor_gene"])
+    remaining = sample_count - 1
+    if remaining == 0:
+        return [anchor]
+    columns: dict[str, list[object]] = {}
+    for name, domain in domains.items():
+        if not domain:
+            raise ValueError(f"{grammar_id}/{name}: miền rỗng")
+        rng = _dimension_rng(seed, grammar_id, name)
+        anchor_index = domain.index(anchor[name])
+        if sample_count <= len(domain):
+            available = [index for index in range(len(domain)) if index != anchor_index]
+            ranks = list(range(remaining))
+            rng.shuffle(ranks)
+            indices = [available[min(
+                len(available) - 1,
+                int((rank + 0.5) * len(available) / remaining),
+            )] for rank in ranks]
+        else:
+            base, extras = divmod(sample_count, len(domain))
+            targets = [base] * len(domain)
+            extra_order = list(range(len(domain)))
+            rng.shuffle(extra_order)
+            if extras and anchor_index not in extra_order[:extras]:
+                anchor_position = extra_order.index(anchor_index)
+                extra_order[extras - 1], extra_order[anchor_position] = \
+                    extra_order[anchor_position], extra_order[extras - 1]
+            for index in extra_order[:extras]:
+                targets[index] += 1
+            targets[anchor_index] -= 1
+            indices = [
+                index for index, count in enumerate(targets)
+                for _ in range(count)
+            ]
+            rng.shuffle(indices)
+        columns[name] = [domain[index] for index in indices]
+    exploratory = [
+        {name: columns[name][row] for name in domains}
+        for row in range(remaining)
+    ]
+    return [anchor, *exploratory]
+
+
+def stratified_multifamily(
+    grammar_ids: Iterable[str], sample_count_per_family: int, *, seed: int = 0,
+) -> list[dict]:
+    """Lấy mẫu round-robin để mọi họ được nhìn thấy trước vòng mật độ kế tiếp."""
+    families = list(grammar_ids)
+    if not families or len(families) != len(set(families)):
+        raise ValueError("grammar_ids phải khác rỗng và không trùng")
+    by_family = {
+        family: stratified_genes(family, sample_count_per_family, seed=seed)
+        for family in families
+    }
+    proposals: list[dict] = []
+    for sample_index in range(sample_count_per_family):
+        for family in families:
+            proposals.append({
+                "family": family,
+                "sample_index": sample_index,
+                "gene": by_family[family][sample_index],
+            })
+    return proposals
+
+
+def _dominates(a: tuple[float, ...], b: tuple[float, ...]) -> bool:
+    return all(x <= y for x, y in zip(a, b)) and any(x < y for x, y in zip(a, b))
+
+
+def robust_pareto(
+    candidate_samples: Iterable[dict], *, min_samples: int = 3,
+    confidence_z: float = 1.645,
+) -> dict:
+    """Pareto theo UCB objective và worst-case utilization.
+
+    Mỗi phần tử cần ``status=SCREENED`` và ``samples`` gồm các lần chạy bất định
+    độc lập: ``objectives`` đủ ba khóa + ``max_utilization``. UCB dùng
+    ``mean + z*s/sqrt(n)``; an toàn dùng max, không dùng trung bình.
+    """
+    if min_samples < 2:
+        raise ValueError("min_samples phải >= 2 để ước lượng độ lệch chuẩn")
+    if not math.isfinite(confidence_z) or confidence_z < 0:
+        raise ValueError("confidence_z phải hữu hạn và không âm")
+
+    eligible: list[dict] = []
+    blocked: list[dict] = []
+    seen: set[str] = set()
+    for candidate in candidate_samples:
+        case_id = candidate.get("case_id")
+        if not isinstance(case_id, str) or not case_id:
+            raise ValueError("Mỗi candidate phải có case_id không rỗng")
+        if case_id in seen:
+            raise ValueError(f"Trùng case_id trong robust study: {case_id}")
+        seen.add(case_id)
+
+        if candidate.get("status") != "SCREENED":
+            blocked.append({"case_id": case_id, "code": "ROBUST-STATUS-001",
+                            "message": "Chỉ candidate SCREENED mới được xếp hạng robust"})
+            continue
+        samples = candidate.get("samples")
+        if not isinstance(samples, list) or len(samples) < min_samples:
+            blocked.append({
+                "case_id": case_id, "code": "ROBUST-SAMPLES-001",
+                "message": f"Cần ít nhất {min_samples} mẫu bất định; nhận {len(samples or [])}",
+            })
+            continue
+
+        values = {key: [] for key in OBJECTIVE_KEYS}
+        utilizations: list[float] = []
+        malformed = None
+        for index, sample in enumerate(samples):
+            objectives = sample.get("objectives", {}) if isinstance(sample, dict) else {}
+            try:
+                for key in OBJECTIVE_KEYS:
+                    value = float(objectives[key])
+                    if not math.isfinite(value) or value < 0:
+                        raise ValueError(key)
+                    values[key].append(value)
+                utilization = float(sample["max_utilization"])
+                if not math.isfinite(utilization) or utilization < 0:
+                    raise ValueError("max_utilization")
+                utilizations.append(utilization)
+            except (KeyError, TypeError, ValueError):
+                malformed = index
+                break
+        if malformed is not None:
+            blocked.append({
+                "case_id": case_id, "code": "ROBUST-DATA-001",
+                "message": f"Mẫu {malformed} thiếu hoặc có số liệu không hợp lệ",
+            })
+            continue
+
+        robust_objectives = {
+            key: statistics.mean(vals)
+            + confidence_z * statistics.stdev(vals) / math.sqrt(len(vals))
+            for key, vals in values.items()
+        }
+        worst_utilization = max(utilizations)
+        if worst_utilization > 1.0:
+            blocked.append({
+                "case_id": case_id, "code": "ROBUST-UTIL-001",
+                "message": f"Worst-case utilization {worst_utilization:.4f} > 1.0",
+            })
+            continue
+        eligible.append({
+            "case_id": case_id,
+            "sample_count": len(samples),
+            "robust_objectives": robust_objectives,
+            "worst_case_utilization": worst_utilization,
+            "source_digest": hashlib.sha256(_canonical(samples).encode("utf-8")).hexdigest(),
+        })
+
+    objective_tuple = lambda item: tuple(
+        item["robust_objectives"][key] for key in OBJECTIVE_KEYS)
+    front = [
+        item for item in eligible
+        if not any(
+            other is not item and _dominates(objective_tuple(other), objective_tuple(item))
+            for other in eligible
+        )
+    ]
+    front.sort(key=lambda item: (objective_tuple(item), item["case_id"]))
+    return {
+        "policy": {
+            "objective_method": "ONE_SIDED_UPPER_CONFIDENCE_BOUND",
+            "confidence_z": confidence_z,
+            "min_samples": min_samples,
+            "safety_method": "WORST_CASE_UTILIZATION_LE_1",
+            "objective_keys": list(OBJECTIVE_KEYS),
+            "claim_ceiling": "SCREENED",
+        },
+        "eligible": eligible,
+        "front": front,
+        "blocked": blocked,
+    }

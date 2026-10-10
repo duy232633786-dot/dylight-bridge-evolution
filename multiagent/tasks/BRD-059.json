@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-059",
+  "title": "Sửa toán tử chọn lọc/đột biến NSGA-II (biến thể 'repaired', giữ 'legacy' mặc định cho thí nghiệm đã pre-register)",
+  "research_question": "Khi NSGA-II (a) chỉ nhận cá thể qua L0 vào quần thể khởi tạo và lứa immigrant, (b) khử trùng lặp gene, (c) bơm immigrant vào đúng 25% cuối sau xếp hạng, (d) đột biến luôn đổi giá trị (reset khác giá trị cũ, bước ±1 phản xạ ở biên) thì độ đa dạng quần thể, tỷ lệ proposal trùng và chất lượng nghiệm cùng ngân sách solver thay đổi thế nào so với bản legacy?",
+  "workstream": "experiments",
+  "priority": "P1",
+  "status": "REVIEW",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G0",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "runtime_scope": {
+    "structural_families": [
+      "super_t_simple_v1",
+      "super_t_parametric_v2"
+    ],
+    "runtime_domain": "production_line_girder_l1"
+  },
+  "write_scope": [
+    "bridge_evolution/optimization/nsga2.py",
+    "tests/test_nsga2_repaired_operators.py",
+    "experiments/run_nsga2_operator_ab.py",
+    "experiments/results/nsga2_operator_ab/"
+  ],
+  "acceptance_criteria": [
+    "nsga2(..., operators='legacy') mặc định cho lịch sử byte-giống hệt bản trước sửa (thí nghiệm grammar A/B đã pre-register và test tương đương _restricted_nsga2 không bị ảnh hưởng).",
+    "operators='repaired': quần thể khởi tạo và immigrant chỉ gồm cá thể qua L0 (L0-reject không tốn solver nên không đổi định nghĩa ngân sách); offspring trùng gene với quần thể hiện tại hoặc trong cùng lứa bị loại; immigrant thay các vị trí cuối của quần thể đã xếp hạng, không đụng front 0 khi còn chỗ; đột biến reset luôn chọn giá trị khác, bước ±1 ở biên phản xạ vào trong.",
+    "Có guard số proposal để không lặp vô hạn khi miền L0-hợp lệ cạn; ngân sách solver vẫn là solver.status != NOT_RUN.",
+    "tests/test_nsga2_repaired_operators.py phủ: legacy không đổi, repaired tái lập theo seed, không có L0-reject trong quần thể, không trùng gene, đột biến luôn đổi gene được chọn, grammar v2 chạy được, ngân sách không vượt.",
+    "Thí nghiệm A/B legacy vs repaired cùng ngân sách/seed báo cả kết quả âm (best cost, số gene duy nhất, tỷ lệ cache hit); kết luận chỉ là tín hiệu định hướng nếu số seed ít."
+  ],
+  "required_artifacts": [
+    "bridge_evolution/optimization/nsga2.py",
+    "tests/test_nsga2_repaired_operators.py",
+    "experiments/run_nsga2_operator_ab.py",
+    "experiments/results/nsga2_operator_ab/summary.json"
+  ],
+  "safety_notes": [
+    "Người dùng yêu cầu sửa trực tiếp ngày 2026-09-25 sau khi rà soát thuật toán chọn lọc tổng thể.",
+    "Không đổi hành vi mặc định vì experiments/run_grammar_ab*.py và tests khóa pre-registration dùng nsga2 legacy.",
+    "Chỉ là thay đổi thuật toán tìm kiếm; không đổi evaluator, L0/L1, verifier, catalog hay claim ceiling SCREENED."
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "structural_analyst",
+  "review_provider": "codex"
+}

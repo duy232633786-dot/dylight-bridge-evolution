@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-039",
+  "handoff_sha256": "65284f8f48ea7d825a754b889ef5d5ab2cd4787446365e6ce23e405fc97ecb32",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task có claim_ceiling=IDEA và required_gates rỗng. Reviewer đã xác minh độc lập 4/4 hash khớp và lệnh pytest chung đạt 37 tests, nhưng test xanh không đủ để APPROVE."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Claude tái hiện nhiều false PASS hình học: tĩnh không THROUGH/NETWORK chỉ xét dải giữa 0.25-0.75 nên bỏ vùng thấp gần chân vòm; max_member_slenderness chỉ đo ARCH_RIB nhưng mang tên phủ mọi thanh; THROUGH/NETWORK luôn sinh hai END_POST zero-length do D0=A0 và Dn=An; load_path_connected chấp nhận cạnh HANGER nối DECK-DECK vì chỉ xét tiền tố ID. Các candidate vẫn có thể L0_PASSED và vào archive."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "validate_candidate chỉ kiểm JSON Schema, không tái tính geometry_sha256 hoặc suy all_known_pass/screening_status từ checks. Reviewer đã sửa axis, graph, các hash và lật một check sang FAIL nhưng candidate vẫn validate; archive chỉ tin all_known_pass. source_ref cũng chưa chuẩn hoá POSIX và proxy thrust không phụ thuộc shape_coefficients/topology dù thuật toán đang sáng tạo các biến đó."
+    }
+  ],
+  "notes": "Review độc lập Claude: 4/4 hash khớp, 37 test xanh nhưng phát hiện false PASS ở tĩnh không, độ mảnh, END_POST zero-length, topology hanger và candidate tamper. Yêu cầu sửa toàn bộ trong write_scope, thêm negative tests rồi resubmit r002."
+}

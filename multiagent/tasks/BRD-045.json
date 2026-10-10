@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-045",
+  "title": "Hardening bất biến cho benchmark OpenSees F1",
+  "research_question": "Có thể đóng toàn bộ bảy finding LOW của review BRD-044 bằng một lớp v2 mới, giữ nguyên artifact BRD-044 đã ACCEPTED, đồng thời tạo bằng chứng âm có hash và không nâng claim khỏi IDEA hay không?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-044"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "experiments/validation/opensees_frame_reference_v2.py",
+    "experiments/validation/opensees_brd045_benchmarks.json",
+    "experiments/validation/opensees_brd045_negative_result.json",
+    "contracts/opensees_frame_reference_v2.schema.json",
+    "docs/design_basis/opensees_frame_reference_v2_basis.json",
+    "tests/test_opensees_frame_reference_v2.py"
+  ],
+  "acceptance_criteria": [
+    "Không sửa bất kỳ artifact, task, handoff hoặc review nào của BRD-044; v2 phải neo SHA-256 của đủ năm artifact BRD-044 làm upstream lineage bất biến",
+    "Worker v2 chạy tiến trình riêng, thêm site-packages ở cuối sys.path, xác định binary từ chính module sở hữu ops.version và fail-closed nếu sys.modules chứa bridge_evolution sau solve",
+    "Basis phải pre-register expected_backend_identity gồm engine/package/python/binary và validator phải đối chiếu mọi case cùng worker/base-source digest; mismatch bất kỳ trường nào là STOP",
+    "Bổ sung benchmark giàn hai thanh nghiêng có nghiệm đóng cho chuyển vị đỉnh, phản lực và lực dọc; validator phải kiểm shear/moment của mọi TRUSS_2D bằng 0 và axial_i bằng đối dấu axial_j",
+    "Mọi DOF rz bị khóa nhân tạo tại nút truss-only phải xuất hiện trong raw audit; phản lực moment của chúng phải được cộng vào cân bằng hoặc bị buộc trong tolerance, có test cho nút truss-only không phải support",
+    "Expected closed-form values và tolerance của bốn case ANALYTICAL phải nằm trong basis có hash; validator kiểm trực tiếp OpenSees result, độc lập frame_f1 và độc lập hằng số trong test",
+    "Backend unavailable, invalid input và solver failure phải sinh negative-result artifact schema-validated có model hash, worker/base/basis/backend provenance khi có, issues gốc và self-hash; không được biến mất thành lỗi schema chung",
+    "Schema v2 phải đóng mọi object do task sở hữu, tham chiếu schema F1 cho model/result khi khả dụng, ghi rõ software self-check không phải design verdict và cấm feasible, verified, design_pass, utilization, safety_factor",
+    "Test phải phủ backend identity tamper, base/worker/basis drift, binary owner module mismatch, runtime isolation, site-packages precedence, inclined truss analytical response, artificial-rz audit, closed-form tamper, negative-result persistence, ID permutation và forbidden verdict backdoors",
+    "Claim giữ const IDEA, design_verdict_authority const NONE, gates_completed rỗng; không phát hành G2/G4, F2/L2, capacity, safety hoặc engineering-use verdict"
+  ],
+  "required_artifacts": [
+    "experiments/validation/opensees_frame_reference_v2.py",
+    "experiments/validation/opensees_brd045_benchmarks.json",
+    "experiments/validation/opensees_brd045_negative_result.json",
+    "contracts/opensees_frame_reference_v2.schema.json",
+    "docs/design_basis/opensees_frame_reference_v2_basis.json",
+    "tests/test_opensees_frame_reference_v2.py"
+  ],
+  "safety_notes": [
+    "Đây vẫn là code-verification đàn hồi tuyến tính 2D ở mức IDEA; hardening provenance không biến mô hình thành F2/L2 hoặc thiết kế an toàn",
+    "Lớp v2 không được sửa production solver, verifier, lab.py, runtime capability matrix, BRD-036 hoặc năm artifact BRD-044 đã được phê duyệt",
+    "Kết quả âm là bằng chứng bắt buộc và không được dùng làm kết quả dương, fallback hoặc tự động chọn nghiệm thuận lợi",
+    "Mọi nâng claim sau BRD-045 cần task mới, design basis công trình và review độc lập theo gate tương ứng"
+  ],
+  "review_notes": [
+    "Claude SOURCE_REVIEW cộng probe P1-P3: 6/6 hash khớp, canonical hash chain khớp, P3 xác nhận schema đóng. REVISE vì 7 blocker tối thiểu: pin module và callable OpenSees thực dùng; phân biệt envelope HOST/WORKER bằng nonce; quét cách ly theo module origin; lưu ISOLATION_BREACH; làm audit rz có positive control; neo digest schema và test v2; bắt buộc mọi ANALYTICAL case có nghiệm đóng từ basis. G0-G7 đều NOT_APPLICABLE vì IDEA/NONE.",
+    "Claude r002 chỉ đọc đúng 6 artifact, kết luận REVISE. Sáu blocker 1,2,3,5,6,7 đã CLOSED ở mức source; blocker 4 còn OPEN vì generate_benchmark_suite validate require_converged rồi ném lỗi trước khi ghi negative artifact, nên ISOLATION_BREACH/AUDIT_FAILED có thể mất trên đường chạy thật. Claude yêu cầu lưu negative trước khi raise và probe end-to-end. G0-G7 NOT_APPLICABLE vì IDEA/NONE; không phải bằng chứng thiết kế cầu.",
+    "Claude r003 chỉ đọc đúng 6 artifact và APPROVE. 7/7 blocker CLOSED; P1 byte hashes, P2 independent canonical hashes, P3 55/55 backend thật không skip, P4 worker thật persist ISOLATION_BREACH sau load case CONVERGED, P5 external refs reject unknown keys đều ACCEPTED. Residual: CONVERGED nhưng hardening-validator exception chưa tự persist; backend pin tại TEMP/đường dẫn máy; output âm mặc định có thể overwrite; JSON không ký; backend tests có thể skip nếu không chạy chế độ nghiệm thu. Tất cả chỉ IDEA/NONE; G0-G7 NOT_APPLICABLE, không phải bằng chứng thiết kế/an toàn cầu."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_opensees_frame_reference_v2.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_opensees_frame_reference.py",
+      "tests/test_opensees_frame_reference_v2.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

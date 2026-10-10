@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-048",
+  "title": "Migrate collaboration fixtures sang runtime_scope contract",
+  "research_question": "Làm sao cập nhật fixture BRD-999 sau BRD-037 mà vẫn kiểm đúng claim gate và không làm yếu fail-closed reachability của task mới?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-046"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "tests/test_collaboration.py"
+  ],
+  "acceptance_criteria": [
+    "Fixture task BRD-999 khai runtime_scope hợp lệ trước mọi test nâng claim_ceiling hoặc required_gates",
+    "Các test vẫn chứng minh task machine-gated thiếu runtime_scope bị từ chối; không xóa hoặc nới guard BRD-037",
+    "tests/test_collaboration.py chạy xanh khi không tính các failure do drift provenance canonical đang mở",
+    "Không sửa lab.py, schema runtime, task lịch sử hoặc production code"
+  ],
+  "required_artifacts": [
+    "tests/test_collaboration.py"
+  ],
+  "safety_notes": [
+    "Đây chỉ là migration fixture sau contract mới, không phải sửa logic để che lỗi",
+    "Không biến fixture thành ngoại lệ legacy và không thay ngưỡng BRD-046 của reachability",
+    "Claim tối đa IDEA; test governance không phải bằng chứng kỹ thuật cầu"
+  ],
+  "review_notes": [
+    "Full suite ngày 2026-08-30 có đúng hai failure trực tiếp vì BRD-999 thiếu runtime_scope; năm failure còn lại phụ thuộc 9 drift provenance canonical.",
+    "APPROVE claim IDEA. Claude tự băm handoff/artifact, tự chạy 21/21 test; fixture runtime_scope hợp lệ. Monkeypatch G3/G4 dùng ba lớp dict copy, chỉ tồn tại trong đúng một test và được pytest hoàn nguyên; production RUNTIME_SCOPE_POLICIES không đổi, các test fail-closed thiếu scope/policy vẫn còn. LOW: bỏ một blank line cuối file là drift thẩm mỹ đã được COR-BRD-018-001 neo; tránh lặp lại. Owner đã chạy toàn tests/test_collaboration.py: chỉ còn 5 failure phụ thuộc 9 drift provenance canonical, không còn failure fixture. Không có bằng chứng kỹ thuật cầu hay gate physics nào được cấp."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_collaboration.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

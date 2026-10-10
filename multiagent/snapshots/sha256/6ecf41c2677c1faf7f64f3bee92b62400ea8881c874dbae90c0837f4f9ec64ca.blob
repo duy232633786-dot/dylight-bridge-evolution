@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "FRAME-F1-LINEAR-2D-1.0.0",
+  "solver_version": "frame-f1/0.1.0",
+  "claim_ceiling": "IDEA",
+  "analysis_fidelity": "F1_LINEAR_ELASTIC_2D",
+  "design_verdict_authority": "NONE",
+  "units": {
+    "length": "m",
+    "force": "kN",
+    "moment": "kN_m",
+    "elastic_modulus_input": "GPa",
+    "section_area": "m2",
+    "second_moment": "m4"
+  },
+  "formulations": {
+    "FRAME_2D": "Euler-Bernoulli elastic beam-column, 3 DOF per node, small displacement, linear coordinate transformation",
+    "TRUSS_2D": "Two-node axial elastic truss embedded in the same 3-DOF assembly; rotational rows remain inactive",
+    "load_application": "Nodal forces and nodal moments only; no implicit code load combination or member-load conversion"
+  },
+  "official_method_sources": [
+    {
+      "title": "OpenSees Elastic Beam Column Element",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/elements/elasticBeamColumn.html",
+      "relevance": "Official parameterization A, E, Iz and geometric transformation for a 2D elastic beam-column element",
+      "accessed_on": "2026-08-28"
+    },
+    {
+      "title": "OpenSees Linear Transformation",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/geomTransf/Linear.html",
+      "relevance": "Official definition of the linear local-to-global beam coordinate transformation",
+      "accessed_on": "2026-08-28"
+    },
+    {
+      "title": "OpenSees Truss Element",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/elements/Truss.html",
+      "relevance": "Official axial truss element scope and explicit warning that geometric nonlinearities are not included",
+      "accessed_on": "2026-08-28"
+    },
+    {
+      "title": "OpenSees PDelta Transformation",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/geomTransf/PDelta.html",
+      "relevance": "Documents P-Delta as a separate transformation, supporting the explicit exclusion from this linear kernel",
+      "accessed_on": "2026-08-28"
+    }
+  ],
+  "numerical_guards": {
+    "inactive_row_relative_tolerance": 1e-13,
+    "loaded_inactive_dof_relative_tolerance": 1e-12,
+    "max_reduced_condition_number": 100000000000000.0,
+    "equilibrium_relative_tolerance": 1e-8,
+    "energy_relative_tolerance": 1e-8,
+    "minimum_element_length_m": 1e-9
+  },
+  "analytical_benchmarks": [
+    "Axial bar: u = P L / (E A)",
+    "Cantilever tip transverse load: v = P L^3 / (3 E I), rotation = P L^2 / (2 E I)",
+    "Simply supported beam with central point load: v_mid = P L^3 / (48 E I), R_A = R_B = P/2"
+  ],
+  "explicit_limitations": [
+    "No P-Delta or corotational geometric nonlinearity",
+    "No material nonlinearity, cracking, yielding or prestress",
+    "No shear deformation or warping/torsion",
+    "No eigenvalue buckling, dynamic, wind, seismic or fatigue analysis",
+    "No connection, bearing, foundation, soil-structure or construction-stage model",
+    "No standard load generation, load combination, resistance factor or capacity check",
+    "A source_ref and hash establish provenance only; they do not prove applicability"
+  ],
+  "promotion_requirements": [
+    "Independent code and benchmark review",
+    "Cross-check against a separate trusted solver on representative arch/truss models",
+    "Project-specific load combinations and section resistance checks with cited standard clauses",
+    "P-Delta/eigen-buckling and staged-construction analysis before structural design use"
+  ]
+}

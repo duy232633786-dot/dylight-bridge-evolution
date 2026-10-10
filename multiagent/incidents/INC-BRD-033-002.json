@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-033-002",
+  "task_id": "BRD-033",
+  "detected_at_utc": "2026-08-30T08:22:55.119237Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-033.claude.r002.json",
+  "original_handoff_sha256": "101c6bb469b241089cf71b1c5a64b412c77a42e4ec161b72ab47674a7b5b93fd",
+  "artifact_path": "bridge_evolution/collaboration/lab.py",
+  "recorded_sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5",
+  "observed_sha256": "0495f233ddaf65cf728d80e359d730102b0c2ebaf7147c27be9ad0a24e0db56d",
+  "reason": "BRD-037 thêm pre-claim runtime reachability guard fail-closed; thay đổi có chủ ý sau handoff lịch sử.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

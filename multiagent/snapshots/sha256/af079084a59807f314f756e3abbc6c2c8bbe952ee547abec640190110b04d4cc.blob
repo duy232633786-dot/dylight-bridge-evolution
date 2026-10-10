@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mặt cắt MIDAS · DYLIGHT Lab</title>
+<link rel="stylesheet" href="lab.css">
+<style>
+  html, body { height: auto; min-height: 100%; }
+  body { overflow: auto; }
+  .ms { padding: 10px 12px 28px; display: grid; gap: 12px; }
+  .ms-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ms-head h2 { margin: 0; font-family: var(--font-head); font-weight: 700; font-size: 20px; letter-spacing: .04em; text-transform: uppercase; }
+  .ms-head select { border: 1px solid var(--line-strong); background: var(--panel); border-radius: 3px; padding: 4px 6px; font-size: 12px; color: var(--ink); max-width: 340px; }
+  .ms-cols { display: grid; grid-template-columns: 340px minmax(380px, 1.1fr) minmax(360px, 1fr); gap: 12px; align-items: start; }
+  .ms-cols.two { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1250px) { .ms-cols { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 860px) { .ms-cols, .ms-cols.two { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 5px; padding: 10px 12px; min-width: 0; }
+  .panel h3 { font-family: var(--font-head); font-weight: 600; font-size: 14px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  .panel h4 { font-family: var(--font-head); font-weight: 600; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 8px 0 4px; }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; }
+  .meta label, .fam label, .prop-in label { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--muted); }
+  .meta input, .meta select, .fam input, .fam select, .prop-in input { border: 1px solid var(--line-strong); background: var(--panel-2); border-radius: 3px; padding: 4px 5px; font-size: 12px; color: var(--ink); width: 100%; }
+  .joints { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px 6px; font-size: 12px; font-family: var(--font-mono); margin: 2px 0 4px; }
+  .joints label { display: flex; align-items: center; gap: 4px; }
+  .dlg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; }
+  .dlg label { display: grid; grid-template-columns: 46px 1fr 12px; align-items: center; gap: 4px; font-size: 11px; font-family: var(--font-mono); color: var(--ink-2); }
+  .dlg input { width: 100%; border: 1px solid var(--line-strong); background: var(--panel-2); border-radius: 3px; padding: 2px 4px; font: 12px var(--font-mono); color: var(--ink); text-align: right; }
+  .dlg input:disabled { opacity: .4; background: var(--bg); }
+  .dlg .u { color: var(--muted); font-size: 10px; }
+  .viewer svg { width: 100%; height: 380px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; display: block; }
+  textarea.code { width: 100%; min-height: 170px; font: 11px/1.4 var(--font-mono); background: var(--panel-2); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 4px; padding: 6px; white-space: pre; overflow: auto; resize: vertical; }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+  .tabs .btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .tab { display: none; } .tab.on { display: block; }
+  .err { color: var(--fail); font-size: 12px; margin: 4px 0; }
+  .stations { max-height: 240px; overflow: auto; }
+  .fam { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .prop-in { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .slot { border: 1px solid var(--line-strong); border-radius: 4px; padding: 5px 8px; background: var(--panel-2); font-size: 11.5px; font-family: var(--font-mono); }
+  table.grid td.grey { color: var(--muted); }
+  .elev svg { width: 100%; height: 120px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; display: block; }
+  .stale { opacity: .45; filter: grayscale(.6); }
+  .warn-note { color: var(--warn); font-size: 12px; margin: 3px 0; }
+  #stale-note { color: var(--warn); font-size: 12px; font-weight: 600; min-height: 16px; }
+</style>
+</head>
+<body>
+<div class="ms">
+  <div class="ms-head">
+    <h2>Mặt cắt MIDAS · PSC-1CELL / 2CELL</h2>
+    <span class="pill na">IDEA · chỉ hình học</span>
+    <span class="note" style="max-width:520px">Tham số đúng tên và thứ tự của dialog MIDAS Civil (Section Data → PSC). Lab vẽ lại như PSC Viewer và tính đặc trưng để anh đối chiếu với "Show Calculation Results"; không kiểm chịu lực.</span>
+    <span style="flex:1"></span>
+    <label class="note">Mẫu <select id="preset"></select></label>
+    <span class="chip" id="ms-status">đang tải…</span>
+  </div>
+
+  <div class="ms-cols">
+    <!-- ---------------- dialog -->
+    <div class="panel">
+      <h3>Section Data · PSC</h3>
+      <div class="meta">
+        <label>Section ID<input type="number" id="f-id" value="1" min="1"></label>
+        <label>Name<input type="text" id="f-name" value="PSC_BOX" maxlength="32"></label>
+        <label>Section Type<select id="f-cell"><option value="1CELL">1 Cell</option><option value="2CELL">2 Cell</option></select></label>
+        <label>Offset<select id="f-offset"><option value="CT">Center-Top</option><option value="CC">Center-Center</option><option value="CB">Center-Bottom</option></select></label>
+      </div>
+      <h4>Joint On/Off</h4>
+      <div class="joints" id="joints"></div>
+      <h4>Outer (m)</h4>
+      <div class="dlg" id="outer"></div>
+      <h4>Inner (m)</h4>
+      <div class="dlg" id="inner"></div>
+      <div class="row-btns">
+        <button class="btn" id="btn-balance" title="HI3 = H − HI1 − HI2 − HI4 − HI5">Tự cân HI3</button>
+        <button class="btn" id="btn-solid" title="Đặt toàn bộ Inner = 0">Mặt cắt đặc</button>
+        <button class="btn" id="btn-to-pier">→ làm mặt cắt TRỤ</button>
+        <button class="btn" id="btn-to-mid">→ làm mặt cắt NHỊP</button>
+      </div>
+      <div id="errors"></div>
+      <div id="warnings"></div>
+      <div id="stale-note"></div>
+      <div class="note">Quy ước: kích thước phụ ngoài (BO1-1, BO1-2) đo từ mút cánh; phụ trong (BI1-1, BI1-2, BI2-1, BI3-1, BI3-2) đo từ tim; HO3-1/BO2-1 đo từ góc đáy ngoài; HI4-1/HI4-2 đo từ mặt trong bản đáy lên. Khi có lỗ: HI1+HI2+HI3+HI4+HI5 = HO1+HO2+HO3.</div>
+    </div>
+
+    <!-- ---------------- viewer + đặc trưng -->
+    <div class="panel viewer">
+      <h3>PSC Viewer · tỉ lệ thật</h3>
+      <svg id="viewer-svg" viewBox="0 0 640 380"></svg>
+      <h4>Đặc trưng (lab tính bằng tích phân đa giác)</h4>
+      <div id="props"></div>
+      <h4>Shear Check · Web Thick (ước lượng Auto)</h4>
+      <div id="shear"></div>
+    </div>
+
+    <!-- ---------------- xuất -->
+    <div class="panel exports">
+      <h3>Xuất sang MIDAS</h3>
+      <div class="tabs" id="tabs">
+        <button class="btn active" data-tab="dialog">Ô dialog</button>
+        <button class="btn" data-tab="tsv">Table Input</button>
+        <button class="btn" data-tab="mct">MCT PSC</button>
+        <button class="btn" data-tab="dbuser">DBUSER Box</button>
+        <button class="btn" data-tab="json">JSON API</button>
+        <button class="btn" data-tab="value">PSC-Value Super-T</button>
+      </div>
+      <div class="tab on" id="tab-dialog"><div id="dialog-table"></div><div class="note">Nhập đúng từng ô này vào Section Data → PSC. Ô xám là ô MIDAS làm mờ khi khớp tắt.</div></div>
+      <div class="tab" id="tab-tsv"><div class="row-btns"><button class="btn" data-copy="tsv-text">Sao chép</button><span class="note">Dán vào Excel → Table Input… của MIDAS (dòng 1 tên trường, dòng 2 giá trị).</span></div><textarea class="code" id="tsv-text" readonly></textarea></div>
+      <div class="tab" id="tab-mct"><div class="row-btns"><button class="btn" data-copy="mct-text">Sao chép</button><span class="pill warn" id="mct-status">SYNTAX_UNVERIFIED</span><span class="note">Chưa nạp thử trên Civil 2022. Kiểm bằng Tools → MCT Command Shell trong mô hình trống; nếu lỗi, xuất MCT mẫu từ MIDAS để đối chiếu.</span></div><textarea class="code" id="mct-text" readonly></textarea></div>
+      <div class="tab" id="tab-dbuser"><div class="row-btns"><button class="btn" data-copy="dbuser-text">Sao chép</button><span class="pill pass" id="dbuser-status">VERIFIED_BY_EXTERNAL_EVIDENCE</span><span class="note">Hộp lý tưởng hoá (mất vút, khớp, sườn nghiêng) theo đúng cú pháp midas-mcp đã kiểm chứng.</span></div><textarea class="code" id="dbuser-text" readonly></textarea><div class="note" id="dbuser-ideal"></div></div>
+      <div class="tab" id="tab-json"><div class="row-btns"><button class="btn" data-copy="json-text">Sao chép</button><span class="note">Cấu trúc db/SECT của MIDAS API (CIVIL NX). Civil 2022 không có API — chỉ để tham chiếu thứ tự trường.</span></div><textarea class="code" id="json-text" readonly></textarea></div>
+      <div class="tab" id="tab-value">
+        <div class="row-btns"><button class="btn" id="btn-anchor-value">Nạp anchor Super-T v2</button><button class="btn" data-copy="value-json">Sao chép JSON</button><button class="btn" data-copy="value-csv">Sao chép đỉnh CSV</button><span class="pill warn">SYNTAX_UNVERIFIED</span></div>
+        <div class="note" id="value-info">Bấm "Xuất PSC-Value MIDAS →" ở Studio tiết diện, hoặc nạp anchor v2 tại đây. Dầm Super-T không có trong họ PSC chuẩn của MIDAS nên đi bằng PSC-Value (đa giác).</div>
+        <textarea class="code" id="value-json" readonly></textarea>
+        <textarea class="code" id="value-csv" readonly style="min-height:90px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="ms-cols two">
+    <!-- ---------------- họ mặt cắt -->
+    <div class="panel">
+      <h3>Họ mặt cắt biến thiên · đúc hẫng (FCM)</h3>
+      <div class="fam">
+        <div class="slot" id="slot-pier">Trụ: <em>chưa đặt</em></div>
+        <div class="slot" id="slot-mid">Nhịp: <em>chưa đặt</em></div>
+        <label>Chiều dài cánh hẫng L (m)<input type="number" id="fam-L" value="40" min="1" step="0.5"></label>
+        <label>Số trạm<input type="number" id="fam-n" value="9" min="2" max="400"></label>
+        <label>Luật<select id="fam-law"><option value="parabola">parabola (đỉnh giữa nhịp)</option><option value="linear">tuyến tính</option></select></label>
+        <label>Bậc n<input type="number" id="fam-exp" value="2" min="0.5" step="0.1"></label>
+        <label>Tiền tố tên<input type="text" id="fam-prefix" value="SEG" maxlength="12"></label>
+        <label>&nbsp;<button class="btn primary" id="btn-family">▶ Sinh họ mặt cắt</button></label>
+      </div>
+      <div class="row-btns"><button class="btn" id="btn-fam-tutorial">Nạp cặp tutorial FCM (trụ 7,0 m → nhịp 2,7 m)</button></div>
+      <div class="note" id="fam-status"></div>
+      <div class="elev"><svg id="elev-svg" viewBox="0 0 640 120"></svg></div>
+      <div class="stations" id="fam-table"></div>
+      <div class="row-btns"><button class="btn" data-copy="fam-mct">Sao chép MCT cả họ</button><span class="pill warn">SYNTAX_UNVERIFIED</span><span class="note">Mỗi phần tử: Tapered Section với Size-I/Size-J = hai trạm kề nhau (y/z Variation Linear) như tutorial FCM.</span></div>
+      <textarea class="code" id="fam-mct" readonly style="min-height:110px"></textarea>
+    </div>
+
+    <!-- ---------------- đề xuất -->
+    <div class="panel">
+      <h3>AI đề xuất từ nhịp · <span class="pill na">IDEA</span></h3>
+      <div class="prop-in">
+        <label>Nhịp chính L (m)<input type="number" id="pr-L" value="75" min="10" step="1"></label>
+        <label>Bề rộng mặt cầu B (m)<input type="number" id="pr-W" value="12" min="4" step="0.5"></label>
+        <label>Nhịp biên (m)<input type="number" id="pr-Ls" value="45" min="0" step="1"></label>
+      </div>
+      <div class="row-btns"><button class="btn primary" id="btn-propose">▶ Đề xuất</button><button class="btn" id="btn-pr-pier" disabled>Nạp TRỤ vào form</button><button class="btn" id="btn-pr-mid" disabled>Nạp NHỊP vào form</button><button class="btn" id="btn-pr-family" disabled>Đưa vào họ mặt cắt</button></div>
+      <div id="propose-out" class="note">Bảng heuristic (LAB-HEURISTIC-UNSOURCED-*) trong docs/design_basis/midas_psc_section_basis.json: H trụ ≈ L/17, H nhịp ≈ L/45 (≥ 2,2 m), cánh hẫng ≤ 3 m, đáy ≈ 0,45 B, sườn 0,45/0,60 m, bản mặt ≥ 0,25 m, bản đáy 0,25 m → ≥ 0,60 m tại trụ, vút 1,0 × 0,3 m. Đây là điểm xuất phát để nhập MIDAS rồi phân tích — không phải thiết kế.</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const nf = (v, d) => (v == null || !isFinite(v)) ? '–' : Number(v).toLocaleString('vi-VN', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const OUTER_H = ['HO1', 'HO2', 'HO2-1', 'HO2-2', 'HO3', 'HO3-1'];
+  const OUTER_B = ['BO1', 'BO1-1', 'BO1-2', 'BO2', 'BO2-1', 'BO3'];
+  const INNER_H = ['HI1', 'HI2', 'HI2-1', 'HI2-2', 'HI3', 'HI3-1', 'HI4', 'HI4-1', 'HI4-2', 'HI5'];
+  const INNER_B = ['BI1', 'BI1-1', 'BI1-2', 'BI2', 'BI2-1', 'BI3', 'BI3-1', 'BI3-2', 'BI4'];
+  const JOINTS = ['JO1', 'JO2', 'JO3', 'JI1', 'JI2', 'JI3', 'JI4', 'JI5'];
+  const JOINT_FIELDS = { JO1: ['BO1-1', 'HO2-1'], JO2: ['BO1-2', 'HO2-2'], JO3: ['BO2-1', 'HO3-1'], JI1: ['BI1-1', 'HI2-1'], JI2: ['BI1-2', 'HI2-2'], JI3: ['BI2-1', 'HI3-1'], JI4: ['BI3-2', 'HI4-2'], JI5: ['BI3-1', 'HI4-1'] };
+  const TIPS = { HO1: 'dày mút cánh hẫng', HO2: 'từ đáy mút cánh xuống góc trên sườn ngoài', HO3: 'từ góc trên sườn ngoài xuống đáy', 'HO2-1': 'JO1: sâu thêm dưới mức HO1', 'HO2-2': 'JO2: sâu thêm dưới mức HO1', 'HO3-1': 'JO3: cao độ trên đáy', BO1: 'cánh hẫng (mút → sườn)', 'BO1-1': 'JO1: từ mút cánh', 'BO1-2': 'JO2: từ mút cánh', BO2: 'độ chạy ngang sườn ngoài', 'BO2-1': 'JO3: từ góc đáy ra phía cánh', BO3: 'nửa bề rộng đáy', HI1: 'dày bản trên tại tim', HI2: 'vút bản trên (đến góc trên lỗ)', 'HI2-1': 'JI1: dưới mức HI1', 'HI2-2': 'JI2: dưới mức HI1', HI3: 'sườn trong (góc trên → góc đáy lỗ)', 'HI3-1': 'JI3: từ góc trên lỗ xuống', HI4: 'vút bản đáy', 'HI4-1': 'JI5: từ mặt trong bản đáy lên', 'HI4-2': 'JI4: từ mặt trong bản đáy lên', HI5: 'dày bản đáy', BI1: 'nửa bề rộng lỗ tại đỉnh (từ tim)', 'BI1-1': 'JI1: từ tim', 'BI1-2': 'JI2: từ tim', BI2: 'MIDAS không dùng cho 1/2CELL', 'BI2-1': 'JI3: từ tim', BI3: 'nửa bề rộng lỗ tại đáy (từ tim)', 'BI3-1': 'JI5: từ tim', 'BI3-2': 'JI4: từ tim', BI4: '2CELL: nửa dày sườn giữa' };
+  const state = { presets: {}, bundle: null, pier: null, mid: null, proposal: null, timer: null, seq: 0, famSeq: 0, prSeq: 0, valSeq: 0 };
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._h); toast._h = setTimeout(() => t.classList.remove('on'), 2600); }
+  async function api(path, body) {
+    const res = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
+    const data = await res.json().catch(() => ({ error: 'phản hồi không phải JSON' }));
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  }
+
+  // ---------------------------------------------------------------- dựng form
+  function field(name) { return '<label title="' + esc(TIPS[name] || '') + '"><span>' + esc(name) + '</span><input type="number" step="0.005" min="0" id="f-' + name + '" value="0"><span class="u">m</span></label>'; }
+  function buildForm() {
+    $('joints').innerHTML = [['JO1', 'JI1', 'JI4'], ['JO2', 'JI2', 'JI5'], ['JO3', 'JI3', '']].map((row) => row.map((j) => j ? '<label><input type="checkbox" id="j-' + j + '"> ' + j + '</label>' : '<span></span>').join('')).join('');
+    const pairs = (a, b) => { let s = ''; for (let i = 0; i < Math.max(a.length, b.length); i++) s += (a[i] ? field(a[i]) : '<span></span>') + (b[i] ? field(b[i]) : '<span></span>'); return s; };
+    $('outer').innerHTML = pairs(OUTER_H, OUTER_B);
+    $('inner').innerHTML = pairs(INNER_H, INNER_B);
+    document.querySelectorAll('#outer input, #inner input, #joints input, .meta input, .meta select').forEach((el) => el.addEventListener('input', () => { applyActive(); schedule(); }));
+    $('f-cell').addEventListener('change', () => { applyActive(); schedule(); });
+  }
+  function applyActive() {
+    for (const [j, [b, h]] of Object.entries(JOINT_FIELDS)) { const on = $('j-' + j).checked; $('f-' + b).disabled = !on; $('f-' + h).disabled = !on; }
+    $('f-BI4').disabled = $('f-cell').value !== '2CELL';
+    $('f-BI2').disabled = true;
+  }
+  function readParams() {
+    const dims = {};
+    for (const name of OUTER_H.concat(OUTER_B, INNER_H, INNER_B)) { if (name === 'BI2') continue; const v = parseFloat($('f-' + name).value); dims[name] = isFinite(v) ? v : 0; }
+    const joints = {}; for (const j of JOINTS) joints[j] = $('j-' + j).checked;
+    return { cell_type: $('f-cell').value, name: ($('f-name').value || 'PSC_BOX').trim(), section_id: Math.max(1, parseInt($('f-id').value, 10) || 1), offset: $('f-offset').value, joints, dims };
+  }
+  function writeParams(p) {
+    $('f-cell').value = p.cell_type || '1CELL'; $('f-name').value = p.name || 'PSC_BOX'; $('f-id').value = p.section_id || 1; $('f-offset').value = p.offset || 'CT';
+    for (const j of JOINTS) $('j-' + j).checked = !!(p.joints && p.joints[j]);
+    for (const name of OUTER_H.concat(OUTER_B, INNER_H, INNER_B)) $('f-' + name).value = (p.dims && p.dims[name] != null) ? +(+p.dims[name]).toFixed(4) : 0;
+    applyActive(); schedule();
+  }
+  // Mỗi lần gõ: tăng revision và khoá output NGAY (trước debounce) để phản hồi cũ tới trong 160 ms không mở khoá được.
+  function schedule() { state.seq += 1; setStale(true, 'đang tính lại…'); clearTimeout(state.timer); const seq = state.seq; state.timer = setTimeout(() => refresh(seq), 160); }
+
+  // ---------------------------------------------------------------- tính + vẽ
+  function setStale(on, why) {
+    // Tham số hiện tại chưa hợp lệ hoặc đang chờ: hình/đặc trưng/xuất là của lần hợp lệ TRƯỚC → khoá sao chép, làm mờ, ghi rõ.
+    document.querySelectorAll('.viewer, .panel.exports').forEach((el) => el.classList.toggle('stale', on));
+    document.querySelectorAll('[data-copy]').forEach((b) => { b.disabled = on; });
+    $('stale-note').textContent = on ? ('Hình và các khối xuất bên dưới là của lần hợp lệ trước — ' + why) : '';
+  }
+  async function refresh(seq) {
+    if (seq == null) { seq = ++state.seq; setStale(true, 'đang tính lại…'); }
+    const params = readParams();
+    try {
+      const bundle = await api('/api/midas/psc-section', { params });
+      if (seq !== state.seq) return;            // phản hồi cũ tới sau: bỏ, chỉ nhận revision mới nhất
+      state.bundle = bundle;
+      $('errors').innerHTML = '';
+      $('warnings').innerHTML = (bundle.warnings || []).map((w) => '<div class="warn-note">△ ' + esc(w) + '</div>').join('');
+      $('ms-status').innerHTML = '<span class="dot" style="background:var(--pass)"></span>' + esc(bundle.module_version) + ' · sha ' + esc(bundle.bundle_sha256.slice(0, 10));
+      drawViewer(bundle.geometry, bundle.params); renderProps(bundle.properties, bundle.shear_check); renderExports(bundle);
+      setStale(false, '');
+    } catch (err) {
+      if (seq !== state.seq) return;
+      $('errors').innerHTML = String(err.message).split('; ').map((e) => '<div class="err">⚠ ' + esc(e) + '</div>').join('');
+      $('ms-status').innerHTML = '<span class="dot" style="background:var(--fail)"></span>tham số chưa hợp lệ';
+      setStale(true, 'tham số hiện tại chưa hợp lệ, không được dùng để nhập MIDAS');
+    }
+  }
+  function drawViewer(geo, p) {
+    const svg = $('viewer-svg'); const W = 640, Hh = 380, pad = 46;
+    const wt = geo.top_width_m / 2, H = geo.depth_m; const d = p.dims;
+    const sc = Math.min((W - 2 * pad) / (2 * wt), (Hh - 2 * pad) / H);
+    const X = (y) => W / 2 + y * sc, Y = (z) => pad + (-z) * sc;
+    const ring = (pts) => pts.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join(' ') + ' Z';
+    let path = ring(geo.outer); for (const h of geo.inners) path += ' ' + ring(h);
+    let s = '<path d="' + path + '" fill="rgba(128,128,128,.28)" stroke="currentColor" stroke-width="1.3" fill-rule="evenodd"/>';
+    const txt = (x, y, t, anchor, cls) => '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" font-size="10" font-family="IBM Plex Mono, monospace" text-anchor="' + (anchor || 'middle') + '" fill="' + (cls || 'var(--accent)') + '">' + esc(t) + '</text>';
+    const dimH = (y1, y2, zpx, label, col) => { if (Math.abs(y2 - y1) < 1e-6) return ''; const x1 = X(y1), x2 = X(y2); return '<line x1="' + x1 + '" x2="' + x2 + '" y1="' + zpx + '" y2="' + zpx + '" stroke="' + col + '" stroke-width="0.8"/><line x1="' + x1 + '" x2="' + x1 + '" y1="' + (zpx - 4) + '" y2="' + (zpx + 4) + '" stroke="' + col + '" stroke-width="0.8"/><line x1="' + x2 + '" x2="' + x2 + '" y1="' + (zpx - 4) + '" y2="' + (zpx + 4) + '" stroke="' + col + '" stroke-width="0.8"/>' + txt((x1 + x2) / 2, zpx - 3, label, 'middle', col); };
+    const dimV = (z1, z2, xpx, label, col) => { if (Math.abs(z2 - z1) < 1e-6) return ''; const y1 = Y(z1), y2 = Y(z2); return '<line x1="' + xpx + '" x2="' + xpx + '" y1="' + y1 + '" y2="' + y2 + '" stroke="' + col + '" stroke-width="0.8"/><line x1="' + (xpx - 4) + '" x2="' + (xpx + 4) + '" y1="' + y1 + '" y2="' + y1 + '" stroke="' + col + '" stroke-width="0.8"/><line x1="' + (xpx - 4) + '" x2="' + (xpx + 4) + '" y1="' + y2 + '" y2="' + y2 + '" stroke="' + col + '" stroke-width="0.8"/>' + txt(xpx - 6, (y1 + y2) / 2 + 3, label, 'end', col); };
+    const green = 'var(--pass)', blue = 'var(--accent)';
+    // ngoài: đáy BO1 | BO2 | BO3 (nửa trái), trái HO1 | HO2 | HO3
+    const zb = Y(-H) + 16;
+    s += dimH(-wt, -wt + d.BO1, zb, 'BO1 ' + nf(d.BO1, 3), blue) + dimH(-wt + d.BO1, -d.BO3, zb, 'BO2 ' + nf(d.BO2, 3), blue) + dimH(-d.BO3, 0, zb, 'BO3 ' + nf(d.BO3, 3), blue);
+    const xl = X(-wt) - 12;
+    s += dimV(0, -d.HO1, xl, 'HO1 ' + nf(d.HO1, 3), green) + dimV(-d.HO1, -(d.HO1 + d.HO2), xl, 'HO2 ' + nf(d.HO2, 3), green) + dimV(-(d.HO1 + d.HO2), -H, xl, 'HO3 ' + nf(d.HO3, 3), green);
+    if (geo.hollow) {
+      const xr = X(wt) + 30; let z = 0;
+      for (const k of ['HI1', 'HI2', 'HI3', 'HI4', 'HI5']) { s += dimV(z, z - d[k], xr, k + ' ' + nf(d[k], 3), green); z -= d[k]; }
+      const y0 = p.cell_type === '2CELL' ? d.BI4 : 0;
+      s += dimH(y0, d.BI1, Y(0) - 14, 'BI1 ' + nf(d.BI1, 3), blue) + dimH(y0, d.BI3, Y(-H) + 30, 'BI3 ' + nf(d.BI3, 3), blue);
+    }
+    // khớp
+    for (const [name, q] of Object.entries(geo.joint_points || {})) { const x = X(q[0]), y = Y(q[1]); s += '<circle cx="' + x + '" cy="' + y + '" r="3" fill="var(--fail)"/>' + txt(x + 5, y - 4, name, 'start', 'var(--fail)'); }
+    // tâm + Z1/Z3
+    if (state.bundle && state.bundle.properties) { const cz = state.bundle.properties.centroid_z_m; s += '<line x1="' + X(-wt) + '" x2="' + X(wt) + '" y1="' + Y(cz) + '" y2="' + Y(cz) + '" stroke="var(--select)" stroke-dasharray="5 3" stroke-width="1"/>' + txt(X(wt) - 4, Y(cz) - 3, 'tâm (Z2)', 'end', 'var(--select)'); }
+    s += txt(10, 14, geo.top_width_m.toFixed(3) + ' m × ' + H.toFixed(3) + ' m · đáy ' + geo.bottom_width_m.toFixed(3) + ' m · ' + p.cell_type + (geo.hollow ? '' : ' · đặc'), 'start', 'var(--muted)');
+    svg.innerHTML = s;
+  }
+  function renderProps(pr, sh) {
+    const kv = (rows) => '<table class="kv">' + rows.map(([k, v]) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>').join('') + '</table>';
+    $('props').innerHTML = kv([
+      ['Diện tích A', nf(pr.area_m2, 4) + ' m²'], ['Diện tích lỗ', nf(pr.hole_area_m2, 4) + ' m²'],
+      ['Iyy (uốn dọc)', nf(pr.Iyy_m4, 4) + ' m⁴'], ['Izz (uốn ngang)', nf(pr.Izz_m4, 4) + ' m⁴'],
+      ['Tâm từ đỉnh / từ đáy', nf(pr.centroid_depth_from_top_m, 4) + ' / ' + nf(pr.centroid_height_from_bottom_m, 4) + ' m'],
+      ['S đỉnh / S đáy', nf(pr.S_top_m3, 4) + ' / ' + nf(pr.S_bot_m3, 4) + ' m³'],
+      ['Chu vi ngoài / trong', nf(pr.perimeter_out_m, 3) + ' / ' + nf(pr.perimeter_in_m, 3) + ' m'],
+    ]) + '<div class="note">' + esc(pr.note) + '</div>';
+    $('shear').innerHTML = sh && sh.hollow ? kv([
+      ['Z1 / Z2 / Z3 (từ đáy)', ['Z1', 'Z2', 'Z3'].map((k) => nf(sh.positions_from_bottom_m[k], 3)).join(' / ') + ' m'],
+      ['t1 / t2 / t3 (tổng sườn)', ['Z1', 'Z2', 'Z3'].map((k) => nf(sh.web_thickness_sum_m[k], 3)).join(' / ') + ' m'],
+      ['t xoắn (min)', nf(sh.torsion_min_thickness_m, 3) + ' m'], ['Số sườn', sh.webs],
+    ]) + '<div class="note">' + esc(sh.note) + '</div>' : '<div class="note">' + esc((sh && sh.note) || '') + '</div>';
+  }
+  function renderExports(b) {
+    $('dialog-table').innerHTML = '<table class="grid"><thead><tr><th>Nhóm</th><th>Ô</th><th>Giá trị</th></tr></thead><tbody>' + b.dialog_table.map((r) => '<tr' + (r.active ? '' : ' class="note"') + '><td class="' + (r.active ? '' : 'grey') + '">' + esc(r.group) + '</td><td class="' + (r.active ? '' : 'grey') + '" style="font-family:var(--font-mono)">' + esc(r.field) + '</td><td class="num ' + (r.active ? '' : 'grey') + '">' + (typeof r.value === 'boolean' ? (r.value ? 'ON' : 'off') : esc(r.value)) + (r.unit && r.active ? ' ' + r.unit : '') + '</td></tr>').join('') + '</tbody></table>';
+    $('tsv-text').value = b.table_input_tsv; $('mct-text').value = b.mct_psc.text; $('mct-status').textContent = b.mct_psc.status;
+    $('dbuser-text').value = b.mct_dbuser_box.text; $('dbuser-status').textContent = b.mct_dbuser_box.status; $('dbuser-ideal').textContent = 'Lý tưởng hoá: ' + Object.entries(b.mct_dbuser_box.idealisation).map(([k, v]) => k + ' ' + nf(v, 3)).join(' · ') + ' — ' + b.mct_dbuser_box.note;
+    $('json-text').value = JSON.stringify(b.midas_api_json, null, 1);
+  }
+
+  // ---------------------------------------------------------------- tabs, copy, preset
+  $('tabs').querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => { $('tabs').querySelectorAll('button').forEach((x) => x.classList.toggle('active', x === btn)); document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t.id === 'tab-' + btn.dataset.tab)); }));
+  document.querySelectorAll('[data-copy]').forEach((btn) => btn.addEventListener('click', async () => { const el = $(btn.dataset.copy); try { await navigator.clipboard.writeText(el.value); toast('Đã sao chép ' + el.value.length + ' ký tự'); } catch (err) { el.focus(); el.select(); toast('Ctrl+C để sao chép'); } }));
+  $('preset').addEventListener('change', () => { const p = state.presets[$('preset').value]; if (p) { writeParams(JSON.parse(JSON.stringify(p.params))); toast(p.label); } });
+  $('btn-balance').addEventListener('click', () => { const d = readParams().dims; const H = d.HO1 + d.HO2 + d.HO3; const hi3 = H - d.HI1 - d.HI2 - d.HI4 - d.HI5; $('f-HI3').value = +hi3.toFixed(4); schedule(); toast('HI3 = ' + hi3.toFixed(4) + ' m'); });
+  $('btn-solid').addEventListener('click', () => { for (const k of INNER_H.concat(INNER_B)) $('f-' + k).value = 0; schedule(); });
+  function setSlot(which, params) { state[which] = params; $('slot-' + which).innerHTML = (which === 'pier' ? 'Trụ: ' : 'Nhịp: ') + esc(params.name) + ' · H ' + nf(params.dims.HO1 + params.dims.HO2 + params.dims.HO3, 3) + ' m'; }
+  $('btn-to-pier').addEventListener('click', () => { setSlot('pier', readParams()); toast('Đã đặt mặt cắt trụ'); });
+  $('btn-to-mid').addEventListener('click', () => { setSlot('mid', readParams()); toast('Đã đặt mặt cắt nhịp'); });
+  $('btn-fam-tutorial').addEventListener('click', () => { setSlot('pier', JSON.parse(JSON.stringify(state.presets.fcm_tutorial_support.params))); setSlot('mid', JSON.parse(JSON.stringify(state.presets.fcm_tutorial_span.params))); toast('Cặp tutorial FCM đã nạp'); });
+
+  // ---------------------------------------------------------------- họ mặt cắt
+  $('btn-family').addEventListener('click', async () => {
+    if (!state.pier || !state.mid) { toast('Cần đặt cả mặt cắt trụ và nhịp'); return; }
+    const seq = ++state.famSeq;
+    $('fam-status').textContent = 'Đang sinh…'; $('fam-table').innerHTML = ''; $('fam-mct').value = ''; $('elev-svg').innerHTML = '';
+    try {
+      const fam = await api('/api/midas/psc-family', { pier: state.pier, mid: state.mid, length_m: +$('fam-L').value, stations: +$('fam-n').value, law: $('fam-law').value, exponent: +$('fam-exp').value, name_prefix: $('fam-prefix').value });
+      if (seq !== state.famSeq) return;
+      $('fam-status').innerHTML = fam.sections.length + ' trạm · H ' + nf(fam.depth_pier_m, 3) + ' → ' + nf(fam.depth_mid_m, 3) + ' m · ' + esc(fam.law) + (fam.law === 'parabola' ? ' n=' + fam.exponent : '') + ' · ' + (fam.monotonic_non_increasing ? '<span class="pill pass">đơn điệu</span>' : '<span class="pill fail">không đơn điệu</span>') + ' · ' + (fam.web_parallel_preserved ? '<span class="pill pass">giữ dày sườn</span>' : '<span class="pill warn">sườn nội suy tuyến tính</span>') + ' · claim ' + esc(fam.claim_level) + (fam.family_warnings && fam.family_warnings.length ? '<div class="warn-note">△ ' + fam.family_warnings.map(esc).join(' ') + '</div>' : '');
+      $('fam-table').innerHTML = '<table class="grid"><thead><tr><th>#</th><th>x (m)</th><th>H (m)</th><th>A (m²)</th><th>Iyy (m⁴)</th><th>HI5</th><th>Tên</th></tr></thead><tbody>' + fam.sections.map((s) => '<tr><td>' + s.index + '</td><td class="num">' + nf(s.station_m, 2) + '</td><td class="num">' + nf(s.depth_m, 3) + '</td><td class="num">' + nf(s.area_m2, 3) + '</td><td class="num">' + nf(s.Iyy_m4, 3) + '</td><td class="num">' + nf(s.params.dims.HI5, 3) + '</td><td style="font-family:var(--font-mono)">' + esc(s.params.name) + '</td></tr>').join('') + '</tbody></table>';
+      $('fam-mct').value = fam.mct_psc_all.text;
+      const W = 640, Hh = 120, pad = 14; const L = fam.length_m, Hmax = fam.depth_pier_m; const sc = Math.min((W - 2 * pad) / L, (Hh - 2 * pad) / Hmax);
+      const X = (x) => pad + x * sc, Y = (h) => pad + h * sc;
+      const pts = fam.sections.map((s) => X(s.station_m).toFixed(1) + ',' + Y(s.depth_m).toFixed(1));
+      $('elev-svg').innerHTML = '<polygon points="' + X(0) + ',' + Y(0) + ' ' + pts.join(' ') + ' ' + X(L) + ',' + Y(0) + '" fill="rgba(128,128,128,.25)" stroke="currentColor" stroke-width="1"/>' + fam.sections.map((s) => '<line x1="' + X(s.station_m) + '" x2="' + X(s.station_m) + '" y1="' + Y(0) + '" y2="' + Y(s.depth_m) + '" stroke="var(--accent)" stroke-width="0.6"/>').join('') + '<text x="' + (X(0) + 3) + '" y="' + (Y(Hmax) - 3) + '" font-size="10" fill="var(--muted)">trụ H ' + Hmax.toFixed(2) + '</text><text x="' + (X(L) - 3) + '" y="' + (Y(fam.depth_mid_m) + 12) + '" font-size="10" text-anchor="end" fill="var(--muted)">giữa nhịp H ' + fam.depth_mid_m.toFixed(2) + ' · L ' + L + ' m</text>';
+    } catch (err) { if (seq !== state.famSeq) return; $('fam-status').innerHTML = '<span class="err">' + esc(err.message) + '</span>'; }
+  });
+
+  // ---------------------------------------------------------------- đề xuất
+  $('btn-propose').addEventListener('click', async () => {
+    const seq = ++state.prSeq; state.proposal = null;
+    ['btn-pr-pier', 'btn-pr-mid', 'btn-pr-family'].forEach((id) => { $(id).disabled = true; });
+    $('propose-out').textContent = 'Đang đề xuất…';
+    try {
+      const out = await api('/api/midas/propose', { main_span_m: +$('pr-L').value, deck_width_m: +$('pr-W').value, side_span_m: +$('pr-Ls').value || null });
+      if (seq !== state.prSeq) return;
+      state.proposal = out;
+      const dv = out.derived;
+      $('propose-out').innerHTML = '<table class="kv"><tr><td>H trụ / H nhịp</td><td>' + nf(dv.depth_pier_m, 3) + ' / ' + nf(dv.depth_mid_m, 3) + ' m</td></tr><tr><td>Cánh hẫng / bề rộng đáy</td><td>' + nf(dv.cantilever_m, 3) + ' / ' + nf(dv.bottom_width_m, 3) + ' m</td></tr><tr><td>Sườn: chạy ngang</td><td>' + nf(dv.web_run_m, 3) + ' m</td></tr><tr><td>Claim</td><td><span class="pill na">' + esc(out.claim_level) + '</span></td></tr></table><div class="note">' + esc(out.warning) + '</div><div class="note">Heuristic: ' + Object.values(out.heuristics_used).map(esc).join(', ') + '</div>';
+      ['btn-pr-pier', 'btn-pr-mid', 'btn-pr-family'].forEach((id) => { $(id).disabled = false; });
+      $('fam-L').value = (+$('pr-L').value / 2).toFixed(1);
+      toast('Đề xuất IDEA sẵn sàng');
+    } catch (err) { if (seq !== state.prSeq) return; $('propose-out').innerHTML = '<span class="err">' + esc(err.message) + '</span>'; }
+  });
+  $('btn-pr-pier').addEventListener('click', () => writeParams(state.proposal.pier));
+  $('btn-pr-mid').addEventListener('click', () => writeParams(state.proposal.mid));
+  $('btn-pr-family').addEventListener('click', () => { setSlot('pier', state.proposal.pier); setSlot('mid', state.proposal.mid); toast('Đã đưa cặp đề xuất vào họ mặt cắt'); });
+
+  // ---------------------------------------------------------------- Super-T → PSC-Value
+  async function loadSuperT(gene, grammar_id, label) {
+    const seq = ++state.valSeq;
+    $('value-json').value = ''; $('value-csv').value = ''; $('value-info').textContent = 'Đang chuyển đa giác…';
+    try {
+      const out = await api('/api/midas/supert-value', { gene: gene || {}, grammar_id: grammar_id || 'super_t_parametric_v2', name: 'SUPER_T_V2' });
+      if (seq !== state.valSeq) return;
+      const v = out.psc_value.Assign['1'].SECT_BEFORE.SECT_I.OUTER_POLYGON[0].VERTEX;
+      $('value-info').innerHTML = esc(label || 'Super-T v2') + ': ' + v.length + ' đỉnh · A lab ' + nf(out.properties.area_m2, 4) + ' m² (repo ' + nf(out.repo_section && out.repo_section.area_m2, 4) + ') · Iyy ' + nf(out.properties.Iyy_m4, 4) + ' m⁴ · ' + '<span class="pill na">' + esc(out.claim_level) + '</span> · ' + esc(out.status) + '<div class="note">' + esc(out.psc_value._lab_note) + '</div>';
+      $('value-json').value = JSON.stringify(out.psc_value, null, 1); $('value-csv').value = out.vertices_csv;
+      $('tabs').querySelector('[data-tab="value"]').click();
+    } catch (err) { if (seq !== state.valSeq) return; $('value-info').innerHTML = '<span class="err">' + esc(err.message) + '</span>'; }
+  }
+  $('btn-anchor-value').addEventListener('click', () => loadSuperT({}, 'super_t_parametric_v2', 'anchor Super-T v2'));
+  window.addEventListener('message', (e) => { const d = e.data; if (d && d.type === 'dylight:supert-gene') loadSuperT(d.gene, d.grammar_id, 'gene Studio'); });
+
+  // ---------------------------------------------------------------- khởi động
+  buildForm();
+  api('/api/midas/presets').then((res) => {
+    state.presets = res.presets;
+    $('preset').innerHTML = Object.entries(res.presets).map(([k, v]) => '<option value="' + esc(k) + '">' + esc(v.label) + '</option>').join('');
+    $('preset').value = 'fcm_tutorial_span';
+    writeParams(JSON.parse(JSON.stringify(res.presets.fcm_tutorial_span.params)));
+  }).catch((err) => { $('ms-status').innerHTML = '<span class="dot" style="background:var(--fail)"></span>' + esc(err.message); });
+})();
+</script>
+</body>
+</html>

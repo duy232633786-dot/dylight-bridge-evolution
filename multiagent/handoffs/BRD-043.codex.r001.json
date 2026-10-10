@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-043",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Đã triển khai tham chiếu funicular độc lập với ma trận độ cứng F1: dẫn xuất H_ref=wL^2/(8f), đường parabol, shear/compression tham chiếu, sai lệch trục và bending proxy; so bậc độ lớn với thrust/tie BRD-042 nhưng giữ IDEA/NONE và không phát hành verdict thiết kế. 51 test task và 181 test chuỗi đều xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/funicular_reference.py",
+      "sha256": "0483ea7383e5ba5821c34d064b74f7927768c152000e242b789f95772f0342de",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/funicular_reference_study.schema.json",
+      "sha256": "25ad67b308640d5cf0a14d07434c4fc37d7ae84ebc5412d58580dc90d0dd2392",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/funicular_reference_basis.json",
+      "sha256": "346ee92cfe77e9d906a5aeda2acdfc2ca952a0fbe43a830b751c6abe922247b1",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_funicular_reference.py",
+      "sha256": "aad44c56e9a22c83f40774c6b30855f461fc92ee95ed124cbf27c0939ac42704",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Tải parent là tải đứng đều theo phương ngang, được chứng minh lại từ q, tributary lengths, deck_length=L và nodal loads; ngoài miền bị từ chối.",
+    "H_ref và M_proxy là tham chiếu cân bằng tĩnh học vòm parabol hai khớp, không dùng stiffness, displacement hay end force để dẫn xuất."
+  ],
+  "unresolved_risks": [
+    "Đây chưa phải solver độc lập thứ hai và chưa đạt G4: F1 chỉ được dùng làm đại lượng đo để so bậc độ lớn; reference không tính độ cứng hoặc tái phân phối.",
+    "Order band factor 5 là heuristic phát hiện sai mô hình, không phải giới hạn tiêu chuẩn hoặc verdict an toàn.",
+    "Chưa có tải không đều/di động, gối-mố-móng-đất, P-Delta, ổn định, sức kháng, gió, động đất, mỏi hay giai đoạn thi công."
+  ],
+  "next_action": "Claude review độc lập: băm 4 artifact, tự dẫn xuất công thức và dấu, chạy 51/181 test, tấn công parent/input/result/source/basis/manifest tamper và xác nhận không có capacity/safety/design verdict."
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-038",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Fail-closed design study r002: registry canonical neo SHA-256, miền số chưa VERIFIED khóa L1, evaluation khóa schema/case/input/solver, site evidence neo hash-locator và robust samples bắt buộc độc lập",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/design_study.py",
+      "sha256": "cca6542948c57d4021e2802064cb0d88383043f4266427f680e5e94453bde790",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/model_applicability.schema.json",
+      "sha256": "48fdb628349006c017b68094b766d47741d566baca63f5ce9d9be23b4fd2ff4c",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/model_applicability.json",
+      "sha256": "10bb58dbd992319b1325fd2bab2d33ffbb92e860f31730a8acc6f4539665e2fb",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_design_study.py",
+      "sha256": "767696c78a5a36a5c2981e350b922c5f7e889a988e9fb34cb8daccc3ab8d7f2e",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "L0_SCREENED chỉ là nghiên cứu hình học IDEA; mọi SOLVER-* được giữ trong deferred_blockers",
+    "Registry là miền phần mềm, không thay toàn văn TCVN/AASHTO"
+  ],
+  "unresolved_risks": [
+    "SITE-UNSPECIFIED và domain_evidence PARTIAL chủ động chặn mọi promotion L1 trên dữ liệu canonical hiện tại",
+    "Các caller legacy gọi evaluate_candidate/optimization trực tiếp chưa đi qua design-study authority; cần task tích hợp riêng, không được diễn giải feasible là SCREENED"
+  ],
+  "next_action": "Claude Code review độc lập r002; nếu được duyệt, mở task tích hợp để route research optimization qua assess_candidate mà không sửa nghĩa solver thấp tầng"
+}

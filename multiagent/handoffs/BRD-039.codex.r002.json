@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-039",
+  "agent_id": "codex",
+  "role": "form_inventor",
+  "summary": "Sửa toàn bộ false-pass review r001: hợp nhất chân vòm tied arch, kiểm topology/edge dương, tĩnh không toàn trục, L/depth mọi edge, candidate integrity, source hash dự kiến và proxy tách tied arch.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_shape.py",
+      "sha256": "15294e4bd2a5735608e4414d45479293f8366ecc9ca2fb6ef2b169a491414547",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_shape_candidate.schema.json",
+      "sha256": "65fea06c931bd844775fbad6da31bc3cfbaaf483cb9c4b41048169192880a3a0",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_shape_domain.json",
+      "sha256": "1dbdf43b113d6c24416093257efc432e3c4c42e7991c618626e5ece3dd4ec853",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_shape.py",
+      "sha256": "7c124c24f60d30ff70ca5bc07e959c0746f5fc0e635ee20257611ce5384af7a0",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "technical_profile dự án cung cấp member depth và ngưỡng kèm source_ref POSIX cùng expected_source_sha256."
+  ],
+  "unresolved_risks": [
+    "L/depth và parabolic thrust vẫn chỉ là proxy F0; không kiểm buckling, tied-arch force flow, connection, wind, fatigue, foundation hoặc staged construction."
+  ],
+  "next_action": "Claude re-review r002 và chạy lại toàn bộ reproduction của review r001."
+}

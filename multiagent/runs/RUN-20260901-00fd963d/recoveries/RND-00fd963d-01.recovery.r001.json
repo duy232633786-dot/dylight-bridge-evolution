@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.1",
+  "recovery_id": "REC-7bfad9b943c84197",
+  "created_at": "2026-09-01T14:18:35.256914Z",
+  "run_id": "RUN-20260901-00fd963d",
+  "task_id": "RND-00fd963d-01",
+  "authorized_by": "project_owner",
+  "reason": "Claude adapter now runs from neutral cwd with repository add-dir; target artifact parent exists",
+  "previous_run_status": "FAILED",
+  "next_run_status": "PLANNED",
+  "previous_task_status": "BLOCKED",
+  "next_task_status": "READY",
+  "previous_owner": "claude",
+  "previous_provider": "claude",
+  "next_provider": "claude",
+  "prior_attempts": 2,
+  "previous_run_sha256": "a7237589ebe41138f2835b8417a30f2264e85e4c1290af71fa0b688f1c579699",
+  "previous_task_sha256": "d1ab4ba02c34441cf8b39968c96c083a73c995778c3f5541ec67d0a60a2f15ea",
+  "attempt_records": [
+    {
+      "path": "runs/RUN-20260901-00fd963d/attempts/RND-00fd963d-01.work.r001.json",
+      "sha256": "df5955f31064329b2b5ad52a385a7c9600ef838caf4db8aedee079de8becf5b1"
+    },
+    {
+      "path": "runs/RUN-20260901-00fd963d/attempts/RND-00fd963d-01.work.r002.json",
+      "sha256": "b0cf17d9c892fd6a35503c991a4f1a2c555e27132686bf392f136aca4af6dad4"
+    }
+  ],
+  "base_retry_budget": 1,
+  "base_attempt_budget": 2,
+  "prior_recovery_grants": 0,
+  "granted_attempts": 1,
+  "effective_attempt_budget_before_grant": 2,
+  "effective_attempt_budget_after_grant": 3,
+  "remaining_attempts_before_grant": 0,
+  "remaining_attempts_after_grant": 1,
+  "authorized_new_attempts": 1
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-0445e2828a134560",
+  "amendment_sha256": "46359019ed6157ee664b1a61a635d96830ac831882125f7f3d2ec239e4b09c1d",
+  "created_at": "2026-08-29T15:18:50.330507Z",
+  "task_id": "BRD-044",
+  "authorized_by": "user+codex",
+  "reason": "Mở benchmark OpenSees độc lập sau khi BRD-043 đã ACCEPTED; chỉ thêm 5 artifact thí nghiệm mới, không sửa production solver/verifier/lab hoặc BRD-036.",
+  "pre_task_sha256": "bd238178e94d6f8bce6a196e598dad667ca9db2894640fb49c87ebf489815924",
+  "post_task_sha256": "03f8d9ef9d38f6eaabf3d6d313b33ab6f1dea9b547191b005df49b098a6d655f",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/bd238178e94d6f8bce6a196e598dad667ca9db2894640fb49c87ebf489815924.json",
+    "sha256": "bd238178e94d6f8bce6a196e598dad667ca9db2894640fb49c87ebf489815924"
+  },
+  "changes": [
+    {
+      "field": "status",
+      "before": "BACKLOG",
+      "after": "READY"
+    }
+  ],
+  "previous_status": "BACKLOG",
+  "next_status": "READY"
+}

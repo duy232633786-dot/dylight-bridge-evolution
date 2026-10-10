@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-032-005",
+  "task_id": "BRD-032",
+  "incident_id": "INC-BRD-032-005",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Thay thế correction stale bằng chain từ snapshot lịch sử bất biến tới lab.py hiện hành; không sửa handoff/review cũ và không nâng claim kỹ thuật.",
+  "original_handoff_path": "multiagent/handoffs/BRD-032.claude.r002.json",
+  "original_handoff_sha256": "5fe75ef9dff37738badf9a45d8a4a29e357a3a47ee2cd25a4057c58807974ae7",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5.blob",
+    "sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5",
+    "current_sha256": "41edf51299906a5de6f296dd3831e9632a07e4a98026f40fe1116fecc951d696"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_correction_chain.py",
+      "tests/test_task_contract_reachability.py",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction chỉ phục hồi provenance cho lab.py; reviewer độc lập vẫn phải kiểm diff và xác nhận claim ceiling không đổi."
+  ],
+  "supersedes_correction_sha256": "ae54cbd203fb0b6da3a7fad03ca75436215c13ffb7c94de6da86be126ceab09a"
+}

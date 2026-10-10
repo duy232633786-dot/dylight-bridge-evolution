@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-050",
+  "title": "Vòng lặp thiết kế cấu kiện: sửa-cho-đạt rồi tinh-chỉnh-kinh-tế trên grammar, ngân sách solver trung thực, lineage tái lập và nối vào audit đa cấu kiện",
+  "research_question": "Có thể đóng chuỗi 'chẩn đoán → nước sửa → đánh giá thật → chấp nhận/loại' thành một thuật toán thiết kế cấu kiện xác định, hội tụ hữu hạn, không tự phát verdict, chỉ đi trong miền grammar với ngân sách solver đếm được, rồi bàn giao bằng chứng L1 của phương án cuối cho audit đa cấu kiện fail-closed hay không?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "REVIEW",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G1",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "runtime_scope": {
+    "structural_families": [
+      "super_t_simple_v1",
+      "super_t_parametric_v2"
+    ],
+    "runtime_domain": "production_line_girder_l1"
+  },
+  "write_scope": [
+    "bridge_evolution/design_loop.py",
+    "contracts/design_loop_report.schema.json",
+    "docs/design_basis/design_loop_basis.json",
+    "docs/06_component_design_loop.md",
+    "tests/test_design_loop.py"
+  ],
+  "acceptance_criteria": [
+    "Thuật toán hai pha REPAIR/TRIM chạy trên BudgetedEvaluator: ngân sách chỉ tăng khi solver thật sự mở; L0 reject, cache hit và trạng thái đã thăm không tiêu ngân sách; không trạng thái nào được mở solver hai lần trong một vòng lặp",
+    "Verdict PASS/FAIL của mỗi phương án chỉ đến từ evaluate_candidate (independent verifier); vòng lặp không có quyền verdict riêng, TRIM không bao giờ chấp nhận phương án infeasible hoặc vượt utilization_target",
+    "Nước sửa lấy từ tầng chẩn đoán analysis.suggest_repairs (kèm card_id não 2) và bảng nước sửa bổ sung khai báo trong basis; mọi nước đi nằm trong miền grammar và áp dụng đúng một biến mỗi bước để lineage đọc được",
+    "Chấp nhận trong REPAIR theo thang tiến bộ rõ ràng (schema → L0 → solver/verifier → mục tiêu utilization); không có nước tiến lên thì dừng NO_IMPROVING_REPAIR thay vì đi vòng",
+    "Hội tụ hữu hạn chứng minh được: tập visited + miền grammar hữu hạn + ngân sách; termination reason thuộc enum khóa trong schema",
+    "Report tuân contract contracts/design_loop_report.schema.json (additionalProperties=false), xác định theo seed (không timestamp, không RNG), có SHA-256 của report, basis và mã nguồn; solver NOT_CONVERGED ở seed dừng vòng lặp, ở nước đi thì phương án bị loại và được ghi nhận",
+    "Phương án cuối SUCCESS được bàn giao cho evaluate.build_component_audit với evidence fidelity L1 chỉ cho STR-001/SERV-001/SERV-002; SHEAR_TORSION, FATIGUE, STABILITY, bản mặt cầu và hệ DƯL giữ NOT_EVALUATED nên audit luôn BLOCKED ở L1 — đây là danh sách việc còn lại cho kỹ sư, không phải lỗi",
+    "Test phủ: GC-06 sửa SERV-001 rồi tinh chỉnh; GC-02 seed L0-invalid không tiêu solver cho tới khi hình học sạch; seed schema-invalid và fixture test-only bị từ chối không mở solver; solver failure ở seed và ở nước đi; budget 0/1; tái lập byte-for-byte; không thăm lại trạng thái; utilization_target; policy cheapest_first; grammar v2 smoke; CLI"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/design_loop.py",
+    "contracts/design_loop_report.schema.json",
+    "docs/design_basis/design_loop_basis.json",
+    "docs/06_component_design_loop.md",
+    "tests/test_design_loop.py"
+  ],
+  "safety_notes": [
+    "Kết quả tối đa là SCREENED: L1 line-girder không có mất mát DƯL theo giai đoạn, ứng suất lúc truyền lực, co ngót–từ biến, xoắn, ổn định, mỏi; phương án 'đạt' của vòng lặp chỉ là ứng viên sàng lọc, bắt buộc L2/L3 và kỹ sư chịu trách nhiệm phê duyệt",
+    "Catalog giá/carbon là placeholder bậc độ lớn: objective chỉ để xếp hạng trong cùng một run, không trích dẫn như dự toán",
+    "Không sửa evaluate.py, verifier, diagnose.py, optimization/common.py, cli.py, capability matrix hay bất kỳ artifact đã neo hash của task khác; mọi mở rộng nằm trong file mới của write_scope",
+    "Vòng lặp là tìm kiếm CỤC BỘ một bước: dừng NO_IMPROVING_REPAIR hay CONVERGED không chứng minh tối ưu toàn cục; so sánh với NSGA-II/oracle phải theo docs/03_validation_protocol.md",
+    "Reviewer độc lập của handoff là codex hoặc opencode; owner không tự review"
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "structural_analyst",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_loop.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_diagnose.py",
+      "tests/test_optimization_budget.py",
+      "tests/test_evaluate.py",
+      "tests/test_design_loop.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false,
+  "review_notes": [
+    "Review read-only tren live bytes. Ca 5/5 SHA-256 khop handoff. Python khong co tren PATH va py3.cmd bi sandbox tu choi Access is denied, nen pytest la NOT_RUN, khong phai FAIL. REVISE chi la ket luan software-contract tai tran SCREENED, khong phai phe duyet ky thuat cau. | Ky thuat: CX-050-01 BLOCKER: A schema-valid Super-T L2/L3 seed can be silently rebuilt as grammar-fixed L1_LINE_GIRDER/BUILTIN_L1 before evaluation.; CX-050-02 BLOCKER: Unresolved NOT_CONVERGED probes can support a false CONVERGED or NO_IMPROVING_REPAIR result; disabled TRIM also returns CONVERGED.; CX-050-03 MAJOR: Audit evidence points to design_loop/<case>/verification_record, but that payload is neither persisted nor included in the report; raw solver-error and negative-result details are lost.; CX-050-04 MAJOR: The executable domain is broader than the task runtime_scope and may issue SCREENED reports for unreviewed I-girder or box-girder families.; CX-050-05 MAJOR: The multi-component audit omits CROSS_BEAM_DIAPHRAGM even though diaphragm_layout_id is changed by REPAIR/TRIM, so its required checks never become NOT_EVALUATED blockers.; CX-050-06 MAJOR: Reproducibility pins only design_loop.py and version labels, not the evaluator, diagnosis, budget logic, verifier, solver adapter, grammar/catalog bytes or report contract; component_audit and solver_status are weakly typed in the report schema. | Chi tiet: .tmp/lab-review/codex_brd050_review_findings.json (codex exec read-only, 703 s, 5/5 hash khop)."
+  ]
+}

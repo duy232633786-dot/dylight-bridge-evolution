@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-036-005",
+  "task_id": "BRD-036",
+  "detected_at_utc": "2026-08-29T19:40:44.015589Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-036.claude.r001.json",
+  "original_handoff_sha256": "96fdd21d239e965c124bf0ee3bec54e168aafe6333dc9a13e633ebaac8313bd7",
+  "artifact_path": "tests/test_revit_family.py",
+  "recorded_sha256": "d1f0c7fff65d1e9327f938d404c9d0cb36327f5d5079523ccb1fa756e991fe42",
+  "observed_sha256": "c8daab94410fd0aecdb87ef3d562e80941ca23e83012197e289d9434c80ed609",
+  "reason": "Workflow Claude chay song song tiep tuc sua artifact sau khi lab submit da bam hash r001; snapshot goc duoc phuc hoi tu transcript va chi chap nhan khi SHA-256 khop tuyet doi. Giu nguyen bytes hien tai vi day la tang cung fail-closed co test, khong hoan nguyen code.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

@@ -1,0 +1,246 @@
+# G0 — Design basis, bằng chứng và tiêu chí bác bỏ
+
+**Đề tài (brief `RND-20260901-00fd963d`):** đánh giá và phát triển hình học–vật lý
+"Final Concept v1.7" của *Hybrid Grand Bridge* — nhịp giữa dây võng 650 m, quạt dây
+văng chỉ phía đất liền, một vòm trung tâm CFST-UHPC và hai nửa vòm biên CFST-UHPC nối
+dầm gần mố.
+
+## 0. Trạng thái phát hành
+
+- Task: `RND-00fd963d-01` (workstream `design_basis`, gate yêu cầu `G0`).
+- Claim level của tài liệu này: `IDEA`. Trần claim của brief: `SCREENED`
+  (`multiagent/intake/RND-20260901-00fd963d.json` → `claim_ceiling`). Trần claim của
+  toàn dự án: `SCREENED` (`docs/runtime_capability_matrix.md` §1, `AGENTS.md`).
+- Engineering use: `PROHIBITED`. Tài liệu này **không** phát hành `PASS/FAIL`, không
+  phải thiết kế cơ sở, không phải thiết kế thi công, không tuyên bố tính "world-first".
+- Mọi số trong tài liệu này hoặc là (a) trích từ file trong repo có đường dẫn, (b) suy
+  ra bằng tĩnh học tay có ghi rõ từng bước và biến còn để ký hiệu, hoặc (c) là
+  **design seed** do người đặt đề bài nêu và mang nhãn `UNVERIFIED`. Không có con số
+  nào đến từ solver, thí nghiệm hay khảo sát — vì không tồn tại.
+
+## 1. Câu hỏi đã khóa
+
+> Dữ liệu đầu vào, nguồn gốc và tiêu chí nào **phải** được khóa trước khi bất kỳ phát
+> biểu kỹ thuật nào về Hybrid Grand Bridge v1.7 được coi là có hiệu lực; và ở trạng
+> thái dữ liệu hiện tại, mức fidelity/claim tối đa hợp lệ là gì?
+
+Trả lời ngắn (chi tiết ở §8): **G0 KHÔNG ĐẠT**. Không một trường design basis bắt buộc
+nào (site, tải, địa chất, thủy văn, gió, động đất, vật liệu, tiêu chuẩn) tồn tại trong
+repo hay trong brief. Do đó công việc hợp lệ duy nhất hiện nay là F0 (topology, giả
+thuyết đường lực, tham số hóa hình học, tiêu chí bác bỏ). Mọi phát biểu về nội lực,
+sức kháng, ổn định, biến dạng, tần số, chi phí, carbon phải trả `NOT_EVALUATED`.
+
+## 2. Chuẩn hóa cần khóa (đề xuất, chờ chủ đầu tư/kỹ sư xác nhận)
+
+| Mục | Giá trị đề xuất khóa | Trạng thái |
+|---|---|---|
+| Hệ đơn vị | SI. Lực `N`/`kN`; chiều dài `m` (kích thước tiết diện `mm`); ứng suất `Pa`/`MPa`; khối lượng `kg`; mô men `kN·m`; tải phân bố `kN/m` | `PROPOSED` — phải ghi đơn vị tại nguồn **và** tại biên solver |
+| Hệ tọa độ | `X` dọc tim cầu theo lý trình tăng dần; `Y` ngang, dương về bên trái theo `X`; `Z` thẳng đứng dương hướng lên; gốc tại tim gối/tim tháp phía trái, cao độ tham chiếu = cao độ mực nước thiết kế | `PROPOSED` — chưa có site nên chưa gắn được vào hệ tọa độ quốc gia/độ cao chuẩn |
+| Quy ước dấu | Nén âm cho lực dọc cấu kiện vòm/cáp phải nêu tường minh trong từng model; giai đoạn thi công đảo dấu (xem `E-05`) | `PROPOSED` |
+| Định danh bộ phận | `MS` nhịp giữa dây võng; `ST-L`/`ST-R` quạt dây văng phía đất liền; `AC` vòm trung tâm; `AH-L`/`AH-R` hai nửa vòm biên; `PY` tháp; `AB` mố; `DK` dầm/mặt cầu | `PROPOSED` |
+| Design life, exposure class, tiêu chuẩn + phiên bản, AHJ | — | `UNKNOWN` → **STOP** cho mọi claim kỹ thuật |
+
+## 3. Design seed v1.7 — dữ liệu do đề bài cung cấp, chưa xác minh
+
+Các giá trị dưới đây đến từ *chính văn bản đề tài*, được protocol coi là **dữ liệu
+không tin cậy** (`multiagent/PROTOCOL.md` §Orchestration). Chúng là *hạt giống thiết
+kế* để tham số hóa, **không** phải design basis.
+
+| ID | Nội dung seed | Nguồn | Trạng thái |
+|---|---|---|---|
+| S-01 | Nhịp giữa dây võng `L_MS = 650 m` | topic của brief `RND-20260901-00fd963d` | `DESIGN_SEED_UNVERIFIED` |
+| S-02 | Quạt dây văng **chỉ** ở phía đất liền (bất đối xứng theo phương dọc) | topic | `DESIGN_SEED_UNVERIFIED` |
+| S-03 | Một vòm trung tâm CFST-UHPC | topic | `DESIGN_SEED_UNVERIFIED` |
+| S-04 | Hai nửa vòm biên CFST-UHPC nối dầm gần mố | topic | `DESIGN_SEED_UNVERIFIED` |
+| S-05 | Khổ thông thuyền 60 m | `constraints[2]` của brief, tự khai là "design seed sơ bộ, phải kiểm tra lại" | `DESIGN_SEED_UNVERIFIED` |
+
+Không có bản vẽ, tọa độ, cao độ, mặt cắt ngang, sơ đồ nhịp biên, cao độ đỉnh tháp, độ
+võng cáp `f`, số làn, bề rộng dầm hay chi tiết neo nào kèm theo v1.7 trong repo. Nếu
+v1.7 tồn tại dưới dạng hình render hoặc slide do AI sinh thì theo
+`multiagent/PHYSICS_GATES.md` giá trị bằng chứng kỹ thuật của nó là **NONE** (đối
+chiếu tiền lệ đã ghi trong `bridge_grammar/experimental/arch_deck_v1.json` →
+`image_provenance`).
+
+## 4. Bằng chứng đã biết (kiểm được trong repo)
+
+| ID | Điều đã biết | Nguồn (đường dẫn/citation) | Trạng thái |
+|---|---|---|---|
+| E-01 | Runtime chỉ có L0 hình học + L1 line-girder cho hệ n dầm Super-T song song nhịp giản đơn; `SOLVER_MIDAS_CIVIL`, `SOLVER_OPENSEESPY`, `GRILLAGE_3D`, `STAGED_PRESTRESS_EFFECTS` đều `ABSENT`; trần claim `SCREENED` | `docs/runtime_capability_matrix.md` (`RCM-2.0.0`, package 0.8.0) §1 | `REPO_VERIFIED` |
+| E-02 | `ARCH_RIB_STABILITY` = `ABSENT`; engine cột **chủ động từ chối** cấu kiện `ARCH_RIB`; chưa có đường áp lực, chiều dài quy đổi vòm, trị riêng hay phi tuyến hình học cho vành vòm | `docs/runtime_capability_matrix.md` §1; `bridge_evolution/column_capacity/engine.py::require_straight_prismatic` | `REPO_VERIFIED` |
+| E-03 | Họ vòm `arch_deck_cfst_skeleton_v1` là **sandbox**: `production_import_forbidden = true`, `runtime_can_evaluate_this_family = false`, loader chặn bằng `GrammarIdError`, schema `family` là enum không chứa họ vòm | `bridge_grammar/experimental/arch_deck_v1.json` → `sandbox_policy`; `bridge_evolution/catalogs.py::GrammarIdError` | `REPO_VERIFIED` |
+| E-04 | Hộp tìm kiếm `span_m` của họ vòm sandbox là **100–600 m, bước 25 m**, mang `domain_provenance = PLACEHOLDER_PENDING_DESIGN_BASIS` và `blocks_claim_above = IDEA` | `bridge_grammar/experimental/arch_deck_v1.json` → `design_variables.span_m` | `REPO_VERIFIED` |
+| E-05 | Với vòm/consol, **dấu nội lực đảo** giữa giai đoạn lắp hẫng (S2: thớ trên kéo, làm việc bằng uốn) và giai đoạn khai thác (S7: nén là chủ đạo); tiết diện chịu lực còn **đổi** giữa chừng (ống thép rỗng → CFST) | cùng file → `load_path_hypothesis.sign_reversal_warning_vi`, `construction_stage_schema` | `REPO_VERIFIED` (giả thuyết tĩnh học tay, không do solver) |
+| E-06 | Vòm parabol chịu tải phân bố đều: `V = w·L/2`, `H = w·L²/(8f)`, `H/V = L/(4f)` — mọi vòm thoải hơn `L/f = 4` có lực xô **lớn hơn** phản lực đứng | cùng file → `derivations.thrust_to_vertical_ratio` (có đủ 3 bước) | `DERIVED_ANALYTIC` |
+| E-07 | Catalog vật liệu của repo **chỉ có bê tông thường** (C30…C60, các cấp trên C50 là PLACEHOLDER nội suy `E = 4700·√f'c`, chưa có báo giá/EPD thực) và ghi rõ **"KHÔNG mở rộng lên UHPC: công thức SERV-001/STR-001/STR-002 hiện hành nằm ngoài miền áp dụng"** | `catalogs/catalogs.json`; `docs/03_shape_evolution.md` §4 | `REPO_VERIFIED` |
+| E-08 | Thư viện có nguồn UHPC đã xác minh URL: `LIT-037`…`LIT-041` (workshop manual, guide specification, thiết kế kết cấu UHPC, cắt UHPC không cốt đai, AASHTO T 397) và `LIT-046` (lớp phủ UHPC mặt cầu Thăng Long) | `research/literature/index.json` | `SOURCE_INDEXED` — mới ở mức metadata/abstract, chưa được đọc và diễn giải trong task này |
+| E-09 | `LIT-089` (NCHRP 20-07 Task 325, 2014) đề xuất coi cầu có chu kỳ dao động cơ bản > 1 s **hoặc cầu dây** là nhạy gió, và ghi nhận đã có cầu dao động quá mức do gió **trong thi công** mà quy định hiện hành không nhận diện được. Chính báo cáo tự ghi "IS NOT an official publication of the NCHRP" | `research/literature/index.json` → `LIT-089` (`evidence_status = VERIFIED_URL`, `unverified_fields` nêu cảnh báo trên) | `SOURCE_INDEXED` |
+| E-10 | Hard safety gate (G0–G7) không được đổi lấy chi phí, carbon, độ mới hay thẩm mỹ; hazard chỉ `NOT_APPLICABLE` khi design basis nêu lý do và reviewer duyệt | `multiagent/PHYSICS_GATES.md` | `REPO_VERIFIED` |
+| E-11 | Ngân sách run: `max_tasks = 5`, `max_parallel = 1`, `max_retries = 1`, `task_timeout_seconds = 1800`, `wall_time_seconds = 21600`; human gate bắt buộc `G5`, `G6`, `G7`, `EXTERNAL_WRITE`, `TECHNICAL_RELEASE` | `multiagent/intake/RND-20260901-00fd963d.json` | `REPO_VERIFIED` |
+| E-12 | Cùng topic đã được nạp trước đó dưới brief `RND-20260831-0aea5309` (2026-08-31) nhưng thư mục `research/orchestration/RND-20260831-0aea5309/` **không tồn tại** — không có artifact tiền nhiệm để kế thừa | `multiagent/intake/RND-20260831-0aea5309.json`; liệt kê `research/orchestration/**/*.md` ngày 2026-09-01 | `REPO_VERIFIED` (kết quả âm) |
+
+### 4.1 Kết quả âm phải giữ lại
+
+- **N-01 — Runtime scope của brief không đánh giá được đối tượng của brief.** Brief đặt
+  `runtime_scope.structural_families = ["arch_deck_v1"]`, nhưng (i) họ đó là sandbox bị
+  loader chặn (`E-03`), (ii) hộp `span_m` của nó tối đa 600 m nên **không chứa** nhịp
+  seed 650 m (`E-04` vs `S-01`), và (iii) họ đó là **vòm chạy trên**, không có bất kỳ
+  biến nào mô tả cáp chủ, dây văng, mố neo, tháp hay hệ lai. Kết luận: không có grammar
+  nào trong repo mô tả được v1.7; phải coi đây là họ kết cấu **mới, chưa có schema**.
+- **N-02 — Không có nguồn đã lập chỉ mục cho hệ dây võng/dây văng.** Tìm trong
+  `research/literature/index.json` theo tiêu đề với các khóa `suspension`,
+  `cable-stayed`, `dây văng`, `dây võng`, `CFST` chỉ trả về nhóm UHPC/FRP (`E-08`) và
+  vòm CFST được nhắc gián tiếp qua `LIT-055`. **Không** có nguồn đã xác minh về cáp
+  chủ, mố neo, hệ neo cáp, khí động đàn hồi (flutter/vortex/galloping) cho nhịp treo
+  650 m, hay về nút liên hợp CFST-UHPC. Đây là lỗ hổng nguồn phải đóng trước F1, không
+  được lấp bằng kiến thức LLM.
+- **N-03 — Không có dữ liệu vật liệu UHPC/CFST dùng được trong runtime** (`E-07`): mọi
+  rule sức kháng hiện hành nằm ngoài miền áp dụng của UHPC, và không có mục CFST nào
+  trong catalog. Mọi phát biểu kiểu "vòm CFST-UHPC đủ khả năng" hiện là **không kiểm
+  được**, không phải "đạt".
+
+## 5. Dữ liệu chưa biết — bắt buộc `STOP` cho claim kỹ thuật
+
+Tất cả các mục dưới đây là `UNKNOWN / UNVERIFIED`. Không được điền từ LLM, từ hình
+render, từ NotebookLM hay từ tương tự công trình khác.
+
+1. **Site & hình học chỗ vượt:** vị trí, lý trình, mặt cắt sông/eo, chiều rộng phải
+   vượt, cao độ mực nước (thấp/cao/thiết kế), tĩnh không đứng và ngang thực tế do cơ
+   quan hàng hải quy định (seed 60 m chưa xác minh — `S-05`), khổ giới hạn tuyến, số
+   làn, bề rộng mặt cầu, trắc dọc và bán kính cong.
+2. **Tiêu chuẩn:** bộ tiêu chuẩn và **phiên bản** áp dụng (TCVN 11823-x? AASHTO LRFD ấn
+   bản nào? Eurocode?), AHJ, design life, exposure class, mức độ quan trọng.
+3. **Tải trọng:** hoạt tải thiết kế và hệ số, tĩnh tải giai đoạn 2, tải gió (vận tốc cơ
+   bản, địa hình, hệ số gió giật), động đất (agR, loại nền, loại phổ), nhiệt độ và
+   gradient, va tàu, va xe, dòng chảy/xói, tổ hợp tải cho **từng** giai đoạn thi công.
+4. **Địa chất & nền móng:** hồ sơ khoan, sức kháng, độ cứng nền, phân tầng, mực nước
+   ngầm, khả năng chịu **lực nhổ và lực ngang** của mố neo cáp chủ, cơ học đá nếu có
+   chân vòm tựa đá, lún/chuyển vị ngang cho phép của từng gối.
+5. **Thủy văn/thủy lực:** lưu lượng, vận tốc, mực nước theo chu kỳ lặp, xói chung/xói
+   cục bộ, thông thuyền và tuyến luồng.
+6. **Vật liệu:** thuộc tính đặc trưng và thiết kế của UHPC (kéo, cắt, mỏi, từ biến, co
+   ngót), của ống thép và bê tông nhồi CFST cùng ứng xử liên hợp và trình tự bơm, của
+   cáp chủ/dây văng (mô đun, chùng ứng suất, mỏi, bảo vệ chống ăn mòn), của hệ neo và
+   gối. Kèm nguồn cung, batch/EPD, mô hình suy giảm theo tuổi thọ (G6 — human gate).
+7. **Mô hình & solver:** chưa có solver nào chạm được tới hệ lai này (`E-01`, `E-02`);
+   chưa có version/hash, element formulation, mesh/step convergence, benchmark hay
+   tolerance đối chiếu độc lập.
+8. **Hình học v1.7:** độ võng cáp `f` và tỷ số `f/L`, cao độ đỉnh tháp, sơ đồ nhịp
+   biên, vị trí chân tháp so với chân vòm, điểm nối nửa vòm biên vào dầm, khe dầm–vòm,
+   độ vồng chế tạo, phân đoạn dầm, sơ đồ gối/khe co giãn/điểm cố định.
+
+## 6. Baseline, metric và ngân sách (pre-registered)
+
+### 6.1 Baseline
+
+- **B0 — "v1.7 như mô tả":** topology lai gồm `MS` + `ST-L/R` + `AC` + `AH-L/R`, đúng
+  như `S-01`…`S-05`, chưa tham số hóa, chưa có đường lực khép kín được chứng minh.
+- **B1 — hệ đơn thuần đối chứng (chỉ để so sánh khái niệm ở F0):** cùng chỗ vượt, chỉ
+  một hệ chịu lực chính (thuần dây võng, hoặc thuần dây văng, hoặc thuần vòm). Mục đích
+  là trả lời câu "mỗi bộ phận trong B0 có mang lại vai trò nào mà B1 không có không?" —
+  **không** phải để tuyên bố phương án nào tốt hơn khi chưa có tải và solver.
+
+So sánh chỉ hợp lệ khi cùng design basis hash, cùng grammar, cùng fidelity, cùng ngân
+sách solver và cùng reference point (`multiagent/PROTOCOL.md` §Quy tắc nghiên cứu 2).
+
+### 6.2 Metric hợp lệ ở F0/F1 hiện nay
+
+Chỉ những metric **không cần** solver mới được tính trong điều kiện hiện tại:
+
+| ID | Metric | Định nghĩa | Đơn vị |
+|---|---|---|---|
+| M-01 | `load_path_closure` | Với mỗi trạng thái `S0…S7`, đường lực từ hoạt tải tới nền có khép kín bằng cân bằng tĩnh học tay hay không | boolean/trạng thái |
+| M-02 | `unresolved_equilibrium_count` | Số điểm trong sơ đồ mà thành phần lực (đặc biệt thành phần ngang của cáp chủ và lực xô vòm) chưa có bộ phận nhận | đếm |
+| M-03 | `roleless_member_count` | Số bộ phận chưa gán được vai trò chịu lực riêng biệt trong ít nhất một trạng thái | đếm |
+| M-04 | `parameter_completeness` | Tỷ lệ biến hình học đã có miền + `domain_provenance` (không `PLACEHOLDER`) | % |
+| M-05 | `clearance_envelope_conflict` | Xung đột hình học giữa hộp khổ thông thuyền, vòm, cáp và dầm | đếm |
+| M-06 | `stage_coverage` | Tỷ lệ giai đoạn thi công đã có sơ đồ, tiết diện và tổ hợp tải được mô tả | % |
+| M-07 | `evidence_completeness` | Tỷ lệ claim chính có citation kiểm được (còn lại phải mang `UNVERIFIED`) | % |
+| M-08 | `NOT_EVALUATED_ratio` | Tỷ lệ hạng mục limit state buộc phải trả `NOT_EVALUATED` do thiếu capability/dữ liệu | % |
+
+Mọi metric về nội lực, ứng suất, ổn định, tần số, chuyển vị, mỏi, chi phí và carbon:
+**`NOT_EVALUATED`** cho tới khi có design basis + solver phù hợp. `NOT_EVALUATED` không
+bao giờ được ánh xạ thành `PASS`.
+
+### 6.3 Ngân sách
+
+Theo `E-11`: tối đa 5 task, tuần tự (`max_parallel = 1`), 1 retry, 1800 s/task,
+21600 s wall-clock cho cả run. Timeout/thất bại được lưu là **kết quả âm**, không retry
+vô hạn, không đổi tiêu chí để "chạy được". Ngân sách solver: **0** — không có solver hợp
+lệ cho họ kết cấu này, nên không được tiêu ngân sách solver để sinh số vô nghĩa
+(`docs/runtime_capability_matrix.md` §3 quy tắc 2).
+
+## 7. Tiêu chí bác bỏ (falsification criteria)
+
+Concept v1.7 (hoặc bộ phận tương ứng) bị **bác bỏ / bắt buộc sửa** nếu bất kỳ mục nào
+dưới đây đúng. Không mục nào đã được kiểm — toàn bộ `NOT_TESTED`, và chính điều đó khóa
+claim ở `IDEA`.
+
+| ID | Phát biểu bác bỏ | Phương pháp kiểm | Trạng thái |
+|---|---|---|---|
+| FC-01 | Thành phần ngang của cáp chủ nhịp giữa **không** có đường khép kín: không có mố neo trong đất/đá với dữ liệu địa chất chứng minh khả năng chịu lực ngang + nhổ, và cũng không có phương án tự neo với dầm chịu **nén** đủ và ổn định | Cân bằng tay ở F0 với `H = w·L²/(8f)` (`E-06`) rồi kiểm bằng L2 khi có solver; địa chất theo gói dữ liệu G0 | `NOT_TESTED` |
+| FC-02 | Quạt dây văng **chỉ** một phía (`S-02`) tạo mất cân bằng dọc ở đỉnh tháp mà cơ chế cân bằng duy nhất là **uốn** của tháp (biến hệ trục thành hệ uốn), hoặc đòi back-stay/neo chưa có trong topology | Cân bằng nút đỉnh tháp cho mọi trạng thái `S0…S7` và mọi mẫu hoạt tải bất lợi (nửa nhịp, một phía) | `NOT_TESTED` |
+| FC-03 | Xung đột độ cứng: vòm (cứng, nhạy chuyển vị gối) và hệ dây võng (mềm, chịu lực bằng thay đổi hình dạng) mắc **song song** vào cùng dầm khiến phản lực tại giao diện dầm–vòm đổi dấu (yêu cầu gối chịu nhổ chưa có), hoặc chuyển vị của hệ mềm áp **chuyển vị cưỡng bức** lên vòm vượt khả năng vành vòm | Mô hình 3D phi tuyến hình học có staged construction; ngưỡng chuyển vị phải suy ra **từ** mô men gây ra trong vành vòm, **không** mượn bảng chuyển vị gối của cầu dầm | `NOT_TESTED` — solver `ABSENT` |
+| FC-04 | Bộ phận thừa: với **mọi** trạng thái và mọi tổ hợp, việc gỡ bỏ `AC` hoặc `AH-L/R` không làm đổi cơ chế chịu lực nào (không đổi utilization khống chế quá dải bất định của mô hình) → bộ phận đó là trang trí và phải bị loại hoặc được định nghĩa lại vai trò | Thử nghiệm gỡ bỏ cấu kiện (member-removal sensitivity) trên cùng mô hình, cùng tải, cùng seed | `NOT_TESTED` |
+| FC-05 | Hai nửa vòm biên nối dầm gần mố (`S-04`) không có bộ phận nhận **lực xô ngang** ở chân phía mố, hoặc lực xô đó truyền qua một phần tử **mềm mắc nối tiếp** trong đường lực chính | Cân bằng chân vòm; `H/V = L/(4f)` (`E-06`) cho biết lực xô cùng bậc hoặc lớn hơn phản lực đứng khi vòm thoải hơn `L/f = 4` | `NOT_TESTED` |
+| FC-06 | Không tồn tại **chuỗi** trạng thái thi công nào mà mọi bước trung gian đều đứng vững — kể cả khi sơ đồ hoàn thiện đứng vững (dấu nội lực đảo giữa consol và vòm, tiết diện đổi giữa chừng — `E-05`) | Phân tích chuỗi sơ đồ, mỗi giai đoạn một sơ đồ/tiết diện/tổ hợp tải | `NOT_TESTED` — `STAGED_PRESTRESS_EFFECTS = ABSENT` |
+| FC-07 | Hệ (đã hoàn thiện **hoặc** ở trạng thái thi công) không kiểm được về khí động đàn hồi. Theo tiêu chí đề xuất trong `LIT-089`, cầu dây hoặc cầu có chu kỳ cơ bản > 1 s được coi là **nhạy gió**; nhịp treo 650 m rơi thẳng vào nhóm này. Thiếu số liệu gió và thiếu năng lực phân tích → `STOP`, không phải `NOT_APPLICABLE` | Số liệu gió của site + phân tích flutter/vortex/buffeting + thí nghiệm hầm gió (G5 — human gate) | `NOT_TESTED` |
+| FC-08 | Ổn định vành vòm trong/ngoài mặt phẳng không được chứng minh ở mọi giai đoạn | Phân tích oằn 3D + phi tuyến hình học | `NOT_TESTED` — `ARCH_RIB_STABILITY = ABSENT` (`E-02`) |
+| FC-09 | Vật liệu CFST-UHPC được dùng làm căn cứ sức kháng trong khi công thức/rule hiện hành nằm **ngoài miền áp dụng** của UHPC và không có thuộc tính đặc trưng có nguồn (`E-07`, `N-03`) | Đóng lỗ hổng bằng `LIT-037`…`LIT-041`/`LIT-046` đã đọc và diễn giải, hoặc số liệu vật liệu có provenance; G6 là human gate | `NOT_TESTED` |
+| FC-10 | Nút liên hợp thép–UHPC và nút neo cáp không có mô hình mỏi/độ bền lâu, trong khi chúng nằm trong đường lực **chính** và có thể ở môi trường ăn mòn | Cần nguồn về mỏi chi tiết thép/nút CFST — hiện **không có** trong thư viện (`N-02`); để `TBD` tường minh, không bịa nguồn | `NOT_TESTED` |
+| FC-11 | Hình học không tham số hóa lặp lại được: cùng bộ tham số không tái tạo cùng mô hình/hash, hoặc miền tham số vẫn là `PLACEHOLDER_PENDING_DESIGN_BASIS` khi có kết quả được trích dẫn | Replay cùng seed/config; kiểm `domain_provenance` từng biến | `NOT_TESTED` |
+| FC-12 | Bất kỳ artifact nào của run này gán số cho `utilization/capacity/demand/frequency/cost/carbon` khi solver chưa chạy hợp lệ, hoặc đổi `NOT_EVALUATED` thành `PASS`, hoặc claim vượt `SCREENED` | Kiểm tra artifact + `lab review` chéo nhà cung cấp | `NOT_TESTED` |
+
+## 8. Sổ giả định (assumption register)
+
+| ID | Giả định | Vì sao cần | Nếu sai thì sao | Cách bác bỏ |
+|---|---|---|---|---|
+| A-01 | v1.7 là **concept hình học**, chưa từng qua bất kỳ phân tích kết cấu nào | Không có artifact phân tích nào trong repo (`E-12`) | Nếu tồn tại hồ sơ tính bên ngoài, phải nạp vào làm bằng chứng và làm lại §4 | Chủ đề tài cung cấp hồ sơ/nguồn có hash |
+| A-02 | Hệ tọa độ và đơn vị ở §2 được chấp nhận | Không thể tham số hóa nếu không khóa | Toàn bộ tham số hóa xuống sau phải ánh xạ lại | Kỹ sư/chủ đầu tư chốt khác đi |
+| A-03 | Nhịp giữa treo bằng cáp chủ dạng gần parabol dưới tĩnh tải phân bố gần đều | Để dùng được `H = w·L²/(8f)` như **ước lượng bậc độ lớn** | Nếu tĩnh tải tập trung mạnh hoặc hệ tự neo, quan hệ trên không áp dụng | Mô hình cáp phi tuyến khi có tải thật |
+| A-04 | Hai nửa vòm biên là bộ phận **chịu lực**, không phải trang trí | Quyết định toàn bộ cách kiểm | Nếu chúng là trang trí thì phải loại bỏ khỏi mô hình chịu lực và khỏi chi phí biện minh | `FC-04` |
+| A-05 | Không có dữ liệu site nào được phép suy đoán từ hình ảnh/render | Quy tắc `PHYSICS_GATES` | — | — |
+
+Không giả định nào ở trên được dùng để **thay thế** dữ liệu thiếu ở §5.
+
+## 9. Điều kiện mở khóa fidelity kế tiếp
+
+- **Để lên F1/`SCREENED` cho bất kỳ bộ phận nào:** phải có (i) design basis §5 mục
+  1–3 tối thiểu cho bộ phận đó, (ii) grammar/schema mô tả được hệ lai (hiện **không**
+  tồn tại — `N-01`), (iii) mô hình L1 phù hợp **loại** cấu kiện (line-girder hiện tại
+  không phù hợp cho cáp, vòm, tháp), (iv) rule sức kháng nằm **trong** miền áp dụng vật
+  liệu (`FC-09`).
+- **Để lên F2:** solver 3D thật (`ABSENT` hôm nay), mesh/step convergence, benchmark,
+  đối chiếu độc lập (G4).
+- **G5/G6/G7 luôn dừng chờ con người** (`E-11`, `multiagent/PROTOCOL.md`).
+
+## 10. Quyết định G0
+
+**`G0 = FAIL / STOP_FOR_ENGINEERING_CLAIMS`.**
+
+Lý do (mỗi lý do đều truy được về §4–§5):
+
+1. Không có site, tải, tổ hợp, địa chất, thủy văn, gió, động đất hay tiêu chuẩn+phiên
+   bản nào được khóa. `PHYSICS_GATES.md` G0 quy định: *"Thiếu dữ liệu thì dừng."*
+2. Không có thuộc tính vật liệu UHPC/CFST dùng được, và rule hiện hành tự khai nằm
+   ngoài miền áp dụng UHPC (`E-07`).
+3. Không có solver nào đánh giá được hệ lai; ổn định vòm, staged construction và khí
+   động đều `ABSENT` (`E-01`, `E-02`).
+4. Runtime family được brief chỉ định (`arch_deck_v1`) không mô tả được đối tượng và
+   thậm chí không chứa nhịp 650 m trong hộp tham số placeholder (`N-01`).
+
+**Được phép làm tiếp trong run này (F0/`IDEA`):** phản biện đường lực bằng tĩnh học
+tay, tham số hóa hình học kèm `domain_provenance` trung thực, liệt kê biến thể và tiêu
+chí bác bỏ định lượng-khi-có-thể, lộ trình lên mô hình phi tuyến/khí động/thi công, và
+danh mục dữ liệu phải thu thập.
+
+**Không được phép:** phát hành bất kỳ `PASS/FAIL`, utilization, sức kháng, tần số, chi
+phí, carbon, "đã kiểm ổn định", "đủ khả năng", "world-first", hay bất kỳ claim nào vượt
+`SCREENED`.
+
+## 11. Đối chiếu acceptance criteria của task
+
+| Acceptance criterion | Đáp ứng ở |
+|---|---|
+| Phân biệt dữ liệu đã biết, chưa biết và giả định | §4 (đã biết + kết quả âm), §5 (chưa biết), §8 (giả định), §3 (design seed chưa xác minh) |
+| Mỗi claim chính có nguồn/citation hoặc ghi `UNVERIFIED` | Cột "Nguồn"/"Trạng thái" trong §3, §4; nhãn `UNVERIFIED`/`UNKNOWN`/`NOT_TESTED` dùng nhất quán |
+| Có baseline, metric, ngân sách và falsification criterion | §6.1 baseline, §6.2 metric, §6.3 ngân sách, §7 `FC-01`…`FC-12` |

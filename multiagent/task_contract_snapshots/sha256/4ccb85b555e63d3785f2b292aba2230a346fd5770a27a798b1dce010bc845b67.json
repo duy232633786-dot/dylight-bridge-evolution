@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-041",
+  "title": "Adapter fail-closed từ hình thái MAP-Elites sang mô hình khung-giàn F1",
+  "research_question": "Làm sao chuyển một candidate vòm đã qua sàng F0 thành mô hình FRAME_2D/TRUSS_2D có bảo toàn hình học, tải và provenance, xử lý đúng nút trùng tại chân vòm, nhưng không biến hội tụ số F1 thành kết luận thiết kế?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "BACKLOG",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "BRD-039",
+    "BRD-040"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "bridge_evolution/creative_frame_adapter.py",
+    "contracts/creative_frame_profile.schema.json",
+    "contracts/creative_frame_analysis.schema.json",
+    "docs/design_basis/creative_frame_adapter_basis.json",
+    "tests/test_creative_frame_adapter.py"
+  ],
+  "acceptance_criteria": [
+    "Adapter chỉ nhận candidate được tái tạo byte-canonical từ genome, domain và technical_profile; candidate FAIL, UNKNOWN, bị sửa geometry/hash hoặc không all_known_pass phải bị chặn trước solver",
+    "THROUGH_ARCH và NETWORK_ARCH phải hợp nhất đúng cặp nút đồng tọa độ D0-A0 và Dn-An, bỏ END_POST zero-length; mọi phần tử zero-length khác phải bị từ chối",
+    "Ánh xạ edge kind là tường minh: ARCH_RIB, DECK, SPANDREL và END_POST hữu hạn sang FRAME_2D; HANGER và NETWORK_HANGER sang TRUSS_2D; kind lạ fail-closed",
+    "Vật liệu và tiết diện được người gọi cấp riêng theo edge kind, có source_ref tồn tại và hash bytes; adapter không tự bịa E, A, I hoặc capacity",
+    "Chỉ hỗ trợ policy gối được khai trong basis; mô hình hai khớp dùng chân trái khóa ux-uy, chân phải khóa uy và không khóa rz",
+    "Tải đường đều trên mặt cầu được quy đổi về tải nút theo chiều dài tributary; tổng tải nút phải bằng q nhân tổng chiều dài mặt cầu trong tolerance đã khai",
+    "Manifest đầu ra giữ candidate_id, geometry_sha256, candidate profile hash, structural profile hash, model_sha256, basis hashes và source digests",
+    "CONVERGED chỉ có nghĩa nghiệm tuyến tính F1 hội tụ; output giữ claim_level=IDEA, design_verdict_authority=NONE và schema cấm feasible, verified, design_pass",
+    "Cùng input cho output deterministic; test âm phủ candidate bị sửa, source drift, profile thiếu kind, gối không ổn định, tải không bảo toàn, nút trùng ngoài chân vòm, graph ngắt và trường verdict cấm",
+    "Không sửa creative_shape.py, frame_f1.py, evaluate.py, geometry_experimental.py, fe_adapter production hoặc lab.py"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/creative_frame_adapter.py",
+    "docs/design_basis/creative_frame_adapter_basis.json",
+    "tests/test_creative_frame_adapter.py"
+  ],
+  "safety_notes": [
+    "BRD-041 không được claim hoặc triển khai trước khi BRD-039 và BRD-040 được reviewer độc lập APPROVE",
+    "FRAME_2D giả định liên kết cứng tại nút; HANGER/TRUSS_2D chỉ chịu dọc trục; đây là lý tưởng hóa nghiên cứu cần ghi rõ",
+    "Không có tự trọng tự sinh, prestress, P-Delta, buckling, dynamic, fatigue, connection, soil-foundation, construction staging hoặc tổ hợp/capacity theo tiêu chuẩn",
+    "Không dùng novelty, thẩm mỹ, chi phí hoặc trạng thái CONVERGED để bù một blocker hình học/provenance"
+  ],
+  "review_notes": [],
+  "preferred_provider": "codex",
+  "preferred_role": "bim_fem_integrator",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_frame_adapter.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "tests/test_creative_frame_adapter.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

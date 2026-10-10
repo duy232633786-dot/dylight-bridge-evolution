@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creative_shape_candidate.schema.json",
+  "title": "CreativeShapeCandidateL0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "claim_level",
+    "generator",
+    "genome",
+    "domain_sha256",
+    "profile_sha256",
+    "geometry_sha256",
+    "axis_points",
+    "graph",
+    "descriptors",
+    "checks",
+    "screening_status",
+    "all_known_pass",
+    "technical_scope"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "candidate_id": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" },
+    "claim_level": { "const": "IDEA" },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "domain_id"],
+      "properties": {
+        "id": { "const": "CONSTRAINED_MAP_ELITES_ARCH" },
+        "version": { "type": "string", "pattern": "^creative-shape/[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "domain_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "genome": { "$ref": "#/$defs/genome" },
+    "domain_sha256": { "$ref": "#/$defs/sha256" },
+    "profile_sha256": { "$ref": "#/$defs/sha256" },
+    "geometry_sha256": { "$ref": "#/$defs/sha256" },
+    "axis_points": {
+      "type": "array",
+      "minItems": 21,
+      "items": { "$ref": "#/$defs/point" }
+    },
+    "graph": { "$ref": "#/$defs/graph" },
+    "descriptors": { "$ref": "#/$defs/descriptors" },
+    "checks": {
+      "type": "array",
+      "minItems": 7,
+      "items": { "$ref": "#/$defs/check" }
+    },
+    "screening_status": {
+      "enum": ["L0_PASSED", "REJECTED", "UNKNOWN_INPUT_MISSING"]
+    },
+    "all_known_pass": { "type": "boolean" },
+    "technical_scope": {
+      "const": "GEOMETRY_AND_SCREENING_PROXY_ONLY_NO_STRUCTURAL_VERIFICATION"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "all_known_pass": { "const": true } },
+        "required": ["all_known_pass"]
+      },
+      "then": {
+        "properties": { "screening_status": { "const": "L0_PASSED" } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "screening_status": { "const": "L0_PASSED" } },
+        "required": ["screening_status"]
+      },
+      "then": {
+        "properties": { "all_known_pass": { "const": true } }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "genome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "topology",
+        "span_m",
+        "rise_ratio",
+        "panel_count",
+        "rib_count",
+        "rib_depth_m",
+        "deck_clearance_m",
+        "shape_coefficients"
+      ],
+      "properties": {
+        "topology": { "enum": ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"] },
+        "span_m": { "type": "number", "exclusiveMinimum": 0 },
+        "rise_ratio": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "panel_count": { "type": "integer", "minimum": 4 },
+        "rib_count": { "type": "integer", "minimum": 1 },
+        "rib_depth_m": { "type": "number", "exclusiveMinimum": 0 },
+        "deck_clearance_m": { "type": "number", "exclusiveMinimum": 0 },
+        "shape_coefficients": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "number" }
+        }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "t", "x_m", "y_m"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "t": { "type": "number", "minimum": 0, "maximum": 1 },
+        "x_m": { "type": "number", "minimum": 0 },
+        "y_m": { "type": "number", "minimum": 0 }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "x_m", "y_m", "support"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[AD][0-9]+$" },
+        "kind": { "enum": ["ARCH", "DECK"] },
+        "x_m": { "type": "number", "minimum": 0 },
+        "y_m": { "type": "number" },
+        "support": { "type": "boolean" }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from", "to", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "from": { "type": "string", "pattern": "^[AD][0-9]+$" },
+        "to": { "type": "string", "pattern": "^[AD][0-9]+$" },
+        "kind": { "enum": ["ARCH_RIB", "DECK", "END_POST", "SPANDREL", "HANGER", "NETWORK_HANGER"] }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topology", "nodes", "edges"],
+      "properties": {
+        "topology": { "enum": ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"] },
+        "nodes": {
+          "type": "array",
+          "minItems": 6,
+          "items": { "$ref": "#/$defs/node" }
+        },
+        "edges": {
+          "type": "array",
+          "minItems": 4,
+          "items": { "$ref": "#/$defs/edge" }
+        }
+      }
+    },
+    "descriptors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rise_ratio",
+        "curvature_complexity",
+        "asymmetry",
+        "arc_length_m",
+        "max_abs_slope",
+        "min_curvature_radius_m",
+        "max_panel_length_m",
+        "max_member_slenderness",
+        "vertical_clearance_m"
+      ],
+      "properties": {
+        "rise_ratio": { "type": "number", "minimum": 0 },
+        "curvature_complexity": { "type": "number", "minimum": 0 },
+        "asymmetry": { "type": "number", "minimum": 0 },
+        "arc_length_m": { "type": "number", "exclusiveMinimum": 0 },
+        "max_abs_slope": { "type": "number", "minimum": 0 },
+        "min_curvature_radius_m": { "type": "number", "exclusiveMinimum": 0 },
+        "max_panel_length_m": { "type": "number", "exclusiveMinimum": 0 },
+        "max_member_slenderness": { "type": "number", "exclusiveMinimum": 0 },
+        "vertical_clearance_m": { "type": "number", "minimum": 0 }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "status",
+        "demand",
+        "limit",
+        "utilization",
+        "margin",
+        "model_kind",
+        "source_ref",
+        "source_sha256",
+        "message"
+      ],
+      "properties": {
+        "check_id": { "type": "string", "pattern": "^CQD-L0-[0-9]{2}$" },
+        "status": { "enum": ["PASS", "FAIL", "UNKNOWN_INPUT_MISSING"] },
+        "demand": { "type": ["number", "null"] },
+        "limit": { "type": ["number", "null"] },
+        "utilization": { "type": ["number", "null"], "minimum": 0 },
+        "margin": { "type": ["number", "null"] },
+        "model_kind": {
+          "enum": [
+            "EXACT_GRAPH_INVARIANT",
+            "GEOMETRY_SCREEN",
+            "SCREENING_PROXY_GEOMETRIC_L_OVER_DEPTH",
+            "SCREENING_PROXY_PARABOLIC_THRUST_ENVELOPE"
+          ]
+        },
+        "source_ref": { "type": ["string", "null"] },
+        "source_sha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

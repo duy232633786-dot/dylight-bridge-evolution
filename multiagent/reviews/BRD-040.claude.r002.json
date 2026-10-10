@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-040",
+  "handoff_sha256": "c69ba37123a86eea6746b36b3690c7e91f57a3a76e87d7f90b571f36fa97add1",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task IDEA, required_gates rỗng. Claude xác minh 5/5 hash r002 khớp, 56 tests đạt và bốn finding r001 đã đóng."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Jacobi scaling chuẩn hóa mọi đường chéo thành 1 nên mù với gần-cơ-cấu có độ mềm nằm trên đường chéo. V-truss offset giảm 2 m xuống 5e-6 m luôn cond=1 và CONVERGED dù chuyển vị tới 1.25e7 m. Cần scale theo đơn vị bằng characteristic length, giữ độ tương phản độ cứng và thêm guard chuyển vị/chiều dài cho miền small-displacement."
+    }
+  ],
+  "notes": "Review r002 độc lập: bốn lỗi r001 đã đóng; còn lỗ hổng HIGH do Jacobi scaling che khuất gần-cơ-cấu và thiếu guard miền chuyển vị nhỏ."
+}

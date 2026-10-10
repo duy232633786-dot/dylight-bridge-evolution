@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "matrix_id": "RCM-2.0.0",
+  "package_version": "0.8.0",
+  "claim_ceiling": "SCREENED",
+  "claim_ceiling_evidence": {
+    "path": "multiagent/lab.json",
+    "pointer": "/current_project_claim_ceiling"
+  },
+  "doc_mirror": "docs/runtime_capability_matrix.md",
+  "runtime_rule_inventory": [
+    "CONS-001", "CONS-002",
+    "FAB-000", "FAB-001", "FAB-002", "FAB-003", "FAB-004", "FAB-005", "FAB-006", "FAB-007",
+    "GEOM-001", "GEOM-002", "GEOM-003",
+    "MODEL-001",
+    "SCHEMA-001", "SCHEMA-002",
+    "SERV-001", "SERV-002", "SERV-003",
+    "SOLVER-001", "SITE-001",
+    "STR-001", "STR-002"
+  ],
+  "capabilities": [
+    {
+      "id": "GRAMMAR_V1_CATALOG",
+      "title": "Grammar v1 — tiết diện định hình tra catalog",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_grammar/super_t_simple_v1.json",
+        "bridge_evolution/geometry.py::resolve_section"
+      ],
+      "limits": "Đặc trưng tiết diện trong catalogs/catalogs.json là placeholder đúng bậc độ lớn, chưa hiệu chỉnh theo hồ sơ Super-T thực.",
+      "probes": [
+        { "kind": "file_exists", "path": "bridge_grammar/super_t_simple_v1.json" },
+        { "kind": "module_attr", "module": "bridge_evolution.geometry", "attr": "resolve_section", "callable": true }
+      ]
+    },
+    {
+      "id": "GRAMMAR_V2_PARAMETRIC",
+      "title": "Grammar v2 — tiết diện tham số hoá 6 biến hình dạng trong vòng tối ưu",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_grammar/super_t_parametric_v2.json",
+        "bridge_evolution/section.py::section_from_params",
+        "bridge_evolution/geometry.py::resolve_section"
+      ],
+      "limits": "Đặc trưng tiết diện tính bằng tích phân Green trên đa giác GẦN ĐÚNG (bỏ vút, bỏ bo góc, sườn dày đều). Không dùng phần tử hữu hạn 2D trong vòng tìm kiếm.",
+      "probes": [
+        { "kind": "file_exists", "path": "bridge_grammar/super_t_parametric_v2.json" },
+        { "kind": "module_attr", "module": "bridge_evolution.section", "attr": "section_from_params", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.section", "attr": "polygon_properties", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.geometry", "attr": "resolve_section", "callable": true }
+      ]
+    },
+    {
+      "id": "L0_LAYOUT_RULES",
+      "title": "L0 — hình học và cấu tạo mặt cắt ngang (GEOM-001…003, CONS-001…002)",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_evolution/geometry.py::check_geometry"
+      ],
+      "limits": "",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.geometry", "attr": "check_geometry", "callable": true }
+      ]
+    },
+    {
+      "id": "L0_FABRICATION_RULES",
+      "title": "L0 — ràng buộc chế tạo/vận chuyển/cẩu lắp FAB-000…FAB-007",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/section.py::fabrication_violations",
+        "bridge_evolution/geometry.py::check_geometry"
+      ],
+      "limits": "CHỈ áp cho tiết diện PARAMETRIC (grammar v2). Tiết diện catalog v1 KHÔNG bị FAB-* kiểm. Ngưỡng FAB là giá trị mặc định của repo/rule profile, chưa lấy từ crane chart, tuyến vận chuyển hay hệ ván khuôn của một nhà máy thực.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.section", "attr": "fabrication_violations", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.section", "attr": "FAB_DEFAULTS" },
+        { "kind": "raises", "module": "bridge_evolution.section", "attr": "section_from_params",
+          "args": [{ "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                     "web_thickness_mm": 110, "bottom_bulb_width_mm": 90, "bottom_bulb_height_mm": 350 }],
+          "exception": "SectionGeometryError" }
+      ]
+    },
+    {
+      "id": "L1_LINE_GIRDER_SOLVER",
+      "title": "L1 — solver dầm đơn + hệ số phân bố ngang (builtin-l1/0.2.0)",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_evolution/fe_adapter/line_girder.py::analyze",
+        "bridge_evolution/fe_adapter/solver.py::run_analysis"
+      ],
+      "limits": "Dầm đơn giản, đàn hồi, tức thời. KHÔNG có mất mát DƯL theo giai đoạn, ứng suất lúc truyền lực, co ngót–từ biến, ổn định thành mỏng, xoắn.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.fe_adapter.line_girder", "attr": "analyze", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.fe_adapter.solver", "attr": "run_analysis", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.fe_adapter.solver", "attr": "SOLVER_VERSION" }
+      ]
+    },
+    {
+      "id": "INDEPENDENT_VERIFIER",
+      "title": "Verifier độc lập — PASS/FAIL (STR-001/002, SERV-001/002/003, MODEL-001)",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_evolution/verifier/rules.py::verify_candidate"
+      ],
+      "limits": "",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.verifier.rules", "attr": "verify_candidate", "callable": true }
+      ]
+    },
+    {
+      "id": "EVALUATION_CONTRACT",
+      "title": "Contract trung tâm evaluate_candidate + provenance SHA-256",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_evolution/evaluate.py::evaluate_candidate"
+      ],
+      "limits": "",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.evaluate", "attr": "evaluate_candidate", "callable": true }
+      ]
+    },
+    {
+      "id": "COMPONENT_AUDIT_ORCHESTRATION",
+      "title": "Điều phối kiểm toán đa cấu kiện cầu và đề xuất tái phân tích",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/evaluate.py::build_component_audit",
+        "contracts/evaluation_result.schema.json"
+      ],
+      "limits": "Chỉ chuẩn hóa component_manifest và evidence do caller cung cấp theo nguyên tắc fail-closed. Không tính demand/capacity, N-M, P-Delta, buckling, fatigue, địa kỹ thuật, thủy lực, giai đoạn thi công hay durability. BLOCKED/REJECTED của component audit không thay status/feasible; independent verifier vẫn là authority duy nhất của verdict hiện tại.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.evaluate", "attr": "build_component_audit", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.evaluate", "attr": "COMPONENT_AUDIT_REGISTRY" },
+        { "kind": "file_exists", "path": "contracts/evaluation_result.schema.json" }
+      ]
+    },
+    {
+      "id": "OPTIMIZATION_BUILTIN",
+      "title": "Tối ưu đa mục tiêu nội bộ — Random Search + NSGA-II + ngân sách solver",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_evolution/optimization/nsga2.py::nsga2",
+        "bridge_evolution/optimization/common.py::BudgetedEvaluator"
+      ],
+      "limits": "",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.optimization.nsga2", "attr": "nsga2", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.optimization.common", "attr": "BudgetedEvaluator" }
+      ]
+    },
+    {
+      "id": "OPTIMIZATION_PYMOO",
+      "title": "Adapter pymoo (NSGA-II của thư viện ngoài)",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/optimization/pymoo_adapter.py::run_pymoo_optimization"
+      ],
+      "limits": "Backend tùy chọn, cài qua extra `optimization`; dev/all có sẵn. NSGA-II vẫn là heuristic phụ thuộc seed/ngân sách và không tự nâng fidelity hay claim kết cấu.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.optimization.pymoo_adapter", "attr": "run_pymoo_optimization", "callable": true },
+        { "kind": "pyproject_dependency", "name": "pymoo", "declared": true }
+      ]
+    },
+    {
+      "id": "SECTION_FEA_2D",
+      "title": "Phân tích tiết diện 2D bằng sectionproperties (FEA)",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/geometry_parametric.py::compute_super_t_section_properties"
+      ],
+      "limits": "KHÔNG nằm trong vòng tối ưu: đây là mô hình tiết diện THỨ HAI, tham số khác grammar v2 (bottom_thickness_m…), chỉ chạy khi use_sectionproperties_fem=True/CLI `section --fem`. Cài qua extra `section-fea`; lỗi import/mesh/backend fail-closed. Chưa có benchmark, mesh-convergence hay V&V để gọi là L2/L3.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.geometry_parametric", "attr": "compute_super_t_section_properties", "callable": true },
+        { "kind": "pyproject_dependency", "name": "shapely", "declared": true },
+        { "kind": "pyproject_dependency", "name": "sectionproperties", "declared": true }
+      ]
+    },
+    {
+      "id": "IFC_4X3_EXPORT",
+      "title": "Xuất Open BIM IFC 4.3 (IfcBridge)",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/bim/ifc_bridge_exporter.py::export_bridge_to_ifc"
+      ],
+      "limits": "Cài qua extra `ifc`; bridge_evolution.bim được đóng gói trong wheel. Hình học xuất ra vẫn lấy từ geometry_parametric.py, KHÔNG phải tiết diện mà vòng tối ưu grammar v2 thực sự dùng.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.bim.ifc_bridge_exporter", "attr": "export_bridge_to_ifc", "callable": true },
+        { "kind": "pyproject_dependency", "name": "ifcopenshell", "declared": true }
+      ]
+    },
+    {
+      "id": "KNOWLEDGE_CARD_STORE",
+      "title": "Não 2 — kho thẻ tri thức có schema (KC-001…KC-020)",
+      "state": "PRESENT",
+      "evidence": [
+        "bridge_evolution/knowledge/store.py::load_cards",
+        "contracts/knowledge_card.schema.json"
+      ],
+      "limits": "Thẻ chỉ GỢI Ý; PASS/FAIL luôn thuộc verifier.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.knowledge.store", "attr": "load_cards", "callable": true },
+        { "kind": "file_exists", "path": "contracts/knowledge_card.schema.json" }
+      ]
+    },
+    {
+      "id": "KNOWLEDGE_AUDIT",
+      "title": "Audit thẻ tri thức — phủ toàn bộ card runtime nạp",
+      "state": "PARTIAL",
+      "evidence": [
+        "knowledge/audits/current.json",
+        "contracts/knowledge_audit.schema.json"
+      ],
+      "limits": "Khối `evidence` của audit chỉ có MỘT nguồn: oracle vét cạn grammar v1. Các thẻ v2 (KC-010…KC-020) được phủ nhưng KHÔNG có oracle tương ứng, nên phần lớn mang claim_audit NOT_TESTED — phủ đủ không có nghĩa là đã kiểm chứng.",
+      "probes": [
+        { "kind": "file_exists", "path": "knowledge/audits/current.json" },
+        { "kind": "file_exists", "path": "contracts/knowledge_audit.schema.json" }
+      ]
+    },
+    {
+      "id": "SOLVER_MIDAS_CIVIL",
+      "title": "L2/L3 — adapter Midas Civil",
+      "state": "ABSENT",
+      "evidence": [
+        "bridge_evolution/fe_adapter/solver.py::run_analysis"
+      ],
+      "limits": "Chỉ là nhánh dispatch ném SolverError. Không có kết nối MCP/Open API, không có mô hình, không có kết quả nào từ Midas trong repo.",
+      "probes": [
+        { "kind": "raises", "module": "bridge_evolution.fe_adapter.solver", "attr": "run_analysis",
+          "args": [{ "analysis": { "solver": "MIDAS_CIVIL" } }, {}], "exception": "SolverError" },
+        { "kind": "no_package_import", "module_name": "midas" }
+      ]
+    },
+    {
+      "id": "SOLVER_OPENSEESPY",
+      "title": "L2 — adapter OpenSeesPy",
+      "state": "ABSENT",
+      "evidence": [
+        "bridge_evolution/fe_adapter/solver.py::run_analysis"
+      ],
+      "limits": "Nhánh dispatch ném SolverError. Thư viện openseespy có thể cài được trong môi trường, nhưng KHÔNG có dòng mã nào trong bridge_evolution/ gọi tới nó.",
+      "probes": [
+        { "kind": "raises", "module": "bridge_evolution.fe_adapter.solver", "attr": "run_analysis",
+          "args": [{ "analysis": { "solver": "OPENSEESPY" } }, {}], "exception": "SolverError" },
+        { "kind": "no_package_import", "module_name": "openseespy" }
+      ]
+    },
+    {
+      "id": "GRILLAGE_3D",
+      "title": "L2 — mạng dầm 3D (grillage) qua ospgrillage",
+      "state": "ABSENT",
+      "evidence": [
+        "bridge_evolution/fe_adapter/solver.py::run_analysis"
+      ],
+      "limits": "KHÔNG tồn tại wrapper nào. Không có module nào trong bridge_evolution/ import ospgrillage. Mọi phát biểu về 'hạ tầng sẵn sàng' cho grillage là sai.",
+      "probes": [
+        { "kind": "no_package_import", "module_name": "ospgrillage" }
+      ]
+    },
+    {
+      "id": "STAGED_PRESTRESS_EFFECTS",
+      "title": "Hiệu ứng theo giai đoạn — ứng suất lúc truyền lực, mất mát DƯL, co ngót–từ biến",
+      "state": "ABSENT",
+      "evidence": [
+        "bridge_evolution/verifier/rules.py::verify_candidate"
+      ],
+      "limits": "Runtime không phát ra bất kỳ rule nào cho các hiệu ứng này; toàn bộ tập rule_id runtime có thể phát ra được khai báo tại runtime_rule_inventory.",
+      "probes": [
+        { "kind": "rule_absent", "rule_id": "STAGE-001" },
+        { "kind": "rule_absent", "rule_id": "LOSS-001" },
+        { "kind": "rule_absent", "rule_id": "CREEP-001" }
+      ]
+    },
+    {
+      "id": "ENGINEER_APPROVED_KNOWLEDGE",
+      "title": "Tri thức đã được kỹ sư cầu phê duyệt",
+      "state": "ABSENT",
+      "evidence": [
+        "bridge_evolution/knowledge/store.py::load_cards",
+        "contracts/knowledge_card.schema.json"
+      ],
+      "limits": "0/20 thẻ ở trạng thái ENGINEER_APPROVED. Không thẻ nào được dùng làm căn cứ kết luận.",
+      "probes": [
+        { "kind": "card_status_count", "status": "ENGINEER_APPROVED", "expected": 0 }
+      ]
+    },
+    {
+      "id": "PHYSICAL_TEST_EVIDENCE",
+      "title": "Thí nghiệm vật lý / quan trắc hiện trường",
+      "state": "ABSENT",
+      "evidence": [
+        "multiagent/lab.json",
+        "knowledge/audits/current.json"
+      ],
+      "limits": "Không có dữ liệu đo nào trong repo. Mọi 'evidence' hiện có đều là kết quả mô phỏng builtin-l1. Trần claim của dự án bị khoá ở SCREENED.",
+      "probes": [
+        { "kind": "json_value_equals", "path": "multiagent/lab.json", "pointer": "/current_project_claim_ceiling", "value": "SCREENED" },
+        { "kind": "json_value_equals", "path": "knowledge/audits/current.json", "pointer": "/evidence/versions/solver", "value": "builtin-l1/0.2.0" }
+      ]
+    },
+    {
+      "id": "GRAMMAR_V2_ORACLE",
+      "title": "Oracle vét cạn cho grammar v2",
+      "state": "ABSENT",
+      "evidence": [
+        "knowledge/audits/current.json"
+      ],
+      "limits": "Miền v2 ~41,9 tỷ tổ hợp — không vét cạn được. Chưa có mẫu phân tầng thay thế. Vì vậy KC-010…KC-020 không có nguồn oracle.",
+      "probes": [
+        { "kind": "json_value_equals", "path": "knowledge/audits/current.json", "pointer": "/evidence/versions/grammar", "value": "1.0.0" },
+        { "kind": "declared_not_machine_provable",
+          "rationale": "Không chứng minh bằng máy được mệnh đề phủ định 'chưa từng có oracle v2 ở bất kỳ đâu'; điều kiểm được chỉ là audit đang hiệu lực gắn với grammar 1.0.0 (probe json_value_equals ở trên). Khi có oracle v2 thật, phải cập nhật khối evidence của audit và gỡ mục ABSENT này." }
+      ]
+    }
+  ],
+  "known_card_reference_exceptions": [],
+  "declared_counts": [
+    {
+      "id": "knowledge_cards",
+      "description": "Số thẻ tri thức mà load_cards() nạp thật.",
+      "source": "load_cards",
+      "doc_claims": [
+        { "file": "README.md", "pattern": "(\\d+) thẻ tri thức \\(KC-001" },
+        { "file": "docs/runtime_capability_matrix.md", "pattern": "kho thẻ tri thức: (\\d+) thẻ" }
+      ]
+    },
+    {
+      "id": "knowledge_card_files",
+      "description": "Số file KC-*.json trong knowledge/cards/ (phải bằng số thẻ nạp được).",
+      "source": "knowledge_card_files",
+      "doc_claims": []
+    },
+    {
+      "id": "audit_cards",
+      "description": "Số thẻ được knowledge/audits/current.json phủ.",
+      "source": "audit_cards",
+      "doc_claims": [
+        { "file": "README.md", "pattern": "audit phủ đủ (\\d+) thẻ" },
+        { "file": "docs/runtime_capability_matrix.md", "pattern": "audit phủ đủ (\\d+) thẻ" }
+      ]
+    },
+    {
+      "id": "fabrication_rules",
+      "description": "Số rule FAB kiểm chế tạo mà section.py phát ra được (không tính FAB-000).",
+      "source": "fabrication_rules",
+      "doc_claims": [
+        { "file": "docs/runtime_capability_matrix.md", "pattern": "(\\d+) rule FAB-001…FAB-007" }
+      ]
+    },
+    {
+      "id": "production_girder_sections",
+      "description": "Số mã tiết diện dầm production theo bộ đếm runtime (bỏ marker ST-PARAM và entry test-only).",
+      "source": "production_girder_sections",
+      "doc_claims": [
+        { "file": "docs/runtime_capability_matrix.md", "pattern": "(\\d+) mã tiết diện dầm production" }
+      ]
+    },
+    {
+      "id": "l0_layout_rules",
+      "description": "Số rule bố trí L0 (GEOM-001…003 + CONS-001…002).",
+      "source": "l0_layout_rules",
+      "doc_claims": [
+        { "file": "docs/runtime_capability_matrix.md", "pattern": "(\\d+) rule bố trí L0" }
+      ]
+    },
+    {
+      "id": "notebooklm_notebooks",
+      "description": "Số notebook trong snapshot NotebookLM chỉ-đọc.",
+      "source": "notebooklm_notebooks",
+      "doc_claims": [
+        { "file": "README.md", "pattern": "(\\d+) notebook cầu/BIM" }
+      ]
+    },
+    {
+      "id": "notebooklm_declared_sources",
+      "description": "Tổng declared_source_count của snapshot NotebookLM.",
+      "source": "notebooklm_declared_sources",
+      "doc_claims": [
+        { "file": "README.md", "pattern": "notebook cầu/BIM, (\\d+) nguồn khai báo" }
+      ]
+    }
+  ],
+  "fabrication_rule_probes": [
+    {
+      "rule_id": "FAB-001",
+      "params": { "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                  "web_thickness_mm": 90, "bottom_bulb_width_mm": 350, "bottom_bulb_height_mm": 350 },
+      "context": {}
+    },
+    {
+      "rule_id": "FAB-002",
+      "params": { "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 80,
+                  "web_thickness_mm": 110, "bottom_bulb_width_mm": 350, "bottom_bulb_height_mm": 350 },
+      "context": {}
+    },
+    {
+      "rule_id": "FAB-003",
+      "params": { "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                  "web_thickness_mm": 110, "bottom_bulb_width_mm": 350, "bottom_bulb_height_mm": 350 },
+      "context": { "strand_count": 200 }
+    },
+    {
+      "rule_id": "FAB-004",
+      "params": { "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                  "web_thickness_mm": 110, "bottom_bulb_width_mm": 350, "bottom_bulb_height_mm": 350 },
+      "context": { "span_m": 120.0 }
+    },
+    {
+      "rule_id": "FAB-005",
+      "params": { "girder_depth_mm": 2500, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                  "web_thickness_mm": 110, "bottom_bulb_width_mm": 350, "bottom_bulb_height_mm": 350 },
+      "context": {}
+    },
+    {
+      "rule_id": "FAB-006",
+      "params": { "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                  "web_thickness_mm": 110, "bottom_bulb_width_mm": 110, "bottom_bulb_height_mm": 350 },
+      "context": {}
+    },
+    {
+      "rule_id": "FAB-007",
+      "params": { "girder_depth_mm": 1750, "top_flange_width_mm": 2050, "top_flange_thickness_mm": 120,
+                  "web_thickness_mm": 110, "bottom_bulb_width_mm": 350, "bottom_bulb_height_mm": 350 },
+      "context": { "span_m": 60.0 }
+    }
+  ],
+  "l0_pipeline_probe": {
+    "grammar_id": "super_t_parametric_v2",
+    "design_variables": {
+      "girder_catalog_id": "ST-PARAM",
+      "girder_count": 5,
+      "girder_spacing_mm": 2350,
+      "deck_slab_thickness_mm": 200,
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-42",
+      "girder_depth_mm": 1750,
+      "top_flange_width_mm": 2050,
+      "top_flange_thickness_mm": 120,
+      "web_thickness_mm": 90,
+      "bottom_bulb_width_mm": 350,
+      "bottom_bulb_height_mm": 350
+    },
+    "girder_concrete_id": "C45",
+    "deck_concrete_id": "C35",
+    "expect_section_source": "PARAMETRIC",
+    "expect_rule_ids": ["FAB-001"]
+  }
+}

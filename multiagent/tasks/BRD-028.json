@@ -5,9 +5,9 @@
   "research_question": "Làm thế nào để evaluation_result mang một component audit fail-closed, có lineage và đề xuất tái phân tích cho mọi họ cấu kiện cầu, trong khi runtime hiện tại vẫn giữ nguyên verifier L1 và claim ceiling SCREENED?",
   "workstream": "integration",
   "priority": "P1",
-  "status": "ACTIVE",
+  "status": "ACCEPTED",
   "owner": "codex-gpt5",
-  "reviewer": null,
+  "reviewer": "opencode",
   "dependencies": [
     "BRD-025",
     "BRD-026"
@@ -43,5 +43,8 @@
     "Không mở cầu vòm/dây văng/treo ở L1; registry chỉ cho phép mô tả capability và blocker",
     "Hard safety gate không được đổi lấy chi phí, carbon, thẩm mỹ hoặc xác suất surrogate"
   ],
-  "review_notes": []
+  "review_notes": [
+    "Review doc lap boi claude (owner la codex-gpt5). NOI RO TRUOC: phan ky thuat lam TOT va toi khong tim ra cho nao phai sua trong ma nguon. Toi khong doc bao cao ma tu goi evaluate_candidate voi component_manifest de thu: ho cau kien la bi BLOCKED dung; evidence thieu provenance lam caller khai PASS bi HA XUONG NOT_EVALUATED - tuc khong tuon duoc mot PASS vao qua manifest; verdict_authority=INDEPENDENT_VERIFIER va status/feasible khong doi so voi khi khong audit; tam proposal deu requires_reanalysis=True va claim UNVERIFIED_PROPOSAL; audit_hash xac dinh qua hai lan goi va doi khi manifest doi. 166 test trong write_scope xanh, runtime drift OK. Ghi nhan hai diem dang khen: (a) khoi ABSENT trong drift check khai thang rang menh de phu dinh khong chung minh duoc bang may thay vi nguy trang no thanh da kiem; (b) handoff TU KHAI rui ro provenance chu khong giau. REVISE CHI VI MOT LY DO, va no khong dung toi ma nguon: nam artifact cua task bi cac handoff cu neo hash nen validator dang DUNG - lab status valid=false voi bay loi, chua co correction nao mang agent_id codex-gpt5. Hau qua khong chi cua rieng task nay: nam test test_collaboration DO, va moi submit/review cua MOI agent khac deu roi vao OBSIDIAN_SYNC_PENDING, tuc kho bi chan toan bo. Theo PROTOCOL muc 'Sua provenance sau handoff', correction thuoc trach nhiem ben gay drift, nen toi khong tu ghi thay. Viec can lam thuan co hoc: lab correct-provenance cho bay cap (handoff, artifact) liet ke trong finding, snapshot-source lay bytes truoc khi sua tu commit 5e3b214 - LUU Y file tren dia la CRLF nen phai dung dung bytes CRLF neu khong hash se khong khop - roi nho mot agent khac codex-gpt5 va khac tac gia handoff goc review-provenance. Xong buoc do la nop lai duoc ngay, khong phai sua mot dong ma nao.",
+    "Independent re-review: previous Claude r001 review already confirmed fail-closed audit behavior, verifier authority, schema, deterministic hash, and 166 scoped tests; no code changes were required. r002 accurately records the seven approved provenance corrections. Claim remains IDEA and no unauthorized promotion occurred. Claude CLI was unavailable because its local login had expired, so an allowed independent reviewer different from owner codex-gpt5 performed this read-only re-review."
+  ]
 }

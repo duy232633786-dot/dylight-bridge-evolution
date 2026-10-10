@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "handoff_sha256": "618537eb5b791f45b4e2a40e9f4b534e964355e6cc04b75f269781b5ebf44b0f",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Khong co bo artifact bat bien de truy nguyen va lap lai; them vao do, co MCT hien tai khong dung trang thai SYNTAX_UNVERIFIED bat buoc khi chua nap thu Civil 2022."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task chi o claim IDEA va khong phat verdict solver, kha nang chiu luc hay engineering approval."
+    }
+  ],
+  "notes": "Review doc lap tren live bytes: REVISE. Reviewer khong sua file va khong nang claim. Hai lenh pytest deu NOT_RUN vi khong co executable python; day khong phai test fail. Hash drift trong luc review lam handoff r005 khong con tai lap duoc; claim van IDEA va khong co phe duyet ky thuat.\n | Ky thuat: CX-052-16 BLOCKER: Bo byte dang review khong con trung handoff va tiep tuc thay doi trong luc review. Lan bam cuoi: midas_section.py live c9ec158e... khac c662299d...; basis live a3ae756a... khac 67f887b7...; test live 7b79841d... khac 83a768c4.... Chinh file handoff cung thay doi hash trong luc review.; CX-052-17 MAJOR: Trang thai MCT da duoc nang tu SYNTAX_UNVERIFIED thanh SYNTAX_FROM_OFFICIAL_MCT_HEADER dua tren header MCT 7.0.1, nhung khong co bang chung khoi PSC sinh ra da nap thanh cong trong Civil 2022. Dieu nay trai acceptance criterion va mau thuan tai lieu r005.; CX-052-18 MAJOR: Log owner 1882 passed, 4 skipped, exit 0 co SHA-256 dung, nhung chi gan voi bo byte r005 cu. No khong chung minh bo live code/basis/tests da drift.; CX-052-19 NOTE: Cac sua r005 ve fail-closed gene Super-T HARD, do web DBUSER cung cao do, safe identifier, vSIZE, section_id, BI4 va stale UI deu hien dien trong snapshot live da doc. | hash_verified=False tests_run_by_reviewer=NOT_RUN | Chi tiet: .tmp/lab-review/codex_BRD-052_review_findings.json"
+}

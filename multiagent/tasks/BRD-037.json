@@ -5,9 +5,9 @@
   "research_question": "BRD-004 khai claim_ceiling=SCREENED với required_gates=[G0,G1,G2] — đúng bằng CLAIM_GATES['SCREENED']. Nhưng nó được dùng cho HỌ VÒM, mà docs/runtime_capability_matrix.json (RCM-2.0.0) khai SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D, STAGED_PRESTRESS_EFFECTS đều ABSENT. Không có solver thì G2 (chất lượng mô hình: equilibrium, benchmark, solver version/hash) KHÔNG THỂ đạt, bất kể owner làm tốt đến đâu và nộp bao nhiêu revision. Hai reviewer độc lập (codex, opencode) đều ra REVISE và cùng chốt G0 FAIL; codex chốt thêm G2 FAIL với đúng lý do 'no arch solver is available'. Task rơi vào bế tắc cấu trúc: không ACCEPTED được, mà lab amend-task lại từ chối vì task đang ACTIVE và đã có handoff. Hai câu hỏi: (a) một task đã kẹt như vậy thì có lối thoát TRUNG THỰC nào, không phải bằng cách nới cổng cho qua? (b) vì sao mâu thuẫn này chỉ lộ ra ở bước REVIEW — sau khi công việc đã làm xong và hai nhà cung cấp đã tốn công thẩm định — mà không bị chặn ngay lúc CLAIM?",
   "workstream": "integration",
   "priority": "P1",
-  "status": "READY",
-  "owner": null,
-  "reviewer": null,
+  "status": "ACTIVE",
+  "owner": "codex",
+  "reviewer": "claude",
   "dependencies": [],
   "required_gates": [
     "G2"
@@ -46,7 +46,8 @@
     "Findings của hai reviewer lưu tại multiagent/scratch/findings-brd004-oc.json (opencode, đã ghi vào lab) và findings-brd004-codex.json (codex, KHÔNG ghi được vào lab do lỗi chạy lệnh chập chờn). Hai bên độc lập, không biết kết luận của nhau: G0 FAIL/FAIL, G1 FAIL/PASS, G2 FAIL/PASS",
     "opencode ghi rõ: handoff khai claim_level=IDEA với gates_completed rỗng là cách khai TRUNG THỰC duy nhất khi design basis trống — tức nó không chê owner khai thấp, nó chê thiếu design basis",
     "Giá trị nghiên cứu của ca này: hai nhà cung cấp khác nhau, độc lập, cùng từ chối nghiệm thu một sản phẩm thiếu design basis và cùng chốt đúng một cổng. Đó là bằng chứng cơ chế an toàn có tác dụng thật. Bản vá của task này KHÔNG được làm yếu điều đó",
-    "Liên quan nhưng KHÁC task: regression test_experimental_grammar_lives_only_in_sandbox (kỳ vọng 2 grammar top-level, thực tế 5 sau BRD-025) thuộc write_scope của BRD-028, không thuộc task này"
+    "Liên quan nhưng KHÁC task: regression test_experimental_grammar_lives_only_in_sandbox (kỳ vọng 2 grammar top-level, thực tế 5 sau BRD-025) thuộc write_scope của BRD-028, không thuộc task này",
+    "Claude Opus review chỉ đọc: hash 3/3 khớp; REVISE vì required_gates rỗng còn bypass claim SCREENED, orchestrator chưa phát runtime_scope nên intake mới bị khóa, runtime_scope chưa amendable và policy có capability ID chưa khai. Bộ mục tiêu chung đã được Codex chạy lại, 49/49 test xanh nhưng chưa phủ các đường lỗi này."
   ],
   "preferred_provider": "opencode",
   "preferred_role": "evidence_safety_auditor",

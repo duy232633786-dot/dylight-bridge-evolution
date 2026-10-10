@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-047",
+  "handoff_sha256": "144ae1a6faa87c2202c91e03905492c83a7217874aec5bbca645ee7778b6634a",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Cả năm family canonical có domain_evidence PARTIAL hoặc UNVERIFIED; L1 bị APP-EVIDENCE-001 và site canonical vẫn UNSPECIFIED. Đây là đúng ranh giới IDEA nhưng G0 chưa đạt."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Không có bằng chứng constructability; nhánh L0 bị applicability block còn làm mất solver_hard/deferred_blockers nên chưa bảo toàn đầy đủ chẩn đoán hình học-mô hình."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Authority core đứng vững nhưng public applicability chưa NaN-safe; result BLOCKED còn có thể nhúng evaluation NaN/Infinity/cyclic; nhánh L0 applicability-blocked mất SOLVER-* diagnostic."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Module không tự kiểm trạng thái giới hạn; strength/serviceability/stability/fatigue vẫn thuộc evaluator và verifier."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có blind recalculation bằng solver hoặc phương pháp kỹ thuật độc lập cho một phương án cầu thật."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có test plan vật lý, calibration ID hoặc raw data."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có provenance vật liệu, exposure thật hoặc mô hình suy giảm."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task và handoff đều IDEA; không có quyền phát hành kỹ thuật hoặc hồ sơ thi công."
+    }
+  ],
+  "notes": "Claude Opus read-only: 4/4 artifact hash và 2 authority schema pin đều khớp; target 24 passed; full suite tái hiện 7 failed/4 skipped, gồm 5 lỗi canonical provenance và 2 fixture BRD-999 thiếu runtime_scope, không có regression trực tiếp BRD-047. HIGH: BRD-047 làm drift hai artifact BRD-038 r002 nhưng chưa có snapshot/incident/correction và handoff chưa nhận trách nhiệm. MEDIUM: _outside/skew chưa NaN-safe; result BLOCKED nhúng lại evaluation NaN/Infinity/cyclic; nhánh L0 applicability-blocked mất SOLVER-*; robust samples chưa nối với assess_candidate/solver provenance; site locator vẫn cần human audit. LOW: zero-variance chỉ chặn khi cả ba objective bằng 0 tuyệt đối; public check_model_applicability không trả digest; chưa có output schema riêng. REVISE; task vẫn chỉ IDEA, G0-G2 chưa đạt và không có xác nhận kỹ thuật cầu."
+}

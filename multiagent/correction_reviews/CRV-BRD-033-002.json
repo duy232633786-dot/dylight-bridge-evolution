@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-033-002",
+  "task_id": "BRD-033",
+  "incident_id": "INC-BRD-033-002",
+  "correction_sha256": "04f838731114c0f3b308a09ee085e9a65898daf7cf19df2ae7d7b6ef263c4b5e",
+  "reviewer_id": "claude-provenance-20260901",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot cũ 3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5 tồn tại, nhưng correction/incident ghi current 0495f233ddaf65cf728d80e359d730102b0c2ebaf7147c27be9ad0a24e0db56d trong khi live lab.py là 41edf51299906a5de6f296dd3831e9632a07e4a98026f40fe1116fecc951d696; không do line ending và không có snapshot 0495 hoặc 41edf. 74 test host-run passed và runtime drift OK không khép được mismatch; lab validate vẫn false."
+  ],
+  "notes": "REVISE: tạo correction thay thế từ snapshot 3ef02cb0 tới live 41edf512, giữ lịch sử bất biến và yêu cầu review độc lập mới."
+}

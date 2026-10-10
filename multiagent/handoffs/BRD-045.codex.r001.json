@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-045",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Lớp OpenSees hardened v2 bất biến: giữ nguyên 5 artifact BRD-044, khóa backend thật, thêm giàn nghiêng có nghiệm đóng, audit phản lực rz ẩn, lưu negative-result có hash và đóng verdict backdoors; 34/34 test BRD-045 xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "experiments/validation/opensees_frame_reference_v2.py",
+      "sha256": "4229f1258bcd604bde80c69b418f5d89394e485b0b4754a6dc693e75824453b1",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd045_benchmarks.json",
+      "sha256": "c18d982f4b713f11c7cc1c3dbcaccc4328d92c051ea4dad1868117ea3c1d0ab0",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd045_negative_result.json",
+      "sha256": "f3be0251c63126bb47c8ebf9d5a1ca152b1872e3deaf646298b60fa93abbaf1c",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/opensees_frame_reference_v2.schema.json",
+      "sha256": "5351441458450b4c49a05ba94fed35d2b0c441af15c9b208c5afab4e9b0ee8d4",
+      "kind": "report"
+    },
+    {
+      "path": "docs/design_basis/opensees_frame_reference_v2_basis.json",
+      "sha256": "a450dcde93bd04e41364b30de701e3ad4f032acb987bca9cdea370031c48ebca",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference_v2.py",
+      "sha256": "afc5587540d8521de779b1bda12d92341ae4f8f67d17049f4983b444e7e0e732",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Chỉ code-verification đàn hồi tuyến tính 2D; không phải F2/L2, không kiểm sức kháng và không cấp G2/G4."
+  ],
+  "unresolved_risks": [
+    "Backend identity được neo theo bytes trên host nhưng chưa chứng minh publisher authenticity; hai solver vẫn có thể chia sẻ sai giả thiết mô hình."
+  ],
+  "next_action": "Claude review độc lập 6 hash, worker isolation, binary owner, giàn nghiêng, artificial-rz audit, closed-form contract, negative-result persistence và tamper guards."
+}

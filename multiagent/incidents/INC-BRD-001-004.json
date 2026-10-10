@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-001-004",
+  "task_id": "BRD-001",
+  "detected_at_utc": "2026-08-31T23:09:32.585592Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-001.claude.r001.json",
+  "original_handoff_sha256": "42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874",
+  "artifact_path": "docs/runtime_capability_matrix.md",
+  "recorded_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28",
+  "observed_sha256": "cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e",
+  "reason": "Capability matrix tiếp tục được cập nhật bởi các task runtime sau handoff lịch sử; cần nối hash hiện hành mà không sửa hồ sơ cũ.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

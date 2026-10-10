@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-055",
+  "agent_id": "codex",
+  "role": "orchestrator",
+  "summary": "Published worldwide research corpus: 104 records, 15 new PDF attachments and 12 existing TCVN links; 133 vault files hash verified. Research-only, no invention implementation.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/corpus.json",
+      "sha256": "cb341a398cb56f917704292656623a8526190e64dc6dd790977084e21da9cd31",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/README.md",
+      "sha256": "ca571d0443dfa639d2956edd1fd58bbb13a9734b109f8d29f75b008dfeffc7b4",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/qa_report.json",
+      "sha256": "985b430393b7e19a5696dce0aef0344b04da2ae4dff265846e04e8bab71ce0dc",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/publication_manifest.json",
+      "sha256": "4eb19f0dde4d36fe8b53269da0aa52472e72c1cd0afd0f5e245fb9983390c721",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/publication_receipt.json",
+      "sha256": "1503272cb5d2f98ff2c87475aa2180b8cfae2337b5d3bc8319d383c53351c093",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/independent_review.json",
+      "sha256": "ac9d2f5e59c82776df31408a1a47c5199971201d267c168440c35f539ad1d6b4",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/build_collection.py",
+      "sha256": "18bb462d872a930b67cbb14050baa4d9eff204284a7041574262f5aa9885bf62",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/verify_collection.py",
+      "sha256": "09811ef299f2ba54c10ea2ae3567d9c8b1dc1f15bc8cf14cfa9a16127e923721",
+      "kind": "report"
+    },
+    {
+      "path": "research/orchestration/RND-20260923-1472cd05/publish_to_obsidian.ps1",
+      "sha256": "e8899405c6c1269e30aa3886311e00d5a6bcaed993dbbf86eb95adc627c478df",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Source reading depth is recorded individually; 12 TCVN entries read scope only.",
+    "Primary corpus and legacy-index matching are documented; no global completeness claim."
+  ],
+  "unresolved_risks": [
+    "Paid or blocked standards remain metadata/links only.",
+    "Full-text datasets not trained; Family Revit data not yet supplied/imported.",
+    "Research references require future engineering and rights review before use as runtime rules."
+  ],
+  "next_action": "Independent documentation review by separate Codex research reviewer; no cross-vendor claim."
+}

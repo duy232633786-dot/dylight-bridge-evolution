@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-022-002",
+  "task_id": "BRD-022",
+  "detected_at_utc": "2026-08-26T13:27:58.509325Z",
+  "detected_by": "codex-gpt5",
+  "original_handoff_path": "multiagent/handoffs/BRD-022.claude.r002.json",
+  "original_handoff_sha256": "2d32204f468c888908ddd146ce71b78d75d98846557650cdcf36ca3423da1fbc",
+  "artifact_path": "tests/test_shape_grammar_experimental.py",
+  "recorded_sha256": "6fd00ab0b4bde4f2a60b6227e387618d46645347474c5329ae82b53780f81ba0",
+  "observed_sha256": "5af9df91c9a6a542e6f7bb45586455cd4b525c5db01854a29ac12d4d8d366ccc",
+  "reason": "BRD-028 cập nhật assertion danh sách grammar production để nhận ba grammar đã được BRD-025 chấp nhận; nội dung kiểm cách ly sandbox vẫn giữ nguyên.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

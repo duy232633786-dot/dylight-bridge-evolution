@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "handoff_sha256": "5556a140c46fbb63d2813fcbb756f226009ddb736492b3c681fb50ee194d343c",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Hinh hoc lab co the khac tham so MIDAS do HI3; bao toan slope sai khi JO3 tao kink; PSC-Value vSIZE chua co mapping dung; mien heuristic co diem tu sinh khong hop le."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task chi o claim IDEA/L0 geometry, khong mo solver, khong tinh suc khang va khong phat verdict ky thuat."
+    }
+  ],
+  "notes": "Review doc lap tren live bytes. REVISE: 10/10 hash khop; hai lenh pytest NOT_RUN vi khong co executable python, khong tinh la test fail. Log owner r003 co hash dung va ghi 1878 pass, 4 skip, exit 0. Claim van IDEA; khong co verdict chiu luc, nhung cac MAJOR ve HI3, slope JO3, PSC-Value, async va mien heuristic lam G1 FAIL. | Ky thuat: CX-052-01 NOTE: RESOLVED: containment da kiem tra giao, cham dau mut va trung duong tren cac vong kin.; CX-052-02 MAJOR: Chi bao toan slope tong hop BO2/HO3; JO3 co the tao kink ngoai trong khi output van bao web_parallel_preserved.; CX-052-03 NOTE: RESOLVED: db/SECT co PSC_OPT1/2 va cac defaults duoc khai provenance trong basis.; CX-052-04 NOTE: RESOLVED: evidence DBUSER ton tai, hash khop, va flags duoc phat trong output.; CX-052-05 MAJOR: PSC-Value van suy dien vSIZE=[HT,BT,T1,T2] tu bbox/gene tai bridge_evolution/midas_section.py:940-965. Manual Param for Design dung cac gia tri nay cho shear strength, va vi du PSC-Value chinh thuc cho thay HT/BT khong bang bbox. Properties dung polygon da dich toa do tai :947-953 nhung payload xuat vertex chua dich tai :956-971.; CX-052-06 MAJOR: Main section race da sua, nhung input family/propose khong tang revision hay khoa output; response cu co the hien thi cho input moi. Gene postMessage cung co the mat truoc khi iframe cai listener.; CX-052-07 NOTE: RESOLVED: tests HTTP that dispatch cac route section, family, propose va supert-value.; CX-052-08 MINOR: Backend da chan section_id khong nguyen va payload sai kieu, nhung UI readParams tai dashboard/midas_section.html:196-200 van silently parseInt/clamp section_id; scripts/serve_lab.py:113-121 co the ep stations=2.9 thanh 2.; CX-052-09 NOTE: RESOLVED: full_suite_r003.txt co SHA-256 dung, dem duoc 1878 passed, 4 skipped va pytest exit 0. Reviewer khong chay lai duoc do executable python khong ton tai.; CX-052-10 MAJOR: Heuristic khong dong tren mien ap dung da khai: L=40 m, W=30 m nam trong mien nhung sinh bottom web am va bi validator tu choi.; CX-052-11 MAJOR: HI3 nhap/xuat khong tham gia dung da giac khi tong HI khac H, nen LAB_CROSS_CHECK co the mo ta mot tiet dien khac payload MIDAS.; CX-052-12 MINOR: JSON Schema khong dong nhat runtime: contracts/midas_psc_section.schema.json:23-39 cho phep dims rong va BI4 tren 1CELL trong khi runtime tai bridge_evolution/midas_section.py:184-186 tu choi. | hash_verified=True tests_run_by_reviewer=NOT_RUN | Chi tiet: .tmp/lab-review/codex_BRD-052_review_findings.json"
+}

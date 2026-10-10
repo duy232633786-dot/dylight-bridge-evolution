@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-034",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Dựng engine F1 N–M cho cột/trụ BTCT thẳng lăng trụ bằng tương thích biến dạng; basis khóa hệ số, beta1, phi và giới hạn thép; tách Po khỏi Pmax; bisection uốn thuần và Pmax; delta_b/delta_s tách mode, Cm tự tính, provenance cấu trúc, fail-closed ở kLu/r>=100 và gần Euler. Tái lập FHWA Pmax=2555 kip/M=764 kip-ft, Mo=928 kip-ft, Pt=-683 kip và ví dụ delta_s/M=2008 kip-ft.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/column_capacity/engine.py",
+      "sha256": "ff4387ca0a43eaf09b643f22a0060a33ad5a846422ab07c9a089113587cde810",
+      "kind": "report"
+    },
+    {
+      "path": "bridge_evolution/column_capacity/__init__.py",
+      "sha256": "65f5991ad9529acd4da345082322d7b81e337ace4082a86a9be7fb8c36281104",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_column_capacity.py",
+      "sha256": "eea193862c8119b74be901f404190580a6d08a60f751b6e734de2d432a5d0139",
+      "kind": "report"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.json",
+      "sha256": "0060a464b1227e673672a7fa472869c3dc79bb9fc66cb26b2c643f5579a80e72",
+      "kind": "report"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.md",
+      "sha256": "cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Basis hiện là DYLIGHT-FHWA-AASHTO-LRFD-SCREENING-v1; chưa phải profile TCVN 11823 đã được kỹ sư phê duyệt."
+  ],
+  "unresolved_risks": [
+    "Chỉ uốn một phương, tiết diện đặc, cốt thép đối xứng; không có uốn hai phương, tiết diện rỗng, dự ứng lực, cắt, mỏi hay tải tổ hợp.",
+    "Engine chưa đóng gói và chưa nối verifier/evaluate; design_verdict_authority luôn NONE.",
+    "Phi chuyển tiếp theo biến dạng chưa có benchmark độc lập riêng; hai benchmark chỉ kiểm các mốc và bậc hai.",
+    "Không được dùng cho vành vòm; ARCH_RIB_STABILITY vẫn ABSENT."
+  ],
+  "next_action": "Claude Code review độc lập cơ học, benchmark, giới hạn miền và hash artifact."
+}

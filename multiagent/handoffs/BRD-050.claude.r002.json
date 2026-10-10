@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-050",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "r002 BRD-050 closes all six findings from independent review r001. CX-050-01: seeds now must declare the reviewed L1_LINE_GIRDER/BUILTIN_L1 analysis and a rebuild from the submitted gene must preserve the core input hash; mismatches are rejected before solver. CX-050-02: disabled trim returns TRIM_DISABLED and unresolved NOT_CONVERGED neighbours return INCONCLUSIVE_SOLVER_FAILURES, so they cannot support CONVERGED or NO_IMPROVING_REPAIR. CX-050-03: the report materializes canonical verification_records for every solver call, including complete responses, violation messages, objectives, evaluator provenance and solver status; audit source_ref values resolve inside the report and hash the exact payload. CX-050-04: executable runtime is allowlisted to super_t_simple_v1 and super_t_parametric_v2. CX-050-05: CROSS_BEAM_DIAPHRAGM is present in the component manifest and remains fail-closed as NOT_EVALUATED at L1. CX-050-06: source_digests pin evaluator, diagnose, budget, verifier, solver, geometry, objective, state, catalogs, grammar, basis and report contract; schema closes solver status, verification records and component audit. Focused verification on current bytes passed 56/56 tests: test_design_loop 32, test_diagnose 10, test_evaluate 11 and test_optimization_budget 3. A full-suite fail-fast run collected 1911 tests and stopped at the unrelated ACTIVE BRD-053 test test_cli_adapter_parses_codex_events_with_fake_runner: expected ASSESSED but received OUT_OF_DOMAIN (21 passed, 1 failed before stop); no BRD-053 artifact was changed.",
+  "claim_level": "SCREENED",
+  "gates_completed": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/design_loop.py",
+      "sha256": "78425587c89f3cd8426bece592348c0789a5ffdf648a809808f85a25f62d0f65",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/design_loop_report.schema.json",
+      "sha256": "93c57fd73b540b05489583e45243793160d96cb9fead56560958224e63e9dac2",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/design_loop_basis.json",
+      "sha256": "3b2d74fc84ea4581064eda5a90d90e755b14e9ff9bcb0ad169d533386ef11d45",
+      "kind": "code"
+    },
+    {
+      "path": "docs/06_component_design_loop.md",
+      "sha256": "9c14d0455256828301c7f5ce8cceb7e6b08f9ffa42a980cd4c66a25d8ac482c5",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_design_loop.py",
+      "sha256": "a865e73458bc0c6d94b7ebf9b2ae3cabe045ebd265104ebfde78037930010b54",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "The reviewed executable domain remains only the two Super-T grammars with L1_LINE_GIRDER and BUILTIN_L1; other families and higher fidelities require separate tasks and evidence.",
+    "The design loop is a deterministic local one-step search; CONVERGED means only that the relevant local neighbourhood was conclusively checked under the locked policy and budget.",
+    "Task-level G0 records design-basis discipline, while project site fields remain UNKNOWN and keep the project gate blocked."
+  ],
+  "unresolved_risks": [
+    "SCREENED is the maximum claim. Prestress losses and stages, transfer stresses, creep-shrinkage, torsion, stability, fatigue, deck system, diaphragm resistance, L2/L3 analysis, physical tests and responsible-engineer approval remain absent.",
+    "Cost and carbon catalogs remain screening values; local convergence does not prove a global optimum and must be compared only under the same solver budget, basis, fidelity and oracle protocol.",
+    "The full repository suite currently has an unrelated BRD-053 ACTIVE-task regression in tests/test_ai_proposer.py; the 56 tests that exercise BRD-050 and its evaluator/diagnosis/budget dependencies pass on current bytes."
+  ],
+  "next_action": "Independent Codex/Astra review of r002: verify all five SHA-256 hashes, rerun the 56 focused tests, adversarially probe the six closed findings, and keep the result at SCREENED; this is not engineering approval."
+}

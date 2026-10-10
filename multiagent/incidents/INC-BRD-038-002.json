@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-038-002",
+  "task_id": "BRD-038",
+  "detected_at_utc": "2026-08-30T10:50:43.703239Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-038.codex.r002.json",
+  "original_handoff_sha256": "de2a31103db09814d22bc776cf580c8fb8b57f34e2a87ff5e382995cfb213e54",
+  "artifact_path": "tests/test_design_study.py",
+  "recorded_sha256": "767696c78a5a36a5c2981e350b922c5f7e889a988e9fb34cb8daccc3ab8d7f2e",
+  "observed_sha256": "e82c6a05d54e1bcfdb075865d79b385b6f155da70e1353cc65ef47a7a80dfcf9",
+  "reason": "BRD-047 bổ sung các probe authority và NaN sau khi BRD-038 r002 bị REJECT; test lịch sử vì vậy drift có chủ đích và cần snapshot byte-exact.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

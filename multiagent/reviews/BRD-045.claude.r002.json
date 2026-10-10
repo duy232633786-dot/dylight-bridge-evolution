@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-045",
+  "handoff_sha256": "1df9c0ed6dc2f8ed9ca5e2d9c3914251c51cfab4fad6fb4dbdaffcbb91f9b44c",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "BRD-045 có claim_ceiling IDEA, design_verdict_authority NONE và required_gates rỗng; đây chỉ là software code-verification, không phải bằng chứng thiết kế."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có design basis công trình thật, tải trọng cầu, tổ hợp tải hoặc tiêu chuẩn thiết kế; tải chỉ là RESEARCH_BENCHMARK."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "So sánh F1 với OpenSees vẫn là hai mô hình tuyến tính 2D dùng chung lý tưởng hóa; không phải model-quality gate ở fidelity cao hơn."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không tính sức kháng, sử dụng, ổn định, mỏi, độ bền, động lực học hoặc giai đoạn thi công của cầu thật."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Đây là cross-implementation code verification, không phải independent design check cho một phương án cầu."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có chế tạo, thi công, thử nghiệm vật lý, calibration hoặc dữ liệu đo hiện trường."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu nghiệm thu, vật liệu theo lô, suy giảm dài hạn, EPD, nhà cung cấp hoặc vận hành-bảo trì."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có quyền phát hành kỹ thuật hay phê duyệt con người; artifact chỉ có authority NONE."
+    }
+  ],
+  "notes": "Claude r002 chỉ đọc đúng 6 artifact, kết luận REVISE. Sáu blocker 1,2,3,5,6,7 đã CLOSED ở mức source; blocker 4 còn OPEN vì generate_benchmark_suite validate require_converged rồi ném lỗi trước khi ghi negative artifact, nên ISOLATION_BREACH/AUDIT_FAILED có thể mất trên đường chạy thật. Claude yêu cầu lưu negative trước khi raise và probe end-to-end. G0-G7 NOT_APPLICABLE vì IDEA/NONE; không phải bằng chứng thiết kế cầu."
+}

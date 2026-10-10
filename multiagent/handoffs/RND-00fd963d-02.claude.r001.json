@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-02",
+  "agent_id": "claude",
+  "role": "form_inventor",
+  "summary": "F0 portfolio bốn cơ chế đã hoàn chỉnh trước khi Claude chạm max-budget; Codex kiểm đủ acceptance criteria",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260901-00fd963d/02_concept_portfolio.md",
+      "sha256": "ec185333051d1d2cd24274e605a40d5a4e8da4eca638b45ac889f14e55adeaf4",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Mọi đường lực chỉ là HYPOTHESIS; G1 vẫn NOT_EVALUATED và không được claim"
+  ],
+  "unresolved_risks": [
+    "Chuỗi nhịp seed không khép số học; site, cao độ, độ võng cáp, hình học vòm, nền neo và solver đều còn thiếu"
+  ],
+  "next_action": "Codex independent F0 review; nếu đạt thì sinh node table độc lập cho HGB-B và đối chứng HGB-D"
+}

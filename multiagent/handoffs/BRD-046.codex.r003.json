@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-046",
+  "agent_id": "codex",
+  "role": "orchestrator",
+  "summary": "r003 giữ nguyên 4 artifact đã qua 60 test Codex; khóa runtime provider về Codex/Claude, fail-closed legacy brief và scope CLI; làm rõ task mẫu SCREENED chỉ là limited-scope G0-G2",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/orchestrator.py",
+      "sha256": "23425558458efaed8dad3de895db2ef5ef1e6239c1971be27a086c7cb48f6dcc",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/cli.py",
+      "sha256": "25cd3208b4437bc95bcda85349f7d3fecaa6f82b199f6c7e1af61d3f78073e5a",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/research_brief.schema.json",
+      "sha256": "bd33e1ba3da16b8ccfc2d5b04e0c86edf5b6779636c6ae121f95770cfafbfb76",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_orchestrator.py",
+      "sha256": "19534e4c995babaf76e0b5d426ccc41bb5db6168c662ec4f372e917c131a38e8",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Brief 1.0 chỉ đọc lịch sử; re-plan phải tạo brief 1.1 có runtime_scope tường minh trước mọi partial write",
+    "Nhãn SCREENED của task mẫu chỉ có nghĩa sàng lọc giới hạn trong phạm vi G0-G2 được task contract khai; không tương đương candidate đã qua G3/G4 và không được dùng để phát hành kỹ thuật"
+  ],
+  "unresolved_risks": [
+    "Đây là resubmit cùng bytes vì r002 REVISE do sandbox reviewer không chạy được test, không phải do artifact có finding kỹ thuật; Claude phải tự chạy test ở r003"
+  ],
+  "next_action": "Claude Code review độc lập r003 với quyền Bash chỉ để băm và chạy pytest; tự đọc source, không dựa vào log Codex"
+}

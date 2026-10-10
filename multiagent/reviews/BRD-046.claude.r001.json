@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-046",
+  "handoff_sha256": "391df2d7484b0fe7b10ebe59c58520f2cda8dbc4f0441bea06303774ac4e8bfc",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task governance IDEA, không khóa design basis."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không tạo hoặc thẩm tra hình học cầu."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không chạy solver hoặc đưa ra kết luận mô hình."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không kiểm trạng thái giới hạn."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Review này là kiểm governance, không phải blind recalculation phương án cầu."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có thử nghiệm vật lý."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu vật liệu hoặc suy giảm."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Claim IDEA, không có quyền phát hành kỹ thuật."
+    }
+  ],
+  "notes": "Claude Code Opus review độc lập: 4/4 hash raw-byte khớp; static collection xác nhận 57 test nhưng không chạy pytest trong read-only. REVISE vì AVAILABLE_WITH_FALLBACK và lab recover vẫn có thể giao task mới cho opencode/antigravity; re-plan brief 1.0 ném KeyError; thiếu CLI-level tests và chưa ghi rõ lý do task-4 giảm G3/G4. Phải khóa runtime provider set về Claude/Codex, fail rõ legacy re-plan, test CLI và công khai gate rationale."
+}

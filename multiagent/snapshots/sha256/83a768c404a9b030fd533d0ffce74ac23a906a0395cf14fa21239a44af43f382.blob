@@ -1,0 +1,607 @@
+"""BRD-052 — cầu nối mặt cắt MIDAS PSC-1CELL/2CELL: thứ tự trường, hình học, đặc trưng, xuất, họ biến thiên.
+
+r002 bổ sung (findings codex r001): cạnh lỗ cắt biên ngoài, họ mặt cắt trả đúng hai đầu, JSON đủ khoá theo
+ví dụ manual, cờ kiểm chứng trong output, khoá VERTEX/vSIZE của PSC-Value, kiểu dữ liệu nghiêm ngặt, route qua HTTP thật.
+"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import sys
+import threading
+import urllib.error
+import urllib.request
+from http.server import ThreadingHTTPServer
+from pathlib import Path
+
+import jsonschema
+import pytest
+
+from bridge_evolution import midas_section as ms
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCHEMA = json.loads((REPO_ROOT / "contracts" / "midas_psc_section.schema.json").read_text(encoding="utf-8"))
+BASIS = json.loads((REPO_ROOT / "docs" / "design_basis" / "midas_psc_section_basis.json").read_text(encoding="utf-8"))
+
+
+def _load_serve_lab():
+    spec = importlib.util.spec_from_file_location("serve_lab_midas_test", REPO_ROOT / "scripts" / "serve_lab.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _rect_box(B=10.0, H=3.0, t_top=0.3, t_bot=0.3, b=6.0):
+    """Hộp chữ nhật đối xứng: không cánh, sườn đứng, không vút."""
+    return {"cell_type": "1CELL", "name": "RECT", "section_id": 1, "offset": "CT",
+            "dims": {"HO1": t_top, "HO2": 0.0, "HO3": H - t_top, "BO1": 0.0, "BO2": 0.0, "BO3": B / 2,
+                     "HI1": t_top, "HI2": 0.0, "HI3": H - t_top - t_bot, "HI4": 0.0, "HI5": t_bot,
+                     "BI1": b / 2, "BI3": b / 2}}
+
+
+def _preset(key):
+    return json.loads(json.dumps(ms.PRESETS[key]["params"]))
+
+
+# ----------------------------------------------------------------- thứ tự trường (manual API)
+def test_field_order_matches_midas_api_manual():
+    assert ms.OUTER_HEIGHT == ("HO1", "HO2", "HO2-1", "HO2-2", "HO3", "HO3-1")
+    assert ms.OUTER_BREADTH == ("BO1", "BO1-1", "BO1-2", "BO2", "BO2-1", "BO3")
+    assert ms.INNER_HEIGHT == ("HI1", "HI2", "HI2-1", "HI2-2", "HI3", "HI3-1", "HI4", "HI4-1", "HI4-2", "HI5")
+    assert ms.INNER_BREADTH_1CEL == ("BI1", "BI1-1", "BI1-2", "BI2-1", "BI3", "BI3-1", "BI3-2")
+    assert ms.INNER_BREADTH_2CEL[-1] == "BI4" and len(ms.INNER_BREADTH_2CEL) == 8
+    assert ms.JOINTS == ("JO1", "JO2", "JO3", "JI1", "JI2", "JI3", "JI4", "JI5")
+    assert ms.PSC_VALUE_VERTEX_KEY == "VERTEX"
+    assert "35851688190105" in BASIS["sources"]["field_order"]["url"]
+    assert BASIS["verification_flags"]["mct_psc_1cel_2cel"]["status"] == "SYNTAX_UNVERIFIED"
+
+
+def test_midas_api_example_1cell_reproduces_manual_arrays():
+    """Ví dụ PSC-1CELL (Assign 401) trong manual: mảng xuất phải trùng từng phần tử, 8 phần tử vSIZE_PSC_D."""
+    ex = BASIS["sources"]["midas_api_example_1cell"]
+    p = ms.normalize_params(_preset("midas_api_example_1cell"))
+    assert ms.validate_psc_box(p) == []
+    arrays = ms.size_arrays(p)
+    for key in ("vSIZE_PSC_A", "vSIZE_PSC_B", "vSIZE_PSC_D"):
+        assert arrays[key] == pytest.approx(ex[key]), key
+    # Ví dụ manual tự mâu thuẫn 0,03 m (HI-sum 2,30 ≠ H 2,33): lab xuất HI3 HIỆU DỤNG 1,26 (r004, CX-052-11) để
+    # tham số MIDAS, đa giác và đặc trưng cùng mô tả một tiết diện; các phần tử còn lại của vSIZE_PSC_C giữ nguyên.
+    c = list(arrays["vSIZE_PSC_C"])
+    assert c[:4] + c[5:] == pytest.approx(ex["vSIZE_PSC_C"][:4] + ex["vSIZE_PSC_C"][5:])
+    assert c[4] == pytest.approx(2.33 - 0.22 - 0.44 - 0.2 - 0.21) and ms.hi3_adjusted(p)
+    assert arrays["JOINT"] == [True] * 8
+    sect = ms.to_midas_api_json(p, BASIS)["Assign"]["401"]["SECT_BEFORE"]
+    assert sect["SECT_I"]["SWIDTH"] == pytest.approx(ex["SWIDTH"])
+    assert sect["PSC_OPT1"] == "" and sect["PSC_OPT2"] == "" and sect["SHAPE"] == "1CEL"
+    for key in ("WARPING_CHK_AUTO_I", "WARPING_CHK_POS_J", "WEB_THICK", "WEB_THICK_SHEAR", "USE_SMALL_HOLE",
+                "USE_USER_DEF_MESHSIZE", "USE_USER_INTPUT_STIFF", "USE_SYMMETRIC", "JOINT"):
+        assert key in sect
+    # manual: HI1+…+HI5 = 2,30 ≠ H = 2,33 → không chặn, chỉ cảnh báo
+    warnings = ms.consistency_warnings(p)
+    assert warnings and "HI3" in warnings[0]
+    bundle = ms.export_bundle(_preset("midas_api_example_1cell"))
+    assert bundle["warnings"] == warnings and bundle["geometry"]["hollow"] and bundle["hi3_adjusted"]
+    assert bundle["exported_dims"]["HI3"] == pytest.approx(1.26) and bundle["params"]["dims"]["HI3"] == 1.23
+    # Tính nhất quán: dựng lại từ bộ kích thước XUẤT phải cho đúng đa giác và đặc trưng đã báo (LAB_CROSS_CHECK)
+    rebuilt = ms.normalize_params({"cell_type": "1CELL", "joints": p["joints"], "dims": bundle["exported_dims"]})
+    assert not ms.hi3_adjusted(rebuilt)
+    polys2 = ms.build_polygons(rebuilt)
+    assert polys2["outer"] == pytest.approx(bundle["geometry"]["outer"]) and polys2["inners"][0] == pytest.approx(bundle["geometry"]["inners"][0])
+    assert ms.section_properties(polys2)["Iyy_m4"] == pytest.approx(bundle["properties"]["Iyy_m4"])
+    assert any(r["group"] == "Lưu ý" and r["field"] == "HI3" for r in bundle["dialog_table"])
+
+
+def test_presets_validate_against_schema():
+    validator = jsonschema.Draft202012Validator(SCHEMA)
+    for preset in ms.PRESETS.values():
+        assert not list(validator.iter_errors(preset["params"]))
+        assert ms.validate_psc_box(ms.normalize_params(preset["params"])) == []
+
+
+def test_schema_rejects_what_runtime_rejects():
+    """r003 CX-052-12: schema đồng bộ runtime — dims rỗng, HO1 = 0 và BI4 ≠ 0 trên 1CELL đều bị từ chối ở cả hai tầng."""
+    validator = jsonschema.Draft202012Validator(SCHEMA)
+    for bad in ({"cell_type": "1CELL", "dims": {}},
+                {"cell_type": "1CELL", "dims": {"HO1": 0, "HO3": 2.0, "BO3": 1.0}},
+                {"cell_type": "1CELL", "dims": {"HO1": 0.2, "HO3": 2.0, "BO3": 1.0, "BI4": 0.2}}):
+        assert list(validator.iter_errors(bad)), bad
+    ok = {"cell_type": "2CELL", "dims": {"HO1": 0.2, "HO3": 2.0, "BO3": 1.0, "BI4": 0.2}}
+    assert not list(validator.iter_errors(ok))
+    assert ms.validate_psc_box(ms.normalize_params({"cell_type": "1CELL", "dims": {"HO1": 0, "HO3": 2.0, "BO3": 1.0}}))
+
+
+# ----------------------------------------------------------------- hình học tutorial FCM
+def test_fcm_tutorial_span_geometry_and_web_thickness():
+    p = ms.normalize_params(_preset("fcm_tutorial_span"))
+    assert ms.consistency_warnings(p) == []
+    polys = ms.build_polygons(p)
+    assert polys["depth_m"] == pytest.approx(2.7) and polys["top_width_m"] == pytest.approx(12.7)
+    assert polys["bottom_width_m"] == pytest.approx(7.1) and polys["hollow"]
+    assert polys["joint_points"]["JO1"] == pytest.approx((6.35 - 1.05, -0.25))     # từ mút cánh, mức HO1
+    assert polys["joint_points"]["JI1"] == pytest.approx((1.35, -0.275))           # từ tim, mức HI1
+    assert polys["joint_points"]["JI5"] == pytest.approx((1.85, -(2.7 - 0.26)))     # từ tim, mặt trong bản đáy
+    ys = sorted(round(y, 9) for y, _ in polys["outer"])
+    assert ys[0] == pytest.approx(-6.35) and ys[-1] == pytest.approx(6.35)
+    props = ms.section_properties(polys)
+    assert props["centroid_y_m"] == pytest.approx(0.0, abs=1e-9)
+    assert props["area_m2"] > 0 and props["hole_area_m2"] > 0
+    shear = ms.web_thickness_report(p, polys)
+    # MIDAS Fig. 4 hiển thị Z3 = 0.51 m (từ đáy), t2 = t3 = 0.9 m (2 sườn × 0.45)
+    assert shear["positions_from_bottom_m"]["Z3"] == pytest.approx(0.51)
+    assert shear["web_thickness_sum_m"]["Z2"] == pytest.approx(0.9)
+    assert shear["web_thickness_sum_m"]["Z3"] == pytest.approx(0.9)
+
+
+def test_fcm_tutorial_support_is_deeper_same_width():
+    span = ms.build_polygons(ms.normalize_params(_preset("fcm_tutorial_span")))
+    sup = ms.build_polygons(ms.normalize_params(_preset("fcm_tutorial_support")))
+    assert sup["depth_m"] == pytest.approx(7.0) and sup["top_width_m"] == span["top_width_m"]
+    assert ms.section_properties(sup)["Iyy_m4"] > 5 * ms.section_properties(span)["Iyy_m4"]
+
+
+def test_user_screenshot_solid_pier_section():
+    p = ms.normalize_params(_preset("user_screenshot_pier_solid"))
+    polys = ms.build_polygons(p)
+    assert not polys["hollow"] and polys["depth_m"] == pytest.approx(6.0)
+    assert polys["top_width_m"] == pytest.approx(12.0) and polys["bottom_width_m"] == pytest.approx(5.0)
+    assert polys["joint_points"]["JO2"] == pytest.approx((4.0, -0.5))
+    props = ms.section_properties(polys)
+    assert props["area_m2"] == pytest.approx(39.25, rel=1e-6)
+    assert ms.web_thickness_report(p, polys)["hollow"] is False
+
+
+# ----------------------------------------------------------------- công thức đóng
+def test_rectangular_hollow_box_matches_closed_form():
+    B, H, t, b = 10.0, 3.0, 0.3, 6.0
+    p = ms.normalize_params(_rect_box(B, H, t, t, b))
+    assert ms.validate_psc_box(p) == []
+    polys = ms.build_polygons(p)
+    props = ms.section_properties(polys)
+    h = H - 2 * t
+    assert props["area_m2"] == pytest.approx(B * H - b * h)
+    assert props["centroid_depth_from_top_m"] == pytest.approx(H / 2)
+    assert props["Iyy_m4"] == pytest.approx((B * H ** 3 - b * h ** 3) / 12)
+    assert props["Izz_m4"] == pytest.approx((H * B ** 3 - h * b ** 3) / 12)
+    assert props["perimeter_out_m"] == pytest.approx(2 * (B + H))
+    assert props["perimeter_in_m"] == pytest.approx(2 * (b + h))
+    assert props["S_top_m3"] == pytest.approx(props["Iyy_m4"] / (H / 2))
+
+
+def test_solid_rectangle_properties():
+    p = ms.normalize_params({"cell_type": "1CELL", "dims": {"HO1": 0.5, "HO2": 0.0, "HO3": 1.5, "BO1": 0.0, "BO2": 0.0, "BO3": 2.0}})
+    props = ms.section_properties(ms.build_polygons(p))
+    assert props["area_m2"] == pytest.approx(4.0 * 2.0)
+    assert props["Iyy_m4"] == pytest.approx(4.0 * 2.0 ** 3 / 12)
+
+
+def test_two_cell_has_two_symmetric_holes_and_middle_web():
+    raw = _rect_box(12.0, 3.0, 0.3, 0.3, 10.0)
+    raw["cell_type"] = "2CELL"
+    raw["dims"]["BI4"] = 0.25
+    p = ms.normalize_params(raw)
+    assert ms.validate_psc_box(p) == []
+    polys = ms.build_polygons(p)
+    assert len(polys["inners"]) == 2
+    props = ms.section_properties(polys)
+    assert props["hole_area_m2"] == pytest.approx(2 * (5.0 - 0.25) * 2.4)
+    assert props["centroid_y_m"] == pytest.approx(0.0, abs=1e-9)
+    report = ms.web_thickness_report(p, polys)
+    assert report["webs"] == 3 and report["web_thickness_sum_m"]["Z2"] == pytest.approx(2 * 1.0 + 0.5)
+    assert ms.size_arrays(p)["vSIZE_PSC_D"][-1] == pytest.approx(0.25)
+
+
+def test_bottom_slab_anchored_from_bottom_when_inner_heights_disagree():
+    """HI3 nhập sai: lab vẽ bản đáy theo HI5 (từ đáy), băng sườn hiệu dụng bù phần lệch; chỉ cảnh báo."""
+    raw = _preset("fcm_tutorial_span")
+    raw["dims"]["HI3"] = 1.4     # đúng phải là 1.59
+    p = ms.normalize_params(raw)
+    assert ms.validate_psc_box(p) == []
+    assert ms.consistency_warnings(p)
+    polys = ms.build_polygons(p)
+    assert polys["levels"]["inner_bottom"] == pytest.approx(-(2.7 - 0.26))
+    assert polys["levels"]["inner_bottom_corner"] == pytest.approx(-(2.7 - 0.26 - 0.25))
+    ref = ms.build_polygons(ms.normalize_params(_preset("fcm_tutorial_span")))
+    assert ms.section_properties(polys)["area_m2"] == pytest.approx(ms.section_properties(ref)["area_m2"])
+
+
+# ----------------------------------------------------------------- validate từ chối
+@pytest.mark.parametrize("mutate, fragment", [
+    (lambda d, j: d.__setitem__("HO3", -1.0), "âm"),
+    (lambda d, j: d.__setitem__("HO3", 0.0), "phải > 0"),
+    (lambda d, j: (j.__setitem__("JO1", True), d.__setitem__("BO1-1", 5.0)), "JO1"),
+    (lambda d, j: (j.__setitem__("JI2", True), d.__setitem__("BI1-2", 1.0)), "JI2"),
+    (lambda d, j: d.__setitem__("HI5", 2.5), "chiều cao sườn"),
+    (lambda d, j: (d.__setitem__("BI1", 3.55), d.__setitem__("HI3", 1.59)), "Sườn tại đỉnh lỗ"),
+])
+def test_validate_rejects_bad_inputs(mutate, fragment):
+    p = ms.normalize_params(_preset("fcm_tutorial_span"))
+    mutate(p["dims"], p["joints"])
+    errors = ms.validate_psc_box(p)
+    assert errors and any(fragment in e for e in errors)
+
+
+def test_containment_catches_edge_crossing_with_all_vertices_inside():
+    """Findings CX-052-01: mọi đỉnh lỗ nằm trong nhưng cạnh JI3→góc đáy lọt ra ngoài qua chỗ lõm JO3."""
+    raw = {"cell_type": "1CELL", "name": "CROSS", "joints": {"JO3": True, "JI3": True},
+           "dims": {"HO1": 0.2, "HO2": 0.3, "HO3": 2.5, "BO1": 1.0, "BO2": 1.5, "BO3": 1.0, "BO2-1": 0.0, "HO3-1": 1.0,
+                    "HI1": 0.2, "HI2": 0.3, "HI3": 2.0, "HI4": 0.2, "HI5": 0.3,
+                    "BI1": 2.2, "BI2-1": 1.85, "HI3-1": 0.6, "BI3": 0.9}}
+    p = ms.normalize_params(raw)
+    polys = ms.build_polygons(p, _skip_validation=True)
+    assert all(ms._point_in_polygon(y, z, polys["outer"], strict=True) for hole in polys["inners"] for (y, z) in hole)
+    errors = ms.validate_psc_box(p)
+    assert any("biên ngoài dù mọi đỉnh nằm trong" in e for e in errors)
+    with pytest.raises(ms.MidasSectionError):
+        ms.export_bundle(raw)
+
+
+def test_containment_rejects_hole_edge_touching_outer_vertex():
+    """Findings r002 CX-052-01: cạnh lỗ đi ĐÚNG QUA đỉnh JO3 (chạm, không cắt) với mọi đỉnh lỗ strict-inside."""
+    raw = {"cell_type": "1CELL", "name": "TOUCH", "joints": {"JO3": True, "JI3": True},
+           "dims": {"HO1": 0.2, "HO2": 0.3, "HO3": 2.5, "BO1": 1.0, "BO2": 1.5, "BO3": 1.0, "BO2-1": 0.0, "HO3-1": 1.0,
+                    "HI1": 0.2, "HI2": 0.3, "HI3": 2.0, "HI4": 0.2, "HI5": 0.3,
+                    "BI1": 2.2, "BI2-1": 1.2, "HI3-1": 1.0, "BI3": 0.8}}
+    p = ms.normalize_params(raw)
+    polys = ms.build_polygons(p, _skip_validation=True)
+    assert polys["joint_points"]["JI3"] == pytest.approx((1.2, -1.5))
+    assert all(ms._point_in_polygon(y, z, polys["outer"], strict=True) for hole in polys["inners"] for (y, z) in hole)
+    assert not ms._rings_cross(polys["inners"][0], polys["outer"])            # giao cắt thật: không có
+    assert ms._rings_cross(polys["inners"][0], polys["outer"], closed=True)   # chạm đỉnh JO3 (1.0, -2.0): có
+    assert any("chạm biên ngoài" in e for e in ms.validate_psc_box(p))
+
+
+def test_normalize_rejects_unknown_fields_and_bad_types():
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "3CELL", "dims": {}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "dims": {"HO9": 1}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "dims": {"HO1": "abc"}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "joints": {"JX": True}, "dims": {}})
+
+
+def test_normalize_strict_bool_and_section_id():
+    """Findings CX-052-08: chuỗi "false" không được thành True; section_id lệch kiểu là lỗi có kiểm soát."""
+    p = ms.normalize_params({"cell_type": "1CELL", "joints": {"JO1": "false", "JO2": "true", "JO3": 1}, "dims": {}})
+    assert p["joints"]["JO1"] is False and p["joints"]["JO2"] is True and p["joints"]["JO3"] is True
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "joints": {"JO1": "maybe"}, "dims": {}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "section_id": "abc", "dims": {}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "section_id": 0, "dims": {}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "section_id": True, "dims": {}})
+    # r002 CX-052-08: không ép ngầm 1.5 → 1; container sai kiểu không được biến thành object rỗng
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "section_id": 1.5, "dims": {}})
+    assert ms.normalize_params({"cell_type": "1CELL", "section_id": 7.0, "dims": {}})["section_id"] == 7
+    for bad in ({"joints": []}, {"joints": "x"}, {"dims": []}, {"dims": "x"}):
+        with pytest.raises(ms.MidasSectionError):
+            ms.normalize_params({"cell_type": "1CELL", "dims": {}, **bad} if "joints" in bad else {"cell_type": "1CELL", **bad})
+    # r004 CX-052-08/15/12: số lớn không qua float, tên phải là identifier an toàn, BI4 ≠ 0 trên 1CELL bị từ chối
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "section_id": "99999999999999999999", "dims": {}})
+    with pytest.raises(ms.MidasSectionError):
+        ms.normalize_params({"cell_type": "1CELL", "section_id": 1e300, "dims": {}})
+    for bad_name in ("A\tB", "X,Y", "C\r\nD", "1abc", "", "x" * 40):
+        with pytest.raises(ms.MidasSectionError):
+            ms.normalize_params({"cell_type": "1CELL", "name": bad_name or None, "dims": {}}) if bad_name else ms.normalize_params({"cell_type": "1CELL", "name": " ", "dims": {}})
+    p = ms.normalize_params({"cell_type": "1CELL", "dims": {"HO1": 0.2, "HO3": 2.0, "BO3": 1.0, "BI4": 0.2}})
+    assert any("BI4" in e for e in ms.validate_psc_box(p))
+
+
+# ----------------------------------------------------------------- xuất
+def test_exports_follow_manual_order_and_flags():
+    bundle = ms.export_bundle(_preset("fcm_tutorial_span"))
+    sect = bundle["midas_api_json"]["Assign"]["2"]["SECT_BEFORE"]
+    assert sect["SHAPE"] == "1CEL"
+    assert sect["JOINT"] == [True, False, False, True, False, False, False, True]
+    assert sect["SECT_I"]["vSIZE_PSC_A"] == [0.25, 0.35, 0.0, 0.0, 2.1, 0.0]
+    assert sect["SECT_I"]["vSIZE_PSC_B"] == [2.8, 1.05, 0.0, 0.0, 0.0, 3.55]
+    assert sect["SECT_I"]["vSIZE_PSC_C"] == [0.275, 0.325, 0.0, 0.0, 1.59, 0.0, 0.25, 0.0, 0.0, 0.26]
+    assert sect["SECT_I"]["vSIZE_PSC_D"] == [3.1, 1.35, 0.0, 0.0, 3.1, 1.85, 0.0, 0.0]
+    assert sect["SECT_I"]["SWIDTH"] == 0.25 and sect["PSC_OPT1"] == "" and sect["PSC_OPT2"] == ""
+    assert bundle["midas_api_json"]["status"] == "REFERENCE_ONLY"
+    tsv = bundle["table_input_tsv"].splitlines()
+    assert len(tsv) == 2 and len(tsv[0].split("\t")) == len(tsv[1].split("\t")) == 4 + 8 + 6 + 6 + 10 + 8
+    assert bundle["mct_psc"]["status"] == "SYNTAX_UNVERIFIED" and "1CEL" in bundle["mct_psc"]["text"]
+    dbuser = bundle["mct_dbuser_box"]
+    assert dbuser["status"] == "VERIFIED_BY_EXTERNAL_EVIDENCE" and ", B, 2, " in dbuser["text"]
+    assert dbuser["evidence"]["files"] and all(len(f["sha256"]) == 64 for f in dbuser["evidence"]["files"])
+    assert bundle["properties"]["status"] == "LAB_CROSS_CHECK"
+    assert set(bundle["verification_flags"]) >= {"mct_psc_1cel_2cel", "mct_dbuser_box", "midas_api_json", "psc_value_polygon", "section_properties"}
+    assert bundle["warnings"] == [] and bundle["claim_level"] == "IDEA" and len(bundle["bundle_sha256"]) == 64
+    table = bundle["dialog_table"]
+    active = {r["field"]: r["active"] for r in table if r["group"] in ("Outer", "Inner")}
+    assert active["BO1-1"] is True and active["BO1-2"] is False and active["BI4"] is False
+    assert not any(k in json.dumps(bundle["properties"]) for k in ("PASS", "FAIL", "feasible"))
+
+
+def test_dbuser_web_thickness_measured_at_hole_corner_level():
+    """r004 CX-052-14: lỗ có góc trên nằm cao hơn góc sườn ngoài và rộng hơn BO2+BO3 vẫn hợp lệ → dày sườn DBUSER phải dương."""
+    raw = _preset("fcm_tutorial_span")
+    raw["dims"]["HO2"] = 0.6          # góc sườn ngoài sâu 0,85 m; góc trên lỗ chỉ sâu 0,6 m (nằm dưới vút cánh)
+    raw["dims"]["BI1"] = 3.58         # > BO2 + BO3 = 3,55 nhưng vẫn cách biên ngoài 0,7 m tại cùng cao độ
+    p = ms.normalize_params(raw)
+    assert ms.validate_psc_box(p) == []
+    assert (p["dims"]["BO2"] + p["dims"]["BO3"]) - p["dims"]["BI1"] < 0      # công thức cũ sẽ cho dày sườn âm
+    box = ms.to_mct_dbuser_box(p)
+    assert box["idealisation"]["web_m"] == pytest.approx(0.45)               # min(0,70 trên; 0,45 dưới)
+    assert ", B, 2, " in box["text"] and "-0." not in box["text"]
+
+
+def test_export_bundle_is_deterministic():
+    a = ms.export_bundle(_preset("fcm_tutorial_span"))
+    b = ms.export_bundle(_preset("fcm_tutorial_span"))
+    assert a["bundle_sha256"] == b["bundle_sha256"]
+
+
+# ----------------------------------------------------------------- họ mặt cắt biến thiên
+def test_variable_depth_family_parabola_endpoints_and_monotonic():
+    fam = ms.variable_depth_family(_preset("fcm_tutorial_support"), _preset("fcm_tutorial_span"), length_m=40.0, stations=9)
+    depths = [s["depth_m"] for s in fam["sections"]]
+    assert depths[0] == pytest.approx(7.0) and depths[-1] == pytest.approx(2.7)
+    assert fam["monotonic_non_increasing"]
+    assert depths[4] == pytest.approx(2.7 + 4.3 * 0.25)          # x = L/2, f = 0.5²
+    assert fam["sections"][-1]["params"]["dims"]["HI5"] == pytest.approx(0.26)
+    assert fam["sections"][0]["params"]["dims"]["HI5"] == pytest.approx(0.85)
+    assert len(fam["tapered_pairs"]) == 8 and fam["mct_psc_all"]["status"] == "SYNTAX_UNVERIFIED"
+    for s in fam["sections"]:
+        assert ms.validate_psc_box(s["params"]) == []
+
+
+def test_variable_depth_family_returns_exact_endpoints_and_interpolates_every_dim():
+    """Findings CX-052-02: trụ và nhịp khác sườn/cánh/bản đáy, sườn nghiêng — x = L phải trả đúng mặt cắt nhịp."""
+    prop = ms.propose_box_from_spans(75.0, 12.0)
+    pier, mid = prop["pier"], prop["mid"]
+    assert pier["dims"]["BI1"] != mid["dims"]["BI1"] and pier["dims"]["BO2"] > 0
+    fam = ms.variable_depth_family(pier, mid, length_m=37.5, stations=7, law="parabola", exponent=2.0)
+    assert fam["sections"][0]["params"]["dims"] == pier["dims"]
+    assert fam["sections"][-1]["params"]["dims"] == mid["dims"]
+    half = fam["sections"][3]["params"]["dims"]           # x = L/2 → f = 0.25
+    for k in ("HI5", "BI1", "HO3", "HI3", "BO2", "HI4"):  # các biến độc lập nội suy tuyến tính theo f
+        assert half[k] == pytest.approx(mid["dims"][k] + (pier["dims"][k] - mid["dims"][k]) * 0.25)
+    # BI3 KHÔNG nội suy độc lập mà suy từ độ dốc sườn ngoài để giữ dày sườn (r003, CX-052-02)
+    h_in = (half["HO1"] + half["HO2"] + half["HO3"]) - half["HI1"] - half["HI2"] - half["HI4"] - half["HI5"]
+    assert half["BI3"] == pytest.approx(half["BI1"] - half["BO2"] / half["HO3"] * h_in)
+    assert fam["monotonic_non_increasing"]
+    for s in fam["sections"]:
+        assert ms.consistency_warnings(s["params"]) == []
+
+
+def test_variable_depth_family_keeps_web_thickness_when_endpoints_are_parallel():
+    """Findings r002 CX-052-02: sườn trong phải song song sườn ngoài ở MỌI trạm khi hai mặt cắt đầu song song."""
+    prop = ms.propose_box_from_spans(75.0, 12.0)
+    fam = ms.variable_depth_family(prop["pier"], prop["mid"], length_m=37.5, stations=9)
+    assert fam["web_parallel_preserved"] is True and fam["family_warnings"] == []
+    for row in fam["web_slopes"]:
+        assert row["inner"] == pytest.approx(row["outer"], abs=1e-9)
+    assert fam["sections"][0]["params"]["dims"] == prop["pier"]["dims"]
+    assert fam["sections"][-1]["params"]["dims"] == prop["mid"]["dims"]
+    # cặp không song song (đổi BI3 của nhịp): vẫn sinh được nhưng phải cảnh báo và không nhận là giữ dày sườn
+    mid = json.loads(json.dumps(prop["mid"]))
+    mid["dims"]["BI3"] -= 0.1
+    fam2 = ms.variable_depth_family(prop["pier"], mid, length_m=37.5, stations=5)
+    assert fam2["web_parallel_preserved"] is False and fam2["family_warnings"]
+    assert fam2["sections"][-1]["params"]["dims"] == ms.normalize_params(mid)["dims"]
+
+
+def test_family_does_not_claim_parallel_webs_when_jo3_kinks_outer_web():
+    """r003 CX-052-02: JO3 làm sườn ngoài thành đường gãy → không được báo giữ dày sườn, phải cảnh báo."""
+    prop = ms.propose_box_from_spans(75.0, 12.0)
+    pier, mid = prop["pier"], prop["mid"]
+    for p in (pier, mid):
+        p["joints"]["JO3"] = True
+        p["dims"]["HO3-1"] = 0.5
+        p["dims"]["BO2-1"] = 0.1
+        assert ms.validate_psc_box(p) == []
+    fam = ms.variable_depth_family(pier, mid, length_m=37.5, stations=5)
+    assert fam["web_parallel_preserved"] is False and any("JO3" in w for w in fam["family_warnings"])
+    assert fam["sections"][0]["params"]["dims"] == pier["dims"] and fam["sections"][-1]["params"]["dims"] == mid["dims"]
+
+
+def test_heuristic_domain_is_closed_on_a_grid():
+    """r003 CX-052-10: mọi điểm trong miền áp dụng khai trong basis phải sinh cặp trụ/nhịp hợp lệ và vào được họ mặt cắt."""
+    dom = BASIS["applicability"]
+    spans = [dom["main_span_m"]["min"], 50.0, 75.0, 120.0, 180.0, dom["main_span_m"]["max"]]
+    widths = [dom["deck_width_m"]["min"], 8.0, 10.0, 12.0, 14.0, dom["deck_width_m"]["max"]]
+    for L in spans:
+        for W in widths:
+            out = ms.propose_box_from_spans(L, W)
+            fam = ms.variable_depth_family(out["pier"], out["mid"], length_m=L / 2, stations=5)
+            assert fam["monotonic_non_increasing"], (L, W)
+            for s in fam["sections"]:
+                assert ms.validate_psc_box(s["params"]) == [], (L, W, s["station_m"])
+    with pytest.raises(ms.MidasSectionError):
+        ms.propose_box_from_spans(75.0, dom["deck_width_m"]["max"] + 1)
+
+
+def test_variable_depth_family_rejects_bad_inputs():
+    with pytest.raises(ms.MidasSectionError):
+        ms.variable_depth_family(_preset("fcm_tutorial_span"), _preset("fcm_tutorial_support"), 40.0, 5)   # trụ thấp hơn nhịp
+    with pytest.raises(ms.MidasSectionError):
+        ms.variable_depth_family(_preset("fcm_tutorial_support"), _preset("fcm_tutorial_span"), 40.0, 1)
+    mid = _preset("fcm_tutorial_span")
+    mid["joints"] = {"JI1": True, "JI5": True}                                    # thiếu JO1 so với trụ
+    with pytest.raises(ms.MidasSectionError):
+        ms.variable_depth_family(_preset("fcm_tutorial_support"), mid, 40.0, 5)
+
+
+# ----------------------------------------------------------------- đề xuất heuristic
+def test_propose_box_uses_unsourced_heuristics_and_stays_idea():
+    out = ms.propose_box_from_spans(75.0, 12.0, side_span_m=45.0)
+    assert out["claim_level"] == "IDEA"
+    assert all(c.startswith("LAB-HEURISTIC-UNSOURCED-") for c in out["heuristics_used"].values())
+    assert out["derived"]["depth_pier_m"] == pytest.approx(75.0 / 17.0)
+    assert out["derived"]["depth_mid_m"] >= 2.2
+    for key in ("pier", "mid"):
+        assert ms.validate_psc_box(out[key]) == []
+    assert ms.depth_m(out["pier"]) > ms.depth_m(out["mid"])
+    assert "LAB-HEURISTIC-UNSOURCED-min_sub_dim_m" in out["heuristics_used"].values()
+    assert out["applicability"]["main_span_m"]["clause_id"].startswith("LAB-HEURISTIC-UNSOURCED-")
+    with pytest.raises(ms.MidasSectionError):
+        ms.propose_box_from_spans(0.0, 12.0)
+
+
+def test_propose_rejects_out_of_domain_and_feeds_family():
+    """Findings r002 CX-052-10: ngoài miền áp dụng phải từ chối; trong miền thì cặp đề xuất phải vào được họ mặt cắt."""
+    with pytest.raises(ms.MidasSectionError) as exc:
+        ms.propose_box_from_spans(30.0, 12.0)            # L/17 = 1,76 m < H nhịp tối thiểu 2,2 m
+    assert "miền áp dụng" in str(exc.value)
+    with pytest.raises(ms.MidasSectionError):
+        ms.propose_box_from_spans(75.0, 40.0)            # bề rộng ngoài miền một hộp
+    for L, W in ((40.0, 6.0), (75.0, 12.0), (250.0, 16.0)):
+        out = ms.propose_box_from_spans(L, W)
+        fam = ms.variable_depth_family(out["pier"], out["mid"], length_m=L / 2, stations=5)
+        assert fam["monotonic_non_increasing"] and fam["sections"][0]["depth_m"] == pytest.approx(ms.depth_m(out["pier"]))
+
+
+# ----------------------------------------------------------------- Super-T → PSC-Value
+def test_polygon_to_psc_value_matches_repo_section_area_and_schema_keys():
+    serve_lab = _load_serve_lab()
+    res = serve_lab.api_section({"grammar_id": "super_t_parametric_v2", "gene": {}})
+    out = ms.polygon_to_psc_value(res["polygon"], name="SUPER_T_ANCHOR", design_thickness_m=(0.12, 0.11))
+    assert out["properties"]["area_m2"] == pytest.approx(res["section"]["area_m2"], rel=1e-6)
+    sect_i = out["psc_value"]["Assign"]["1"]["SECT_BEFORE"]["SECT_I"]
+    vertices = sect_i["OUTER_POLYGON"][0]["VERTEX"]
+    assert len(vertices) == len(res["polygon"]) and {"X", "Y"} <= set(vertices[0])
+    assert "Vertex" not in json.dumps(sect_i)
+    assert sect_i["vSIZE"][0] == pytest.approx(out["properties"]["depth_m"]) and sect_i["vSIZE"][2:] == [0.12, 0.11]
+    # r003 CX-052-05: không có vSIZE do người dùng cung cấp → trạng thái hạ xuống NEEDS_ENGINEER_INPUT
+    assert out["status"] == "NEEDS_ENGINEER_INPUT" and out["vsize_provenance"] == "LAB_ASSUMED_BBOX_GENE"
+    assert out["properties"]["status"] == "LAB_CROSS_CHECK" and "vsize_assumption" in out
+    # đỉnh xuất phải cùng hệ toạ độ với đa giác tính đặc trưng: mặt đỉnh Y = 0, mọi Y ≤ 0
+    assert max(v["Y"] for v in vertices) == pytest.approx(0.0, abs=1e-9) and min(v["Y"] for v in vertices) == pytest.approx(-out["properties"]["depth_m"])
+    given = ms.polygon_to_psc_value(res["polygon"], name="X", vsize=[1.75, 2.1, 0.12, 0.11])
+    assert given["status"] == BASIS["verification_flags"]["psc_value_polygon"]["status"] == "SYNTAX_UNVERIFIED"
+    assert given["vsize_provenance"] == "USER_PROVIDED"
+    assert given["psc_value"]["Assign"]["1"]["SECT_BEFORE"]["SECT_I"]["vSIZE"] == [1.75, 2.1, 0.12, 0.11]
+    with pytest.raises(ms.MidasSectionError):
+        ms.polygon_to_psc_value(res["polygon"], vsize=[1, 2, 3])
+
+
+# ----------------------------------------------------------------- API lab (gọi hàm và qua HTTP thật)
+def test_lab_api_routes_are_thin_wrappers():
+    serve_lab = _load_serve_lab()
+    presets = serve_lab.api_midas_presets({})
+    assert "fcm_tutorial_span" in presets["presets"] and presets["joints"] == list(ms.JOINTS)
+    bundle = serve_lab.api_midas_section({"params": _preset("fcm_tutorial_span")})
+    assert bundle["properties"]["area_m2"] > 0
+    with pytest.raises(serve_lab.LabApiError):
+        serve_lab.api_midas_section({"params": {"cell_type": "1CELL", "dims": {"HO1": -1}}})
+    with pytest.raises(serve_lab.LabApiError):
+        serve_lab.api_midas_section({"params": {"cell_type": "1CELL", "section_id": "x", "dims": {}}})
+    fam = serve_lab.api_midas_family({"pier": _preset("fcm_tutorial_support"), "mid": _preset("fcm_tutorial_span"),
+                                      "length_m": 30, "stations": 4})
+    assert len(fam["sections"]) == 4
+    with pytest.raises(serve_lab.LabApiError):
+        serve_lab.api_midas_family({"pier": _preset("fcm_tutorial_support"), "mid": _preset("fcm_tutorial_span"),
+                                    "length_m": 30, "stations": 10_000})
+    prop = serve_lab.api_midas_propose({"main_span_m": 60, "deck_width_m": 11})
+    assert prop["claim_level"] == "IDEA"
+    val = serve_lab.api_midas_supert_value({"gene": {}, "grammar_id": "super_t_parametric_v2"})
+    assert val["properties"]["area_m2"] > 0
+    t1 = val["gene"]["top_flange_thickness_mm"] / 1000.0
+    assert val["psc_value"]["Assign"]["1"]["SECT_BEFORE"]["SECT_I"]["vSIZE"][2] == pytest.approx(t1)
+
+
+def test_http_dispatch_of_midas_routes():
+    """Findings CX-052-07: đi qua LabHandler thật (GET/POST, mã 200/400/404, header no-store)."""
+    serve_lab = _load_serve_lab()
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), serve_lab.LabHandler)
+    port = httpd.server_address[1]
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{port}"
+
+    def post(path, payload):
+        req = urllib.request.Request(base + path, data=json.dumps(payload).encode("utf-8"),
+                                     headers={"Content-Type": "application/json"}, method="POST")
+        return urllib.request.urlopen(req, timeout=120)
+
+    try:
+        with urllib.request.urlopen(base + "/api/midas/presets", timeout=60) as r:
+            assert r.status == 200 and r.headers.get("Cache-Control") == "no-store"
+            presets = json.loads(r.read().decode("utf-8"))
+        assert "midas_api_example_1cell" in presets["presets"]
+        with post("/api/midas/psc-section", {"params": presets["presets"]["fcm_tutorial_span"]["params"]}) as r:
+            bundle = json.loads(r.read().decode("utf-8"))
+        assert bundle["properties"]["area_m2"] > 0
+        assert bundle["verification_flags"]["mct_psc_1cel_2cel"]["status"] == "SYNTAX_UNVERIFIED"
+        with pytest.raises(urllib.error.HTTPError) as bad:
+            post("/api/midas/psc-section", {"params": {"cell_type": "1CELL", "dims": {"HO1": -1}}})
+        assert bad.value.code == 400 and "HO1" in json.loads(bad.value.read().decode("utf-8"))["error"]
+        with pytest.raises(urllib.error.HTTPError) as weird:
+            post("/api/midas/psc-section", {"params": {"cell_type": "1CELL", "section_id": "x", "dims": {}}})
+        assert weird.value.code == 400
+        with pytest.raises(urllib.error.HTTPError) as toobig:
+            post("/api/midas/psc-family", {"pier": presets["presets"]["fcm_tutorial_support"]["params"],
+                                           "mid": presets["presets"]["fcm_tutorial_span"]["params"], "length_m": 30, "stations": 10_000})
+        assert toobig.value.code == 400
+        with pytest.raises(urllib.error.HTTPError) as missing:
+            urllib.request.urlopen(base + "/api/midas/nope", timeout=60)
+        assert missing.value.code == 404
+        # r002 CX-052-07: hai route còn lại cũng phải đi qua HTTP thật, cả đường vui lẫn đường lỗi
+        with post("/api/midas/propose", {"main_span_m": 75, "deck_width_m": 12}) as r:
+            prop = json.loads(r.read().decode("utf-8"))
+        assert prop["claim_level"] == "IDEA" and prop["pier"]["dims"]["HO3"] > 0
+        with pytest.raises(urllib.error.HTTPError) as pr_bad:
+            post("/api/midas/propose", {"main_span_m": 30, "deck_width_m": 12})
+        assert pr_bad.value.code == 400 and "miền áp dụng" in json.loads(pr_bad.value.read().decode("utf-8"))["error"]
+        with post("/api/midas/supert-value", {"gene": {}, "grammar_id": "super_t_parametric_v2"}) as r:
+            val = json.loads(r.read().decode("utf-8"))
+        assert val["psc_value"]["Assign"]["1"]["SECT_BEFORE"]["SECT_I"]["OUTER_POLYGON"][0]["VERTEX"]
+        for bad_payload in ({"gene": "abc"}, {"gene": [1, 2]}, {"gene": {}, "grammar_id": "arch_deck_v1"}, {"gene": {"girder_depth_mm": "x"}},
+                            {"gene": {}, "vsize": [1, 2, 3]}, {"gene": {}, "vsize": ["a", 1, 2, 3]}):
+            with pytest.raises(urllib.error.HTTPError) as sv_bad:
+                post("/api/midas/supert-value", bad_payload)
+            assert sv_bad.value.code == 400, bad_payload
+        with post("/api/midas/supert-value", {"gene": {}, "vsize": [1.75, 2.1, 0.12, 0.11]}) as r:
+            given = json.loads(r.read().decode("utf-8"))
+        assert given["vsize_provenance"] == "USER_PROVIDED" and given["status"] == "SYNTAX_UNVERIFIED" and given["violations"] == []
+        # r004 CX-052-13 (BLOCKER): gene vi phạm L0 HARD (sườn 90 mm → FAB-001) không được xuất PSC-Value
+        with pytest.raises(urllib.error.HTTPError) as hard:
+            post("/api/midas/supert-value", {"gene": {"web_thickness_mm": 90}, "grammar_id": "super_t_parametric_v2"})
+        assert hard.value.code == 400 and "FAB" in json.loads(hard.value.read().decode("utf-8"))["error"]
+        # r004 CX-052-05/15: vsize ngoài miền và tên không an toàn → 400
+        for bad_payload in ({"gene": {}, "vsize": [-1, 2, 0, 0]}, {"gene": {}, "vsize": [0, 0, 0, 0]}, {"gene": {}, "vsize": [1, 2, 3, 0]},
+                            {"gene": {}, "name": "A\tB"}, {"gene": {}, "name": "X,Y"}):
+            with pytest.raises(urllib.error.HTTPError) as bad2:
+                post("/api/midas/supert-value", bad_payload)
+            assert bad2.value.code == 400, bad_payload
+        with pytest.raises(urllib.error.HTTPError) as name_bad:
+            post("/api/midas/psc-section", {"params": {**presets["presets"]["fcm_tutorial_span"]["params"], "name": "Sp\tan"}})
+        assert name_bad.value.code == 400
+        with pytest.raises(urllib.error.HTTPError) as prefix_bad:
+            post("/api/midas/psc-family", {"pier": presets["presets"]["fcm_tutorial_support"]["params"],
+                                           "mid": presets["presets"]["fcm_tutorial_span"]["params"], "length_m": 30, "stations": 3, "name_prefix": "x,y"})
+        assert prefix_bad.value.code == 400
+        # r003 CX-052-08: số nguyên nghiêm ngặt ở API — stations 2.9 không được ép thành 2
+        with pytest.raises(urllib.error.HTTPError) as st_bad:
+            post("/api/midas/psc-family", {"pier": presets["presets"]["fcm_tutorial_support"]["params"],
+                                           "mid": presets["presets"]["fcm_tutorial_span"]["params"], "length_m": 30, "stations": 2.9})
+        assert st_bad.value.code == 400
+    finally:
+        httpd.shutdown()
+        httpd.server_close()
+
+
+def test_ui_reads_uppercase_vertex_key_and_locks_outputs_on_input():
+    """Findings r002 CX-052-05/06: UI phải đọc VERTEX như backend và khoá output ngay trong handler nhập."""
+    html = (REPO_ROOT / "dashboard" / "midas_section.html").read_text(encoding="utf-8")
+    assert "OUTER_POLYGON[0].VERTEX" in html and ".Vertex" not in html
+    assert "function schedule() { state.seq += 1; setStale(true" in html
+    for flow in ("state.famSeq", "state.prSeq", "state.valSeq"):
+        assert html.count(flow) >= 2, flow
+    # r003 CX-052-06/08: input họ/đề xuất vô hiệu output cũ; bắt tay iframe; Section ID nguyên nghiêm ngặt
+    assert "function invalidateFamily()" in html and "function invalidateProposal()" in html
+    assert "addEventListener('input', invalidateFamily)" in html and "addEventListener('input', invalidateProposal)" in html
+    assert "dylight:midas-ready" in html and "dylight:supert-ack" in html
+    assert "/^\\d+$/.test(idRaw)" in html and "parseInt($('f-id')" not in html
+    # r004 CX-052-06/08/11/12: đề xuất đổi L phải vô hiệu họ; safe integer; nhãn hình dùng exported_dims; BI4 = 0 với 1 Cell
+    assert "toFixed(1); invalidateFamily();" in html and "Number.isSafeInteger" in html
+    assert "dims: bundle.exported_dims" in html and "dims.BI4 = 0" in html
+    lab_js = (REPO_ROOT / "dashboard" / "lab.js").read_text(encoding="utf-8")
+    assert "dylight:midas-ready" in lab_js and "state.midasQueue" in lab_js

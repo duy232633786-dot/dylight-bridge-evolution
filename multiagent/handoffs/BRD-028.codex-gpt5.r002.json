@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-028",
+  "agent_id": "codex-gpt5",
+  "role": "bim_fem_integrator",
+  "summary": "Đã tích hợp component audit fail-closed cho 20 họ cấu kiện cầu vào evaluate_candidate; contract chặn evidence thiếu provenance, giữ verifier làm authority, sinh proposal bắt buộc tái phân tích, bổ sung test lineage/hash/hard-fail/unknown/durability và đồng bộ capability matrix. 166 test phạm vi đạt, runtime drift đạt; toàn bộ 7 drift lịch sử do BRD-028 đã có correction và review độc lập APPROVE.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/evaluate.py",
+      "sha256": "edea1d88511de476fcb60ed9a3d9689277961fd64f03a41272507c5376fc5e14",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/evaluation_result.schema.json",
+      "sha256": "2d360c67ade72e56769e724295323f8332614f44cde707dc1aca4a25b93025c0",
+      "kind": "report"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.md",
+      "sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28",
+      "kind": "report"
+    },
+    {
+      "path": "docs/runtime_capability_matrix.json",
+      "sha256": "12101a75dac7d4d5da411e4560809cfe9c34c48a3d6ba4da8de05a8d7d773ef2",
+      "kind": "report"
+    },
+    {
+      "path": "README.md",
+      "sha256": "9e1764a17f0c0218ad8905a2c9d4b98f3dd285f8ff0247df09806a7ffa5462ed",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_design_basis.py",
+      "sha256": "11e147565976f7fb87de81164d15f525f3dfa0992fa341a40c9b566b0c9c5ca3",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_shape_grammar_experimental.py",
+      "sha256": "5af9df91c9a6a542e6f7bb45586455cd4b525c5db01854a29ac12d4d8d366ccc",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Caller chịu trách nhiệm cung cấp evidence từ solver, thí nghiệm hoặc kỹ sư; runtime chỉ kiểm provenance và điều phối trạng thái.",
+    "Registry liệt kê check bắt buộc nhưng không hiện thực demand/capacity ngoài verifier L1."
+  ],
+  "unresolved_risks": [
+    "N-M, P-Delta, buckling, fatigue, địa kỹ thuật, thủy lực, giai đoạn thi công và durability chưa có physics oracle trong component audit.",
+    "Lab hiện còn năm drift BRD-036 ngoài write_scope và không do BRD-028 gây ra; các correction thuộc BRD-028 đã được review độc lập APPROVE."
+  ],
+  "next_action": "Claude re-review r002; phần kỹ thuật không đổi, chỉ cần xác nhận correction provenance đã được phê duyệt."
+}

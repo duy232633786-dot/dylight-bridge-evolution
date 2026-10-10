@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-035",
+  "agent_id": "opencode",
+  "role": "bim_fem_integrator",
+  "summary": "Lowered global girder_count minimum from 2 to 1 in bridge_design_state.schema.json so single-girder configurations can be specified; re-tightened the per-family if/then block to still require minimum 2 for the four non-box families (I, ST, CI, and their parametric variants) while allowing 1 for BOX families. Added I-PARAM, BOX-PARAM, and CI-PARAM parametric catalog entries alongside existing ST-PARAM. Created test_multifamily_contract.py with 1 positive case (single-box-species config passes) and 4 negative cases (I/ST/CI/CIW families reject single-girder count). All 7 gold-case input_hash values in test_state.py held unchanged.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0"
+  ],
+  "artifacts": [
+    {
+      "path": "catalogs/catalogs.json",
+      "sha256": "0d40310ace678ae31bb5a82dc0dd076406c6c4821d02fc86fb4f501d3202d35c",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/bridge_design_state.schema.json",
+      "sha256": "ec924f3126892f1fd2400133f0bada9ceb65b8b294262bade5968049061a9510",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_multifamily_contract.py",
+      "sha256": "6319c3b06d26c8f81a986427ac8a6fd0fed2d5aac87d3cb7af2af0ff7b3f53b5",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Another task BRD-028 is actively editing README.md, docs/runtime_capability_matrix.md and json, tests/test_design_basis.py, tests/test_shape_grammar_experimental.py; lab validator may report drift on those unrelated files. Obsidian mirror may show OBSIDIAN_SYNC_PENDING which is expected and not a defect of this task."
+  ],
+  "next_action": "Independent review"
+}

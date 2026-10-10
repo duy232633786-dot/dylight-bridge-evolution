@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-001-003",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-003",
+  "agent_id": "independent-provenance-author",
+  "role": "evidence_safety_auditor",
+  "summary": "Bao toan baseline Markdown dung SHA-256 1bec3485 va lien ket bytes live bo sung COMPONENT_AUDIT_ORCHESTRATION cung cap nhat catalog; day chi la correction provenance, khong review noi dung ky thuat hay nang claim.",
+  "original_handoff_path": "multiagent/handoffs/BRD-001.claude.r001.json",
+  "original_handoff_sha256": "42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f.blob",
+    "sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f"
+  },
+  "corrected_artifact": {
+    "path": "docs/runtime_capability_matrix.md",
+    "previous_sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f",
+    "current_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-B",
+      "docs/check_runtime_drift.py"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction moi can mot agent khac review; lab status phai tiep tuc fail-closed cho toi khi co APPROVE doc lap."
+  ],
+  "supersedes_correction_sha256": "5476348eca9cc3ad85105e481f4da989ecf19efc7ea3977f81edb5f4756a87ed"
+}

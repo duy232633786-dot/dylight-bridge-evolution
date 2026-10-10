@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "CREATIVE-PORTFOLIO-1.0.0",
+  "algorithm_version": "creative-portfolio/0.1.0",
+  "creative_generator_version": "creative-shape/0.3.0",
+  "frame_adapter_version": "creative-frame-adapter/0.1.0",
+  "frame_solver_version": "frame-f1/0.3.0",
+  "arch_action_version": "arch-action-f1/0.1.0",
+  "funicular_reference_version": "funicular-reference/0.1.0",
+  "claim_ceiling": "IDEA",
+  "design_verdict_authority": "NONE",
+  "portfolio_source_files": [
+    "bridge_evolution/creative_portfolio.py",
+    "bridge_evolution/creative_shape.py",
+    "bridge_evolution/creative_frame_adapter.py",
+    "bridge_evolution/frame_f1.py",
+    "bridge_evolution/arch_action_f1.py",
+    "bridge_evolution/funicular_reference.py"
+  ],
+  "portfolio_source_sha256": "82339efce2c9b100cd8d2cc58c326a09623e559d1ff5b1cda3d6691f25794a93",
+  "portfolio_schema_sha256": "26fd9806814eb03f76b7e5b7d1b40d0089c5e2274784f083480ff32ea456fdc9",
+  "search_policy": {
+    "algorithm": "CONSTRAINED_MAP_ELITES_ARCH",
+    "selection": "TOPOLOGY_ROUND_ROBIN_THEN_QUALITY_DESCENDING",
+    "maximum_iterations": 10000,
+    "maximum_candidates": 100
+  },
+  "robustness_policy": {
+    "minimum_samples": 3,
+    "maximum_samples": 20,
+    "maximum_perturbation_fraction": 0.1,
+    "continuous_variables": [
+      "span_m",
+      "rise_ratio",
+      "rib_depth_m",
+      "deck_clearance_m",
+      "shape_coefficients"
+    ],
+    "discrete_variables_held_fixed": [
+      "topology",
+      "panel_count",
+      "rib_count"
+    ],
+    "acceptance": "EVERY_SAMPLE_MUST_REMAIN_RESEARCH_SCREENED"
+  },
+  "pareto_objectives": [
+    "worst_axis_rms_deviation_ratio",
+    "worst_bending_proxy_max_abs_ratio",
+    "worst_translation_ratio",
+    "inverse_minimum_l0_margin"
+  ],
+  "required_chain_status": {
+    "creative_shape": "L0_PASSED",
+    "frame_f1": "CONVERGED_WITH_ALL_CHECKS_PASS",
+    "arch_action": "ACTION_DIAGNOSTIC_COMPLETE",
+    "funicular_comparison": "AGREEMENT_WITHIN_ORDER_BAND"
+  },
+  "explicit_assumptions": [
+    "MAP-Elites provides diversity cells; it does not establish structural adequacy",
+    "Perturbations are bounded local sensitivity probes, not probability distributions or reliability analysis",
+    "Every technical threshold and material/section input is supplied by the caller with the upstream source-ref contracts",
+    "The structural-profile factory is a pure deterministic mapping from a canonical candidate to one canonical profile",
+    "The funicular order band is a heuristic model-error alarm and not a code acceptance limit",
+    "Pareto dominance is applied only after every hard screening stage and every perturbation sample has passed"
+  ],
+  "explicit_limitations": [
+    "RESEARCH_SCREENED means only that no implemented F0/F1 diagnostic rejected the candidate; it is not a feasible, verified or design-pass verdict",
+    "The F1 kernel is linear elastic 2D Euler-Bernoulli frame/axial truss analysis and does not check resistance or nonlinear stability",
+    "The portfolio does not include code load combinations, moving loads, prestress, construction stages, buckling, fatigue, dynamics, wind, seismic, hydraulic, geotechnical or durability verification",
+    "Local deterministic perturbations do not establish statistical reliability, target beta, design life or robustness under unknown hazards",
+    "The funicular reference is statics-only and its reciprocal factor-five agreement band is not an engineering acceptance criterion",
+    "Caller-supplied material, section, load and threshold provenance is checked for byte identity by upstream modules but still requires competent human applicability review",
+    "No novelty, aesthetics, cost or Pareto rank may compensate for a failed or unknown technical check",
+    "Promotion beyond IDEA requires a project-specific design basis, complete site model, code combinations, higher-fidelity nonlinear analysis, independent solver reproduction and responsible-engineer approval"
+  ],
+  "promotion_requirements": [
+    "Bind project geometry, survey, geotechnical, hydrological, wind, seismic, traffic and construction-stage inputs to approved sources",
+    "Add code-specific demand, resistance, serviceability, fatigue, stability, durability and accidental-action checks",
+    "Run a separate trusted solver on selected candidates and reconcile reactions, forces, deformations, modes and governing limit states",
+    "Complete fabrication, transport, erection, inspection, maintenance and BIM information requirements",
+    "Obtain independent calculation and responsible-engineer sign-off before any engineering use"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dylight/contracts/midas_psc_section.schema.json",
+  "title": "MIDAS PSC-1CELL/2CELL section parameters (BRD-052)",
+  "description": "Tham số mặt cắt hộp PSC đúng tên trường dialog MIDAS Civil. Chỉ hình học; không mang kết luận chịu lực.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["cell_type", "dims"],
+  "properties": {
+    "cell_type": {"enum": ["1CELL", "2CELL"]},
+    "name": {"type": "string", "minLength": 1, "maxLength": 32},
+    "section_id": {"type": "integer", "minimum": 1},
+    "offset": {"enum": ["CT", "CC", "CB", "LT", "LC", "LB", "RT", "RC", "RB"]},
+    "joints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "JO1": {"type": "boolean"}, "JO2": {"type": "boolean"}, "JO3": {"type": "boolean"},
+        "JI1": {"type": "boolean"}, "JI2": {"type": "boolean"}, "JI3": {"type": "boolean"},
+        "JI4": {"type": "boolean"}, "JI5": {"type": "boolean"}
+      }
+    },
+    "dims": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "HO1": {"$ref": "#/$defs/len"}, "HO2": {"$ref": "#/$defs/len"}, "HO2-1": {"$ref": "#/$defs/len"},
+        "HO2-2": {"$ref": "#/$defs/len"}, "HO3": {"$ref": "#/$defs/len"}, "HO3-1": {"$ref": "#/$defs/len"},
+        "BO1": {"$ref": "#/$defs/len"}, "BO1-1": {"$ref": "#/$defs/len"}, "BO1-2": {"$ref": "#/$defs/len"},
+        "BO2": {"$ref": "#/$defs/len"}, "BO2-1": {"$ref": "#/$defs/len"}, "BO3": {"$ref": "#/$defs/len"},
+        "HI1": {"$ref": "#/$defs/len"}, "HI2": {"$ref": "#/$defs/len"}, "HI2-1": {"$ref": "#/$defs/len"},
+        "HI2-2": {"$ref": "#/$defs/len"}, "HI3": {"$ref": "#/$defs/len"}, "HI3-1": {"$ref": "#/$defs/len"},
+        "HI4": {"$ref": "#/$defs/len"}, "HI4-1": {"$ref": "#/$defs/len"}, "HI4-2": {"$ref": "#/$defs/len"},
+        "HI5": {"$ref": "#/$defs/len"},
+        "BI1": {"$ref": "#/$defs/len"}, "BI1-1": {"$ref": "#/$defs/len"}, "BI1-2": {"$ref": "#/$defs/len"},
+        "BI2-1": {"$ref": "#/$defs/len"}, "BI3": {"$ref": "#/$defs/len"}, "BI3-1": {"$ref": "#/$defs/len"},
+        "BI3-2": {"$ref": "#/$defs/len"}, "BI4": {"$ref": "#/$defs/len"}
+      }
+    }
+  },
+  "$defs": {
+    "len": {"type": "number", "minimum": 0, "maximum": 50, "description": "m"}
+  }
+}

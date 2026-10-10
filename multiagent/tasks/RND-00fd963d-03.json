@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-03",
+  "title": "Tiền-sàng-lọc hình học và vật lý fail-closed ở mức F0",
+  "research_question": "Có thể chuẩn hóa topo và biến hình học nào cho HGB-B/HGB-D, đồng thời xác định rõ điều gì phải STOP trước khi G0/G1/G2 có thể chạy?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-00fd963d-01",
+    "RND-00fd963d-02"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260901-00fd963d/03_physics_screening.md"
+  ],
+  "acceptance_criteria": [
+    "Lập hai mô hình topo chuẩn hóa cho HGB-B và HGB-D bằng biến không thứ nguyên; chưa gán tọa độ tuyệt đối khi chuỗi khẩu độ còn mâu thuẫn",
+    "Nêu input, đơn vị, miền giá trị chỉ ở dạng placeholder nghiên cứu và phân biệt rõ giá trị từ ảnh, từ đề bài PSC, giả thuyết và dữ liệu còn thiếu",
+    "Đăng ký trước các kiểm tra hình học, cân bằng và lực khép kín sẽ dùng khi G0 được khóa; mọi kiểm tra chưa chạy phải ghi NOT_RUN hoặc NOT_TESTED",
+    "Tạo bộ kiểm fail-closed phát hiện chuỗi khẩu độ không khép kín, đường cáp không khép lực, xâm phạm khổ thông thuyền và topo thiếu nút neo",
+    "Không chạy hoặc giả lập solver vòm; G0, G1 và G2 đều ghi FAIL/PENDING hoặc NOT_CLAIMED theo bằng chứng runtime",
+    "Báo cả phương án bị giữ lại, bị loại và các quyết định người dùng còn thiếu; không suy diễn quá fidelity F0"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260901-00fd963d/03_physics_screening.md"
+  ],
+  "safety_notes": [
+    "Đây là tiền-sàng-lọc IDEA, không phải SCREENED, thiết kế cơ sở hay hồ sơ thi công",
+    "Runtime experimental_arch_frame không đánh giá được hybrid bridge; SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D và ARCH_RIB_STABILITY đều ABSENT",
+    "Không dùng số liệu PSC 45+75+45 m làm design basis cho hybrid 650 m",
+    "Không phát sinh tọa độ tuyệt đối cho tới khi người dùng khóa một chuỗi khẩu độ canonical và cơ chế khép lực của dây chủ",
+    "Mọi miền tham số chỉ phục vụ falsification và chuẩn bị mô hình; không phải kích thước được phê duyệt"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260901-00fd963d",
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false,
+  "runtime_scope": {
+    "structural_families": [
+      "arch_deck_v1"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  }
+}

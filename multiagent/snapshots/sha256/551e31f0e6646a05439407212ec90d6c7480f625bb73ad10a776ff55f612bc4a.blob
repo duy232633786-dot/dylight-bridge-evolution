@@ -1,0 +1,1660 @@
+"""Điều phối danh mục hình thái cầu sáng tạo với safety shield nhiều tầng.
+
+Pipeline này ghép các artifact nghiên cứu đã được tách quyền rõ ràng:
+
+``MAP-Elites F0 -> frame adapter -> F1 -> arch action -> funicular reference``.
+
+Nó chỉ tạo ``RESEARCH_SCREENED`` ở claim ``IDEA``. Một candidate có độ mới cao
+không bao giờ được bù một lỗi hình học, cơ cấu, cân bằng, hội tụ hay lineage.
+Không output nào của module có quyền phát hành thiết kế cầu.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import random
+from copy import deepcopy
+from pathlib import Path
+from typing import Callable
+
+import jsonschema
+
+from . import CONTRACTS_DIR, REPO_ROOT
+from . import (
+    arch_action_f1,
+    creative_frame_adapter,
+    creative_shape,
+    frame_f1,
+    funicular_reference,
+)
+
+
+ALGORITHM_ID = "CONSTRAINED_CREATIVE_PORTFOLIO"
+ALGORITHM_VERSION = "creative-portfolio/0.2.0"
+CLAIM_LEVEL = "IDEA"
+DESIGN_VERDICT_AUTHORITY = "NONE"
+TECHNICAL_SCOPE = (
+    "F0_TO_F1_ARCH_RESEARCH_SCREENING_NO_CAPACITY_OR_DESIGN_VERDICT"
+)
+
+_SCHEMA_PATH = CONTRACTS_DIR / "creative_portfolio_study.schema.json"
+_BASIS_PATH = REPO_ROOT / "docs" / "design_basis" / "creative_portfolio_basis.json"
+_SOURCE_PATHS = (
+    ("bridge_evolution/creative_portfolio.py", Path(__file__).resolve()),
+    ("bridge_evolution/creative_shape.py", Path(creative_shape.__file__).resolve()),
+    (
+        "bridge_evolution/creative_frame_adapter.py",
+        Path(creative_frame_adapter.__file__).resolve(),
+    ),
+    ("bridge_evolution/frame_f1.py", Path(frame_f1.__file__).resolve()),
+    ("bridge_evolution/arch_action_f1.py", Path(arch_action_f1.__file__).resolve()),
+    (
+        "bridge_evolution/funicular_reference.py",
+        Path(funicular_reference.__file__).resolve(),
+    ),
+)
+_FORBIDDEN_VERDICT_KEYS = {"feasible", "verified", "design_pass"}
+
+
+class CreativePortfolioError(ValueError):
+    """Input, lineage hoặc output portfolio vi phạm contract fail-closed."""
+
+
+def _canonical(value: object) -> str:
+    try:
+        return json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as exc:
+        raise CreativePortfolioError(
+            f"Dữ liệu portfolio không thể canonical JSON: {exc}"
+        ) from exc
+
+
+def _sha256_json(value: object) -> str:
+    return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
+
+
+def _read_json(path: Path, label: str) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise CreativePortfolioError(f"Không đọc được {label}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise CreativePortfolioError(f"{label} phải là JSON object")
+    return value
+
+
+def _source_digests() -> list[dict]:
+    digests = []
+    for label, path in _SOURCE_PATHS:
+        if not path.is_file():
+            raise CreativePortfolioError(f"Không tìm thấy source portfolio: {label}")
+        digests.append({
+            "path": label,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        })
+    return digests
+
+
+def _source_sha256() -> str:
+    return _sha256_json(_source_digests())
+
+
+def _schema_errors(value: dict) -> list[str]:
+    schema = _read_json(_SCHEMA_PATH, "creative portfolio schema")
+    errors = sorted(
+        jsonschema.Draft202012Validator(schema).iter_errors(value),
+        key=lambda error: list(error.absolute_path),
+    )
+    return [
+        f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: "
+        f"{error.message}"
+        for error in errors
+    ]
+
+
+def _schema_sha256() -> str:
+    if not _SCHEMA_PATH.is_file():
+        raise CreativePortfolioError("Không tìm thấy creative portfolio schema")
+    return hashlib.sha256(_SCHEMA_PATH.read_bytes()).hexdigest()
+
+
+def load_portfolio_basis() -> dict:
+    """Nạp basis và khóa version/source của toàn chuỗi upstream."""
+    basis = _read_json(_BASIS_PATH, "creative portfolio basis")
+    expected = {
+        "schema_version": "1.1",
+        "basis_id": "CREATIVE-PORTFOLIO-1.1.0",
+        "algorithm_version": ALGORITHM_VERSION,
+        "creative_generator_version": creative_shape.GENERATOR_VERSION,
+        "frame_adapter_version": creative_frame_adapter.ADAPTER_VERSION,
+        "frame_solver_version": frame_f1.SOLVER_VERSION,
+        "arch_action_version": arch_action_f1.STUDY_VERSION,
+        "funicular_reference_version": funicular_reference.REFERENCE_VERSION,
+        "claim_ceiling": CLAIM_LEVEL,
+        "design_verdict_authority": DESIGN_VERDICT_AUTHORITY,
+    }
+    for key, value in expected.items():
+        if basis.get(key) != value:
+            raise CreativePortfolioError(
+                f"Portfolio basis {key} không khớp runtime: "
+                f"expected={value!r}, actual={basis.get(key)!r}"
+            )
+    expected_files = [label for label, _path in _SOURCE_PATHS]
+    if basis.get("portfolio_source_files") != expected_files:
+        raise CreativePortfolioError("portfolio_source_files không khớp runtime")
+    observed_source = _source_sha256()
+    if basis.get("portfolio_source_sha256") != observed_source:
+        raise CreativePortfolioError(
+            "Source portfolio/upstream đã drift khỏi basis: "
+            f"expected={basis.get('portfolio_source_sha256')}, "
+            f"observed={observed_source}"
+        )
+    observed_schema = _schema_sha256()
+    if basis.get("portfolio_schema_sha256") != observed_schema:
+        raise CreativePortfolioError(
+            "Creative portfolio schema đã drift khỏi basis: "
+            f"expected={basis.get('portfolio_schema_sha256')}, "
+            f"observed={observed_schema}"
+        )
+    policy = basis.get("robustness_policy")
+    if not isinstance(policy, dict):
+        raise CreativePortfolioError("Basis thiếu robustness_policy")
+    if policy.get("minimum_samples") != 3:
+        raise CreativePortfolioError("Basis phải giữ minimum_samples=3")
+    maximum_fraction = policy.get("maximum_perturbation_fraction")
+    minimum_fraction = policy.get("minimum_perturbation_fraction")
+    if (
+        not isinstance(minimum_fraction, (int, float))
+        or isinstance(minimum_fraction, bool)
+        or not math.isfinite(float(minimum_fraction))
+        or float(minimum_fraction) <= 0.0
+    ):
+        raise CreativePortfolioError(
+            "Basis minimum_perturbation_fraction phải hữu hạn và dương"
+        )
+    if (
+        not isinstance(maximum_fraction, (int, float))
+        or isinstance(maximum_fraction, bool)
+        or not math.isfinite(float(maximum_fraction))
+        or not 0.0 < float(maximum_fraction) <= 0.25
+    ):
+        raise CreativePortfolioError(
+            "Basis maximum_perturbation_fraction phải hữu hạn trong (0, 0.25]"
+        )
+    if float(minimum_fraction) > float(maximum_fraction):
+        raise CreativePortfolioError(
+            "Basis minimum_perturbation_fraction không được vượt maximum"
+        )
+    if policy.get("perturbation_interpretation") != (
+        "NUMERICAL_LOCAL_SENSITIVITY_FLOOR_NOT_PHYSICAL_RELIABILITY"
+    ):
+        raise CreativePortfolioError(
+            "Basis phải khóa đúng diễn giải numerical sensitivity của perturbation"
+        )
+    if basis.get("pareto_objectives") != [
+        "worst_axis_rms_deviation_ratio",
+        "worst_bending_proxy_max_abs_ratio",
+        "worst_translation_ratio",
+        "inverse_minimum_l0_margin",
+    ]:
+        raise CreativePortfolioError("pareto_objectives không khớp runtime")
+    limitations = basis.get("explicit_limitations")
+    if (
+        not isinstance(limitations, list)
+        or not limitations
+        or not all(isinstance(item, str) and item for item in limitations)
+        or len(set(limitations)) != len(limitations)
+    ):
+        raise CreativePortfolioError("Basis phải có explicit_limitations duy nhất")
+    return basis
+
+
+def _finite_number(value: object) -> bool:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+    )
+
+
+def _validate_run_parameters(
+    seed: int,
+    iterations: int,
+    max_candidates: int,
+    robustness_samples: int,
+    perturbation_fraction: float,
+    basis: dict,
+) -> None:
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise CreativePortfolioError("seed phải là số nguyên")
+    if isinstance(iterations, bool) or not isinstance(iterations, int) or iterations < 0:
+        raise CreativePortfolioError("iterations phải là số nguyên không âm")
+    if iterations > int(basis["search_policy"]["maximum_iterations"]):
+        raise CreativePortfolioError("iterations vượt search_policy của basis")
+    if (
+        isinstance(max_candidates, bool)
+        or not isinstance(max_candidates, int)
+        or max_candidates < 1
+        or max_candidates > int(basis["search_policy"]["maximum_candidates"])
+    ):
+        raise CreativePortfolioError("max_candidates ngoài search_policy của basis")
+    if (
+        isinstance(robustness_samples, bool)
+        or not isinstance(robustness_samples, int)
+        or robustness_samples < int(basis["robustness_policy"]["minimum_samples"])
+        or robustness_samples > int(basis["robustness_policy"]["maximum_samples"])
+    ):
+        raise CreativePortfolioError("robustness_samples ngoài robustness_policy")
+    if (
+        not _finite_number(perturbation_fraction)
+        or float(perturbation_fraction)
+        < float(basis["robustness_policy"]["minimum_perturbation_fraction"])
+        or float(perturbation_fraction)
+        > float(basis["robustness_policy"]["maximum_perturbation_fraction"])
+    ):
+        raise CreativePortfolioError("perturbation_fraction ngoài robustness_policy")
+
+
+def _blocker(code: str, stage: str, message: str) -> dict:
+    return {"code": code, "stage": stage, "message": str(message)[:2000]}
+
+
+def _evidence(
+    evidence_kind: str,
+    payload: dict | None,
+    *,
+    reproducible: bool,
+) -> dict:
+    copied = deepcopy(payload) if payload is not None else None
+    return {
+        "evidence_kind": evidence_kind,
+        "evidence_reproducible": bool(reproducible),
+        "evidence_sha256": _sha256_json(copied) if copied is not None else None,
+        "payload": copied,
+    }
+
+
+def _candidate_l0_blockers(candidate: dict) -> list[dict]:
+    if candidate.get("screening_status") == "L0_PASSED" \
+            and candidate.get("all_known_pass") is True:
+        return []
+    return [_blocker(
+        "CP-L0-001", "L0", "Candidate không còn L0_PASSED/all_known_pass"
+    )]
+
+
+def _analysis_blockers(analysis: dict) -> list[dict]:
+    blockers: list[dict] = []
+    if analysis.get("status") != "CONVERGED":
+        blockers.append(_blocker(
+            "CP-F1-001", "FRAME_F1", f"Adapter F1 status={analysis.get('status')}"
+        ))
+    frame_result = analysis.get("frame_result", {})
+    for case in frame_result.get("load_case_results", []):
+        if case.get("status") != "CONVERGED":
+            blockers.append(_blocker(
+                "CP-F1-002",
+                "FRAME_F1",
+                f"Load case {case.get('load_case_id')} status={case.get('status')}",
+            ))
+        failed = [
+            item.get("check_id") for item in case.get("checks", [])
+            if item.get("status") != "PASS"
+        ]
+        if failed:
+            blockers.append(_blocker(
+                "CP-F1-003",
+                "FRAME_F1",
+                f"Load case {case.get('load_case_id')} có check chưa PASS: {failed}",
+            ))
+    return blockers
+
+
+def _action_blockers(action: dict) -> list[dict]:
+    blockers: list[dict] = []
+    if action.get("status") != "ACTION_DIAGNOSTIC_COMPLETE":
+        blockers.append(_blocker(
+            "CP-ACTION-002",
+            "ARCH_ACTION",
+            f"Arch-action status={action.get('status')}",
+        ))
+    for diagnostic in action.get("diagnostics", []):
+        if diagnostic.get("f1_status") != "CONVERGED" \
+                or diagnostic.get("action_status") not in {
+                    "FOUNDATION_THRUST_DETECTED", "INTERNAL_TIE_ACTION_DETECTED"
+                }:
+            blockers.append(_blocker(
+                "CP-ACTION-003",
+                "ARCH_ACTION",
+                f"Diagnostic {diagnostic.get('load_case_id')} không phát hiện cơ chế: "
+                f"{diagnostic.get('action_status')}",
+            ))
+    return blockers
+
+
+def _funicular_blockers(reference: dict) -> list[dict]:
+    comparison = reference.get("reference_result", {}).get("f1_comparison", {})
+    if comparison.get("agreement_status") == "AGREEMENT_WITHIN_ORDER_BAND":
+        return []
+    return [_blocker(
+        "CP-FUNICULAR-002",
+        "FUNICULAR",
+        f"F1/reference agreement={comparison.get('agreement_status')}",
+    )]
+
+
+def _structural_comparison_payload(structural_profile: dict) -> dict:
+    """Bỏ đúng hai binding theo candidate, giữ nguyên tải/vật liệu/tiết diện."""
+    payload = deepcopy(structural_profile)
+    payload.pop("candidate_id", None)
+    payload.pop("candidate_profile_sha256", None)
+    return payload
+
+
+def _structural_comparison_sha256(structural_profile: dict) -> str:
+    return _sha256_json(_structural_comparison_payload(structural_profile))
+
+
+def _comparison_blockers(expected_sha256: str, observed_sha256: str) -> list[dict]:
+    if observed_sha256 == expected_sha256:
+        return []
+    return [_blocker(
+        "CP-COMPARABILITY-001",
+        "STRUCTURAL_COMPARISON",
+        "Structural profile khác nhóm so sánh chung: "
+        f"expected={expected_sha256}, observed={observed_sha256}",
+    )]
+
+
+def _comparison_evidence(
+    reference: dict,
+    expected_sha256: str,
+    observed_sha256: str,
+) -> dict:
+    return _evidence(
+        "STRUCTURAL_COMPARISON",
+        {
+            "reference": reference,
+            "expected_sha256": expected_sha256,
+            "observed_sha256": observed_sha256,
+        },
+        reproducible=True,
+    )
+
+
+def _run_reference_chain(
+    candidate: dict,
+    technical_profile: dict,
+    structural_profile_factory: Callable[[dict], dict],
+) -> tuple[dict | None, list[dict], dict, str | None]:
+    """Chạy một candidate qua toàn chuỗi; lỗi nào cũng thành blocker rõ tầng."""
+    l0_blockers = _candidate_l0_blockers(candidate)
+    if l0_blockers:
+        return (
+            None,
+            l0_blockers,
+            _evidence("L0_CANDIDATE", candidate, reproducible=True),
+            None,
+        )
+    try:
+        structural_profile = structural_profile_factory(deepcopy(candidate))
+        repeated_profile = structural_profile_factory(deepcopy(candidate))
+    except Exception as exc:  # factory là seam của caller, cần fail-closed.
+        return (
+            None,
+            [_blocker(
+                "CP-PROFILE-001", "STRUCTURAL_PROFILE", f"Profile factory lỗi: {exc}"
+            )],
+            _evidence("CALLER_DEPENDENT", None, reproducible=False),
+            None,
+        )
+    if not isinstance(structural_profile, dict):
+        return (
+            None,
+            [_blocker(
+                "CP-PROFILE-002",
+                "STRUCTURAL_PROFILE",
+                "Profile factory phải trả JSON object",
+            )],
+            _evidence("CALLER_DEPENDENT", None, reproducible=False),
+            None,
+        )
+    try:
+        if _canonical(structural_profile) != _canonical(repeated_profile):
+            pair = {
+                "first_profile": structural_profile,
+                "second_profile": repeated_profile,
+            }
+            return (
+                None,
+                [_blocker(
+                    "CP-PROFILE-003",
+                    "STRUCTURAL_PROFILE",
+                    "Profile factory không deterministic cho cùng candidate",
+                )],
+                _evidence("STRUCTURAL_PROFILE_PAIR", pair, reproducible=True),
+                None,
+            )
+        comparison_sha256 = _structural_comparison_sha256(structural_profile)
+    except CreativePortfolioError as exc:
+        return (
+            None,
+            [_blocker("CP-PROFILE-004", "STRUCTURAL_PROFILE", str(exc))],
+            _evidence("CALLER_DEPENDENT", None, reproducible=False),
+            None,
+        )
+    try:
+        analysis = creative_frame_adapter.analyze_creative_candidate(
+            candidate,
+            technical_profile=technical_profile,
+            structural_profile=structural_profile,
+        )
+        creative_frame_adapter.validate_creative_frame_analysis(analysis)
+    except Exception as exc:
+        return (
+            None,
+            [_blocker("CP-ADAPTER-001", "FRAME_ADAPTER", str(exc))],
+            _evidence("EXCEPTION_ONLY", None, reproducible=False),
+            comparison_sha256,
+        )
+    blockers = _analysis_blockers(analysis)
+    if blockers:
+        return (
+            None,
+            blockers,
+            _evidence("FRAME_ANALYSIS", analysis, reproducible=True),
+            comparison_sha256,
+        )
+    try:
+        action = arch_action_f1.run_arch_action_study(analysis)
+        arch_action_f1.validate_arch_action_study(action)
+    except Exception as exc:
+        return (
+            None,
+            [_blocker("CP-ACTION-001", "ARCH_ACTION", str(exc))],
+            _evidence("EXCEPTION_ONLY", None, reproducible=False),
+            comparison_sha256,
+        )
+    blockers = _action_blockers(action)
+    if blockers:
+        return (
+            None,
+            blockers,
+            _evidence("ARCH_ACTION", action, reproducible=True),
+            comparison_sha256,
+        )
+    try:
+        reference = funicular_reference.run_funicular_reference(action)
+        funicular_reference.validate_funicular_reference(reference)
+    except Exception as exc:
+        return (
+            None,
+            [_blocker("CP-FUNICULAR-001", "FUNICULAR", str(exc))],
+            _evidence("EXCEPTION_ONLY", None, reproducible=False),
+            comparison_sha256,
+        )
+    blockers = _funicular_blockers(reference)
+    if blockers:
+        return (
+            None,
+            blockers,
+            _evidence("FUNICULAR_REFERENCE", reference, reproducible=True),
+            comparison_sha256,
+        )
+    return reference, [], _evidence(
+        "FUNICULAR_REFERENCE", reference, reproducible=True
+    ), comparison_sha256
+
+
+def _reference_candidate(reference: dict) -> dict:
+    return reference["parent_study"]["parent_analysis"]["candidate"]
+
+
+def _reference_analysis(reference: dict) -> dict:
+    return reference["parent_study"]["parent_analysis"]
+
+
+def _reference_blockers(reference: dict) -> list[dict]:
+    """Không để status tổng quát che một check con FAIL/NOT_RUN."""
+    candidate = _reference_candidate(reference)
+    analysis = _reference_analysis(reference)
+    action = reference["parent_study"]
+    return (
+        _candidate_l0_blockers(candidate)
+        + _analysis_blockers(analysis)
+        + _action_blockers(action)
+        + _funicular_blockers(reference)
+    )
+
+
+def _candidate_minimum_margin(candidate: dict) -> float:
+    pass_checks = [item for item in candidate["checks"] if item["status"] == "PASS"]
+    if not pass_checks:
+        raise CreativePortfolioError("Candidate không có check PASS")
+    margins = []
+    for item in pass_checks:
+        margin = item.get("margin")
+        if not _finite_number(margin):
+            raise CreativePortfolioError(
+                f"Check PASS {item.get('check_id')} có margin null/không hữu hạn"
+            )
+        if float(margin) < 0.0:
+            raise CreativePortfolioError(
+                f"Check PASS {item.get('check_id')} có margin âm"
+            )
+        margins.append(float(margin))
+    if not margins:
+        raise CreativePortfolioError("Candidate không có margin PASS hữu hạn")
+    result = min(margins)
+    return result
+
+
+def _reference_metrics(reference: dict) -> dict:
+    candidate = _reference_candidate(reference)
+    analysis = _reference_analysis(reference)
+    action = reference["parent_study"]
+    frame_ratios = []
+    condition_numbers = []
+    for case in analysis["frame_result"]["load_case_results"]:
+        diagnostics = case["diagnostics"]
+        ratio = diagnostics["max_translation_to_characteristic_length"]
+        condition = diagnostics["condition_number"]
+        if not _finite_number(ratio) or float(ratio) < 0.0:
+            raise CreativePortfolioError("F1 thiếu translation ratio hữu hạn")
+        if not _finite_number(condition) or float(condition) < 1.0:
+            raise CreativePortfolioError("F1 thiếu condition number hữu hạn")
+        frame_ratios.append(float(ratio))
+        condition_numbers.append(float(condition))
+    equilibrium = []
+    for item in action["diagnostics"]:
+        for key in (
+            "horizontal_equilibrium_residual_relative",
+            "vertical_equilibrium_residual_relative",
+        ):
+            value = item[key]
+            if not _finite_number(value) or float(value) < 0.0:
+                raise CreativePortfolioError("Arch-action thiếu equilibrium residual")
+            equilibrium.append(float(value))
+    result = reference["reference_result"]
+    metrics = {
+        "minimum_l0_margin": _candidate_minimum_margin(candidate),
+        "axis_rms_deviation_ratio": float(result["axis_rms_deviation_ratio"]),
+        "bending_proxy_max_abs_ratio": float(result["bending_proxy_max_abs_ratio"]),
+        "max_translation_ratio": max(frame_ratios),
+        "max_condition_number": max(condition_numbers),
+        "max_equilibrium_residual_relative": max(equilibrium),
+    }
+    if not all(_finite_number(value) and float(value) >= 0.0 for value in metrics.values()):
+        raise CreativePortfolioError("Metrics reference phải hữu hạn và không âm")
+    return metrics
+
+
+def _lineage(reference: dict) -> dict:
+    action = reference["parent_study"]
+    analysis = action["parent_analysis"]
+    candidate = analysis["candidate"]
+    return {
+        "candidate_id": candidate["candidate_id"],
+        "candidate_sha256": candidate["candidate_sha256"],
+        "geometry_sha256": candidate["geometry_sha256"],
+        "analysis_id": analysis["analysis_id"],
+        "analysis_sha256": analysis["analysis_sha256"],
+        "frame_model_sha256": analysis["manifest"]["model_sha256"],
+        "frame_result_sha256": analysis["manifest"]["frame_result_sha256"],
+        "arch_action_study_id": action["study_id"],
+        "arch_action_study_sha256": action["study_sha256"],
+        "funicular_reference_id": reference["reference_id"],
+        "funicular_reference_sha256": reference["reference_sha256"],
+    }
+
+
+def _sample_seed(study_seed: int, candidate_id: str, sample_index: int) -> int:
+    payload = f"{study_seed}:{candidate_id}:{sample_index}".encode("utf-8")
+    # 13 hex digits stay below 2**53, so JSON/JavaScript consumers preserve
+    # the exact deterministic seed instead of silently rounding it.
+    return int(hashlib.sha256(payload).hexdigest()[:13], 16)
+
+
+def _clip(value: float, bounds: dict) -> float:
+    return min(float(bounds["max"]), max(float(bounds["min"]), value))
+
+
+def _perturbed_genome(
+    parent: dict,
+    *,
+    sample_seed: int,
+    perturbation_fraction: float,
+    domain: dict,
+) -> tuple[dict, dict]:
+    """Nhiễu liên tục có biên, giữ topology và biến rời rạc."""
+    rng = random.Random(sample_seed)
+    child = deepcopy(parent)
+    perturbation: dict[str, object] = {}
+    for key in ("span_m", "rise_ratio", "rib_depth_m", "deck_clearance_m"):
+        bounds = domain[key]
+        width = float(bounds["max"]) - float(bounds["min"])
+        requested = rng.uniform(-perturbation_fraction, perturbation_fraction) * width
+        updated = _clip(float(parent[key]) + requested, bounds)
+        child[key] = updated
+        perturbation[key] = updated - float(parent[key])
+    coefficient_bounds = domain["coefficient_bounds"]
+    coefficient_width = (
+        float(coefficient_bounds["max"]) - float(coefficient_bounds["min"])
+    )
+    deltas = []
+    for index, value in enumerate(parent["shape_coefficients"]):
+        requested = rng.uniform(
+            -perturbation_fraction, perturbation_fraction
+        ) * coefficient_width
+        updated = _clip(float(value) + requested, coefficient_bounds)
+        child["shape_coefficients"][index] = updated
+        deltas.append(updated - float(value))
+    perturbation["shape_coefficients"] = deltas
+    changed = any(
+        abs(float(value)) > 0.0
+        for key, value in perturbation.items()
+        if key != "shape_coefficients"
+    ) or any(abs(float(value)) > 0.0 for value in deltas)
+    if not changed:
+        bounds = domain["rise_ratio"]
+        width = float(bounds["max"]) - float(bounds["min"])
+        direction = 1.0 if float(parent["rise_ratio"]) <= (
+            float(bounds["min"]) + float(bounds["max"])
+        ) / 2.0 else -1.0
+        updated = _clip(
+            float(parent["rise_ratio"])
+            + direction * float(perturbation_fraction) * width,
+            bounds,
+        )
+        child["rise_ratio"] = updated
+        perturbation["rise_ratio"] = updated - float(parent["rise_ratio"])
+    changed = any(
+        abs(float(value)) > 0.0
+        for key, value in perturbation.items()
+        if key != "shape_coefficients"
+    ) or any(
+        abs(float(value)) > 0.0
+        for value in perturbation["shape_coefficients"]
+    )
+    if not changed or _canonical(child) == _canonical(parent):
+        raise CreativePortfolioError(
+            "Không tạo được perturbation khác parent sau fallback"
+        )
+    creative_shape.validate_genome(child, domain)
+    return child, perturbation
+
+
+def _sample_identity(
+    parent_candidate_sha256: str,
+    sample_index: int,
+    sample_seed: int,
+    perturbation_fraction: float,
+    perturbation: dict,
+    genome: dict,
+) -> dict:
+    return {
+        "parent_candidate_sha256": parent_candidate_sha256,
+        "sample_index": sample_index,
+        "sample_seed": sample_seed,
+        "perturbation_fraction": float(perturbation_fraction),
+        "perturbation": perturbation,
+        "genome": genome,
+    }
+
+
+def _sample_record(
+    parent_candidate: dict,
+    technical_profile: dict,
+    structural_profile_factory: Callable[[dict], dict],
+    *,
+    study_seed: int,
+    sample_index: int,
+    perturbation_fraction: float,
+    domain: dict,
+    expected_comparison_sha256: str,
+) -> tuple[dict | None, list[dict], dict, str | None]:
+    sample_seed = _sample_seed(
+        study_seed, parent_candidate["candidate_id"], sample_index
+    )
+    genome, perturbation = _perturbed_genome(
+        parent_candidate["genome"],
+        sample_seed=sample_seed,
+        perturbation_fraction=perturbation_fraction,
+        domain=domain,
+    )
+    identity = _sample_identity(
+        parent_candidate["candidate_sha256"],
+        sample_index,
+        sample_seed,
+        perturbation_fraction,
+        perturbation,
+        genome,
+    )
+    digest = _sha256_json(identity)
+    sample_id = "CP-S-" + digest[:16]
+    try:
+        candidate = creative_shape.evaluate_genome(genome, technical_profile, domain)
+    except Exception as exc:
+        message = f"{sample_id}: L0 lỗi: {exc}"
+        evidence = _evidence(
+            "PERTURBATION_L0",
+            {
+                "sample_identity": identity,
+                "sample_id": sample_id,
+                "candidate": None,
+                "error_message": str(exc)[:2000],
+            },
+            reproducible=True,
+        )
+        return None, [_blocker("CP-PERTURB-001", "ROBUSTNESS", message)], evidence, None
+    l0_blockers = _candidate_l0_blockers(candidate)
+    if l0_blockers:
+        message = (
+            f"{sample_id}: L0 không PASS: "
+            + "; ".join(item["code"] for item in l0_blockers)
+        )
+        evidence = _evidence(
+            "PERTURBATION_L0",
+            {
+                "sample_identity": identity,
+                "sample_id": sample_id,
+                "candidate": candidate,
+                "error_message": None,
+            },
+            reproducible=True,
+        )
+        return None, [_blocker("CP-PERTURB-001", "ROBUSTNESS", message)], evidence, None
+    reference, blockers, cause_evidence, comparison_sha256 = _run_reference_chain(
+        candidate, technical_profile, structural_profile_factory
+    )
+    if not blockers and reference is not None and comparison_sha256 is not None:
+        blockers = _comparison_blockers(
+            expected_comparison_sha256, comparison_sha256
+        )
+        if blockers:
+            cause_evidence = _comparison_evidence(
+                reference, expected_comparison_sha256, comparison_sha256
+            )
+    if blockers or reference is None:
+        details = "; ".join(item["code"] for item in blockers) or "UNKNOWN"
+        wrapper = _evidence(
+            "ROBUSTNESS_STAGE",
+            {
+                "sample_identity": identity,
+                "sample_id": sample_id,
+                "candidate": candidate,
+                "cause_blockers": blockers,
+                "cause_evidence": cause_evidence,
+            },
+            reproducible=bool(cause_evidence["evidence_reproducible"]),
+        )
+        return (
+            None,
+            [_blocker(
+                "CP-PERTURB-002",
+                "ROBUSTNESS",
+                f"{sample_id}: perturbation bị chặn bởi {details}",
+            )],
+            wrapper,
+            comparison_sha256,
+        )
+    record = {
+        "sample_id": sample_id,
+        "sample_index": sample_index,
+        "sample_seed": sample_seed,
+        "input_digest": digest,
+        "perturbation": perturbation,
+        "genome": genome,
+        "status": "RESEARCH_SCREENED",
+        "reference": reference,
+        "metrics": _reference_metrics(reference),
+        "lineage": _lineage(reference),
+    }
+    return record, [], cause_evidence, comparison_sha256
+
+
+def _aggregate_metrics(base: dict, samples: list[dict]) -> dict:
+    values = [base] + [item["metrics"] for item in samples]
+    minimum_margin = min(item["minimum_l0_margin"] for item in values)
+    return {
+        "robustness_sample_count": len(samples),
+        "minimum_l0_margin": minimum_margin,
+        "inverse_minimum_l0_margin": 1.0 / (1.0 + minimum_margin),
+        "worst_axis_rms_deviation_ratio": max(
+            item["axis_rms_deviation_ratio"] for item in values
+        ),
+        "worst_bending_proxy_max_abs_ratio": max(
+            item["bending_proxy_max_abs_ratio"] for item in values
+        ),
+        "worst_translation_ratio": max(
+            item["max_translation_ratio"] for item in values
+        ),
+        "worst_condition_number": max(
+            item["max_condition_number"] for item in values
+        ),
+        "worst_equilibrium_residual_relative": max(
+            item["max_equilibrium_residual_relative"] for item in values
+        ),
+    }
+
+
+def _cost_vector(entry: dict) -> tuple[float, float, float, float]:
+    metrics = entry["robust_metrics"]
+    return (
+        float(metrics["worst_axis_rms_deviation_ratio"]),
+        float(metrics["worst_bending_proxy_max_abs_ratio"]),
+        float(metrics["worst_translation_ratio"]),
+        float(metrics["inverse_minimum_l0_margin"]),
+    )
+
+
+def _dominates(left: tuple[float, ...], right: tuple[float, ...]) -> bool:
+    return all(a <= b for a, b in zip(left, right)) and any(
+        a < b for a, b in zip(left, right)
+    )
+
+
+def _assign_pareto_ranks(entries: list[dict]) -> None:
+    remaining = set(range(len(entries)))
+    rank = 0
+    while remaining:
+        front = [
+            index for index in sorted(remaining)
+            if not any(
+                _dominates(_cost_vector(entries[other]), _cost_vector(entries[index]))
+                for other in remaining if other != index
+            )
+        ]
+        if not front:
+            raise CreativePortfolioError("Không xác định được Pareto front")
+        for index in front:
+            entries[index]["pareto_rank"] = rank
+            entries[index]["pareto_front"] = rank == 0
+            remaining.remove(index)
+        rank += 1
+
+
+def _selected_archive_items(search: dict, max_candidates: int) -> list[dict]:
+    """Round-robin theo topology để chất lượng không xóa mất đa dạng hình thái."""
+    grouped: dict[str, list[dict]] = {}
+    for item in search["archive"]:
+        topology = item["candidate"]["genome"]["topology"]
+        grouped.setdefault(topology, []).append(item)
+    for values in grouped.values():
+        values.sort(key=lambda item: (
+            -float(item["quality_score"]), item["candidate"]["candidate_id"]
+        ))
+    selected: list[dict] = []
+    depth = 0
+    while len(selected) < max_candidates:
+        added = False
+        for topology in sorted(grouped):
+            values = grouped[topology]
+            if depth < len(values):
+                selected.append(values[depth])
+                added = True
+                if len(selected) == max_candidates:
+                    break
+        if not added:
+            break
+        depth += 1
+    return selected
+
+
+def _search_manifest(search: dict, selected: list[dict]) -> dict:
+    return {
+        "algorithm": search["algorithm"],
+        "algorithm_version": search["algorithm_version"],
+        "domain_sha256": search["domain_sha256"],
+        "profile_sha256": search["profile_sha256"],
+        "statistics": deepcopy(search["statistics"]),
+        "selected_candidate_ids": [
+            item["candidate"]["candidate_id"] for item in selected
+        ],
+    }
+
+
+def _blocked_candidate(
+    candidate: dict,
+    stage: str,
+    blockers: list[dict],
+    evidence: dict,
+) -> dict:
+    return {
+        "candidate_id": candidate["candidate_id"],
+        "candidate_sha256": candidate["candidate_sha256"],
+        "topology": candidate["genome"]["topology"],
+        "stage": stage,
+        "blockers": blockers,
+        "evidence": evidence,
+    }
+
+
+def run_creative_portfolio(
+    *,
+    technical_profile: dict,
+    structural_profile_factory: Callable[[dict], dict],
+    seed: int,
+    iterations: int = 100,
+    max_candidates: int = 12,
+    robustness_samples: int = 3,
+    perturbation_fraction: float = 0.02,
+    domain: dict | None = None,
+) -> dict:
+    """Sinh danh mục đa dạng và giữ lại candidate qua toàn safety shield."""
+    basis = load_portfolio_basis()
+    _validate_run_parameters(
+        seed,
+        iterations,
+        max_candidates,
+        robustness_samples,
+        perturbation_fraction,
+        basis,
+    )
+    if not isinstance(technical_profile, dict):
+        raise CreativePortfolioError("technical_profile phải là object")
+    if not callable(structural_profile_factory):
+        raise CreativePortfolioError("structural_profile_factory phải callable")
+    canonical_domain = (
+        creative_shape.load_creative_domain()
+        if domain is None else creative_shape.validate_creative_domain(domain)
+    )
+    search = creative_shape.run_constrained_map_elites(
+        technical_profile=technical_profile,
+        seed=seed,
+        iterations=iterations,
+        domain=canonical_domain,
+    )
+    selected = _selected_archive_items(search, max_candidates)
+    archive: list[dict] = []
+    blocked: list[dict] = []
+    structural_comparison_sha256: str | None = None
+    for item in selected:
+        candidate = item["candidate"]
+        reference, blockers, chain_evidence, candidate_comparison_sha256 = (
+            _run_reference_chain(
+            candidate, technical_profile, structural_profile_factory
+            )
+        )
+        if blockers or reference is None:
+            blocked.append(_blocked_candidate(
+                candidate, "BASE_CHAIN", blockers, chain_evidence
+            ))
+            continue
+        if candidate_comparison_sha256 is None:
+            raise CreativePortfolioError(
+                "Reference hoàn tất nhưng thiếu structural comparison hash"
+            )
+        comparison_target = (
+            structural_comparison_sha256 or candidate_comparison_sha256
+        )
+        comparison_blockers = _comparison_blockers(
+            comparison_target, candidate_comparison_sha256
+        )
+        if comparison_blockers:
+            blocked.append(_blocked_candidate(
+                candidate,
+                "BASE_CHAIN",
+                comparison_blockers,
+                _comparison_evidence(
+                    reference, comparison_target, candidate_comparison_sha256
+                ),
+            ))
+            continue
+        samples: list[dict] = []
+        sample_digests: set[str] = set()
+        robustness_blockers: list[dict] = []
+        robustness_evidence: dict | None = None
+        for sample_index in range(robustness_samples):
+            sample, sample_blockers, sample_evidence, _sample_comparison_sha256 = (
+                _sample_record(
+                candidate,
+                technical_profile,
+                structural_profile_factory,
+                study_seed=seed,
+                sample_index=sample_index,
+                perturbation_fraction=float(perturbation_fraction),
+                domain=canonical_domain,
+                expected_comparison_sha256=comparison_target,
+                )
+            )
+            if sample_blockers or sample is None:
+                robustness_blockers.extend(sample_blockers)
+                robustness_evidence = sample_evidence
+                break
+            if sample["input_digest"] in sample_digests:
+                robustness_blockers.append(_blocker(
+                    "CP-PERTURB-003",
+                    "ROBUSTNESS",
+                    f"Replay input_digest: {sample['input_digest']}",
+                ))
+                robustness_evidence = _evidence(
+                    "EXCEPTION_ONLY", None, reproducible=False
+                )
+                break
+            sample_digests.add(sample["input_digest"])
+            samples.append(sample)
+        if robustness_blockers:
+            if robustness_evidence is None:
+                raise CreativePortfolioError(
+                    "Robustness blocker thiếu evidence fail-closed"
+                )
+            blocked.append(_blocked_candidate(
+                candidate,
+                "ROBUSTNESS",
+                robustness_blockers,
+                robustness_evidence,
+            ))
+            continue
+        if structural_comparison_sha256 is None:
+            structural_comparison_sha256 = candidate_comparison_sha256
+        base_metrics = _reference_metrics(reference)
+        archive.append({
+            "candidate_id": candidate["candidate_id"],
+            "candidate_sha256": candidate["candidate_sha256"],
+            "topology": candidate["genome"]["topology"],
+            "cell": deepcopy(item["cell"]),
+            "map_elites_quality_score": float(item["quality_score"]),
+            "status": "RESEARCH_SCREENED",
+            "pareto_rank": 0,
+            "pareto_front": False,
+            "base_reference": reference,
+            "base_metrics": base_metrics,
+            "robustness_samples": samples,
+            "robust_metrics": _aggregate_metrics(base_metrics, samples),
+            "lineage": _lineage(reference),
+        })
+    _assign_pareto_ranks(archive)
+    archive.sort(key=lambda entry: (
+        entry["pareto_rank"],
+        entry["topology"],
+        entry["cell"]["rise_bin"],
+        entry["cell"]["curvature_bin"],
+        entry["cell"]["asymmetry_bin"],
+        entry["candidate_id"],
+    ))
+    source_digests = _source_digests()
+    basis_sha256 = hashlib.sha256(_BASIS_PATH.read_bytes()).hexdigest()
+    identity = {
+        "algorithm_id": ALGORITHM_ID,
+        "algorithm_version": ALGORITHM_VERSION,
+        "seed": seed,
+        "iterations": iterations,
+        "max_candidates": max_candidates,
+        "robustness_samples": robustness_samples,
+        "perturbation_fraction": float(perturbation_fraction),
+        "domain_sha256": _sha256_json(canonical_domain),
+        "technical_profile_sha256": _sha256_json(technical_profile),
+        "structural_comparison_sha256": (
+            structural_comparison_sha256 if archive else None
+        ),
+        "schema_sha256": _schema_sha256(),
+        "basis_sha256": basis_sha256,
+    }
+    study = {
+        "schema_version": "1.1",
+        "study_id": "CP-" + _sha256_json(identity)[:16],
+        "algorithm": {"id": ALGORITHM_ID, "version": ALGORITHM_VERSION},
+        "claim_level": CLAIM_LEVEL,
+        "design_verdict_authority": DESIGN_VERDICT_AUTHORITY,
+        "technical_scope": TECHNICAL_SCOPE,
+        "status": "PORTFOLIO_COMPLETE",
+        "seed": seed,
+        "iterations": iterations,
+        "max_candidates": max_candidates,
+        "robustness_samples_per_candidate": robustness_samples,
+        "perturbation_fraction": float(perturbation_fraction),
+        "creative_domain": deepcopy(canonical_domain),
+        "domain_sha256": _sha256_json(canonical_domain),
+        "technical_profile": deepcopy(technical_profile),
+        "technical_profile_sha256": _sha256_json(technical_profile),
+        "structural_comparison_sha256": (
+            structural_comparison_sha256 if archive else None
+        ),
+        "search_manifest": _search_manifest(search, selected),
+        "source_digests": source_digests,
+        "source_sha256": _sha256_json(source_digests),
+        "schema_sha256": _schema_sha256(),
+        "basis_sha256": basis_sha256,
+        "archive": archive,
+        "blocked_candidates": blocked,
+        "statistics": {
+            "map_elites_evaluated": int(search["statistics"]["evaluated"]),
+            "map_elites_occupied_cells": int(search["statistics"]["occupied_cells"]),
+            "selected_for_chain": len(selected),
+            "research_screened": len(archive),
+            "blocked": len(blocked),
+            "pareto_front": sum(1 for entry in archive if entry["pareto_front"]),
+        },
+        "limitations": list(basis["explicit_limitations"]),
+    }
+    study["study_sha256"] = _sha256_json(study)
+    validate_creative_portfolio(study)
+    return study
+
+
+def _reject_forbidden_verdict_keys(value: object, path: str = "<root>") -> None:
+    if isinstance(value, dict):
+        forbidden = sorted(_FORBIDDEN_VERDICT_KEYS & set(value))
+        if forbidden:
+            raise CreativePortfolioError(
+                f"Output chứa verdict key bị cấm tại {path}: {forbidden}"
+            )
+        for key, child in value.items():
+            _reject_forbidden_verdict_keys(child, f"{path}/{key}")
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            _reject_forbidden_verdict_keys(child, f"{path}/{index}")
+
+
+def _validate_reference(reference: dict, technical_profile: dict) -> None:
+    try:
+        funicular_reference.validate_funicular_reference(reference)
+    except Exception as exc:
+        raise CreativePortfolioError(f"Reference lineage không hợp lệ: {exc}") from exc
+    candidate = _reference_candidate(reference)
+    try:
+        creative_shape.validate_candidate(
+            candidate, technical_profile=technical_profile
+        )
+    except Exception as exc:
+        raise CreativePortfolioError(f"Candidate lineage không hợp lệ: {exc}") from exc
+    blockers = _reference_blockers(reference)
+    if blockers:
+        raise CreativePortfolioError(
+            "Archive chứa reference bị chặn: "
+            + "; ".join(item["code"] for item in blockers)
+        )
+
+
+def _validate_evidence_digest(evidence: dict) -> dict | None:
+    payload = evidence["payload"]
+    expected_sha256 = _sha256_json(payload) if payload is not None else None
+    if evidence["evidence_sha256"] != expected_sha256:
+        raise CreativePortfolioError("Blocked evidence_sha256 không khớp payload")
+    return payload
+
+
+def _sample_context_from_identity(
+    parent_candidate: dict,
+    identity: dict,
+    *,
+    study_seed: int,
+    perturbation_fraction: float,
+    domain: dict,
+) -> tuple[dict, str]:
+    sample_index = identity.get("sample_index")
+    if isinstance(sample_index, bool) or not isinstance(sample_index, int) \
+            or sample_index < 0:
+        raise CreativePortfolioError("Blocked sample_index không hợp lệ")
+    expected_seed = _sample_seed(
+        study_seed, parent_candidate["candidate_id"], sample_index
+    )
+    genome, perturbation = _perturbed_genome(
+        parent_candidate["genome"],
+        sample_seed=expected_seed,
+        perturbation_fraction=perturbation_fraction,
+        domain=domain,
+    )
+    expected_identity = _sample_identity(
+        parent_candidate["candidate_sha256"],
+        sample_index,
+        expected_seed,
+        perturbation_fraction,
+        perturbation,
+        genome,
+    )
+    if identity != expected_identity:
+        raise CreativePortfolioError("Blocked robustness sample không tái lập được")
+    digest = _sha256_json(expected_identity)
+    return genome, "CP-S-" + digest[:16]
+
+
+def _validate_blocked_evidence(
+    evidence: dict,
+    blockers: list[dict],
+    expected_candidate: dict,
+    technical_profile: dict,
+    domain: dict,
+    *,
+    study_seed: int,
+    perturbation_fraction: float,
+    structural_comparison_sha256: str | None,
+) -> None:
+    payload = _validate_evidence_digest(evidence)
+    kind = evidence["evidence_kind"]
+    reproducible = evidence["evidence_reproducible"]
+
+    if kind == "CALLER_DEPENDENT":
+        allowed = {"CP-PROFILE-001", "CP-PROFILE-002", "CP-PROFILE-004"}
+        if reproducible or payload is not None \
+                or not blockers or any(item["code"] not in allowed for item in blockers):
+            raise CreativePortfolioError(
+                "CALLER_DEPENDENT chỉ dành cho lỗi profile không thể tái lập"
+            )
+        return
+    if kind == "EXCEPTION_ONLY":
+        allowed = {
+            "CP-ADAPTER-001", "CP-ACTION-001", "CP-FUNICULAR-001",
+            "CP-PERTURB-003",
+        }
+        if reproducible or payload is not None \
+                or not blockers or any(item["code"] not in allowed for item in blockers):
+            raise CreativePortfolioError(
+                "EXCEPTION_ONLY có mã blocker hoặc payload không hợp lệ"
+            )
+        return
+    if kind != "ROBUSTNESS_STAGE" \
+            and (not reproducible or not isinstance(payload, dict)):
+        raise CreativePortfolioError(
+            f"Evidence {kind} phải có payload tái lập được"
+        )
+    if kind == "ROBUSTNESS_STAGE" and not isinstance(payload, dict):
+        raise CreativePortfolioError("ROBUSTNESS_STAGE phải có payload")
+
+    if kind == "STRUCTURAL_PROFILE_PAIR":
+        first = payload.get("first_profile")
+        second = payload.get("second_profile")
+        if not isinstance(first, dict) or _canonical(first) == _canonical(second):
+            raise CreativePortfolioError("Profile-pair evidence không chứng minh drift")
+        expected = [_blocker(
+            "CP-PROFILE-003",
+            "STRUCTURAL_PROFILE",
+            "Profile factory không deterministic cho cùng candidate",
+        )]
+    elif kind == "L0_CANDIDATE":
+        try:
+            creative_shape.validate_candidate(
+                payload, domain=domain, technical_profile=technical_profile
+            )
+        except Exception as exc:
+            raise CreativePortfolioError(
+                f"L0 blocked evidence không hợp lệ: {exc}"
+            ) from exc
+        if payload != expected_candidate:
+            raise CreativePortfolioError("L0 evidence không chứa đúng candidate")
+        expected = _candidate_l0_blockers(payload)
+    elif kind == "FRAME_ANALYSIS":
+        try:
+            creative_frame_adapter.validate_creative_frame_analysis(payload)
+        except Exception as exc:
+            raise CreativePortfolioError(
+                f"Frame blocked evidence không hợp lệ: {exc}"
+            ) from exc
+        if payload.get("candidate") != expected_candidate:
+            raise CreativePortfolioError("Frame evidence không chứa đúng candidate")
+        expected = _analysis_blockers(payload)
+    elif kind == "ARCH_ACTION":
+        try:
+            arch_action_f1.validate_arch_action_study(payload)
+        except Exception as exc:
+            raise CreativePortfolioError(
+                f"Arch-action blocked evidence không hợp lệ: {exc}"
+            ) from exc
+        if payload.get("parent_analysis", {}).get("candidate") != expected_candidate:
+            raise CreativePortfolioError("Arch-action evidence sai candidate")
+        expected = _action_blockers(payload)
+    elif kind == "FUNICULAR_REFERENCE":
+        try:
+            funicular_reference.validate_funicular_reference(payload)
+        except Exception as exc:
+            raise CreativePortfolioError(
+                f"Funicular blocked evidence không hợp lệ: {exc}"
+            ) from exc
+        if _reference_candidate(payload) != expected_candidate:
+            raise CreativePortfolioError("Funicular evidence sai candidate")
+        expected = _funicular_blockers(payload)
+    elif kind == "STRUCTURAL_COMPARISON":
+        reference = payload.get("reference")
+        if not isinstance(reference, dict):
+            raise CreativePortfolioError("Comparison evidence thiếu reference")
+        _validate_reference(reference, technical_profile)
+        if _reference_candidate(reference) != expected_candidate:
+            raise CreativePortfolioError("Comparison evidence sai candidate")
+        observed = _structural_comparison_sha256(
+            _reference_analysis(reference)["structural_profile"]
+        )
+        expected_sha = payload.get("expected_sha256")
+        if payload.get("observed_sha256") != observed \
+                or expected_sha != structural_comparison_sha256 \
+                or not isinstance(expected_sha, str):
+            raise CreativePortfolioError("Comparison evidence/hash không tái lập được")
+        expected = _comparison_blockers(expected_sha, observed)
+    elif kind == "PERTURBATION_L0":
+        identity = payload.get("sample_identity")
+        if not isinstance(identity, dict):
+            raise CreativePortfolioError("Perturbation L0 evidence thiếu identity")
+        genome, sample_id = _sample_context_from_identity(
+            expected_candidate,
+            identity,
+            study_seed=study_seed,
+            perturbation_fraction=perturbation_fraction,
+            domain=domain,
+        )
+        if payload.get("sample_id") != sample_id:
+            raise CreativePortfolioError("Perturbation L0 sample_id không khớp")
+        stored_candidate = payload.get("candidate")
+        if stored_candidate is None:
+            try:
+                creative_shape.evaluate_genome(genome, technical_profile, domain)
+            except Exception as exc:
+                message = str(exc)[:2000]
+            else:
+                raise CreativePortfolioError(
+                    "Perturbation khai L0 exception nhưng runtime không tái hiện"
+                )
+            if payload.get("error_message") != message:
+                raise CreativePortfolioError("Perturbation L0 error_message bị sửa")
+            expected = [_blocker(
+                "CP-PERTURB-001",
+                "ROBUSTNESS",
+                f"{sample_id}: L0 lỗi: {message}",
+            )]
+        else:
+            candidate = creative_shape.evaluate_genome(
+                genome, technical_profile, domain
+            )
+            if stored_candidate != candidate or not _candidate_l0_blockers(candidate):
+                raise CreativePortfolioError(
+                    "Perturbation L0 candidate không chứng minh trạng thái bị chặn"
+                )
+            if payload.get("error_message") is not None:
+                raise CreativePortfolioError("L0 candidate evidence không được có lỗi")
+            expected = [_blocker(
+                "CP-PERTURB-001",
+                "ROBUSTNESS",
+                f"{sample_id}: L0 không PASS: CP-L0-001",
+            )]
+    elif kind == "ROBUSTNESS_STAGE":
+        identity = payload.get("sample_identity")
+        if not isinstance(identity, dict):
+            raise CreativePortfolioError("Robustness evidence thiếu sample identity")
+        genome, sample_id = _sample_context_from_identity(
+            expected_candidate,
+            identity,
+            study_seed=study_seed,
+            perturbation_fraction=perturbation_fraction,
+            domain=domain,
+        )
+        if payload.get("sample_id") != sample_id:
+            raise CreativePortfolioError("Robustness evidence sample_id không khớp")
+        candidate = creative_shape.evaluate_genome(genome, technical_profile, domain)
+        if payload.get("candidate") != candidate or _candidate_l0_blockers(candidate):
+            raise CreativePortfolioError("Robustness evidence sai candidate/L0")
+        cause_blockers = payload.get("cause_blockers")
+        cause_evidence = payload.get("cause_evidence")
+        if not isinstance(cause_blockers, list) or not isinstance(cause_evidence, dict):
+            raise CreativePortfolioError("Robustness evidence thiếu cause")
+        _validate_blocked_evidence(
+            cause_evidence,
+            cause_blockers,
+            candidate,
+            technical_profile,
+            domain,
+            study_seed=study_seed,
+            perturbation_fraction=perturbation_fraction,
+            structural_comparison_sha256=structural_comparison_sha256,
+        )
+        if reproducible is not bool(cause_evidence["evidence_reproducible"]):
+            raise CreativePortfolioError("Robustness reproducibility không khớp cause")
+        details = "; ".join(item["code"] for item in cause_blockers) or "UNKNOWN"
+        expected = [_blocker(
+            "CP-PERTURB-002",
+            "ROBUSTNESS",
+            f"{sample_id}: perturbation bị chặn bởi {details}",
+        )]
+    else:
+        raise CreativePortfolioError(f"Evidence kind không được hỗ trợ: {kind}")
+
+    if not expected or blockers != expected:
+        raise CreativePortfolioError(
+            f"Blocked evidence {kind} không chứng minh đúng blockers"
+        )
+
+
+def validate_creative_portfolio(study: dict) -> None:
+    """Tái lập search/perturbation/metrics/rank và xác minh mọi lineage nhúng."""
+    if not isinstance(study, dict):
+        raise CreativePortfolioError("Creative portfolio study phải là object")
+    _canonical(study)
+    _reject_forbidden_verdict_keys(study)
+    errors = _schema_errors(study)
+    if errors:
+        raise CreativePortfolioError(
+            "Creative portfolio study sai schema: " + "; ".join(errors[:30])
+        )
+    payload = deepcopy(study)
+    claimed_sha256 = payload.pop("study_sha256")
+    actual_sha256 = _sha256_json(payload)
+    if claimed_sha256 != actual_sha256:
+        raise CreativePortfolioError(
+            f"study_sha256 không khớp: expected={actual_sha256}, "
+            f"actual={claimed_sha256}"
+        )
+    if study["algorithm"] != {
+        "id": ALGORITHM_ID, "version": ALGORITHM_VERSION
+    }:
+        raise CreativePortfolioError("Algorithm identity/version không khớp runtime")
+    if study["claim_level"] != CLAIM_LEVEL \
+            or study["design_verdict_authority"] != DESIGN_VERDICT_AUTHORITY \
+            or study["technical_scope"] != TECHNICAL_SCOPE:
+        raise CreativePortfolioError("Output cố nâng quyền ngoài IDEA/NONE")
+    basis = load_portfolio_basis()
+    _validate_run_parameters(
+        study["seed"],
+        study["iterations"],
+        study["max_candidates"],
+        study["robustness_samples_per_candidate"],
+        study["perturbation_fraction"],
+        basis,
+    )
+    expected_sources = _source_digests()
+    if study["source_digests"] != expected_sources:
+        raise CreativePortfolioError("source_digests không khớp bytes runtime")
+    if study["source_sha256"] != _sha256_json(expected_sources):
+        raise CreativePortfolioError("source_sha256 không khớp source_digests")
+    if study["schema_sha256"] != _schema_sha256():
+        raise CreativePortfolioError("schema_sha256 không khớp contract runtime")
+    expected_basis_sha256 = hashlib.sha256(_BASIS_PATH.read_bytes()).hexdigest()
+    if study["basis_sha256"] != expected_basis_sha256:
+        raise CreativePortfolioError("basis_sha256 không khớp bytes runtime")
+    domain = creative_shape.validate_creative_domain(study["creative_domain"])
+    if study["domain_sha256"] != _sha256_json(domain):
+        raise CreativePortfolioError("domain_sha256 không khớp creative_domain")
+    technical_profile = study["technical_profile"]
+    if study["technical_profile_sha256"] != _sha256_json(technical_profile):
+        raise CreativePortfolioError(
+            "technical_profile_sha256 không khớp technical_profile"
+        )
+    search = creative_shape.run_constrained_map_elites(
+        technical_profile=technical_profile,
+        seed=study["seed"],
+        iterations=study["iterations"],
+        domain=domain,
+    )
+    selected = _selected_archive_items(search, study["max_candidates"])
+    if study["search_manifest"] != _search_manifest(search, selected):
+        raise CreativePortfolioError("search_manifest không tái lập được")
+    selected_by_id = {
+        item["candidate"]["candidate_id"]: item for item in selected
+    }
+    represented = [entry["candidate_id"] for entry in study["archive"]] + [
+        item["candidate_id"] for item in study["blocked_candidates"]
+    ]
+    if len(represented) != len(set(represented)):
+        raise CreativePortfolioError("Candidate bị lặp giữa archive/blocked")
+    if set(represented) != set(selected_by_id):
+        raise CreativePortfolioError("Archive/blocked không phủ đúng selected candidates")
+    comparison_sha256 = study["structural_comparison_sha256"]
+    if study["archive"] and not isinstance(comparison_sha256, str):
+        raise CreativePortfolioError(
+            "Portfolio có archive phải khai structural_comparison_sha256"
+        )
+    if not study["archive"] and comparison_sha256 is not None:
+        raise CreativePortfolioError(
+            "Portfolio rỗng phải để structural_comparison_sha256=null"
+        )
+
+    expected_entries = []
+    for entry in study["archive"]:
+        selected_item = selected_by_id[entry["candidate_id"]]
+        selected_candidate = selected_item["candidate"]
+        if entry["candidate_sha256"] != selected_candidate["candidate_sha256"]:
+            raise CreativePortfolioError("candidate_sha256 không khớp MAP-Elites")
+        reference = entry["base_reference"]
+        _validate_reference(reference, technical_profile)
+        if _reference_candidate(reference) != selected_candidate:
+            raise CreativePortfolioError("Base reference không chứa selected candidate")
+        base_comparison_sha256 = _structural_comparison_sha256(
+            _reference_analysis(reference)["structural_profile"]
+        )
+        if base_comparison_sha256 != comparison_sha256:
+            raise CreativePortfolioError(
+                "Base structural profile không cùng nhóm so sánh portfolio"
+            )
+        if entry["topology"] != selected_candidate["genome"]["topology"]:
+            raise CreativePortfolioError("Topology entry không khớp candidate")
+        if entry["cell"] != selected_item["cell"]:
+            raise CreativePortfolioError("Cell entry không khớp MAP-Elites")
+        if not math.isclose(
+            float(entry["map_elites_quality_score"]),
+            float(selected_item["quality_score"]),
+            rel_tol=0.0,
+            abs_tol=0.0,
+        ):
+            raise CreativePortfolioError("MAP-Elites quality bị thay đổi")
+        if entry["lineage"] != _lineage(reference):
+            raise CreativePortfolioError("Base lineage summary không khớp reference")
+        base_metrics = _reference_metrics(reference)
+        if entry["base_metrics"] != base_metrics:
+            raise CreativePortfolioError("Base metrics không tái lập được")
+        samples = entry["robustness_samples"]
+        if len(samples) != study["robustness_samples_per_candidate"]:
+            raise CreativePortfolioError("Thiếu robustness samples")
+        seen_ids: set[str] = set()
+        seen_digests: set[str] = set()
+        for sample_index, sample in enumerate(samples):
+            expected_seed = _sample_seed(
+                study["seed"], selected_candidate["candidate_id"], sample_index
+            )
+            genome, perturbation = _perturbed_genome(
+                selected_candidate["genome"],
+                sample_seed=expected_seed,
+                perturbation_fraction=study["perturbation_fraction"],
+                domain=domain,
+            )
+            identity = _sample_identity(
+                selected_candidate["candidate_sha256"],
+                sample_index,
+                expected_seed,
+                study["perturbation_fraction"],
+                perturbation,
+                genome,
+            )
+            digest = _sha256_json(identity)
+            sample_id = "CP-S-" + digest[:16]
+            if sample["sample_index"] != sample_index \
+                    or sample["sample_seed"] != expected_seed \
+                    or sample["input_digest"] != digest \
+                    or sample["sample_id"] != sample_id \
+                    or sample["perturbation"] != perturbation \
+                    or sample["genome"] != genome:
+                raise CreativePortfolioError(
+                    f"Robustness sample {sample_index} không tái lập được"
+                )
+            if sample_id in seen_ids or digest in seen_digests:
+                raise CreativePortfolioError("Robustness sample replay/duplicate")
+            seen_ids.add(sample_id)
+            seen_digests.add(digest)
+            expected_candidate = creative_shape.evaluate_genome(
+                genome, technical_profile, domain
+            )
+            sample_reference = sample["reference"]
+            _validate_reference(sample_reference, technical_profile)
+            if _reference_candidate(sample_reference) != expected_candidate:
+                raise CreativePortfolioError(
+                    "Robustness reference không chứa candidate tái lập"
+                )
+            sample_comparison_sha256 = _structural_comparison_sha256(
+                _reference_analysis(sample_reference)["structural_profile"]
+            )
+            if sample_comparison_sha256 != comparison_sha256:
+                raise CreativePortfolioError(
+                    "Robustness structural profile không cùng nhóm so sánh"
+                )
+            expected_metrics = _reference_metrics(sample_reference)
+            if sample["metrics"] != expected_metrics:
+                raise CreativePortfolioError("Robustness metrics không tái lập được")
+            if sample["lineage"] != _lineage(sample_reference):
+                raise CreativePortfolioError("Robustness lineage không khớp")
+        expected_robust = _aggregate_metrics(base_metrics, samples)
+        if entry["robust_metrics"] != expected_robust:
+            raise CreativePortfolioError("Robust metrics không tái lập được")
+        expected_entry = deepcopy(entry)
+        expected_entry["pareto_rank"] = 0
+        expected_entry["pareto_front"] = False
+        expected_entries.append(expected_entry)
+
+    _assign_pareto_ranks(expected_entries)
+    expected_entries.sort(key=lambda entry: (
+        entry["pareto_rank"],
+        entry["topology"],
+        entry["cell"]["rise_bin"],
+        entry["cell"]["curvature_bin"],
+        entry["cell"]["asymmetry_bin"],
+        entry["candidate_id"],
+    ))
+    if study["archive"] != expected_entries:
+        raise CreativePortfolioError("Pareto ranks/order không tái lập được")
+    for item in study["blocked_candidates"]:
+        selected_item = selected_by_id[item["candidate_id"]]
+        candidate = selected_item["candidate"]
+        if item["candidate_sha256"] != candidate["candidate_sha256"] \
+                or item["topology"] != candidate["genome"]["topology"]:
+            raise CreativePortfolioError("Blocked candidate identity không khớp search")
+        _validate_blocked_evidence(
+            item["evidence"],
+            item["blockers"],
+            candidate,
+            technical_profile,
+            domain,
+            study_seed=study["seed"],
+            perturbation_fraction=study["perturbation_fraction"],
+            structural_comparison_sha256=comparison_sha256,
+        )
+    expected_statistics = {
+        "map_elites_evaluated": int(search["statistics"]["evaluated"]),
+        "map_elites_occupied_cells": int(search["statistics"]["occupied_cells"]),
+        "selected_for_chain": len(selected),
+        "research_screened": len(study["archive"]),
+        "blocked": len(study["blocked_candidates"]),
+        "pareto_front": sum(1 for entry in study["archive"] if entry["pareto_front"]),
+    }
+    if study["statistics"] != expected_statistics:
+        raise CreativePortfolioError("Statistics không tái lập được")
+    if study["limitations"] != list(basis["explicit_limitations"]):
+        raise CreativePortfolioError("Limitations không khớp basis")
+    expected_identity = {
+        "algorithm_id": ALGORITHM_ID,
+        "algorithm_version": ALGORITHM_VERSION,
+        "seed": study["seed"],
+        "iterations": study["iterations"],
+        "max_candidates": study["max_candidates"],
+        "robustness_samples": study["robustness_samples_per_candidate"],
+        "perturbation_fraction": study["perturbation_fraction"],
+        "domain_sha256": study["domain_sha256"],
+        "technical_profile_sha256": study["technical_profile_sha256"],
+        "structural_comparison_sha256": study["structural_comparison_sha256"],
+        "schema_sha256": study["schema_sha256"],
+        "basis_sha256": study["basis_sha256"],
+    }
+    expected_study_id = "CP-" + _sha256_json(expected_identity)[:16]
+    if study["study_id"] != expected_study_id:
+        raise CreativePortfolioError("study_id không khớp identity canonical")

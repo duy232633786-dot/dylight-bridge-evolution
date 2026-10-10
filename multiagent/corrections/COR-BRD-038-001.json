@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-038-001",
+  "task_id": "BRD-038",
+  "incident_id": "INC-BRD-038-001",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Neo byte-exact BRD-038 r002 design_study.py rồi nối provenance sang implementation BRD-047 hiện tại; không thay đổi hay hợp thức hóa phán quyết REJECT của BRD-038.",
+  "original_handoff_path": "multiagent/handoffs/BRD-038.codex.r002.json",
+  "original_handoff_sha256": "de2a31103db09814d22bc776cf580c8fb8b57f34e2a87ff5e382995cfb213e54",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/cca6542948c57d4021e2802064cb0d88383043f4266427f680e5e94453bde790.blob",
+    "sha256": "cca6542948c57d4021e2802064cb0d88383043f4266427f680e5e94453bde790"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/design_study.py",
+    "previous_sha256": "cca6542948c57d4021e2802064cb0d88383043f4266427f680e5e94453bde790",
+    "current_sha256": "2c6b6c50790136f12d9ad3f5a539faaa3304eb2fa1a510ceba7bd3829ba81b78"
+  },
+  "verification_commands": [
+    [
+      "C:\\Users\\ADMIN\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "-m",
+      "pytest",
+      "tests/test_design_study.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Snapshot được khôi phục cơ học từ snapshot BRD-047 r001 bằng cách đảo đúng các diff lịch sử và đã khớp SHA handoff cca6542948c57d4021e2802064cb0d88383043f4266427f680e5e94453bde790."
+  ],
+  "unresolved_risks": [
+    "Correction chỉ khép bookkeeping provenance; BRD-038 vẫn REJECT và implementation hiện tại chỉ có claim IDEA cho tới review BRD-047."
+  ],
+  "supersedes_correction_sha256": null
+}

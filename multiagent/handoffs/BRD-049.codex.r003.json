@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-049",
+  "agent_id": "codex",
+  "role": "form_inventor",
+  "summary": "R003 đóng CP-R002-01..04: archive rỗng giữ group hash chỉ để tái lập comparison blocker, upstream errors được wrap, blocked stage được rederive và PERTURBATION_L0 có end-to-end tamper test; 39 target và 220 integration test xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_portfolio.py",
+      "sha256": "c6a0971c0c831ea2401bb0cecbdf4353e587f06401948d3521283c3891ed39bc",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_portfolio_study.schema.json",
+      "sha256": "70a9f1e0a35fec95ccf5091ce4f2c8b3743e86f9a1c5ce887bf53a902eac11af",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_portfolio_basis.json",
+      "sha256": "faf66a6af2eca745b3a395d519768a07b7ec4a045c818902d3b773d92a5c848b",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_portfolio.py",
+      "sha256": "6bc6c2acd0a42710508eee1bf20e1a49e840e1bee515e7357f3e3b49e4a2a03f",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Empty archive chỉ giữ structural comparison fingerprint khi cần tái lập đúng comparison evidence đã chặn robustness.",
+    "RESEARCH_SCREENED chỉ có nghĩa không bị các check F0/F1 hiện có bác bỏ."
+  ],
+  "unresolved_risks": [
+    "Chưa có kiểm sức kháng, ổn định phi tuyến, mỏi, động lực, gió, động đất, địa chất, thủy văn, thi công, durability hoặc tổ hợp tiêu chuẩn.",
+    "Full suite r003: 1799 pass, 4 skip, 5 fail tests/test_collaboration.py do bốn drift provenance BRD-001/030/032/033 cần reviewer thứ ba; không phải hồi quy BRD-049."
+  ],
+  "next_action": "Claude Code review độc lập r003 và tự chạy 39 target cùng 220 integration test bằng allowlist Python chính xác; không coi APPROVE phần mềm là phê duyệt cầu."
+}

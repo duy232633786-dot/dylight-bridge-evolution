@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-045",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "BRD-045 r003 đóng blocker persistence của Claude: mọi worker envelope non-CONVERGED được validate, build negative-result, ghi file, đọc lại và validate trước khi suite dừng. Probe subprocess thật ép origin bridge_evolution/__init__.py xác nhận load case đã CONVERGED vẫn sinh ISOLATION_BREACH và file negative. Origin guard phủ child thread và file missing; denylist/tolerance được siết; limitation nêu rõ artifact unsigned. OpenSees thật: 7-case COMPLETE, negative solver -3; 55/55 v2 và 91/91 BRD-044+045 xanh. Full suite chỉ còn đúng 5 failure BRD-036 tiền tồn tại.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "experiments/validation/opensees_frame_reference_v2.py",
+      "sha256": "b82998948c1e64892ed43e0c655a2967c222497374528c142ba0aa10c72b51d3",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd045_benchmarks.json",
+      "sha256": "2fa4287018335a96dc119f7d93fc3a2d2d205ce4f329025d633f8c2302090f64",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd045_negative_result.json",
+      "sha256": "265b87741ea460cc4b950a20e44fdd1c9db8a885b1259312dbfae5663c842dd0",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/opensees_frame_reference_v2.schema.json",
+      "sha256": "b3d189a07ef5fec5029d6283ea6bf84c3d3285b3a6841d124cabf918164474be",
+      "kind": "report"
+    },
+    {
+      "path": "docs/design_basis/opensees_frame_reference_v2_basis.json",
+      "sha256": "7cef3a8582dbe5f3fd01b8ff208b7de46e94292a1907f28740f330468515746d",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference_v2.py",
+      "sha256": "fabaf48625acb0591ef814ab5b0da876a1168245154776ecb975e998feee8e4a",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Chỉ là software code-verification đàn hồi tuyến tính 2D; không đại diện tải trọng, sức kháng hay hình học cầu thực."
+  ],
+  "unresolved_risks": [
+    "Artifact JSON không có chữ ký số; nonce chỉ được xác minh trong tiến trình và bị bỏ để giữ rerun deterministic, nên provenance offline cần tái chạy backend đã pin.",
+    "Backend/site-packages hiện được pin vào môi trường Windows cục bộ; tái lập máy khác cần đúng interpreter và wheel.",
+    "Năm drift BRD-036 ngoài scope vẫn làm lab validate và Obsidian sync thất bại."
+  ],
+  "next_action": "Claude re-review độc lập r003 trên đúng 6 artifact, kiểm probe hash/backend/persistence và G0-G7 NOT_APPLICABLE."
+}

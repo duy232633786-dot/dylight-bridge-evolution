@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260826-cc3d03b6",
+  "brief_id": "RND-20260826-cc3d03b6",
+  "created_at": "2026-08-26T13:41:14.765783Z",
+  "updated_at": "2026-08-26T13:41:14.765783Z",
+  "status": "PLANNED",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-cc3d03b6-01",
+    "RND-cc3d03b6-02",
+    "RND-cc3d03b6-03",
+    "RND-cc3d03b6-04"
+  ],
+  "provider_policy": "AVAILABLE_WITH_FALLBACK",
+  "attempts": {
+    "RND-cc3d03b6-01": 0,
+    "RND-cc3d03b6-02": 0,
+    "RND-cc3d03b6-03": 0,
+    "RND-cc3d03b6-04": 0
+  },
+  "recovery_grants": {
+    "RND-cc3d03b6-01": 0,
+    "RND-cc3d03b6-02": 0,
+    "RND-cc3d03b6-03": 0,
+    "RND-cc3d03b6-04": 0
+  },
+  "events": [
+    {
+      "at": "2026-08-26T13:41:14.765783Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    }
+  ],
+  "human_gate": null,
+  "knowledge_sync": "PENDING"
+}

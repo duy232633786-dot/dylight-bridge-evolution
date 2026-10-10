@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-06",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Đã tạo đặc tả F0 không thứ nguyên cho HGB-B/HGB-D: graph cáp-vòm-dầm-móng, năm lớp provenance, mâu thuẫn span 1440/1490/1940 m, 16 kiểm fail-closed và pseudo-code sinh node không default ẩn.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "research/orchestration/RND-20260901-00fd963d/03a_normalized_geometry_prescreen.md",
+      "sha256": "87356163ea8c94139a846cc125e559024f690b2357597fa939eaf7d5b29e1578",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "HGB-B và HGB-D chỉ là topology hypotheses; không có tọa độ tuyệt đối hoặc solver output.",
+    "HGB-B dùng main cable liên tục qua yên thành backstay tới CATB; quạt ST là hệ riêng landward-only."
+  ],
+  "unresolved_risks": [
+    "Chuỗi khẩu độ canonical chưa khóa nên node table mét bị STOP.",
+    "Vai trò đứng của vòm giữa B0/B1 và navigation envelope chưa khóa.",
+    "Runtime không có solver vòm, stability, staged construction hoặc khí động."
+  ],
+  "next_action": "Claude review độc lập graph, cơ chế khép lực, provenance và các falsifier; không chạy solver."
+}

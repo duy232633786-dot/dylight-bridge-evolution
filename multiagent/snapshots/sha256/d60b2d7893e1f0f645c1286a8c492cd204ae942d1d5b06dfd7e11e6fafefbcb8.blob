@@ -1,0 +1,185 @@
+{
+  "schema_version": "2.0",
+  "reference": {
+    "id": "OPENSEES_FRAME_2D_REFERENCE_HARDENED",
+    "version": "opensees-frame-reference/0.2.0"
+  },
+  "claim_ceiling": "IDEA",
+  "design_verdict_authority": "NONE",
+  "technical_scope": "HARDENED_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT",
+  "units": {
+    "length": "m",
+    "force": "kN",
+    "moment": "kN_m",
+    "elastic_modulus": "GPa",
+    "area": "m2",
+    "inertia": "m4"
+  },
+  "formulations": {
+    "FRAME_2D": "OpenSees elasticBeamColumn 2D, Euler-Bernoulli, Linear geometric transformation",
+    "TRUSS_2D": "OpenSees Truss with Elastic uniaxial material, small displacement",
+    "TRUSS_2D_localForce_contract": "For the pinned OpenSees 3.8.0 Windows backend, localForce is treated as [N_i, V_i=0, M_i=0, N_j=-N_i, V_j=0, M_j=0] in the element local frame; this is runtime-asserted for every truss and independently challenged by an inclined two-bar analytical benchmark.",
+    "analysis": "Static Linear, one LoadControl step per clean domain",
+    "truss_rotation_policy": "Fix rz at every node incident only to TRUSS_2D because rotation is outside the truss formulation; every such implicit constraint is enumerated and its Mz reaction must remain within the preregistered zero tolerance."
+  },
+  "minimum_element_length_m": 1e-09,
+  "artificial_rotation_reaction_absolute_kNm": 1e-08,
+  "artificial_rotation_positive_control_mz_kNm": 1.0,
+  "truss_response_tolerances": {
+    "force_absolute_kN": 1e-08,
+    "force_relative": 1e-08,
+    "moment_absolute_kNm": 1e-08
+  },
+  "comparison_tolerances": {
+    "displacement_absolute_m": 1e-10,
+    "displacement_relative": 1e-06,
+    "rotation_absolute_rad": 1e-12,
+    "rotation_relative": 1e-06,
+    "force_absolute_kN": 1e-06,
+    "force_relative": 1e-06,
+    "moment_absolute_kNm": 1e-06,
+    "moment_relative": 1e-06,
+    "equilibrium_force_absolute_kN": 1e-06,
+    "equilibrium_force_relative": 1e-08,
+    "equilibrium_moment_absolute_kNm": 1e-06,
+    "equilibrium_moment_relative": 1e-08
+  },
+  "expected_backend_identity": {
+    "name": "OpenSees",
+    "engine_version": "3.8.0",
+    "package_name": "openseespywin",
+    "package_version": "3.8.0.0",
+    "python_version": "3.12.13",
+    "python_implementation": "CPython",
+    "python_executable_sha256": "d8e3f0adf246db00358c0c4ed349cf714898178f9558fb0e944f79f5c07f8eaa",
+    "binary_owner_module": "openseespywin.opensees",
+    "binary_file_name": "opensees.pyd",
+    "binary_sha256": "25ba42e1672526137d765d9c3631d1403e091f54f5afcdb9242f9243c63c3a96",
+    "shim_module": "openseespy.opensees",
+    "shim_package_name": "openseespy",
+    "shim_package_version": "3.8.0.0",
+    "shim_relative_path": "openseespy/opensees/__init__.py",
+    "shim_sha256": "8bd3a626052bb33e372dc9c38844098efd25cdb9d1548533ff2cb7b0abc9868d",
+    "binary_relative_path": "openseespywin/opensees.pyd",
+    "callable_bindings": [
+      {"name": "algorithm", "module": "openseespywin.opensees", "qualname": "algorithm", "kind": "builtin_function_or_method"},
+      {"name": "analysis", "module": "openseespywin.opensees", "qualname": "analysis", "kind": "builtin_function_or_method"},
+      {"name": "analyze", "module": "openseespywin.opensees", "qualname": "analyze", "kind": "builtin_function_or_method"},
+      {"name": "constraints", "module": "openseespywin.opensees", "qualname": "constraints", "kind": "builtin_function_or_method"},
+      {"name": "eleResponse", "module": "openseespywin.opensees", "qualname": "eleResponse", "kind": "builtin_function_or_method"},
+      {"name": "element", "module": "openseespywin.opensees", "qualname": "element", "kind": "builtin_function_or_method"},
+      {"name": "fix", "module": "openseespywin.opensees", "qualname": "fix", "kind": "builtin_function_or_method"},
+      {"name": "geomTransf", "module": "openseespywin.opensees", "qualname": "geomTransf", "kind": "builtin_function_or_method"},
+      {"name": "getEleTags", "module": "openseespywin.opensees", "qualname": "getEleTags", "kind": "builtin_function_or_method"},
+      {"name": "getFixedDOFs", "module": "openseespywin.opensees", "qualname": "getFixedDOFs", "kind": "builtin_function_or_method"},
+      {"name": "getFixedNodes", "module": "openseespywin.opensees", "qualname": "getFixedNodes", "kind": "builtin_function_or_method"},
+      {"name": "getNodeTags", "module": "openseespywin.opensees", "qualname": "getNodeTags", "kind": "builtin_function_or_method"},
+      {"name": "integrator", "module": "openseespywin.opensees", "qualname": "integrator", "kind": "builtin_function_or_method"},
+      {"name": "load", "module": "openseespywin.opensees", "qualname": "load", "kind": "builtin_function_or_method"},
+      {"name": "model", "module": "openseespywin.opensees", "qualname": "model", "kind": "builtin_function_or_method"},
+      {"name": "node", "module": "openseespywin.opensees", "qualname": "node", "kind": "builtin_function_or_method"},
+      {"name": "nodeCoord", "module": "openseespywin.opensees", "qualname": "nodeCoord", "kind": "builtin_function_or_method"},
+      {"name": "nodeDisp", "module": "openseespywin.opensees", "qualname": "nodeDisp", "kind": "builtin_function_or_method"},
+      {"name": "nodeReaction", "module": "openseespywin.opensees", "qualname": "nodeReaction", "kind": "builtin_function_or_method"},
+      {"name": "numberer", "module": "openseespywin.opensees", "qualname": "numberer", "kind": "builtin_function_or_method"},
+      {"name": "pattern", "module": "openseespywin.opensees", "qualname": "pattern", "kind": "builtin_function_or_method"},
+      {"name": "reactions", "module": "openseespywin.opensees", "qualname": "reactions", "kind": "builtin_function_or_method"},
+      {"name": "system", "module": "openseespywin.opensees", "qualname": "system", "kind": "builtin_function_or_method"},
+      {"name": "timeSeries", "module": "openseespywin.opensees", "qualname": "timeSeries", "kind": "builtin_function_or_method"},
+      {"name": "uniaxialMaterial", "module": "openseespywin.opensees", "qualname": "uniaxialMaterial", "kind": "builtin_function_or_method"},
+      {"name": "version", "module": "openseespywin.opensees", "qualname": "version", "kind": "builtin_function_or_method"},
+      {"name": "wipe", "module": "openseespywin.opensees", "qualname": "wipe", "kind": "builtin_function_or_method"}
+    ]
+  },
+  "benchmark_inputs": {
+    "inclined_two_bar_truss": {
+      "half_span_m": 3.0,
+      "height_m": 4.0,
+      "elastic_modulus_GPa": 200.0,
+      "area_m2": 0.01,
+      "inertia_m4": 0.001,
+      "apex_force_kN": -80.0
+    }
+  },
+  "analytical_expectations": {
+    "BRD044-ANALYTICAL-AXIAL": {
+      "equation_id": "AXIAL_BAR_DELTA_PL_OVER_EA",
+      "checks": [
+        {"response_kind": "NODE_DISPLACEMENT", "load_case_id": "LC1", "entity_id": "N2", "component": "ux_m", "expected_value": 0.00005, "absolute_tolerance": 1e-11, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N1", "component": "fx_kN", "expected_value": -100.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "ELEMENT_END_FORCE", "load_case_id": "LC1", "entity_id": "E1", "component": "axial_i_kN", "expected_value": -100.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "ELEMENT_END_FORCE", "load_case_id": "LC1", "entity_id": "E1", "component": "axial_j_kN", "expected_value": 100.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08}
+      ]
+    },
+    "BRD044-ANALYTICAL-CANTILEVER": {
+      "equation_id": "EULER_BERNOULLI_CANTILEVER_TIP_LOAD",
+      "checks": [
+        {"response_kind": "NODE_DISPLACEMENT", "load_case_id": "LC1", "entity_id": "N2", "component": "uy_m", "expected_value": -0.000225, "absolute_tolerance": 1e-11, "relative_tolerance": 1e-08},
+        {"response_kind": "NODE_DISPLACEMENT", "load_case_id": "LC1", "entity_id": "N2", "component": "rz_rad", "expected_value": -0.0001125, "absolute_tolerance": 1e-11, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N1", "component": "fy_kN", "expected_value": 10.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N1", "component": "mz_kNm", "expected_value": 30.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08}
+      ]
+    },
+    "BRD044-ANALYTICAL-SIMPLE-BEAM": {
+      "equation_id": "EULER_BERNOULLI_SIMPLY_SUPPORTED_MIDSPAN_POINT_LOAD",
+      "checks": [
+        {"response_kind": "NODE_DISPLACEMENT", "load_case_id": "LC1", "entity_id": "M", "component": "uy_m", "expected_value": -0.0010416666666666667, "absolute_tolerance": 1e-11, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "A", "component": "fy_kN", "expected_value": 10.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "B", "component": "fy_kN", "expected_value": 10.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "MAX_ABS_ELEMENT_MOMENT", "load_case_id": "LC1", "entity_id": "ALL", "component": "max_abs_moment_kNm", "expected_value": 50.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08}
+      ]
+    },
+    "BRD045-ANALYTICAL-INCLINED-TRUSS": {
+      "equation_id": "SYMMETRIC_TWO_BAR_TRUSS_DELTA_PL_OVER_2EA_SIN2_THETA",
+      "checks": [
+        {"response_kind": "NODE_DISPLACEMENT", "load_case_id": "LC1", "entity_id": "N3", "component": "ux_m", "expected_value": 0.0, "absolute_tolerance": 1e-11, "relative_tolerance": 1e-08},
+        {"response_kind": "NODE_DISPLACEMENT", "load_case_id": "LC1", "entity_id": "N3", "component": "uy_m", "expected_value": -0.00015625, "absolute_tolerance": 1e-11, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N1", "component": "fx_kN", "expected_value": 30.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N1", "component": "fy_kN", "expected_value": 40.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N2", "component": "fx_kN", "expected_value": -30.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "SUPPORT_REACTION", "load_case_id": "LC1", "entity_id": "N2", "component": "fy_kN", "expected_value": 40.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "ELEMENT_END_FORCE", "load_case_id": "LC1", "entity_id": "E1", "component": "axial_i_kN", "expected_value": 50.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "ELEMENT_END_FORCE", "load_case_id": "LC1", "entity_id": "E1", "component": "axial_j_kN", "expected_value": -50.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "ELEMENT_END_FORCE", "load_case_id": "LC1", "entity_id": "E2", "component": "axial_i_kN", "expected_value": 50.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08},
+        {"response_kind": "ELEMENT_END_FORCE", "load_case_id": "LC1", "entity_id": "E2", "component": "axial_j_kN", "expected_value": -50.0, "absolute_tolerance": 1e-08, "relative_tolerance": 1e-08}
+      ]
+    }
+  },
+  "official_method_sources": [
+    {"title": "OpenSees Truss element and valid localForce query", "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/elements/Truss.html"},
+    {"title": "OpenSees eleResponse command", "url": "https://opensees.berkeley.edu/OpenSees/manuals/usermanual/4223.htm"},
+    {"title": "OpenSees elasticBeamColumn element", "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/elements/elasticBeamColumn.html"}
+  ],
+  "upstream_brd044_artifacts": [
+    {"path": "experiments/validation/opensees_frame_reference.py", "sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915"},
+    {"path": "experiments/validation/opensees_brd044_benchmarks.json", "sha256": "d4031a4d704f6acbc7d3c3895fe62f977e4cbcf725c905858cca4db96bbc5ef2"},
+    {"path": "contracts/opensees_frame_reference.schema.json", "sha256": "f573c6471447c4ec45c1589bb0ee65af0a2e33b653a2919e4657ce5a7b7799d7"},
+    {"path": "docs/design_basis/opensees_frame_reference_basis.json", "sha256": "c90f857b0d81c8f1d2c210a4eaf192d6b033b3e72c4f1713daedeffe0c02c594"},
+    {"path": "tests/test_opensees_frame_reference.py", "sha256": "62c3446e63db82b905ddbdd56762749f1a1bee71b91ea9a4b5b1a4c81cd45193"}
+  ],
+  "task_artifact_digests": [
+    {"path": "contracts/opensees_frame_reference_v2.schema.json", "sha256": "ed72f157acc5b93eee896b1685c23cf597d0691219a2e20c389049c0f929fb3d"},
+    {"path": "tests/test_opensees_frame_reference_v2.py", "sha256": "948df8d1de88cf2992f874dc306323475c31a81c53437f0785f92f90d4ff7c86"}
+  ],
+  "reference_source_files": [
+    "experiments/validation/opensees_frame_reference_v2.py",
+    "experiments/validation/opensees_frame_reference.py",
+    "bridge_evolution/creative_shape.py",
+    "bridge_evolution/frame_f1.py",
+    "bridge_evolution/creative_frame_adapter.py",
+    "bridge_evolution/arch_action_f1.py",
+    "bridge_evolution/funicular_reference.py"
+  ],
+  "reference_source_sha256": "f456c398d5c712e2200e4d1a0a56d4e8a0328fdded26d33039d17bf30d6435f1",
+  "explicit_limitations": [
+    "This is an immutable hardening layer over BRD-044, not a replacement or mutation of the accepted BRD-044 evidence.",
+    "This artifact compares linear-elastic 2D implementations sharing idealized geometry, sections, loads and boundary conditions; agreement cannot validate omitted physics.",
+    "This is not F2 or L2: no 3D grillage, shell or solid model, moving-load analysis, mesh convergence, bearing-foundation-soil interaction or bridge-code load combination is present.",
+    "No strength, serviceability, stability, fatigue, robustness, durability, construction-stage or hazard capacity is calculated; no safe, feasible, verified, design-pass or utilization verdict is permitted.",
+    "The backend identity is pinned to one Python executable and OpenSees binary. Trust remains bounded by the operator-selected executable and site-packages directory, whose bytes are recorded and checked but whose publisher authenticity is not established here.",
+    "The worker runs with Python safe-path mode, appends the operator-selected site-packages path at the end of sys.path, pins both the openseespy shim and native openseespywin binary, and records each invoked callable owner. Any Python code executed from repo/bridge_evolution under any alias is a persisted ISOLATION_BREACH; no fallback to frame_f1 is permitted.",
+    "Artificial rz constraints are audited by tag, coordinates and fixed DOFs. A separate +1 kNm positive control must create a nonzero balancing reaction; this is a software observability control, not a physical bridge load case.",
+    "The absolute-plus-relative tolerances are deterministic code-verification tolerances, not acceptance limits from a bridge design standard.",
+    "G2 and G4 are not passed: model-quality and independent-design gates require a real bridge design basis, higher-fidelity model, blind reproduction and discrepancy reconciliation."
+  ]
+}

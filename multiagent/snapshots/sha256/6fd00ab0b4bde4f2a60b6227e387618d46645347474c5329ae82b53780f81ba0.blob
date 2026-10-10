@@ -1,0 +1,1297 @@
+"""Kiểm tra sandbox hình thái thực nghiệm BRD-004 (họ vòm chạy trên).
+
+Bốn nhóm bảo vệ, theo thứ tự quan trọng:
+
+1. CHỐNG BỊA NGUỒN — mọi ``reference_id`` và mọi chuỗi dạng ``LIT-nnn`` xuất
+   hiện trong grammar thực nghiệm VÀ trong báo cáo phải tồn tại thật trong
+   ``research/literature/index.json``. Đây là test quan trọng nhất của file.
+2. CHỐNG FALSE PRECISION — không trường số liệu hiệu năng nào được điền.
+3. CÁCH LY SANDBOX — grammar thực nghiệm không được lọt vào production grammar.
+4. HÌNH HỌC — toạ độ hợp lệ, và tham số phi vật lý phải raise.
+"""
+
+import hashlib
+import inspect
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from bridge_evolution.catalogs import GrammarIdError, grid_domain, load_grammar
+from bridge_evolution.optimization.common import gene_order
+from bridge_evolution.geometry_experimental import arch_geometry as ag
+from bridge_evolution.geometry_experimental import arch_l0_constructability as al0
+from bridge_evolution.geometry_experimental import shape_diversity as sd
+from bridge_evolution.geometry_experimental.arch_geometry import (
+    ArchGeometryError,
+    arch_axis_polyline,
+    arch_geometry,
+    catenary_parameter,
+    geometry_case_id,
+    geometry_hash,
+    rib_transverse_offsets_m,
+    spandrel_column_lines,
+)
+from bridge_evolution.geometry_experimental.arch_l0_constructability import (
+    screen_constructability_l0,
+)
+from bridge_evolution.geometry_experimental.shape_diversity import (
+    ShapeDiversityError,
+    enumerate_topology_hypotheses,
+    select_diverse_top_set,
+)
+
+ROOT = Path(__file__).resolve().parent.parent
+GRAMMAR_PATH = ROOT / "bridge_grammar" / "experimental" / "arch_deck_v1.json"
+REPORT_PATH = ROOT / "experiments" / "shape_discovery" / "arch_render_study.md"
+PREREG_PATH = ROOT / "experiments" / "shape_discovery" / "pre_registration.json"
+LITERATURE_INDEX = ROOT / "research" / "literature" / "index.json"
+
+LIT_ID_RE = re.compile(r"LIT[-_](\d{3})")
+#: Quét RỘNG: bắt cả biến thể dị dạng (LIT-99, lit-055b, LIT_0555) để chúng
+#: không lách qua lưới rồi được đọc như một nguồn có thật. Chỉ dạng chuẩn
+#: LIT-<3 chữ số> viết hoa mới được coi là hợp lệ.
+LIT_TOKEN_RE = re.compile(r"\bLIT[-_][A-Za-z0-9]+", re.IGNORECASE)
+CANONICAL_LIT_RE = re.compile(r"\ALIT-\d{3}\Z")
+
+
+def _lit_tokens_with_problems(text: str, literature_ids: set) -> list[str]:
+    """Token dị dạng HOẶC không có trong thư viện. Dị dạng cũng là bịa nguồn."""
+    bad = []
+    for tok in LIT_TOKEN_RE.findall(text):
+        if not CANONICAL_LIT_RE.match(tok):
+            bad.append(f"{tok} (sai dạng — phải là LIT-<3 chữ số> viết hoa)")
+        elif tok not in literature_ids:
+            bad.append(f"{tok} (không có trong index.json)")
+    return sorted(set(bad))
+
+#: Tên khoá bị cấm mang giá trị khác null — đây là các đại lượng HIỆU NĂNG mà
+#: runtime hiện KHÔNG có phương tiện tính cho họ vòm (RCM-2.0.0: SOLVER_MIDAS_CIVIL,
+#: SOLVER_OPENSEESPY, GRILLAGE_3D, STAGED_PRESTRESS_EFFECTS đều ABSENT).
+FORBIDDEN_VALUE_KEYS = {
+    "utilization",
+    "utilisation",
+    "capacity",
+    "demand",
+    "moment",
+    "shear",
+    "axial_force",
+    "stress",
+    "deflection",
+    "natural_frequency",
+    "safety_factor",
+    "buckling_load",
+    "thrust_kn",
+    "cost",
+    "carbon",
+    "mass",
+    "score",
+    "margin",
+    "reserve",
+}
+
+#: Khối kết quả không được tồn tại trong một grammar mức IDEA.
+FORBIDDEN_BLOCK_KEYS = {"results", "evaluation", "objective_values", "verdict_numbers"}
+
+#: Hậu tố đơn vị vật lý: nếu xuất hiện thì giá trị phải là null (chưa có solver).
+FORBIDDEN_UNIT_SUFFIXES = ("_kn", "_knm", "_mpa", "_kpa", "_mm2", "_hz")
+
+
+# ---------------------------------------------------------------------------
+# Tiện ích
+# ---------------------------------------------------------------------------
+
+def _load_json(path: Path) -> dict:
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _walk(node, path="$"):
+    """Duyệt toàn bộ cây JSON, sinh ``(đường_dẫn, khoá, giá_trị)``."""
+    if isinstance(node, dict):
+        for key, value in node.items():
+            yield f"{path}.{key}", key, value
+            yield from _walk(value, f"{path}.{key}")
+    elif isinstance(node, list):
+        for i, value in enumerate(node):
+            yield from _walk(value, f"{path}[{i}]")
+
+
+@pytest.fixture(scope="module")
+def grammar():
+    return _load_json(GRAMMAR_PATH)
+
+
+@pytest.fixture(scope="module")
+def literature_ids():
+    index = _load_json(LITERATURE_INDEX)
+    return {ref["reference_id"] for ref in index["references"]}
+
+
+# ---------------------------------------------------------------------------
+# 1. CHỐNG BỊA NGUỒN — test quan trọng nhất
+# ---------------------------------------------------------------------------
+
+def test_literature_index_is_readable(literature_ids):
+    """Index đọc được và không mất nguồn cũ.
+
+    Trước đây test khoá cứng `== 111`, nên mỗi đợt quét bổ sung lại làm đỏ một
+    test thuộc file khác — trong khi điều test này thực sự cần bảo vệ là
+    "grammar không được trỏ tới reference_id bịa". Thư viện chỉ được phép LỚN
+    lên; ID cũ biến mất mới là lỗi. Số lượng chính xác do
+    `tests/test_literature_index.py` neo cùng `counts` trong index.
+    """
+    assert len(literature_ids) >= 111
+    assert "LIT-055" in literature_ids
+
+
+def test_sources_non_empty_and_all_exist_in_literature_index(grammar, literature_ids):
+    sources = grammar["sources"]
+    assert isinstance(sources, list) and sources, "sources không được rỗng"
+    assert len(sources) == len(set(sources)), "sources có reference_id trùng"
+    missing = [s for s in sources if s not in literature_ids]
+    assert not missing, f"reference_id KHÔNG tồn tại trong index.json: {missing}"
+
+
+def test_every_reference_id_field_is_null_or_real(grammar, literature_ids):
+    for path, key, value in _walk(grammar):
+        if key != "reference_id":
+            continue
+        assert value is None or value in literature_ids, (
+            f"{path} = {value!r} — reference_id bịa hoặc sai chính tả"
+        )
+
+
+def test_no_invented_lit_ids_anywhere_in_grammar_text(literature_ids):
+    text = GRAMMAR_PATH.read_text(encoding="utf-8")
+    bad = _lit_tokens_with_problems(text, literature_ids)
+    assert not bad, f"Grammar nhắc tới reference_id bịa hoặc sai dạng: {bad}"
+
+
+def test_no_invented_lit_ids_anywhere_in_report_text(literature_ids):
+    text = REPORT_PATH.read_text(encoding="utf-8")
+    assert LIT_TOKEN_RE.search(text), "Báo cáo phải viện dẫn ít nhất một nguồn"
+    bad = _lit_tokens_with_problems(text, literature_ids)
+    assert not bad, f"Báo cáo nhắc tới reference_id bịa hoặc sai dạng: {bad}"
+
+
+def test_non_indexed_sources_are_flagged_not_hidden(grammar, literature_ids):
+    """Nguồn ngoài thư viện phải được khai báo tường minh với reference_id = null."""
+    for entry in grammar["non_indexed_sources"]:
+        assert entry["reference_id"] is None
+        assert entry["evidence_status"] in {
+            "NOT_IN_VERIFIED_LIBRARY",
+            "AI_GENERATED_SLIDES_NOT_EVIDENCE",
+        }
+    for prec in grammar["precedents"]:
+        rid = prec["reference_id"]
+        assert rid is None or rid in literature_ids
+        if rid is None:
+            assert prec["evidence_status"] == "NOT_IN_VERIFIED_LIBRARY"
+
+
+# ---------------------------------------------------------------------------
+# 2. Grammar validate được + mọi biến có miền RỜI RẠC
+# ---------------------------------------------------------------------------
+
+def test_grammar_header_fields(grammar):
+    assert grammar["family_id"]
+    assert grammar["status"] == "EXPERIMENTAL"
+    assert grammar["claim_level"] == "IDEA"
+    assert grammar["task_id"] == "BRD-004"
+    for block in (
+        "load_path_hypothesis",
+        "falsification_criterion",
+        "design_variables",
+        "constraints_needed",
+        "precedents",
+        "sources",
+    ):
+        assert block in grammar, f"Thiếu khối bắt buộc: {block}"
+
+
+def test_sandbox_policy_declares_runtime_cannot_evaluate(grammar):
+    policy = grammar["sandbox_policy"]
+    assert policy["production_import_forbidden"] is True
+    assert policy["runtime_can_evaluate_this_family"] is False
+    absent = policy["runtime_evidence"]["absent_capabilities_blocking_this_family"]
+    assert {"SOLVER_OPENSEESPY", "GRILLAGE_3D", "STAGED_PRESTRESS_EFFECTS"} <= set(absent)
+
+
+def test_every_design_variable_has_discrete_finite_domain(grammar):
+    variables = grammar["design_variables"]
+    assert variables, "design_variables rỗng"
+    for name, spec in variables.items():
+        assert spec["type"] in {"catalog", "int", "grid"}, name
+        domain = grid_domain(spec)  # dùng chính hàm của runtime: chứng minh rời rạc
+        assert isinstance(domain, list) and domain, f"{name}: miền rỗng"
+        assert len(domain) == len(set(domain)), f"{name}: miền có giá trị trùng"
+        assert len(domain) < 10_000, f"{name}: miền quá lớn, không còn là rời rạc hữu ích"
+
+
+def test_every_design_variable_declares_domain_provenance(grammar):
+    """Miền số không được xuất hiện như một kết quả — phải khai xuất xứ."""
+    allowed = {
+        "ENUMERATED_TOPOLOGY",
+        "NON_INDEXED_SOURCE",
+        "SOURCE_LIT_055",
+        "SOURCE_LIT_054_LIT_055",
+        "PLACEHOLDER_PENDING_DESIGN_BASIS",
+    }
+    for name, spec in grammar["design_variables"].items():
+        prov = spec.get("domain_provenance")
+        assert prov in allowed, f"{name}: domain_provenance thiếu hoặc lạ ({prov!r})"
+        if prov == "PLACEHOLDER_PENDING_DESIGN_BASIS":
+            assert spec.get("blocks_claim_above") == "IDEA", (
+                f"{name}: miền placeholder phải khoá claim ở IDEA"
+            )
+
+
+def test_stage_dimension_present_from_the_start(grammar):
+    """INC-004: grammar phải mang trường GIAI ĐOẠN ngay từ định nghĩa."""
+    stage_var = grammar["design_variables"]["construction_stage_id"]
+    assert stage_var["type"] == "catalog"
+    stage_ids = {s["id"] for s in grammar["construction_stage_schema"]["stages"]}
+    assert set(stage_var["domain"]) == stage_ids
+    assert "S2_CANTILEVER_ERECTION" in stage_ids
+    assert "S7_SERVICE" in stage_ids
+
+
+def test_project_inputs_are_unknown_not_invented(grammar):
+    """Ảnh không cho biết khẩu độ/địa chất/tải trọng — phải là null hoặc TBD."""
+    for key, value in grammar["project_inputs"].items():
+        if key.startswith("_"):
+            continue
+        assert value is None or value == "TBD" or value == ["TBD"], (
+            f"project_inputs.{key} = {value!r} — không được bịa dữ liệu design basis"
+        )
+
+
+# ---------------------------------------------------------------------------
+# 3. load_path_hypothesis và falsification_criterion khác rỗng
+# ---------------------------------------------------------------------------
+
+def test_load_path_hypothesis_is_a_complete_chain(grammar):
+    lph = grammar["load_path_hypothesis"]
+    steps = lph["steps"]
+    assert len(steps) >= 5, "Đường lực phải đi từ bánh xe xuống tận nền"
+    allowed_actions = {"NEN", "KEO", "UON", "CAT", "HON_HOP", "KHONG_XAC_DINH"}
+    for step in steps:
+        assert step["from"].strip()
+        assert step["to"].strip()
+        assert step["action"] in allowed_actions
+    assert [s["step"] for s in steps] == list(range(1, len(steps) + 1))
+    assert lph["closure_element"].strip()
+    assert "đá" in lph["closure_element"].lower()
+    assert lph["parallel_branch_lateral"], "Thiếu nhánh lực NGANG (gió/động đất)"
+    assert lph["sign_reversal_warning_vi"].strip()
+    assert lph["unresolved_in_load_path"], "Phải ghi rõ phần đường lực còn ẩn số"
+
+
+def test_falsification_criterion_non_empty_and_untested(grammar):
+    fc = grammar["falsification_criterion"]
+    assert fc["family_rejected_if"].strip()
+    falsifiers = fc["falsifiers"]
+    assert len(falsifiers) >= 3
+    for f in falsifiers:
+        assert f["id"].strip()
+        assert f["statement_vi"].strip()
+        assert f["status"] == "NOT_TESTED", (
+            f"{f['id']}: không falsifier nào đã được kiểm — runtime không có "
+            "phương tiện đánh giá vòm"
+        )
+
+
+def test_constraints_needed_lists_the_missing_runtime_checks(grammar):
+    needed = grammar["constraints_needed"]
+    titles = " ".join(c["title_vi"] for c in needed).lower()
+    for keyword in ("ổn định", "thi công", "lực xô", "gió", "mỏi"):
+        assert keyword in titles, f"constraints_needed thiếu hạng mục: {keyword}"
+    for c in needed:
+        assert c["runtime_state"] in {"ABSENT", "PARTIAL"}
+        assert c["blocks_claim_above"] == "IDEA"
+
+
+# ---------------------------------------------------------------------------
+# 4. CHỐNG FALSE PRECISION
+# ---------------------------------------------------------------------------
+
+def test_no_performance_number_is_filled(grammar):
+    for path, key, value in _walk(grammar):
+        low = key.lower()
+        if low in FORBIDDEN_VALUE_KEYS:
+            assert value is None, f"{path} = {value!r} — false precision"
+        if low.endswith(FORBIDDEN_UNIT_SUFFIXES):
+            assert value is None, f"{path} = {value!r} — số có đơn vị chưa có solver"
+
+
+def test_no_result_block_exists(grammar):
+    for path, key, _ in _walk(grammar):
+        assert key.lower() not in FORBIDDEN_BLOCK_KEYS, f"{path}: khối kết quả bị cấm"
+
+
+def test_performance_fields_block_is_all_null(grammar):
+    fields = grammar["performance_fields"]
+    filled = {k: v for k, v in fields.items() if not k.startswith("_") and v is not None}
+    assert not filled, f"performance_fields đã bị điền: {filled}"
+
+
+def test_precedent_spans_are_not_asserted(grammar):
+    """Khẩu độ của công trình tiền lệ nằm trong unverified_fields của nguồn."""
+    for prec in grammar["precedents"]:
+        assert prec["main_span_m"] is None, (
+            f"{prec['id']}: không được gán khẩu độ — LIT-054/LIT-055 đều liệt kê "
+            "khẩu độ cụ thể trong unverified_fields"
+        )
+
+
+def test_derivation_is_shown_step_by_step(grammar):
+    """Con số duy nhất được phép có là con số SUY RA, và phải trình bày từng bước."""
+    d = grammar["derivations"]["thrust_to_vertical_ratio"]
+    assert len(d["steps"]) >= 3
+    table = d["table_L_over_f_to_H_over_V"]
+    for l_over_f, h_over_v in table.items():
+        assert abs(h_over_v - int(l_over_f) / 4.0) < 1e-12, (
+            f"L/f={l_over_f}: bảng không khớp chính công thức H/V = (L/f)/4"
+        )
+    assert d["scope_warning_vi"].strip()
+    assert d["friction_and_bearing_values"].startswith("TBD")
+
+
+# ---------------------------------------------------------------------------
+# 5. CÁCH LY SANDBOX
+# ---------------------------------------------------------------------------
+
+def test_experimental_grammar_lives_only_in_sandbox():
+    assert GRAMMAR_PATH.exists()
+    top_level = sorted(p.name for p in (ROOT / "bridge_grammar").glob("*.json"))
+    assert "arch_deck_v1.json" not in top_level
+    assert top_level == ["super_t_parametric_v2.json", "super_t_simple_v1.json"]
+
+
+def test_flat_grammar_name_does_not_reach_the_experimental_grammar():
+    """Tra bằng TÊN PHẲNG thì không tới được sandbox. Đây là bất biến YẾU."""
+    with pytest.raises(FileNotFoundError):
+        load_grammar("arch_deck_v1")
+    with pytest.raises(FileNotFoundError):
+        load_grammar("arch_deck_cfst_skeleton_v1")
+
+
+def test_loader_refuses_to_traverse_into_sandbox():
+    """BRD-022 đã siết loader — cách ly nay là bất biến ĐƯỢC THỰC THI.
+
+    Lịch sử: phản biện BRD-004 chỉ ra artifact từng khẳng định sai rằng
+    load_grammar() "không nạp được" sandbox; thực tế catalogs.py dựng
+    GRAMMAR_DIR/f"{grammar_id}.json" mà không chặn dấu "/". Test này khi đó KHOÁ
+    hành vi thật lại để việc siết loader không thể diễn ra âm thầm. BRD-022 siết
+    thật, nên test đảo chiều — và bản chất bất biến vẫn nguyên: phát biểu an toàn
+    phải khớp cơ chế đo được (xem test kế tiếp).
+    """
+    with pytest.raises(GrammarIdError):
+        load_grammar("experimental/arch_deck_v1")
+    # Sandbox vẫn còn nguyên tại chỗ của nó — cái sai nằm ở loader, không ở sandbox.
+    sandbox = json.loads(GRAMMAR_PATH.read_text(encoding="utf-8"))
+    assert sandbox["family_id"] == "arch_deck_cfst_skeleton_v1"
+    assert sandbox["claim_level"] == "IDEA"
+
+
+def test_state_schema_is_the_real_barrier_against_the_arch_family(grammar):
+    """Hàng rào THẬT: enum "family" của schema state không chứa họ vòm."""
+    schema = json.loads(
+        (ROOT / "contracts" / "bridge_design_state.schema.json").read_text(
+            encoding="utf-8"))
+
+    def find_family_enum(node):
+        if isinstance(node, dict):
+            fam = node.get("family")
+            if isinstance(fam, dict) and "enum" in fam:
+                return fam["enum"]
+            for value in node.values():
+                found = find_family_enum(value)
+                if found is not None:
+                    return found
+        elif isinstance(node, list):
+            for value in node:
+                found = find_family_enum(value)
+                if found is not None:
+                    return found
+        return None
+
+    enum = find_family_enum(schema)
+    assert enum is not None, "Schema state không còn khoá 'family' bằng enum"
+    assert grammar["family_id"] not in enum
+
+    # Bất biến THẬT: enum phải trùng khít tập grammar PRODUCTION (top-level), không
+    # nhiều hơn cũng không ít hơn. Trước đây chỗ này khoá cứng hai tên, nên mỗi lần
+    # thêm một họ tiết diện hợp lệ lại làm đỏ một test thuộc file khác. Bản này tự
+    # bảo trì mà vẫn chặn đúng thứ cần chặn: bất kỳ grammar sandbox nào lọt vào enum
+    # đều làm test đỏ, vì sandbox không nằm ở top-level.
+    production = {p.stem for p in (ROOT / "bridge_grammar").glob("*.json")}
+    assert set(enum) == production, (
+        f"enum family lệch tập grammar production: enum={sorted(enum)} vs "
+        f"bridge_grammar/={sorted(production)}"
+    )
+    assert not any("arch" in name for name in enum), "họ vòm không được vào enum"
+
+
+def test_sandbox_policy_matches_the_measured_mechanism():
+    """Phát biểu an toàn phải khớp cơ chế ĐO ĐƯỢC — không nói quá, cũng không nói thiếu.
+
+    Trước BRD-022 test này bắt phát biểu phải ghi NOT_BLOCKED cho hai đường đi
+    còn hở. Nay loader đã chặn thật, nên phát biểu phải nói đúng điều đó — và
+    mỗi khẳng định BLOCKED ở đây được đối chiếu bằng hành vi runtime ngay dưới,
+    để phát biểu không thể "đẹp hơn" cơ chế.
+    """
+    policy = json.loads(GRAMMAR_PATH.read_text(encoding="utf-8"))["sandbox_policy"]
+    measured = policy["isolation_mechanism_measured"]
+    assert measured["load_grammar_flat_name"].startswith("BLOCKED_FileNotFoundError")
+    assert measured["load_grammar_with_slash"].startswith("BLOCKED_GrammarIdError")
+    assert measured["gene_order_gene_domains"].startswith("BLOCKED_GrammarIdError")
+    assert measured["state_schema_family_enum"].startswith("BLOCKED")
+    # Chỗ này vẫn là tai nạn và phải tiếp tục tự khai là tai nạn.
+    assert measured["budgeted_evaluator"].startswith("BLOCKED_BY_ACCIDENT")
+
+    # Đối chiếu từng khẳng định với hành vi thật.
+    with pytest.raises(FileNotFoundError):
+        load_grammar("arch_deck_v1")
+    with pytest.raises(GrammarIdError):
+        load_grammar("experimental/arch_deck_v1")
+    with pytest.raises(GrammarIdError):
+        gene_order("experimental/arch_deck_v1")
+
+
+def test_production_grammars_do_not_reference_the_arch_family(grammar):
+    family_id = grammar["family_id"]
+    for name in ("super_t_simple_v1", "super_t_parametric_v2"):
+        prod = load_grammar(name)
+        text = json.dumps(prod, ensure_ascii=False)
+        assert family_id not in text
+        assert "arch" not in prod["grammar_id"].lower()
+
+
+def test_experimental_geometry_module_is_not_imported_by_production():
+    """Không file production nào được import gói geometry_experimental."""
+    offenders = []
+    for py in (ROOT / "bridge_evolution").rglob("*.py"):
+        if "geometry_experimental" in py.parts:
+            continue
+        if "geometry_experimental" in py.read_text(encoding="utf-8"):
+            offenders.append(str(py.relative_to(ROOT)))
+    assert not offenders, f"Sandbox bị nhập vào production: {offenders}"
+
+
+# ---------------------------------------------------------------------------
+# 6. HÌNH HỌC — toạ độ hợp lệ
+# ---------------------------------------------------------------------------
+
+BASE = dict(span_m=200.0, rise_m=40.0, deck_level_m=60.0, bay_count=20)
+
+
+@pytest.mark.parametrize("axis_type", ["PARABOLA_2ND_ORDER", "CATENARY"])
+def test_axis_hits_springings_and_crown(axis_type):
+    pts = arch_axis_polyline(200.0, 40.0, axis_type, 101)
+    assert pts[0] == {"x_m": 0.0, "y_m": 0.0}
+    assert pts[-1]["x_m"] == pytest.approx(200.0)
+    assert pts[-1]["y_m"] == pytest.approx(0.0)
+    crown = pts[len(pts) // 2]
+    assert crown["x_m"] == pytest.approx(100.0)
+    assert crown["y_m"] == pytest.approx(40.0, abs=1e-6)
+
+
+@pytest.mark.parametrize("axis_type", ["PARABOLA_2ND_ORDER", "CATENARY"])
+def test_axis_is_symmetric_and_bounded(axis_type):
+    pts = arch_axis_polyline(200.0, 40.0, axis_type, 101)
+    ys = [p["y_m"] for p in pts]
+    assert all(-1e-9 <= y <= 40.0 + 1e-9 for y in ys)
+    for i in range(len(ys)):
+        assert ys[i] == pytest.approx(ys[-1 - i], abs=1e-6)
+    half = len(ys) // 2
+    assert all(ys[i] <= ys[i + 1] + 1e-12 for i in range(half))
+
+
+def test_catenary_parameter_satisfies_its_own_equation():
+    import math
+
+    span, rise = 200.0, 40.0
+    a = catenary_parameter(span, rise)
+    assert a > 0
+    assert a * (math.cosh((span / 2.0) / a) - 1.0) == pytest.approx(rise, abs=1e-9)
+
+
+def test_spandrel_columns_shorten_towards_the_springings():
+    lines = spandrel_column_lines(**BASE)
+    assert len(lines) == BASE["bay_count"] + 1
+    interior = [c for c in lines if not c["at_springing"]]
+    assert all(c["height_m"] > 0 for c in interior)
+    crown_col = min(interior, key=lambda c: abs(c["x_m"] - 100.0))
+    assert crown_col["height_m"] == pytest.approx(20.0, abs=1e-6)
+    near_springing = min(interior, key=lambda c: c["x_m"])
+    assert near_springing["height_m"] > crown_col["height_m"]
+
+
+def test_arch_geometry_returns_valid_coordinates_and_claim_flags():
+    out = arch_geometry(**BASE, axis_type="PARABOLA_2ND_ORDER", deck_width_m=20.0)
+    assert out["claim_level"] == "IDEA"
+    assert out["computes_internal_forces"] is False
+    assert out["runtime_can_evaluate_this_family"] is False
+    assert out["construction_stage_id"] == "S7_SERVICE"
+    assert out["span_rise_ratio_L_over_f"] == pytest.approx(5.0)
+    assert out["bay_length_m"] == pytest.approx(10.0)
+    assert out["axis_arc_length_m"] > out["span_m"]
+    assert out["rib_transverse_offsets_m"] == [-10.0, 10.0]
+    assert out["min_interior_column_height_m"] == pytest.approx(20.0, abs=1e-6)
+    for p in out["axis_points"]:
+        assert all(isinstance(p[k], float) for k in ("x_m", "y_m"))
+
+
+def test_rib_offsets_single_and_double():
+    assert rib_transverse_offsets_m(20.0, 1) == [0.0]
+    assert rib_transverse_offsets_m(20.0, 2, edge_inset_m=2.0) == [-8.0, 8.0]
+
+
+# ---------------------------------------------------------------------------
+# 7. HÌNH HỌC — tham số phi vật lý phải raise
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        dict(span_m=0.0, rise_m=40.0),
+        dict(span_m=-200.0, rise_m=40.0),
+        dict(span_m=200.0, rise_m=0.0),
+        dict(span_m=200.0, rise_m=-40.0),
+        dict(span_m=200.0, rise_m=200.0),
+        dict(span_m=200.0, rise_m=250.0),
+        dict(span_m=float("inf"), rise_m=40.0),
+        dict(span_m="200", rise_m=40.0),
+    ],
+)
+def test_non_physical_axis_params_raise(kwargs):
+    with pytest.raises(ArchGeometryError):
+        arch_axis_polyline(**kwargs)
+
+
+def test_unknown_axis_type_raises():
+    with pytest.raises(ArchGeometryError):
+        arch_axis_polyline(200.0, 40.0, "CIRCULAR_ARC")
+
+
+@pytest.mark.parametrize("n", [2, 100, 1, 0, -5])
+def test_bad_point_count_raises(n):
+    with pytest.raises(ArchGeometryError):
+        arch_axis_polyline(200.0, 40.0, "PARABOLA_2ND_ORDER", n)
+
+
+@pytest.mark.parametrize("bays", [0, 1, 3, 21, -4])
+def test_bad_bay_count_raises(bays):
+    with pytest.raises(ArchGeometryError):
+        spandrel_column_lines(200.0, 40.0, 60.0, bays)
+
+
+def test_deck_below_crown_raises():
+    with pytest.raises(ArchGeometryError):
+        spandrel_column_lines(200.0, 40.0, 39.9, 20)
+
+
+def test_unequal_springing_elevations_raise_instead_of_being_faked():
+    with pytest.raises(ArchGeometryError) as exc:
+        ag.validate_arch_params(
+            200.0, 40.0, "PARABOLA_2ND_ORDER",
+            springing_left_y_m=0.0, springing_right_y_m=8.0,
+        )
+    assert "CAO DO KHAC NHAU" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        (20.0, 3),
+        (20.0, 0),
+        (0.0, 2),
+        (-20.0, 2),
+    ],
+)
+def test_bad_rib_params_raise(args):
+    with pytest.raises(ArchGeometryError):
+        rib_transverse_offsets_m(*args)
+
+
+def test_rib_inset_wider_than_half_deck_raises():
+    with pytest.raises(ArchGeometryError):
+        rib_transverse_offsets_m(20.0, 2, edge_inset_m=10.0)
+
+
+# ---------------------------------------------------------------------------
+# 8. KHÔNG module sandbox nào được có hàm tính nội lực
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "module",
+    [ag, al0, sd],
+    ids=["arch_geometry", "arch_l0_constructability", "shape_diversity"],
+)
+def test_geometry_module_exposes_no_analysis_function(module):
+    banned = re.compile(
+        r"(force|moment|stress|strain|solve|analy|capacity|utilis|utiliz|buckl|"
+        r"reaction|thrust|deflect|fatigue)",
+        re.IGNORECASE,
+    )
+    offenders = [
+        name for name in dir(module)
+        if callable(getattr(module, name)) and banned.search(name)
+    ]
+    assert not offenders, (
+        f"Module {module.__name__} lộ hàm mang tính phân tích: {offenders}. "
+        "Runtime không có solver cho vòm và không được giả vờ có."
+    )
+
+
+def test_geometry_result_contains_no_force_like_key():
+    out = arch_geometry(**BASE)
+    for path, key, value in _walk(out):
+        assert key.lower() not in FORBIDDEN_VALUE_KEYS, f"{path}: {key}"
+
+
+# ---------------------------------------------------------------------------
+# 9. Báo cáo có đủ các mục bắt buộc
+# ---------------------------------------------------------------------------
+
+def test_report_has_required_sections():
+    text = REPORT_PATH.read_text(encoding="utf-8")
+    for heading in (
+        "F0 IDEA",
+        "Những gì bức ảnh KHÔNG cho biết",
+        "Cần gì để đi tiếp",
+        "G0",
+        "G7",
+    ):
+        assert heading in text, f"Báo cáo thiếu mục: {heading}"
+    _assert_no_unnegated_overclaim(text)
+
+
+#: Cửa sổ ký tự TRƯỚC từ khoá được coi là "cùng mệnh đề". Phủ định ở xa hơn —
+#: hoặc ở mệnh đề khác trên cùng dòng — không được tính là phủ định.
+NEGATION_WINDOW_CHARS = 70
+NEGATION_TOKENS = ("không", "chưa", "chẳng")
+#: Dấu ngắt mệnh đề: phủ định bên kia dấu ngắt thuộc mệnh đề khác.
+CLAUSE_BREAK_RE = re.compile(r"[;:\u2014]|(?<![0-9]),(?![0-9])")
+
+
+def _assert_no_unnegated_overclaim(text: str) -> None:
+    """Mỗi lần xuất hiện 'khả thi'/'thi công được' phải có phủ định SÁT nó.
+
+    Bản cũ chỉ hỏi cả DÒNG có chữ 'không' nào không, nên câu "Phương án A hoàn
+    toàn khả thi và chi phí không cao." vẫn lọt (phản biện BRD-004 tái hiện được).
+    """
+    offenders = []
+    for banned in ("khả thi", "thi công được"):
+        start = 0
+        while True:
+            i = text.find(banned, start)
+            if i == -1:
+                break
+            start = i + len(banned)
+            line_start = text.rfind("\n", 0, i) + 1
+            window = text[max(line_start, i - NEGATION_WINDOW_CHARS):i].lower()
+            breaks = list(CLAUSE_BREAK_RE.finditer(window))
+            clause = window[breaks[-1].end():] if breaks else window
+            if not any(tok in clause for tok in NEGATION_TOKENS):
+                line_end = text.find("\n", i)
+                offenders.append(text[line_start:line_end if line_end != -1 else None])
+    assert not offenders, (
+        f"Khẳng định vượt mức claim (thiếu phủ định trong cùng mệnh đề): {offenders}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 10. LINEAGE — geometry hash tái lập được (BRD-004, tiêu chí #2)
+# ---------------------------------------------------------------------------
+
+def test_lineage_hash_is_deterministic_in_process():
+    out1 = arch_geometry(**BASE)
+    out2 = arch_geometry(**BASE)
+    h = geometry_hash(dict(BASE))
+    assert out1["lineage"]["geometry_hash"] == out2["lineage"]["geometry_hash"] == h
+    # Thứ tự khoá của dict không ảnh hưởng (canonical JSON sort_keys).
+    reordered = dict(sorted(BASE.items(), reverse=True))
+    assert geometry_hash(reordered) == h
+    # Chuẩn hoá kiểu: int và float cùng giá trị băm ra cùng hash.
+    as_ints = {k: int(v) for k, v in BASE.items()}
+    assert geometry_hash(as_ints) == h
+
+
+def test_lineage_hash_is_deterministic_across_two_subprocesses():
+    code = (
+        "from bridge_evolution.geometry_experimental.arch_geometry "
+        f"import geometry_hash; print(geometry_hash({dict(BASE)!r}))"
+    )
+    runs = [
+        subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True, text=True, cwd=ROOT, check=True,
+        ).stdout.strip()
+        for _ in range(2)
+    ]
+    assert runs[0] == runs[1], "hash đổi giữa hai process — không tái lập được"
+    assert runs[0] == geometry_hash(dict(BASE))
+    assert re.fullmatch(r"[0-9a-f]{64}", runs[0])
+
+
+@pytest.mark.parametrize(
+    "delta",
+    [
+        {"span_m": 210.0},
+        {"rise_m": 41.0},
+        {"deck_level_m": 61.0},
+        {"bay_count": 22},
+        {"axis_type": "CATENARY"},
+        {"deck_width_m": 20.0},
+        {"rib_count": 1},
+        {"rib_edge_inset_m": 1.0},
+        {"point_count": 103},
+        {"construction_stage_id": "S2_CANTILEVER_ERECTION"},
+    ],
+)
+def test_lineage_hash_changes_when_any_single_parameter_changes(delta):
+    assert geometry_hash({**BASE, **delta}) != geometry_hash(dict(BASE)), delta
+
+
+def test_lineage_hash_changes_with_generator_version(monkeypatch):
+    base_hash = geometry_hash(dict(BASE))
+    monkeypatch.setattr(ag, "GENERATOR_VERSION", "0.0.0-test-bump")
+    assert geometry_hash(dict(BASE)) != base_hash
+
+
+@pytest.mark.parametrize(
+    "bad_parent",
+    ["abc", "A" * 64, "g" * 64, "0" * 63, "0" * 65, 123, ""],
+)
+def test_lineage_malformed_parent_hash_raises(bad_parent):
+    with pytest.raises(ArchGeometryError):
+        arch_geometry(**BASE, parent_geometry_hash=bad_parent)
+
+
+@pytest.mark.parametrize("bad_action", ["", "   ", None, 7])
+def test_lineage_malformed_generation_action_raises(bad_action):
+    with pytest.raises(ArchGeometryError):
+        arch_geometry(**BASE, generation_action=bad_action)
+
+
+def test_lineage_unknown_or_missing_hash_params_raise():
+    with pytest.raises(ArchGeometryError):
+        geometry_hash({**BASE, "bogus_key": 1.0})
+    with pytest.raises(ArchGeometryError):
+        geometry_hash({"span_m": 200.0, "rise_m": 40.0})
+    with pytest.raises(ArchGeometryError):
+        geometry_hash([("span_m", 200.0)])  # không phải dict
+
+
+def test_lineage_block_is_complete_and_contains_no_forbidden_keys():
+    parent = geometry_hash(dict(BASE))
+    out = arch_geometry(**BASE, parent_geometry_hash=parent,
+                        generation_action="MUTATE_RISE")
+    lin = out["lineage"]
+    assert lin["parent_geometry_hash"] == parent
+    assert lin["generation_action"] == "MUTATE_RISE"
+    assert lin["generator_id"] == ag.GENERATOR_ID
+    assert lin["generator_version"] == ag.GENERATOR_VERSION
+    # Metadata phả hệ KHÔNG tham gia hash: cùng tham số -> cùng geometry_hash.
+    assert lin["geometry_hash"] == parent
+    for path, key, _ in _walk(lin):
+        assert key.lower() not in FORBIDDEN_VALUE_KEYS, path
+        assert key.lower() not in FORBIDDEN_BLOCK_KEYS, path
+
+
+def test_lineage_hash_matches_production_canonical_json_convention():
+    """hash_inputs + quy ước canonical JSON của state.py phải tái tạo đúng hash."""
+    out = arch_geometry(**BASE)
+    payload = {
+        "generator_id": ag.GENERATOR_ID,
+        "generator_version": ag.GENERATOR_VERSION,
+        "params": out["lineage"]["hash_inputs"],
+    }
+    expected = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"),
+                   ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    assert out["lineage"]["geometry_hash"] == expected
+
+
+def test_lineage_case_id_format():
+    h = geometry_hash(dict(BASE))
+    cid = geometry_case_id(h)
+    assert cid == "ARCH-" + h[:16]
+    assert re.fullmatch(r"ARCH-[0-9a-f]{16}", cid)
+    for bad in ["abc", "A" * 64, None, 5, h + "0"]:
+        with pytest.raises(ArchGeometryError):
+            geometry_case_id(bad)
+
+
+def test_lineage_hash_param_defaults_match_arch_geometry_signature():
+    """Chống trôi: default của geometry_hash phải khớp chữ ký arch_geometry."""
+    sig = inspect.signature(arch_geometry)
+    for name, default in ag._HASH_PARAM_DEFAULTS.items():
+        assert sig.parameters[name].default == default, name
+
+
+# ---------------------------------------------------------------------------
+# 11. L0 chế tạo / vận chuyển / cẩu lắp / inspection access (ARCH-L0-xx)
+# ---------------------------------------------------------------------------
+# Mọi ngưỡng dưới đây là FIXTURE CỦA TEST, không phải giá trị kỹ thuật.
+
+L0_PROV = "TEST_FIXTURE_NOT_ENGINEERING_VALUE"
+
+
+def _l0_threshold(value):
+    return {"value": value, "provenance": L0_PROV}
+
+
+def _l0_geometry():
+    return arch_geometry(**BASE, deck_width_m=20.0, rib_count=2)
+
+
+def _l0_segmentation(**overrides):
+    seg = {
+        "segment_count_per_rib": 8,
+        "rib_section_area_m2": 0.5,
+        "rib_material_density_kg_m3": 7850.0,
+        "rib_width_m": 1.0,
+        "provenance": L0_PROV,
+    }
+    seg.update(overrides)
+    return seg
+
+
+def _l0_full_profile():
+    return {
+        "max_transport_segment_length_m": _l0_threshold(30.0),
+        "max_lift_piece_mass_t": _l0_threshold(150.0),
+        "min_inspection_walkway_clearance_m": _l0_threshold(2.0),
+        "min_spandrel_column_height_for_inspection_m": _l0_threshold(2.0),
+        "min_rib_clear_gap_m": _l0_threshold(5.0),
+        "max_cantilever_half_arch_segments": _l0_threshold(4),
+    }
+
+
+def _l0_checks_by_id(out):
+    return {c["check_id"]: c for c in out["checks"]}
+
+
+def test_l0_missing_threshold_yields_unknown_and_blocks_all_known_pass():
+    """Fail-closed: thiếu ngưỡng -> UNKNOWN, và UNKNOWN chặn all_known_pass.
+
+    QUY ƯỚC (khoá lại bằng test): all_known_pass=True CHỈ khi không có FAIL
+    và KHÔNG có UNKNOWN. Thiếu dữ liệu không bao giờ được hiểu ngầm là đạt.
+    """
+    out = screen_constructability_l0(
+        _l0_geometry(), {}, {"segment_count_per_rib": 8, "provenance": L0_PROV}
+    )
+    by_id = _l0_checks_by_id(out)
+    # ARCH-L0-03 (số đốt chẵn) là check topo, không cần ngưỡng ngoài -> PASS.
+    assert by_id["ARCH-L0-03"]["status"] == "PASS"
+    for check_id, check in by_id.items():
+        if check_id == "ARCH-L0-03":
+            continue
+        assert check["status"] == "UNKNOWN_INPUT_MISSING", check_id
+        assert check["message_vi"].strip(), check_id
+    assert out["any_unknown"] is True
+    assert out["any_fail"] is False
+    assert out["all_known_pass"] is False, (
+        "all_known_pass phải False khi còn UNKNOWN — thiếu dữ liệu không phải PASS"
+    )
+
+
+def test_l0_pass_direction_all_known_pass_only_when_every_check_passes():
+    out = screen_constructability_l0(
+        _l0_geometry(), _l0_full_profile(), _l0_segmentation()
+    )
+    assert len(out["checks"]) == 7
+    assert all(c["status"] == "PASS" for c in out["checks"])
+    assert out["status_counts"] == {"PASS": 7, "FAIL": 0, "UNKNOWN_INPUT_MISSING": 0}
+    assert out["all_known_pass"] is True
+    assert out["any_fail"] is False and out["any_unknown"] is False
+    # Mỗi check PASS vẫn phải mang provenance của ngưỡng (trừ check topo).
+    for c in out["checks"]:
+        assert c["limit_provenance"], c["check_id"]
+        if c["check_id"] != "ARCH-L0-03":
+            assert c["limit_provenance"] == L0_PROV, c["check_id"]
+
+
+def test_l0_fail_direction_each_check_fails_the_right_way():
+    """Ngưỡng siết chặt -> FAIL đúng check, đúng chiều so sánh."""
+    tight = {
+        "max_transport_segment_length_m": _l0_threshold(10.0),
+        "max_lift_piece_mass_t": _l0_threshold(50.0),
+        "min_inspection_walkway_clearance_m": _l0_threshold(25.0),
+        "min_spandrel_column_height_for_inspection_m": _l0_threshold(25.0),
+        "min_rib_clear_gap_m": _l0_threshold(25.0),
+        "max_cantilever_half_arch_segments": _l0_threshold(3),
+    }
+    out = screen_constructability_l0(_l0_geometry(), tight, _l0_segmentation())
+    by_id = _l0_checks_by_id(out)
+    for check_id in ("ARCH-L0-01", "ARCH-L0-02", "ARCH-L0-04",
+                     "ARCH-L0-05", "ARCH-L0-06", "ARCH-L0-07"):
+        assert by_id[check_id]["status"] == "FAIL", check_id
+    assert by_id["ARCH-L0-03"]["status"] == "PASS"
+    assert out["any_fail"] is True and out["all_known_pass"] is False
+    # FAIL cột thấp phải gợi ý tường khoang vòm đặc (khớp notes_vi arch_geometry).
+    assert "tường khoang" in by_id["ARCH-L0-06"]["message_vi"].lower()
+    # Giá trị/giới hạn phải nhất quán chiều: value vượt/không đạt limit thật.
+    assert by_id["ARCH-L0-01"]["value"] > by_id["ARCH-L0-01"]["limit"]
+    assert by_id["ARCH-L0-05"]["value"] < by_id["ARCH-L0-05"]["limit"]
+
+
+def test_l0_odd_segment_count_fails_erection_closure_check():
+    """Số đốt LẺ không raise — nó là kết quả sàng lọc FAIL của ARCH-L0-03."""
+    out = screen_constructability_l0(
+        _l0_geometry(), _l0_full_profile(), _l0_segmentation(segment_count_per_rib=7)
+    )
+    assert _l0_checks_by_id(out)["ARCH-L0-03"]["status"] == "FAIL"
+    assert out["any_fail"] is True
+    assert out["all_known_pass"] is False
+
+
+def test_l0_output_contains_no_forbidden_key():
+    """Không khoá hiệu năng nào trong toàn bộ cây output (fail-closed L0)."""
+    out = screen_constructability_l0(
+        _l0_geometry(), _l0_full_profile(), _l0_segmentation()
+    )
+    for path, key, value in _walk(out):
+        low = key.lower()
+        assert low not in FORBIDDEN_VALUE_KEYS, f"{path}: {key}"
+        assert low not in FORBIDDEN_BLOCK_KEYS, f"{path}: {key}"
+        if low.endswith(FORBIDDEN_UNIT_SUFFIXES):
+            assert value is None, f"{path} = {value!r}"
+
+
+def test_l0_claim_flags_and_statement():
+    out = screen_constructability_l0(
+        _l0_geometry(), {}, {"segment_count_per_rib": 8, "provenance": L0_PROV}
+    )
+    assert out["claim_level"] == "IDEA"
+    assert out["screening_level"] == "L0_GEOMETRY_ONLY"
+    assert out["runtime_can_evaluate_this_family"] is False
+    assert out["statement_vi"].strip()
+    assert "IDEA" in out["statement_vi"]
+
+
+def test_l0_geometry_hash_passes_through_and_missing_lineage_is_not_an_error():
+    geom = _l0_geometry()
+    seg = _l0_segmentation()
+    out = screen_constructability_l0(geom, {}, seg)
+    assert out["geometry_hash"] == geom["lineage"]["geometry_hash"]
+    plain = {k: v for k, v in geom.items() if k != "lineage"}
+    assert screen_constructability_l0(plain, {}, seg)["geometry_hash"] is None
+
+
+def test_l0_lift_estimate_unknown_without_area_or_density():
+    out = screen_constructability_l0(
+        _l0_geometry(), _l0_full_profile(),
+        _l0_segmentation(rib_section_area_m2=None),
+    )
+    lift = _l0_checks_by_id(out)["ARCH-L0-02"]
+    assert lift["status"] == "UNKNOWN_INPUT_MISSING"
+    assert lift["segment_mass_t_estimate_l0"] is None
+    assert out["all_known_pass"] is False
+
+
+def test_l0_rib_gap_unknown_without_rib_width():
+    out = screen_constructability_l0(
+        _l0_geometry(), _l0_full_profile(), _l0_segmentation(rib_width_m=None)
+    )
+    gap = _l0_checks_by_id(out)["ARCH-L0-07"]
+    assert gap["status"] == "UNKNOWN_INPUT_MISSING"
+    assert out["all_known_pass"] is False
+
+
+def test_l0_single_rib_emits_no_gap_check():
+    geom = arch_geometry(**BASE, deck_width_m=20.0, rib_count=1)
+    out = screen_constructability_l0(geom, _l0_full_profile(), _l0_segmentation())
+    ids = [c["check_id"] for c in out["checks"]]
+    assert "ARCH-L0-07" not in ids
+    assert len(ids) == 6
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        {"value": -5.0, "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"value": 0.0, "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"value": float("inf"), "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"value": "5", "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"value": 5.0},  # có value nhưng KHÔNG provenance -> raise
+        5.0,  # ngưỡng trần không bọc dict -> raise
+    ],
+)
+def test_l0_bad_threshold_entry_raises(entry):
+    """Ngưỡng phi vật lý hoặc thiếu provenance phải NỔ, không âm thầm bỏ qua.
+
+    Lưu ý chiều quy ước: value=None là 'chưa chốt' -> UNKNOWN (không raise);
+    value là số thì phải hữu hạn dương và có provenance, sai là raise.
+    """
+    with pytest.raises(ArchGeometryError):
+        screen_constructability_l0(
+            _l0_geometry(),
+            {"max_transport_segment_length_m": entry},
+            _l0_segmentation(),
+        )
+
+
+@pytest.mark.parametrize(
+    "seg",
+    [
+        {"segment_count_per_rib": 1, "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"segment_count_per_rib": "8", "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"segment_count_per_rib": True, "provenance": "TEST_FIXTURE_NOT_ENGINEERING_VALUE"},
+        {"segment_count_per_rib": 8},  # thiếu provenance
+        {"segment_count_per_rib": 8, "provenance": "X", "rib_section_area_m2": -1.0},
+        {"segment_count_per_rib": 8, "provenance": "X", "rib_material_density_kg_m3": 0.0},
+    ],
+)
+def test_l0_bad_segmentation_raises(seg):
+    with pytest.raises(ArchGeometryError):
+        screen_constructability_l0(_l0_geometry(), {}, seg)
+
+
+def test_l0_geometry_missing_required_key_raises():
+    geom = _l0_geometry()
+    broken = {k: v for k, v in geom.items() if k != "axis_arc_length_m"}
+    with pytest.raises(ArchGeometryError):
+        screen_constructability_l0(broken, {}, _l0_segmentation())
+
+
+# ---------------------------------------------------------------------------
+# 12. shape_diversity — chọn tập đa dạng KHÔNG hàm mục tiêu (BRD-004)
+# ---------------------------------------------------------------------------
+
+TOPOLOGY_KEYS = [
+    "arch_axis_type",
+    "arch_rib_count",
+    "springing_restraint",
+    "spandrel_system",
+    "thrust_restraint_system",
+]
+
+
+def _toy_candidates():
+    return [
+        {"candidate_id": "C-01", "descriptors": {"a": "X", "n": 0.0}, "l0_status": "PASS"},
+        {"candidate_id": "C-02", "descriptors": {"a": "X", "n": 100.0}, "l0_status": "PASS"},
+        {"candidate_id": "C-03", "descriptors": {"a": "Y", "n": 50.0}, "l0_status": "UNKNOWN_INPUT_MISSING"},
+        {"candidate_id": "C-04", "descriptors": {"a": "Y", "n": 25.0}, "l0_status": "FAIL"},
+        {"candidate_id": "C-05", "descriptors": {"a": "Z", "n": 75.0}, "l0_status": None},
+    ]
+
+
+def test_diversity_selection_is_deterministic_and_objective_free():
+    kwargs = dict(categorical_keys=["a"], numeric_keys=["n"])
+    first = select_diverse_top_set(_toy_candidates(), 3, **kwargs)
+    second = select_diverse_top_set(_toy_candidates(), 3, **kwargs)
+    assert first == second
+    assert first["selected"][0] == "C-01"  # seed_index = 0, tất định
+    assert first["claim_level"] == "IDEA"
+    assert first["selection_is_objective_free"] is True
+    assert first["statement_vi"].strip()
+
+
+def test_diversity_excludes_l0_fail_and_flags_unknown():
+    out = select_diverse_top_set(
+        _toy_candidates(), 4, categorical_keys=["a"], numeric_keys=["n"])
+    assert out["excluded_l0_fail"] == ["C-04"]
+    assert "C-04" not in out["selected"]
+    assert out["unknown_l0_included"] == ["C-03"]
+    assert out["unscreened_l0_included"] == ["C-05"]
+    assert out["min_pairwise_distance"] > 0.0
+
+
+def test_diversity_coverage_quota_swaps_in_missing_value():
+    cands = [
+        {"candidate_id": "D-01", "descriptors": {"a": "X", "n": 0.0}, "l0_status": "PASS"},
+        {"candidate_id": "D-02", "descriptors": {"a": "X", "n": 100.0}, "l0_status": "PASS"},
+        {"candidate_id": "D-03", "descriptors": {"a": "X", "n": 50.0}, "l0_status": "PASS"},
+        {"candidate_id": "D-04", "descriptors": {"a": "Y", "n": 0.0}, "l0_status": "PASS"},
+    ]
+    out = select_diverse_top_set(
+        cands, 2, categorical_keys=["a"], numeric_keys=["n"], coverage_quota={"a": 2})
+    assert {d["a"] for d in out["selected_descriptors"]} == {"X", "Y"}
+    assert out["quota_unmet"] == []
+
+
+def test_diversity_unmet_quota_is_reported_not_silent():
+    cands = [
+        {"candidate_id": "E-01", "descriptors": {"a": "X"}, "l0_status": "PASS"},
+        {"candidate_id": "E-02", "descriptors": {"a": "X"}, "l0_status": "PASS"},
+    ]
+    out = select_diverse_top_set(cands, 2, categorical_keys=["a"], coverage_quota={"a": 2})
+    assert out["quota_unmet"] and out["quota_unmet"][0]["key"] == "a"
+
+
+def test_diversity_bad_inputs_raise():
+    with pytest.raises(ShapeDiversityError):
+        select_diverse_top_set(_toy_candidates(), 0, categorical_keys=["a"])
+    with pytest.raises(ShapeDiversityError):
+        # k lớn hơn số ứng viên hợp lệ (4 sau khi loại FAIL) — người gọi phải biết
+        select_diverse_top_set(_toy_candidates(), 5, categorical_keys=["a"])
+    with pytest.raises(ShapeDiversityError):
+        # thiếu descriptor — không được đoán giá trị thay người gọi
+        select_diverse_top_set(
+            [{"candidate_id": "F-01", "descriptors": {}, "l0_status": None}],
+            1, categorical_keys=["a"])
+    with pytest.raises(ShapeDiversityError):
+        # quota > k: không thể thoả theo nguyên lý ngăn kéo
+        select_diverse_top_set(
+            _toy_candidates(), 1, categorical_keys=["a"], coverage_quota={"a": 2})
+
+
+def test_diversity_output_contains_no_forbidden_key():
+    out = select_diverse_top_set(
+        _toy_candidates(), 3, categorical_keys=["a"], numeric_keys=["n"])
+    for path, key, _ in _walk(out):
+        low = str(key).lower()
+        assert low not in FORBIDDEN_VALUE_KEYS, f"{path}: {key}"
+        assert low not in FORBIDDEN_BLOCK_KEYS, f"{path}: {key}"
+
+
+def test_enumerated_hypotheses_are_reproducible_and_only_topology(grammar):
+    hyps = enumerate_topology_hypotheses(grammar, TOPOLOGY_KEYS)
+    assert len(hyps) == 2 * 2 * 3 * 3 * 3  # tích Descartes 5 miền hình thái
+    ids = [h["candidate_id"] for h in hyps]
+    assert len(ids) == len(set(ids))
+    assert all(h["l0_status"] is None for h in hyps)
+    assert hyps == enumerate_topology_hypotheses(grammar, TOPOLOGY_KEYS)  # tái lập
+    first = hyps[0]
+    canonical = json.dumps(
+        first["descriptors"], sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    assert first["candidate_id"] == (
+        "HYP-" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16])
+    with pytest.raises(ShapeDiversityError):
+        # miền PLACEHOLDER_PENDING_DESIGN_BASIS không được liệt kê thành giả thuyết
+        enumerate_topology_hypotheses(grammar, ["span_m"])
+
+
+def test_top6_from_real_grammar_keeps_shape_diversity(grammar):
+    hyps = enumerate_topology_hypotheses(grammar, TOPOLOGY_KEYS)
+    out = select_diverse_top_set(
+        hyps, 6, categorical_keys=TOPOLOGY_KEYS,
+        coverage_quota={"arch_axis_type": 2, "spandrel_system": 2})
+    assert len(out["selected"]) == 6
+    assert len({d["arch_axis_type"] for d in out["selected_descriptors"]}) >= 2
+    assert len({d["spandrel_system"] for d in out["selected_descriptors"]}) >= 2
+    assert out["quota_unmet"] == []
+    assert out["claim_level"] == "IDEA"
+
+
+# ---------------------------------------------------------------------------
+# 13. pre_registration.json — artifact bắt buộc của BRD-004
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def prereg():
+    return _load_json(PREREG_PATH)
+
+
+def test_pre_registration_required_fields_locked_and_idea(prereg):
+    assert prereg["schema_version"] == "1.0"
+    assert prereg["preregistration_id"] == "SHAPE-DISCOVERY-ARCH-DECK-V1"
+    assert prereg["task_id"] == "BRD-004"
+    assert prereg["locked_before_running"] is True
+    assert prereg["claim_ceiling"] == "IDEA"
+    for field in (
+        "title", "created_at_utc", "claim_ceiling_note", "research_question",
+        "hypotheses", "l0_screening_protocol", "diversity_selection_rule",
+        "primary_endpoint", "invalidation_conditions", "not_run_statement_vi",
+    ):
+        assert field in prereg, f"pre_registration thiếu trường: {field}"
+    assert prereg["not_run_statement_vi"].startswith("Chưa chạy")
+
+
+def test_pre_registration_hypotheses_cover_four_morphology_unknowns(prereg):
+    hyps = prereg["hypotheses"]
+    assert [h["id"] for h in hyps] == ["H1", "H2", "H3", "H4"]
+    joined = " ".join(h["morphology_unknown_vi"] for h in hyps).lower()
+    for phrase in ("số sườn", "chân vòm", "phân đoạn", "tháp"):
+        assert phrase in joined, f"hypotheses thiếu ẩn số hình thái: {phrase}"
+    for h in hyps:
+        assert h["falsifier_vi"].strip()
+        assert h["what_would_decide_it"]["evidence_kinds"]
+        assert h["status"] == "NOT_TESTED"
+
+
+def test_pre_registration_l0_protocol_thresholds_come_from_caller(prereg):
+    protocol = prereg["l0_screening_protocol"]
+    assert protocol["current_state"] == "THRESHOLDS_NOT_YET_PROVIDED"
+    check_ids = [c["check_id"] for c in protocol["checks"]]
+    for expected in ("ARCH-L0-FAB", "ARCH-L0-LIFT", "ARCH-L0-ERECTION", "ARCH-L0-INSPECTION"):
+        assert expected in check_ids, f"thiếu check {expected}"
+    for check in protocol["checks"]:
+        assert check["status"] == "THRESHOLDS_NOT_YET_PROVIDED"
+        assert "logistics_profile" in check["threshold_source"]
+    assert "UNKNOWN_INPUT_MISSING" in protocol["threshold_policy_vi"]
+
+
+def test_pre_registration_diversity_rule_is_objective_free(prereg):
+    rule = prereg["diversity_selection_rule"]
+    assert rule["selection_is_objective_free"] is True
+    assert set(rule["coverage_quota_keys"]) == {
+        "arch_axis_type", "spandrel_system", "springing_restraint",
+        "thrust_restraint_system"}
+    assert prereg["primary_endpoint"]["performance_endpoint"] is None
+
+
+def test_pre_registration_no_invented_lit_ids(literature_ids):
+    text = PREREG_PATH.read_text(encoding="utf-8")
+    assert LIT_TOKEN_RE.search(text), "pre_registration phải viện dẫn ít nhất một nguồn"
+    bad = _lit_tokens_with_problems(text, literature_ids)
+    assert not bad, f"pre_registration nhắc tới reference_id bịa hoặc sai dạng: {bad}"
+
+
+def test_pre_registration_no_performance_number_and_no_overclaim(prereg):
+    for path, key, value in _walk(prereg):
+        low = str(key).lower()
+        if low in FORBIDDEN_VALUE_KEYS:
+            assert value is None, f"{path} = {value!r} — false precision"
+        assert low not in FORBIDDEN_BLOCK_KEYS, f"{path}: khối kết quả bị cấm"
+        if low.endswith(FORBIDDEN_UNIT_SUFFIXES):
+            assert value is None, f"{path} = {value!r} — số có đơn vị chưa có solver"
+    _assert_no_unnegated_overclaim(PREREG_PATH.read_text(encoding="utf-8"))
+
+
+def test_pre_registration_check_ids_map_onto_the_ids_the_module_really_emits(prereg):
+    """Nhãn nhóm trong hồ sơ phải truy được về check_id chạy thật.
+
+    Hồ sơ dùng nhãn nhóm ARCH-L0-FAB/LIFT/ERECTION/INSPECTION, còn module phát ra
+    ARCH-L0-01..07. Nếu hai bên trôi khỏi nhau thì hồ sơ mô tả một cơ chế không
+    tồn tại — đúng kiểu lệch phát biểu–cơ chế mà BRD-022 ghi lại. Test này khoá
+    ánh xạ: mọi id trong ``implemented_check_ids`` phải có trong output thật, và
+    mọi check thật phải được ít nhất một nhóm nhận.
+    """
+    emitted = _l0_checks_by_id(
+        screen_constructability_l0(
+            _l0_geometry(), _l0_full_profile(), _l0_segmentation()
+        )
+    )
+    claimed = set()
+    for group in prereg["l0_screening_protocol"]["checks"]:
+        assert group["check_id_is_a_group_label"] is True, group["check_id"]
+        mapped = group["implemented_check_ids"]
+        assert mapped, f"{group['check_id']} không ánh xạ tới check_id nào"
+        for item in mapped:
+            check_id = item["check_id"]
+            assert check_id in emitted, (
+                f"{group['check_id']} khai check_id {check_id} mà module không phát ra"
+            )
+            assert item["title_vi"] == emitted[check_id]["title_vi"], (
+                f"{check_id}: title_vi trong hồ sơ lệch khỏi title_vi module phát ra"
+            )
+            claimed.add(check_id)
+    assert claimed == set(emitted), (
+        f"check thật không được nhóm nào nhận: {sorted(set(emitted) - claimed)}"
+    )
+    assert "ARCH-L0-01..07" in prereg["l0_screening_protocol"]["id_mapping_note_vi"]
+    assert (
+        prereg["modules"]["l0_constructability_screening"]
+        == "bridge_evolution/geometry_experimental/arch_l0_constructability.py"
+    )

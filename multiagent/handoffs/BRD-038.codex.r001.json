@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-038",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Safe Design Study: anchor + lấy mẫu phân tầng đa họ, applicability fail-closed, kiểm site có nguồn thật, và Pareto bền vững",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/design_study.py",
+      "sha256": "414d6caaea4b5b002377aa5a08bb07d7327a03975d8bf63e3aeb7eb60cce724a",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/model_applicability.schema.json",
+      "sha256": "fd00b4355975cce381dfb741adb493e0455de170a3e4315d42621c97a4cbb478",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/model_applicability.json",
+      "sha256": "679befd2cc26868555cd62d227dbfb83095b42b66fdf77c75dc8b208da650d0e",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_design_study.py",
+      "sha256": "334bfee8a158c05833a28743ac06472a25a1fe3b0c346612701ffc99aaf5fe4a",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Registry là miền phần mềm screening, không thay toàn văn tiêu chuẩn",
+    "L1 chỉ được mở khi site SPECIFIED, G0 PASSED, ENGINEER_APPROVED và source_ref tồn tại"
+  ],
+  "unresolved_risks": [
+    "SITE-UNSPECIFIED hiện tại chặn mọi promotion L1; đây là kết quả an toàn có chủ đích",
+    "Registry mặc định hiện nằm dưới docs và cần task đóng gói riêng nếu dùng wheel ngoài source checkout"
+  ],
+  "next_action": "Independent review by provider other than codex; do not promote above IDEA until G0/G1 evidence exists"
+}

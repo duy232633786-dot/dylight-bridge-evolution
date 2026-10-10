@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-046-001",
+  "task_id": "BRD-046",
+  "incident_id": "INC-BRD-046-001",
+  "agent_id": "provenance-repair",
+  "role": "evidence_safety_auditor",
+  "summary": "Bảo toàn bytes BRD-046 và nối sang cli.py hiện tại sau khi test orchestrator và task reachability chạy sạch.",
+  "original_handoff_path": "multiagent/handoffs/BRD-046.codex.r003.json",
+  "original_handoff_sha256": "c05ccc2a5ee2409498e354d85ace4506ccf00c056ae8936c8800a14c8e45caa4",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/25cd3208b4437bc95bcda85349f7d3fecaa6f82b199f6c7e1af61d3f78073e5a.blob",
+    "sha256": "25cd3208b4437bc95bcda85349f7d3fecaa6f82b199f6c7e1af61d3f78073e5a"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/cli.py",
+    "previous_sha256": "25cd3208b4437bc95bcda85349f7d3fecaa6f82b199f6c7e1af61d3f78073e5a",
+    "current_sha256": "5c009ec363207e158698a913fca2ed305c2146f83e4cc6e28709376122b9d3f8"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "tests/test_task_contract_reachability.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction không tự xác nhận nội dung kỹ thuật của các lệnh CLI mới; cần reviewer độc lập."
+  ],
+  "supersedes_correction_sha256": null
+}

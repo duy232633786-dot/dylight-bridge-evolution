@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-036-002",
+  "task_id": "BRD-036",
+  "incident_id": "INC-BRD-036-002",
+  "correction_sha256": "684bf47ff1015923110e6a2f1e755592bf64a81b59587bfc97ba4b61032ed7fe",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "COR-002 sketch_family.py: diff snapshot 2227b0a4 -> live facef601 adds SKETCH_DECLARED_OVERLOADS, 'GIA DINH OVERLOAD' markers in emitted C#, InclinedWorkPlane gating, and correct void-overlap volume via _box_overlap_m3 (200 - 3.6 = 196.4 matching RFC-1.1.0, replacing wrong 195.68); self-check now runs on comment-stripped code.",
+    "Hash chain: handoff 96fdd21d ok; snapshot blob byte-exact 2227b0a4; live artifact equals recorded current_sha256; verify_brd036_provenance.py PASS (read-only).",
+    "pytest tests/test_revit_family.py: 624 passed."
+  ],
+  "notes": "Reviewer opencode is independent (not codex, not claude). Scope: IDEA claim level only; string-level self-checks are not proof a family ran in real Revit; this is not a structural-bridge audit. Approve correction."
+}

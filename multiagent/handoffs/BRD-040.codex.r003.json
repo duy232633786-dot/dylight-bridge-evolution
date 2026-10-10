@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-040",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "r003 thay Jacobi scaling bằng characteristic-length unit scaling, giữ bất biến đồng dạng nhưng lộ độ mềm gần cơ cấu; thêm F1-SMALL-DISPLACEMENT và MODEL_LIMIT_EXCEEDED. Target 66/66 xanh; full suite chỉ còn 5 lỗi BRD-036 tiền tồn tại.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/frame_f1.py",
+      "sha256": "1ebbd5defb47b58eb5eb9171d28c52b1db721c10c2fbfefe083f86fba756720c",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/frame_f1_model.schema.json",
+      "sha256": "15bce3cbf61e934ff995ee30e6d2a625eb9662a90213bc3a25600b5ef60caa30",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/frame_f1_result.schema.json",
+      "sha256": "104754afdcb4d29daec64d4359bfe74e57661f65620d1c129aa0cfe969311dd9",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/frame_f1_basis.json",
+      "sha256": "dec3fd14dba159818bd2a0bd73bec9d7acf57cd04b8d2bc3d7dbcab6dc73ed80",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_frame_f1.py",
+      "sha256": "be6904ee17efa85a92a53aea48361ac4552fe41ee377b50fb9dc25aecbfb8af2",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "FRAME_2D là Euler-Bernoulli đàn hồi tuyến tính chuyển vị nhỏ; TRUSS_2D chỉ có độ cứng tịnh tiến và rz ở nút thuần truss bị loại có giải thích."
+  ],
+  "unresolved_risks": [
+    "Guard tỷ số chuyển vị 0.05 là biên applicability nghiên cứu, không phải giới hạn sử dụng theo tiêu chuẩn; F1 vẫn thiếu P-Delta, buckling, phi tuyến, tải động, mỏi, liên kết, móng và giai đoạn."
+  ],
+  "next_action": "Claude review độc lập r003; tái chạy V-truss offset giảm, đồng dạng scale 0.01 và 100, benchmark giải tích, schema và solver-source hash."
+}

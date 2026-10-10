@@ -1,0 +1,232 @@
+"""Sinh mã C# dựng **family Revit** — cổng chặn theo năng lực ĐÃ ĐO (BRD-036 Pha 2).
+
+===========================================================================
+GIÁ TRỊ CỐT LÕI: **không thể sinh ra C# mà ta đã ĐO là hỏng**
+===========================================================================
+Xin ``NewExtrusion`` trong template adaptive -> Python raise NGAY, không đợi
+Revit ném lỗi. Xin ``NewBlend`` với hai profile cùng cao độ -> ràng buộc
+``[B1]`` nói thẳng ra. Xin một phép CHƯA ĐO -> :class:`NotMeasuredError`.
+
+Ba module, ba vai:
+
+* :mod:`~bridge_evolution.revit_family.worlds` — **cổng**. Mã hoá RFC-1.1.0
+  (``docs/revit_family_capability.md``) thành hai bảng dữ liệu và một hàm
+  :func:`require_operation` raise-chứ-không-trả-bool.
+* :mod:`~bridge_evolution.revit_family.csharp` — **hạ tầng phát mã**. Khuôn
+  ``NewFamilyDocument -> Transaction riêng -> Regenerate TRONG transaction ->
+  SaveAs .rfa`` đúng như đã kiểm chứng, cộng bốn kiểm tra fail-closed chạy
+  trên chính chuỗi vừa sinh.
+* :mod:`~bridge_evolution.revit_family.sketch_family` — **bộ sinh cấu kiện**
+  cho thế giới SKETCH. Năm hàm (:func:`arch_rib_segment`,
+  :func:`tapered_pier_shaft`, :func:`revolved_member`,
+  :func:`prismatic_member`, :func:`void_cut`), mỗi hàm gác cổng TRƯỚC rồi mới
+  kiểm ràng buộc hình học đã đo ([S1] [S2] [S3] [B1] [R1]).
+
+* :mod:`~bridge_evolution.revit_family.adaptive_family` — **thế giới ADAPTIVE /
+  MASSING**, nơi ĐIỂM điều khiển hình. Đây là môi trường của dầm chủ, gờ lan
+  can, lan can thép.
+
+Đường dùng mặc định là :func:`guarded_family_scaffold` (có cổng).
+:func:`family_scaffold` là hạ tầng trần — nó chỉ nhận đường dẫn ``.rft`` nên
+KHÔNG biết thế giới, và do đó KHÔNG gác.
+
+TRẠNG THÁI HÔM NAY: THẾ GIỚI ADAPTIVE ĐANG **CHẶN**
+---------------------------------------------------
+Không family adaptive/mass nào ra được ``.rfa``, vì hai chặn độc lập:
+
+1. **dấu claim** — ``FamilyManager.AddParameter`` CHƯA ĐO ngoài thế giới SKETCH
+   (RFC-1.1.0 §5), mà dấu claim là bắt buộc;
+2. **phép dựng khối giữ được tham số** — ``NewSweptBlendForm`` ([A5]) còn vướng
+   mâu thuẫn nội bộ của §3.
+
+Cái vẫn phát được mã: bộ xương 2 điểm, mặt phẳng tiết diện YZ, và FLEX PROBE.
+Xem docstring của :mod:`~bridge_evolution.revit_family.adaptive_family`.
+
+MỨC CLAIM
+---------
+Trần claim của BRD-036 là **IDEA**. Mọi family sinh ra mang tham số
+``DYLIGHT_ClaimLevel = "F0_IDEA"`` + ``DYLIGHT_ClaimStatement`` đọc được ngay
+trong bảng Family Types của Revit. Family tham số hoá trông giống hồ sơ kỹ
+thuật thật hơn DirectShape, nên dấu claim ở đây quan trọng HƠN chứ không phải
+ít hơn.
+
+Ví dụ::
+
+    from bridge_evolution.revit_family import require_operation, xyz
+
+    require_operation("NewExtrusion", "structural_foundation")   # im lặng = OK
+    require_operation("NewExtrusion", "adaptive")                # -> raise
+"""
+from .adaptive_family import (
+    DECLARED_OVERLOADS,
+    FLEX_PRESERVING_FORM_OP,
+    FLEX_PROBE_OPS,
+    MASSING_LOFT_OPS,
+    MEMBER_OPS,
+    SECTION_PLANE_OPS,
+    SPINE_OPS,
+    STATIC_FORM_OP,
+    VOID_OPS,
+    AdaptiveTwoPointSpec,
+    adaptive_flex_probe,
+    adaptive_four_point_panel,
+    adaptive_section_plane_body,
+    adaptive_two_point_member,
+    adaptive_two_point_spine_body,
+    adaptive_void,
+    blocking_operations,
+    massing_loft_surface,
+)
+from .csharp import (
+    ALLOWED_CLAIM_LEVELS,
+    CLAIM_LEVEL_PARAM,
+    CLAIM_STATEMENT_PARAM,
+    DEFAULT_CLAIM_STATEMENT,
+    FT,
+    ClaimCeilingError,
+    CSharpBuilder,
+    CSharpEmitError,
+    CSharpStructureError,
+    ForbiddenCSharpError,
+    NonAsciiCSharpError,
+    claim_parameters_cs,
+    cs_string,
+    family_scaffold,
+    guarded_family_scaffold,
+    m_to_ft,
+    xyz,
+)
+from .sketch_family import (
+    PLANE_TOL_COS,
+    PLANE_TOL_M,
+    REVIT_SHORT_CURVE_TOL_M,
+    SAG_TOL_M,
+    BlendElevationError,
+    BoxSpec,
+    CollinearArcError,
+    DegenerateGeometryError,
+    RevolveAxisError,
+    SketchFamilyError,
+    VoidDoesNotCutError,
+    arch_rib_segment,
+    prismatic_member,
+    revolved_member,
+    tapered_pier_shaft,
+    void_cut,
+)
+from .worlds import (
+    CAPABILITY_DOC,
+    NOT_MEASURED_OPERATIONS,
+    OPERATION_ALIASES,
+    OPERATIONS,
+    RFC_VERSION,
+    TEMPLATE_ALIASES,
+    TEMPLATE_ROOT,
+    TEMPLATES,
+    FamilyWorld,
+    MeasuredStatus,
+    NotMeasuredError,
+    OperationSpec,
+    RevitFamilyCapabilityError,
+    TemplateSpec,
+    UnknownOperationError,
+    UnknownTemplateError,
+    UnsupportedInWorldError,
+    capability_table,
+    operation_spec,
+    operation_status,
+    operations_ok_in,
+    require_operation,
+    require_operations,
+    template_exists,
+    template_path,
+    template_spec,
+    templates_in_world,
+    world_of,
+)
+
+__all__ = [
+    # -- worlds: cổng ------------------------------------------------------
+    "RFC_VERSION",
+    "CAPABILITY_DOC",
+    "TEMPLATE_ROOT",
+    "FamilyWorld",
+    "MeasuredStatus",
+    "TemplateSpec",
+    "OperationSpec",
+    "TEMPLATES",
+    "TEMPLATE_ALIASES",
+    "OPERATIONS",
+    "OPERATION_ALIASES",
+    "NOT_MEASURED_OPERATIONS",
+    "RevitFamilyCapabilityError",
+    "UnknownTemplateError",
+    "UnknownOperationError",
+    "UnsupportedInWorldError",
+    "NotMeasuredError",
+    "template_spec",
+    "operation_spec",
+    "world_of",
+    "template_path",
+    "template_exists",
+    "operation_status",
+    "require_operation",
+    "require_operations",
+    "templates_in_world",
+    "operations_ok_in",
+    "capability_table",
+    # -- csharp: hạ tầng phát mã -------------------------------------------
+    "FT",
+    "m_to_ft",
+    "xyz",
+    "cs_string",
+    "CSharpBuilder",
+    "family_scaffold",
+    "guarded_family_scaffold",
+    "claim_parameters_cs",
+    "CLAIM_LEVEL_PARAM",
+    "CLAIM_STATEMENT_PARAM",
+    "ALLOWED_CLAIM_LEVELS",
+    "DEFAULT_CLAIM_STATEMENT",
+    "CSharpEmitError",
+    "ForbiddenCSharpError",
+    "CSharpStructureError",
+    "NonAsciiCSharpError",
+    "ClaimCeilingError",
+    # -- adaptive_family: thế giới ADAPTIVE / MASSING ----------------------
+    "AdaptiveTwoPointSpec",
+    "SPINE_OPS",
+    "SECTION_PLANE_OPS",
+    "MEMBER_OPS",
+    "VOID_OPS",
+    "MASSING_LOFT_OPS",
+    "FLEX_PROBE_OPS",
+    "FLEX_PRESERVING_FORM_OP",
+    "STATIC_FORM_OP",
+    "DECLARED_OVERLOADS",
+    "blocking_operations",
+    "adaptive_two_point_spine_body",
+    "adaptive_section_plane_body",
+    "adaptive_two_point_member",
+    "adaptive_flex_probe",
+    "massing_loft_surface",
+    "adaptive_void",
+    "adaptive_four_point_panel",
+    # -- sketch_family: cấu kiện thế giới SKETCH ---------------------------
+    "REVIT_SHORT_CURVE_TOL_M",
+    "SAG_TOL_M",
+    "PLANE_TOL_M",
+    "PLANE_TOL_COS",
+    "SketchFamilyError",
+    "DegenerateGeometryError",
+    "CollinearArcError",
+    "BlendElevationError",
+    "RevolveAxisError",
+    "VoidDoesNotCutError",
+    "BoxSpec",
+    "arch_rib_segment",
+    "tapered_pier_shaft",
+    "revolved_member",
+    "prismatic_member",
+    "void_cut",
+]

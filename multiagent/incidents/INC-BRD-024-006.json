@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-024-006",
+  "task_id": "BRD-024",
+  "detected_at_utc": "2026-08-26T12:12:58.288293Z",
+  "detected_by": "opencode",
+  "original_handoff_path": "multiagent/handoffs/BRD-024.codex.r001.json",
+  "original_handoff_sha256": "8f5c687b189e5d90304e6445871d90ea8e91b76f4e60ea9da6c75d902c4e3ce2",
+  "artifact_path": "docs/runtime_capability_matrix.md",
+  "recorded_sha256": "1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f",
+  "observed_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28",
+  "reason": "Artifact thay doi sau khi handoff duoc ky do checkpoint git cua phien agent song song va chuan hoa line-ending CRLF tren Windows; trang thai hien tai duoc bao tri boi cac task ACCEPTED phien 2026-08-25/26.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

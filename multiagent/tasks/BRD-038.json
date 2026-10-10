@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-038",
+  "title": "Safe Design Study: sinh phương án đa họ và chặn mô hình ngoài miền áp dụng trước solver",
+  "research_question": "Làm sao tăng sức mạnh tìm kiếm phương án cầu bằng lấy mẫu phân tầng đa họ, đánh giá nhiều tầng và Pareto bền vững, đồng thời bảo đảm một agent không thể dùng solver hoặc công thức phân phối ngang ngoài miền áp dụng để tạo kết luận có vẻ hợp lệ?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "REJECTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-025",
+    "BRD-028",
+    "BRD-035"
+  ],
+  "required_gates": [
+    "G0",
+    "G1"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "bridge_evolution/design_study.py",
+    "contracts/model_applicability.schema.json",
+    "docs/design_basis/model_applicability.json",
+    "tests/test_design_study.py"
+  ],
+  "acceptance_criteria": [
+    "Sinh mẫu phân tầng xác định cho nhiều grammar rời rạc, cùng seed cho kết quả byte-for-byte giống nhau và phủ đủ từng họ trước khi tăng mật độ",
+    "Kiểm model applicability trước khi gọi evaluator: family, fidelity, solver, alignment, skew, span và giới hạn công thức phân phối ngang đều fail-closed",
+    "Ứng viên ngoài miền trả BLOCKED kèm mã lý do và evaluator không được gọi",
+    "Box girder và composite I chỉ được L0 cho đến khi registry khai solver phù hợp; không được chạy BUILTIN_L1 bằng cách đổi marker",
+    "Pareto bền vững chỉ nhận ứng viên SCREENED, dùng upper-confidence objective và worst-case utilization; phương án thiếu mẫu bất định không được giả là robust",
+    "Registry có JSON Schema Draft 2020-12, additionalProperties=false và được kiểm tra trước khi dùng",
+    "Test âm phủ ít nhất: box ngoài miền DF, composite dùng solver BTCT-DUL, skew ngoài miền, span ngoài miền, thiếu site profile và evaluator không được gọi",
+    "Không sửa verdict của evaluate_candidate, không nâng claim trên SCREENED và không thay thế kiểm toán kỹ sư"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/design_study.py",
+    "docs/design_basis/model_applicability.json",
+    "tests/test_design_study.py"
+  ],
+  "safety_notes": [
+    "Đây là orchestration và screening, không phải solver kết cấu mới; kết quả không được dùng trực tiếp cho hồ sơ thiết kế",
+    "Mọi điều kiện không biết hoặc thiếu dữ liệu phải BLOCKED, không nội suy hoặc dùng giá trị mặc định im lặng",
+    "Không đụng bridge_evolution/evaluate.py, geometry.py, line_girder.py hoặc lab.py vì đang có provenance/task khác neo vào",
+    "Không cho chi phí, carbon, thẩm mỹ hoặc surrogate bù trừ một blocker HARD",
+    "Ngưỡng applicability trong registry là miền phần mềm được phép chạy, không tự nhận là toàn bộ miền tiêu chuẩn"
+  ],
+  "review_notes": [
+    "Claude Opus review chỉ đọc: hash 4/4 khớp; REVISE vì registry tùy biến bỏ schema/hash, evaluator giả có thể phát SCREENED, mẫu uncertainty trùng được tính độc lập, outside-domain và blocker schema không fail-closed nhất quán. Codex chạy lại bộ mục tiêu chung 49/49 xanh; các finding là đường đối kháng chưa được test cũ phủ.",
+    "Claude Code Opus independent review: 4/4 artifact hashes matched, 15/15 target tests and approximately 30 adversarial probes passed; implementation is sound only as IDEA and G2 PASS, while G0/G1 genuinely FAIL. Claude initially judged the IDEA code acceptable, but canonical review_handoff correctly refused APPROVE because BRD-038 contract requires G0/G1. On explicit reconciliation Claude chose REJECT, not REVISE: the lineage contract is structurally mismatched and cannot honestly close without nonexistent design-basis/geometry evidence. Preserve r002 unchanged; carry sound code into a new IDEA lineage and open separate G0 design-basis plus guarded integration tasks."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_study.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

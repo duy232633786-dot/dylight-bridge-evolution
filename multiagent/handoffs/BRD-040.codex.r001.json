@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-040",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Kernel F1 độ cứng trực tiếp FRAME_2D/TRUSS_2D có source-byte hashing, phát hiện cơ cấu, benchmark giải tích và kiểm cân bằng-năng lượng",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/frame_f1.py",
+      "sha256": "f872b3aafd9ac08684b14c956a0950f6d75b3c39cac5163180a7e8f26437d780",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/frame_f1_model.schema.json",
+      "sha256": "15bce3cbf61e934ff995ee30e6d2a625eb9662a90213bc3a25600b5ef60caa30",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/frame_f1_result.schema.json",
+      "sha256": "604412010211f1c8581ec33d2484808d26432f2fc75073a759d522db84062c5c",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/frame_f1_basis.json",
+      "sha256": "6ecf41c2677c1faf7f64f3bee92b62400ea8881c874dbae90c0837f4f9ec64ca",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_frame_f1.py",
+      "sha256": "74c3c7704c75c97b817cd0bcbbb34573b245cc5603ef328bc8d2049dd2cdeda8",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Mô hình dùng kN-m-GPa và chỉ nhận tải nút do caller cung cấp",
+    "Nguồn tồn tại và hash khớp chỉ xác lập provenance, không tự chứng minh applicability"
+  ],
+  "unresolved_risks": [
+    "Chưa có P-Delta, buckling, phi tuyến, động lực, mỏi, liên kết, móng hoặc staged construction",
+    "Chưa cross-check với solver độc lập trên mô hình vòm thực và chưa có load combination/capacity theo tiêu chuẩn"
+  ],
+  "next_action": "Review độc lập và cross-check với OpenSees/Midas; chỉ sau đó mới tạo adapter creative-shape sang F1"
+}

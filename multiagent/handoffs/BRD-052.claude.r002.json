@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "agent_id": "claude",
+  "role": "bim_fem_integrator",
+  "summary": "r002 BRD-052 (sau REVISE r001 cua codex, 7 MAJOR + 2 MINOR - da xu ly het): CX-052-01 containment kiem ca CANH lo cat bien ngoai va tu cat (segment intersection), test hoi quy voi truong hop moi dinh nam trong nhung canh JI3->goc day lot qua cho lom JO3; CX-052-02 ho mat cat noi suy MOI kich thuoc d(x) = d_mid + (d_pier - d_mid)*f, x=0/x=L tra dung nguyen mat cat tru/nhip (test voi cap de xuat khac suon, suon nghieng), doi hoi cung JOINT; CX-052-03 JSON db/SECT du khoa theo dung vi du PSC-1CELL (Assign 401) trong manual: PSC_OPT1/2, SWIDTH, WARPING_*, WEB_THICK*, USE_SMALL_HOLE..., mac dinh lay tu basis midas_api_json_defaults (ghi ro la mac dinh cua lab); CX-052-04 bang chung DBUSER nam ngoai repo duoc neo SHA-256 (3 file midas-mcp/evidence) trong basis, co doi ten VERIFIED_BY_EXTERNAL_EVIDENCE, moi co kiem chung phat trong export_bundle().verification_flags va status tung khoi; CX-052-05 PSC-Value dung khoa VERTEX (JSON Schema), vSIZE = [HT, BT, T1, T2] (T1/T2 tu gene Super-T), SHAPE VALU theo vi du manual; CX-052-06 UI danh so yeu cau (bo phan hoi cu), khi tham so loi thi lam mo hinh/khoi xuat cua lan hop le truoc, khoa nut sao chep va ghi ro; CX-052-07 test route qua LabHandler that (ThreadingHTTPServer cong ngau nhien: 200/400/404, header no-store); CX-052-08 bool nghiem ngat (chuoi 'false' khong thanh True), section_id lech kieu -> 400; CX-052-09 so lieu test lan nay dem tu log day du. Phat hien them tu vi du manual: 1CEL van xuat 8 phan tu vSIZE_PSC_D (BI4 = 0) + SWIDTH, va HI1+..+HI5 (2.30) khong bat buoc bang H (2.33) -> lab neo ban day theo HI5, lech HI3 chi la canh bao (consistency_warnings), preset 'MIDAS API manual - vi du PSC-1CELL' tai tao dung 4 mang (test). UI: tab 'Hop PSC kieu MIDAS' trong ban 'Sang tao mat cat' (gop voi Studio Super-T v2 co o nhap so + MAP-Elites). Test: tests/test_midas_section.py 27 ca PASS (7 ca hoi quy findings); + tests/test_lab_api.py 38/38 PASS; full suite: 78 pass, 0 skip, 0 fail (exit 0, log day du .tmp/lab-review/full_suite_r002.txt).",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G1"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/midas_section.py",
+      "sha256": "91288a2d4848e4346b32cd75a1aab9b54183153d48f2778476a7d7043e5e7f80",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/midas_psc_section.schema.json",
+      "sha256": "cf8f9f843c566460b9b7f45543cf6958cd2d48290fdb130bc90b47b08f946579",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/midas_psc_section_basis.json",
+      "sha256": "d6ef9c7886fec86d7e33656f3696005a5fec4ec6d7ec44591151caa9b15afc0b",
+      "kind": "code"
+    },
+    {
+      "path": "docs/08_midas_section_bridge.md",
+      "sha256": "a284e7d462ae5e9ec03d26e6f16a6cb68867a157b8a7d0e9d4d9356b3172736c",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_midas_section.py",
+      "sha256": "9a7dc5bb192fbfcdf3a28560a73f9011950dad694105a98f228af3a0dd3d5b85",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/midas_section.html",
+      "sha256": "81f813829f41bc7033312d3e39de4c6c50c49e38e869326ddc8b0c4aed822012",
+      "kind": "code"
+    },
+    {
+      "path": "scripts/serve_lab.py",
+      "sha256": "d1c86f17766794f27985635e397f95d7ed477d0cba89ef2286c2fc5563d5515c",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/lab.html",
+      "sha256": "6f225e4cdaeb14a9ef30cb7b97d90f9d3260a7c471b4dc70ec428f412410e63d",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/lab.js",
+      "sha256": "986a6ad1a3fb5b0a794a811ba2252613aa95151e2485b4ca5c154e0e8c6d2dc9",
+      "kind": "code"
+    },
+    {
+      "path": "dashboard/lab.css",
+      "sha256": "9de200a585559828b2c4baadcf23027f4b294eea5e556a0bfc0497b1f6c3664f",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Quy uoc huong do kich thuoc phu suy tu hinh guide PSC Viewer trong tutorial chinh hang (05 FCM General Fig.4/5), doi chieu so tutorial (Z3 0.51 m, t2 = t3 = 0.90 m) va vi du manual (4 mang tai tao dung); 2CELL (BI4 = nua day suon giua, hai lo doi xung) la gia dinh chua doi chieu guide 2CELL",
+    "Khi HI1+HI2+HI3+HI4+HI5 khac H, lab ve ban day theo HI5 (tu day) va bang suon hieu dung bu phan lech; MIDAS co the ve khac - chi canh bao, nut Tu can HI3",
+    "Dinh dang dong MCT *SECTION cho PSC suy doan theo thu tu truong manual API; dialog/Table Input la duong nhap chac chan; DBUSER Box la du phong co bang chung ngoai repo"
+  ],
+  "unresolved_risks": [
+    "Module chi sinh hinh hoc va du lieu nhap; khong co kiem tra chiu luc, cap DUL, cot thep, giai doan thi cong; moi de xuat tham so la IDEA tu heuristic chua co nguon",
+    "MCT PSC va PSC-Value chua nap thu tren Civil 2022; can nguoi dung xuat MCT mau tu MIDAS de hieu chinh va go co",
+    "Bon file dung chung voi BRD-051 (serve_lab.py, lab.html, lab.js, lab.css) duoc bam o day; BRD-051 khi nop se bam cung bytes"
+  ],
+  "next_action": "Independent review r002 by codex; sau do nguoi dung nap thu khoi MCT PSC tren Civil 2022 (hoac xuat MCT mau tu MIDAS) de go co SYNTAX_UNVERIFIED"
+}

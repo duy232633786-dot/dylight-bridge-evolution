@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-053",
+  "title": "Lớp đề xuất AI có hợp đồng (AI proposer contract): bộ não AI chỉ đề xuất trong miền grammar, lab đánh giá qua assess_candidate; ngữ cảnh có nguồn, phản hồi có cấu trúc, pre-registration + lineage, cổng applicability; adapter heuristic / HTTP local / vendor CLI",
+  "research_question": "Có thể đưa một 'bộ não AI' (LLM local qua HTTP tương thích OpenAI, hoặc CLI codex/claude/opencode, hoặc heuristic không LLM làm đối chứng) vào vòng sáng tạo của phòng lab sao cho AI chỉ ĐỀ XUẤT thay đổi gene trong miền grammar, mọi phán quyết khả thi/claim đều do assess_candidate (L0 → applicability → L1 → independent verifier) đưa ra, mọi đề xuất kể cả kết quả âm đều được ghi lineage có hash và pre-registration khóa trước khi chạy hay không?",
+  "workstream": "integration",
+  "priority": "P1",
+  "status": "REVIEW",
+  "owner": "claude",
+  "reviewer": null,
+  "dependencies": [],
+  "required_gates": [
+    "G1",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "runtime_scope": {
+    "structural_families": [
+      "super_t_simple_v1",
+      "super_t_parametric_v2"
+    ],
+    "runtime_domain": "production_line_girder_l1"
+  },
+  "write_scope": [
+    "bridge_evolution/proposer/__init__.py",
+    "bridge_evolution/proposer/contract.py",
+    "bridge_evolution/proposer/adapters.py",
+    "bridge_evolution/proposer/loop.py",
+    "contracts/ai_proposal.schema.json",
+    "docs/design_basis/ai_proposer_basis.json",
+    "docs/09_ai_proposer.md",
+    "tests/test_ai_proposer.py",
+    "scripts/propose_cli.py"
+  ],
+  "acceptance_criteria": [
+    "Hợp đồng JSON Schema (contracts/ai_proposal.schema.json) cho ba đối tượng: ProposalRequest (những gì bộ não nhận: miền grammar đầy đủ, gene hiện tại, đánh giá hiện tại đã tóm tắt, lịch sử kể cả kết quả âm, thẻ tri thức có nhãn trạng thái, ngân sách), ProposalResponse (những gì bộ não trả: danh sách thay đổi gene + giả thuyết + hiệu ứng kỳ vọng; additionalProperties=false nên mọi khóa verdict/pass/feasible do LLM tự phát đều bị từ chối), ProposalSessionReport (lineage đầy đủ)",
+    "Mọi đề xuất chỉ được áp dụng nếu từng giá trị nằm đúng miền grammar (catalog/int/grid, kiểm kiểu nghiêm ngặt); ngoài miền → ghi nhận, không đánh giá, không ném lỗi; request_id không khớp hoặc JSON hỏng → adapter_status MALFORMED, không đánh giá",
+    "Phán quyết duy nhất là assess_candidate của design_study với evaluator mặc định (đường schema → L0 → applicability registry đã neo hash → L1 → independent verifier); study_level chọn theo registry (họ chỉ cho L0_GEOMETRY thì không bao giờ gọi L1 và objective được báo 'không có ở mức nghiên cứu này'); vòng lặp không nới ràng buộc, không tự phong SCREENED",
+    "Pre-registration (câu hỏi, objective, ngân sách vòng/lượt đánh giá, tiêu chí thành công, tiêu chí bác bỏ, seed) được khóa và băm SHA-256 trước vòng 1 và nằm trong báo cáo; mọi lượt (request/response hash, adapter status, từng proposal + kết quả) được ghi, kết quả âm không bị xóa; báo cáo hợp lệ theo schema và tái lập (cùng seed, cùng adapter tất định → cùng nội dung trừ timestamp/elapsed)",
+    "Ba adapter cùng một giao diện: HeuristicProposer (không LLM, tất định theo seed, dùng thẻ tri thức + bước lân cận trong miền — làm đối chứng), OpenAICompatibleProposer (endpoint HTTP local như LM Studio/Ollama/vLLM; endpoint/model từ tham số hoặc biến môi trường; API key chỉ đọc từ biến môi trường lúc chạy, không bao giờ ghi vào báo cáo/repo; transport tiêm được để test hermetic), VendorCLIProposer (tái dùng collaboration.providers.run_provider với writable=False, runner tiêm được)",
+    "tests/test_ai_proposer.py phủ: schema, áp dụng thay đổi trong/ngoài miền, phiên heuristic trên gene neo Super-T (tái lập, có SCREENED), phiên với seed vi phạm (ghi kết quả âm), họ chỉ L0 (không gọi L1), LLM giả trả verdict/pass → MALFORMED, request_id sai → MALFORMED, transport HTTP giả trả proposal hợp lệ → được đánh giá, không rò rỉ API key vào báo cáo, CLI adapter với runner giả, script scripts/propose_cli.py chạy end-to-end",
+    "docs/09_ai_proposer.md trả lời câu hỏi 'phòng lab ảo cần gì để đưa bộ não AI vào sáng tạo': hiện trạng năng lực (ma trận), khoảng trống, kiến trúc lớp đề xuất, bất biến an toàn, lộ trình task kế tiếp có ghi rõ cái gì CHƯA có (đọc kết quả MIDAS L2, verifier hộp, thư viện điều khoản đã duyệt)"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/proposer/contract.py",
+    "bridge_evolution/proposer/adapters.py",
+    "bridge_evolution/proposer/loop.py",
+    "contracts/ai_proposal.schema.json",
+    "docs/design_basis/ai_proposer_basis.json",
+    "docs/09_ai_proposer.md",
+    "tests/test_ai_proposer.py",
+    "scripts/propose_cli.py"
+  ],
+  "safety_notes": [
+    "LLM/heuristic chỉ đề xuất; không tính sức kháng, không phát PASS/FAIL; schema từ chối mọi khóa phán quyết do bộ não tự thêm",
+    "Trần claim của phiên là SCREENED (L1 line-girder) và chỉ khi assess_candidate với evaluator mặc định cấp; họ dầm hộp chỉ được L0_GEOMETRY theo registry nên objective/utilization không tồn tại ở mức đó",
+    "Không lưu credentials: API key chỉ đọc từ biến môi trường lúc chạy, báo cáo chỉ ghi host của endpoint; prompt/response được băm, không chứa khóa",
+    "Thẻ tri thức đưa vào ngữ cảnh đang DRAFT/UNVERIFIED và được gắn nhãn như vậy trong request; không được coi là luật",
+    "Adapter vendor CLI chạy read-only (writable=False) và không được gọi lab CLI; kết quả của AI vendor là dữ liệu không tin cậy",
+    "Không đụng 10 file thuộc BRD-052 đang REVIEW; không sửa cli.py/serve_lab.py — script độc lập scripts/propose_cli.py; hook UI để task sau khi BRD-051/052 hoàn tất",
+    "Reviewer độc lập là codex hoặc opencode; owner không tự review"
+  ],
+  "preferred_provider": "claude",
+  "preferred_role": "structural_analyst",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_ai_proposer.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_ai_proposer.py",
+      "tests/test_design_study.py",
+      "tests/test_knowledge.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

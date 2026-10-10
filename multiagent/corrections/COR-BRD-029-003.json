@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-029-003",
+  "task_id": "BRD-029",
+  "incident_id": "INC-BRD-029-003",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Ha girder_count tu minimum 2 xuong minimum 1 o CAP GLOBAL, roi SIET LAI ve minimum 2 trong khoi if/then cua bon ho con lai (super_t_simple_v1, super_t_parametric_v2, i_girder_parametric_v1, composite_i_girder_parametric_v1). Chi box_girder_parametric_v1 theo global, vi hop don o dung mot dot. JSON Schema allOf la phep AND nen khong the noi rang buoc global tu mot khoi if/then - do la ly do phai lam theo huong nay thay vi them mot ngoai le. Khong doi bat ky truong nao khac cua schema.",
+  "original_handoff_path": "multiagent/handoffs/BRD-029.claude.r001.json",
+  "original_handoff_sha256": "791517899baf26fb8e9695ebc3b4d8240ddef3c26fff68b76ad99a811bf00ee1",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/4ddda1d898327f64d01dcb25b0bfebf0e6bb00551b5e9e2912b05b9ed93fed94.blob",
+    "sha256": "4ddda1d898327f64d01dcb25b0bfebf0e6bb00551b5e9e2912b05b9ed93fed94"
+  },
+  "corrected_artifact": {
+    "path": "contracts/bridge_design_state.schema.json",
+    "previous_sha256": "4ddda1d898327f64d01dcb25b0bfebf0e6bb00551b5e9e2912b05b9ed93fed94",
+    "current_sha256": "ec924f3126892f1fd2400133f0bada9ceb65b8b294262bade5968049061a9510"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_multifamily_contract.py",
+      "tests/test_state.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Bay input_hash gold case trong tests/test_state.py phai y nguyen sau khi noi hop dong; da chay lai va 27/27 xanh."
+  ],
+  "unresolved_risks": [
+    "Chua duoc review doc lap; can agent khac claude APPROVE thi lab moi hop le tro lai."
+  ],
+  "supersedes_correction_sha256": null
+}

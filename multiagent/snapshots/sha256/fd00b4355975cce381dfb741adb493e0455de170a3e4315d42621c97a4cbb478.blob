@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "model_applicability.schema.json",
+  "title": "DYLIGHT model applicability registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_version",
+    "claim_ceiling",
+    "objective_keys",
+    "families"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "registry_version": {
+      "type": "string",
+      "pattern": "^DYLIGHT-MODEL-APPLICABILITY-[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "claim_ceiling": { "const": "SCREENED" },
+    "objective_keys": {
+      "const": [
+        "relative_cost",
+        "material_mass_t",
+        "embodied_carbon_kgCO2e"
+      ]
+    },
+    "families": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" },
+      "additionalProperties": { "$ref": "#/$defs/family" }
+    }
+  },
+  "$defs": {
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    },
+    "analysis_pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fidelity", "solver"],
+      "properties": {
+        "fidelity": {
+          "enum": ["L1_LINE_GIRDER", "L2_GRILLAGE", "L3_NONLINEAR"]
+        },
+        "solver": {
+          "enum": ["BUILTIN_L1", "MIDAS_CIVIL", "OPENSEESPY"]
+        }
+      }
+    },
+    "distribution_domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formula_id",
+        "spacing_mm",
+        "slab_thickness_mm",
+        "girder_count",
+        "kg_mm4"
+      ],
+      "properties": {
+        "formula_id": { "type": "string", "minLength": 3 },
+        "spacing_mm": { "$ref": "#/$defs/range" },
+        "slab_thickness_mm": { "$ref": "#/$defs/range" },
+        "girder_count": { "$ref": "#/$defs/range" },
+        "kg_mm4": { "$ref": "#/$defs/range" }
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "span_m",
+        "alignment_types",
+        "skew_abs_max_deg",
+        "distribution"
+      ],
+      "properties": {
+        "span_m": { "$ref": "#/$defs/range" },
+        "alignment_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["STRAIGHT", "CURVED"] }
+        },
+        "skew_abs_max_deg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 90
+        },
+        "distribution": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/distribution_domain" }
+          ]
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_study_levels",
+        "allowed_analysis",
+        "anchor_gene",
+        "section_material_kind",
+        "domain",
+        "required_site_rule_groups",
+        "limitations"
+      ],
+      "properties": {
+        "allowed_study_levels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["L0_GEOMETRY", "L1_STRUCTURAL"] }
+        },
+        "allowed_analysis": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/analysis_pair" }
+        },
+        "anchor_gene": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": ["string", "number"] }
+        },
+        "section_material_kind": {
+          "enum": ["PRESTRESSED_CONCRETE", "STEEL_COMPOSITE"]
+        },
+        "domain": { "$ref": "#/$defs/domain" },
+        "required_site_rule_groups": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["HYDRO", "SEIS", "WIND", "GEO", "DUR"] }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 5 }
+        }
+      }
+    }
+  }
+}

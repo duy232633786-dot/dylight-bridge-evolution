@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-059",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "Thêm nsga2(operators='repaired') sửa 4 khiếm khuyết đo được (khởi tạo/immigrant lọc L0, khử trùng gene, immigrant thay đuôi đã xếp hạng, đột biến luôn đổi gene); 'legacy' giữ mặc định và byte-giống bản cũ (fingerprint khóa trong test). A/B pre-register 20 seed x {v1,v2} x {150,600}: KẾT QUẢ ÂM - v1|150 REPAIRED_WORSE (thắng 4/thua 15/hòa 1, trung vị 2114,14 vs 2101,90); v1|600 legacy chạm oracle 2072,94 ở 20/20 seed, repaired 15/20; v2 cả hai ngân sách NO_SUPPORTED_DIFFERENCE (12-8 và 8-12) dù repaired không có run trắng và worst-case tốt hơn (v2|150: 2229 vs 2491). Giải thích: gene trùng/L0-reject KHÔNG tốn solver nên 'lỗi' của legacy thực chất là khai thác miễn phí quanh nghiệm tốt; ép đa dạng tiêu ngân sách vào khám phá. Không đổi mặc định. Claim IDEA vì đây là thay đổi thuật toán tìm kiếm, không có gate G1. Test: toàn suite 1909 pass/4 skip/65 fail - cả 65 fail ở 5 file test lab (collaboration, correction_chain, orchestrator, reference_docs, task_contract_amendment) với FileNotFoundError dưới basetemp scratchpad rất sâu; chạy lại 5 file đó + test NSGA-II/grammar A/B/budget với basetemp C:/pt059b: 163/163 pass. Ghi chú quy trình: task JSON do claude tạo; runtime_scope được thêm trực tiếp trước claim vì amend-task không thêm được field chưa tồn tại.",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G0",
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/optimization/nsga2.py",
+      "sha256": "e0dfa7cd90f86a33a93140c8c90b62b728e3f8e735a6fa33325ae254560b244f",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_nsga2_repaired_operators.py",
+      "sha256": "9e47ae974f1f982c98238e26891c3bef9a8cc37c7c28fd0535cf6a4e10fe299a",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/run_nsga2_operator_ab.py",
+      "sha256": "d32dac21426bdd1bbf358b539074ef6226ac285e63a8ab078dbf2f32fb65d134",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/results/nsga2_operator_ab/summary.json",
+      "sha256": "bd513c891b305b0dd248719af6f239f1d2f53af03c46e2b0303d9892f3a4c575",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/results/nsga2_operator_ab/runs.jsonl",
+      "sha256": "8b00ca33f9a73be9d179eb46baddfc39921d5bee55dad0a13e2a7c6c8c9aa86b",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/results/nsga2_operator_ab/pytest_full_suite_long_basetemp.log",
+      "sha256": "4dbde0065cd00675f6603aad003a25d86049657b71f26c12ac1e8fce492d1eb9",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/results/nsga2_operator_ab/pytest_rerun_short_basetemp.log",
+      "sha256": "34b7b5a0b25c5dc3e1d0905dd4d97fd7efeead79a73d5218d6cd19365f3b5a89",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Ngân sách = số solver call thật; L0-reject và cache hit miễn phí (định nghĩa BudgetedEvaluator không đổi).",
+    "20 seed 100..119 tách khỏi seed 42/43/44 đã dùng để phát hiện khiếm khuyết."
+  ],
+  "unresolved_risks": [
+    "Kết luận chỉ cho grammar Super-T v1/v2 với L1 line-girder; không gian lớn hơn có thể đảo chiều.",
+    "Nguyên nhân 65 fail dưới basetemp sâu chưa chứng minh; khớp giới hạn đường dẫn dài Windows nhưng chưa kiểm riêng."
+  ],
+  "next_action": "Reviewer độc lập (codex/opencode) chạy lại test + experiment; nếu muốn tiếp: thử biến thể lai (chỉ lọc L0 khởi tạo, giữ trùng lặp) trong task riêng pre-register."
+}

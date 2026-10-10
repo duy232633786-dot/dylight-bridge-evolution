@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-036-001",
+  "task_id": "BRD-036",
+  "incident_id": "INC-BRD-036-001",
+  "correction_sha256": "b4a2ef616509eb88fa35bf090ab0f6f28e967871a9bd117595e4ed30e83301f9",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "COR-001 csharp.py: diff snapshot b2ca50a6 -> live 73ec42e8 adds 2 fail-closed invariants (mandatory DYLIGHT_ClaimLevel on fd.SaveAs; [A3] GetCoordinateSystem must follow Regenerate) via pre_regen_lines param; claim ceiling unchanged (F0_IDEA only).",
+    "Hash chain: handoff 96fdd21d ok; snapshot blob byte-exact b2ca50a6; live artifact equals recorded current_sha256; verify_brd036_provenance.py PASS (read-only).",
+    "pytest tests/test_revit_family.py: 624 passed."
+  ],
+  "notes": "Reviewer opencode is independent (not codex, not claude). Scope: IDEA claim level only; string-level self-checks are not proof a family ran in real Revit; this is not a structural-bridge audit. Approve correction."
+}

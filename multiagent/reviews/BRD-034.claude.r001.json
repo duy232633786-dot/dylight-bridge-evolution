@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-034",
+  "handoff_sha256": "f715fd6f58cd427f688ebc5e610b8d76f55dd73ea596f92d6fff04a2de89f6d6",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Basis N-M/second-order đang hardcode trong engine, chưa có artifact design-basis canonical được schema/hash; site và tổ hợp tải dự án vẫn chưa khóa."
+    },
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "Guard STRAIGHT_PRISMATIC chỉ là nhãn caller tự khai, không có provenance hình học và chưa chứng minh fabrication, tolerance, vận chuyển hay lắp dựng."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Quy ước dấu M1/M2 chưa khóa có thể bỏ hiệu ứng bậc hai; miền vật liệu và benchmark kernel chưa đủ, không có convergence/version-hash đầy đủ."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task chỉ xây engine screening F1, không phải kiểm đầy đủ mọi trạng thái giới hạn của cầu."
+    },
+    {
+      "gate": "G4",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Chưa có independent design check cho phương án cầu thật."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có thí nghiệm vật lý, calibration hoặc dữ liệu hiện trường."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu nghiệm thu, suy giảm dài hạn hoặc vận hành bảo trì."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Engine giữ design_verdict_authority=NONE và không có quyền phát hành kỹ thuật."
+    }
+  ],
+  "notes": "Claude Opus review chỉ đọc: hash 5/5 khớp; REVISE vì quy ước M1/M2 chưa khóa có thể bỏ khuếch đại, basis chưa canonical, miền vật liệu và benchmark chưa đủ. Claude không được phép chạy test trong phiên; Codex tái chạy bộ mục tiêu chung và 49/49 test xanh, nhưng test xanh không đóng các finding ngữ nghĩa."
+}

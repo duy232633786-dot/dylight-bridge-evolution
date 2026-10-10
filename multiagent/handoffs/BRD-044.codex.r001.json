@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-044",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Benchmark độc lập OpenSeesPy cho 6 bài khung/giàn F1; 217/217 test chuỗi BRD-039–044 xanh, so đủ chuyển vị, phản lực, nội lực đầu thanh và cân bằng tổng thể bằng dung sai đăng ký trước.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "experiments/validation/opensees_frame_reference.py",
+      "sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915",
+      "kind": "report"
+    },
+    {
+      "path": "experiments/validation/opensees_brd044_benchmarks.json",
+      "sha256": "d4031a4d704f6acbc7d3c3895fe62f977e4cbcf725c905858cca4db96bbc5ef2",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/opensees_frame_reference.schema.json",
+      "sha256": "f573c6471447c4ec45c1589bb0ee65af0a2e33b653a2919e4657ce5a7b7799d7",
+      "kind": "report"
+    },
+    {
+      "path": "docs/design_basis/opensees_frame_reference_basis.json",
+      "sha256": "c90f857b0d81c8f1d2c210a4eaf192d6b033b3e72c4f1713daedeffe0c02c594",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference.py",
+      "sha256": "62c3446e63db82b905ddbdd56762749f1a1bee71b91ea9a4b5b1a4c81cd45193",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Chỉ đàn hồi tuyến tính 2D với cùng giả thiết mô hình F1; không phải F2/L2 hay kiểm tra sức kháng."
+  ],
+  "unresolved_risks": [
+    "Hai implementation có thể cùng chia sẻ sai giả thiết design basis; agreement không chứng minh an toàn cầu."
+  ],
+  "next_action": "Claude kiểm tra độc lập hash, cô lập worker, mapping OpenSees, benchmark giải tích, tamper guards và giới hạn claim trước khi quyết định."
+}

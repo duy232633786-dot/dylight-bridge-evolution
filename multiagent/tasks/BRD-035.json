@@ -5,9 +5,9 @@
   "research_question": "BRD-025 đã thêm ba họ i_girder / box_girder / composite_i và BRD-029 đã mở enum family, nhưng KHÔNG họ nào tạo được một BridgeDesignState hợp lệ: cả ba chết ở SCHEMA-001 trước khi solver kịp chạy. Ba nguyên nhân riêng biệt, đo được: (1) box_girder khai girder_count domain [1] cho hộp đơn ô, trong khi contracts/bridge_design_state.schema.json đặt girder_count minimum = 2 ở CẤP GLOBAL; (2) i_girder trỏ tới girder_catalog_id 'I-PARAM' không tồn tại trong catalogs/catalogs.json; (3) composite_i trỏ tới 'CI-PARAM' cũng không tồn tại. Họ Super-T tham số dùng 'ST-PARAM' và mục đó CÓ trong catalog — tức khuôn mẫu đã đúng, chỉ là ba mục tương ứng chưa ai tạo. Hai file phải sửa đều nằm ngoài write_scope của BRD-025 lẫn BRD-028, nên không task nào hiện có đóng được khoảng trống này. Làm sao mở đường cho ba họ mà KHÔNG nới hàng rào cho các họ còn lại?",
   "workstream": "integration",
   "priority": "P0",
-  "status": "ACTIVE",
+  "status": "ACCEPTED",
   "owner": "opencode",
-  "reviewer": null,
+  "reviewer": "claude",
   "dependencies": [
     "BRD-025",
     "BRD-029"
@@ -40,7 +40,9 @@
     "Không đụng bridge_grammar/*.json: ba grammar đã được BRD-025 duyệt và nằm ngoài write_scope của task này. Nếu thấy grammar sai thì báo trong handoff, không tự sửa",
     "Nới hợp đồng KHÔNG có nghĩa là ba họ mới đã được kiểm chứng. Trần claim riêng của từng họ trong grammar_bindings (box và composite đang ở IDEA vì hệ số phân bố ngang nằm ngoài miền áp dụng) vẫn giữ nguyên và vẫn chặn như cũ"
   ],
-  "review_notes": [],
+  "review_notes": [
+    "Review doc lap boi claude (owner la opencode). Toi kiem bang cach tu dung state va goi validate_design_state chu khong doc file test: girder_count=1 chi lot cho box, bi chan o ba ho kia; girder_count=0 va -1 bi chan o ca bon. Bay gold hash giu nguyen. Ket qua dich thuc su la ba ho moi da qua duoc cong hop dong va di den verifier hinh hoc L0 that su - truoc do chung chet o SCHEMA-001 truoc khi solver kip chay. GHI NHAN MOT LOI CUA CHINH TOI: script kiem toi viet o multiagent/scratch/check_cor029.py tra sai duong dan then.properties.design_variables nen in ra 'theo global' cho moi ho; reviewer cua correction (opencode) da phat hien va tu doc schema thu cong de xac minh thay vi tin output cua toi. Bai hoc: script kiem cua reviewer cung phai duoc kiem. OBSIDIAN MIRROR se con OBSIDIAN_SYNC_PENDING mot thoi gian: task BRD-028 dang chay song song (owner codex-gpt5) va lam drift bay artifact thuoc write_scope cua no (README.md, hai file capability matrix, test_design_basis.py, test_shape_grammar_experimental.py). Do KHONG phai loi cua BRD-035; se tu het khi BRD-028 ghi correction cho phan cua no."
+  ],
   "preferred_provider": "opencode",
   "preferred_role": "bim_fem_integrator",
   "review_provider": "claude",

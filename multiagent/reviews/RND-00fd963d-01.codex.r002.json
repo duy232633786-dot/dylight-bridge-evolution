@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-01",
+  "handoff_sha256": "e243c1769ef190f3e911a07632e2a0d743bb74ec64dc2b5fcc0cbc490f3f6544",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Artifact SHA-256 39cb0d3318b4dc7825d2ad1dd0d04932ba4cd077e2f7f9c6998bc0b87534bde4 explicitly records G0=FAIL/STOP_FOR_ENGINEERING_CLAIMS; site, loads, codes/version, design life, geotechnical, hydraulic, wind, seismic, material, and full geometry inputs remain UNKNOWN/UNVERIFIED."
+    }
+  ],
+  "notes": "Claim remains IDEA; verified engineering inputs are required before technical claims."
+}

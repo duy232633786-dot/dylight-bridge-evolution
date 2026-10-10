@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "brief_id": "RND-20260826-dc6374c9",
+  "created_at": "2026-08-26T12:42:48.331070Z",
+  "topic": "Dựng lại toàn bộ cây cầu trong Revit 2026 từ bộ dữ liệu hình học mới, đạt LOD 300 về hình học và phân rã cấu kiện; mỗi loại cấu kiện là một family nhỏ kiểm độc lập rồi mới lắp thành cầu; dùng đúng môi trường Family SKETCH, MASSING hoặc ADAPTIVE và phép Blend, Sweep, SweptBlend, Revolution, Extrusion/Form/void theo hình dạng thực tế, không ép tất cả về Extrusion; bảo toàn lineage của bản F0 hiện có và kiểm tra hình học sau khi mở lại RFA/RVT.",
+  "objectives": [
+    "Sinh bộ RFA cấu kiện và mô hình RVT lắp ráp LOD 300 có tham số, category, material, mã cấu kiện, điểm lắp, số lượng và bao hình học khớp dữ liệu nguồn; có flex test và QA độc lập cho từng family."
+  ],
+  "constraints": [
+    "Không tuyên bố thiết kế kết cấu hay IFC; claim tối đa IDEA/geometry-only nếu chưa có design basis và solver. Không xóa DirectShape baseline. Không dùng void hoặc adaptive 4 điểm khi chưa có phép đo hình học xác nhận."
+  ],
+  "requested_by": "user",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "budget": {
+    "max_tasks": 6,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 21600
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}

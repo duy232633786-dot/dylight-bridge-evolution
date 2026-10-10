@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-036-004",
+  "task_id": "BRD-036",
+  "incident_id": "INC-BRD-036-004",
+  "correction_sha256": "8d7d97053783a98b02b5158abe4b773b07d3aed7b5d9045de381a3192389b68f",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "COR-004 __init__.py: diff snapshot eef2662f -> live 83b2215d is exactly 2 added lines re-exporting SKETCH_DECLARED_OVERLOADS in the .sketch_family import and in __all__; consistent with COR-002 addition.",
+    "Hash chain: handoff 96fdd21d ok; snapshot blob byte-exact eef2662f; live artifact equals recorded current_sha256; verify_brd036_provenance.py PASS (read-only).",
+    "pytest tests/test_revit_family.py: 624 passed."
+  ],
+  "notes": "Reviewer opencode is independent (not codex, not claude). Scope: IDEA claim level only; string-level self-checks are not proof a family ran in real Revit; this is not a structural-bridge audit. Approve correction."
+}

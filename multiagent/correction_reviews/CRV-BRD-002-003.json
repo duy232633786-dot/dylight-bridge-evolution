@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-002-003",
+  "task_id": "BRD-002",
+  "incident_id": "INC-BRD-002-003",
+  "correction_sha256": "ce694273022f47e064fc072d427bc52d3cafafb031257da6353a3d7d848ef4ad",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot cũ và file hiện tại khớp SHA-256 trong correction; diff chỉ bổ sung 196 dòng test design-basis đã được lưu từ công việc sau; targeted test đạt 33/33."
+  ],
+  "notes": "APPROVE provenance correction. Full suite hiện còn lỗi ngoài artifact này; quyết định không phê duyệt claim kỹ thuật."
+}

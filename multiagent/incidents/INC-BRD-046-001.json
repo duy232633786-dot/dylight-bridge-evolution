@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-046-001",
+  "task_id": "BRD-046",
+  "detected_at_utc": "2026-08-31T23:09:33.174495Z",
+  "detected_by": "provenance-repair",
+  "original_handoff_path": "multiagent/handoffs/BRD-046.codex.r003.json",
+  "original_handoff_sha256": "c05ccc2a5ee2409498e354d85ace4506ccf00c056ae8936c8800a14c8e45caa4",
+  "artifact_path": "bridge_evolution/cli.py",
+  "recorded_sha256": "25cd3208b4437bc95bcda85349f7d3fecaa6f82b199f6c7e1af61d3f78073e5a",
+  "observed_sha256": "5c009ec363207e158698a913fca2ed305c2146f83e4cc6e28709376122b9d3f8",
+  "reason": "CLI tiếp tục phát triển sau handoff BRD-046; ghi nhận drift bằng snapshot bất biến thay vì cập nhật hash lịch sử.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

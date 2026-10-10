@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260922-74117064",
+  "brief_id": "RND-20260922-74117064",
+  "created_at": "2026-09-22T17:07:00.980427Z",
+  "updated_at": "2026-09-22T17:07:12.854216Z",
+  "status": "PLANNED",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-74117064-01",
+    "RND-74117064-02",
+    "RND-74117064-03",
+    "RND-74117064-04"
+  ],
+  "provider_policy": "STRICT_MULTI_VENDOR",
+  "attempts": {
+    "RND-74117064-01": 0,
+    "RND-74117064-02": 0,
+    "RND-74117064-03": 0,
+    "RND-74117064-04": 0
+  },
+  "recovery_grants": {
+    "RND-74117064-01": 0,
+    "RND-74117064-02": 0,
+    "RND-74117064-03": 0,
+    "RND-74117064-04": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-22T17:07:00.980427Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    },
+    {
+      "at": "2026-09-22T17:07:12.854216Z",
+      "kind": "KNOWLEDGE_SYNC",
+      "message": "Obsidian mirror: SYNCED"
+    }
+  ],
+  "human_gate": null,
+  "knowledge_sync": "SYNCED"
+}

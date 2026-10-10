@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260901-00fd963d",
+  "brief_id": "RND-20260901-00fd963d",
+  "created_at": "2026-09-01T14:13:04.474847Z",
+  "updated_at": "2026-09-01T16:29:17.982443Z",
+  "status": "RUNNING",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-00fd963d-01",
+    "RND-00fd963d-02",
+    "RND-00fd963d-03",
+    "RND-00fd963d-04",
+    "RND-00fd963d-05"
+  ],
+  "provider_policy": "STRICT_MULTI_VENDOR",
+  "attempts": {
+    "RND-00fd963d-01": 5,
+    "RND-00fd963d-02": 0,
+    "RND-00fd963d-03": 0,
+    "RND-00fd963d-04": 0,
+    "RND-00fd963d-05": 0
+  },
+  "recovery_grants": {
+    "RND-00fd963d-01": 2,
+    "RND-00fd963d-02": 0,
+    "RND-00fd963d-03": 0,
+    "RND-00fd963d-04": 0,
+    "RND-00fd963d-05": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-01T14:13:04.474847Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    },
+    {
+      "at": "2026-09-01T14:13:11.495153Z",
+      "kind": "KNOWLEDGE_SYNC",
+      "message": "Obsidian mirror: SYNCED"
+    },
+    {
+      "at": "2026-09-01T14:13:30.422545Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-09-01T14:13:54.012291Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 1 thất bại: MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:14:38.470376Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 2 thất bại: MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:14:38.472491Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-00fd963d-01 đã dùng hết attempt budget 2/2 (1 initial + 1 retries + 0 recovery grants)",
+      "task_id": "RND-00fd963d-01"
+    },
+    {
+      "at": "2026-09-01T14:18:35.258484Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-7bfad9b943c84197: authorized attempt 3..3 (+1); total attempt budget 2->3; claude -> claude",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:18:49.981275Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-09-01T14:18:55.498356Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 3 thất bại: MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:18:55.500650Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-00fd963d-01 đã dùng hết attempt budget 3/3 (1 initial + 1 retries + 1 recovery grants)",
+      "task_id": "RND-00fd963d-01"
+    },
+    {
+      "at": "2026-09-01T14:22:18.578689Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-ccb05e14ba5e401c: authorized attempt 4..4 (+1); total attempt budget 3->4; claude -> claude",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:22:35.566408Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-09-01T14:29:37.310453Z",
+      "kind": "HANDOFF_CREATED",
+      "message": "Handoff có hash đã nộp",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:30:22.391742Z",
+      "kind": "REVIEW_RECORDED",
+      "message": "REVISE",
+      "task_id": "RND-00fd963d-01",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-09-01T14:34:00.423297Z",
+      "kind": "HANDOFF_CREATED",
+      "message": "Handoff có hash đã nộp",
+      "task_id": "RND-00fd963d-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:34:41.296618Z",
+      "kind": "REVIEW_RECORDED",
+      "message": "REVISE",
+      "task_id": "RND-00fd963d-01",
+      "provider": "codex"
+    },
+    {
+      "at": "2026-09-01T16:02:27.238666Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-acc47bcbe2a7496b f028cde9500d04e2f94354c1424864931d646f02cc8114953e62faaa90a680ea: acceptance_criteria, required_gates, safety_notes",
+      "task_id": "RND-00fd963d-02"
+    },
+    {
+      "at": "2026-09-01T16:29:17.982443Z",
+      "kind": "TASK_CONTRACT_AMENDED",
+      "message": "AMD-b0a5fa1ce966451b 00e1a823aaf3d08af61f063ed50f7b7f103280a7d2c771ad92e946028cbd7a6e: acceptance_criteria, claim_ceiling, required_gates, research_question, safety_notes, title",
+      "task_id": "RND-00fd963d-03"
+    }
+  ],
+  "human_gate": null,
+  "knowledge_sync": "PENDING"
+}

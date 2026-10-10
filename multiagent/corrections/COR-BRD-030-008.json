@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-030-008",
+  "task_id": "BRD-030",
+  "incident_id": "INC-BRD-030-008",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Nối correction head 3ef02cb0 sang lab.py hiện tại có policy family/domain; không viết lại lịch sử.",
+  "original_handoff_path": "multiagent/handoffs/BRD-030.claude.r001.json",
+  "original_handoff_sha256": "afa300a709a368ed66ad64a89f67612601cbbe448e838cee128a853466b0a696",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5.blob",
+    "sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5",
+    "current_sha256": "0495f233ddaf65cf728d80e359d730102b0c2ebaf7147c27be9ad0a24e0db56d"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_task_contract_reachability.py",
+      "tests/test_task_contract_amendment.py",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction cần OpenCode review vì handoff do claude và correction do codex."
+  ],
+  "supersedes_correction_sha256": "aed36cbc0be827deef5ba0df880091283d3abebe3167ec03eca5bb31ad543de6"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-038-001",
+  "task_id": "BRD-038",
+  "incident_id": "INC-BRD-038-001",
+  "correction_sha256": "d8f73fa1a8855845599f7d8683e5e43cf990b6ede0c41b2cf0a075f77bf8fe0c",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Claude tự xác minh handoff SHA de2a311..., correction SHA d8f73f..., snapshot SHA cca654... và live artifact SHA 2c6b6c... đều khớp tuyệt đối.",
+    "Incident và correction schema-valid, liên kết đúng cùng BRD-038 r002 và đúng artifact bridge_evolution/design_study.py.",
+    "Hai artifact BRD-038 còn lại vẫn khớp handoff; drift chỉ nằm trong đúng hai artifact có correction.",
+    "Claude tự chạy tests/test_design_study.py: 26 passed; đây chỉ là software regression evidence, không phải bằng chứng thiết kế."
+  ],
+  "notes": "APPROVE bookkeeping provenance only. BRD-038 giữ nguyên REJECT, G0/G1 FAIL; không gate hay claim thiết kế nào được nâng."
+}

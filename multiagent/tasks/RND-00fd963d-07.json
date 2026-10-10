@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-07",
+  "title": "B1 1440 m: hình học concept có kiểm chứng độc lập",
+  "research_question": "Có thể chuyển quyết định người dùng B1 và chuỗi 145+250+650+250+145 m thành bộ hình học concept tái lập, đối xứng và fail-closed mà không biến các seed trình bày thành tuyên bố kỹ thuật không?",
+  "workstream": "geometry",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "RND-00fd963d-06"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260901-00fd963d/04_b1_1440_f0_geometry.md",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_geometry_seed.json",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_geometry.json",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_nodes.csv",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_checks.json",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_elevation.svg",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_cross_section.svg",
+    "research/orchestration/RND-20260901-00fd963d/tools/hgb_b1_generate.py",
+    "research/orchestration/RND-20260901-00fd963d/tools/hgb_b1_verify.py"
+  ],
+  "acceptance_criteria": [
+    "Khóa đúng chuỗi nhịp K1 = 145+250+650+250+145 = 1440 m và khai provenance USER_CONFIRMED",
+    "Định danh đúng mố, CATB/trụ chuyển tiếp, chân tháp/yên cáp và phép đối xứng quanh x=720 m",
+    "Sinh node cáp, hanger, dây văng ngoài, vòm giữa B1 và hai nửa vòm biên từ một JSON canonical; không nhập bảng node bằng tay",
+    "Chạy verifier độc lập cho span closure, symmetry, cable/arch endpoint closure, no-inward-stays, node-law agreement và deterministic replay",
+    "Xuất mặt đứng và mặt cắt có nhãn F0/IDEA; phân biệt kích thước đã chốt với seed chỉ để render",
+    "Khổ thông thuyền, cân bằng tháp, phần tải đứng qua vòm và an toàn đều fail-closed nếu thiếu khảo sát hoặc solver",
+    "Claude review độc lập trước khi ACCEPTED và đồng bộ Obsidian"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260901-00fd963d/04_b1_1440_f0_geometry.md",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_geometry_seed.json",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_geometry.json",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_checks.json",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_elevation.svg",
+    "research/orchestration/RND-20260901-00fd963d/b1_1440_cross_section.svg"
+  ],
+  "safety_notes": [
+    "Fidelity bị khóa tại F0/IDEA; G0 kế thừa FAIL và vòng này không được phát hành engineering claim",
+    "Tất cả cao độ, chiều sâu dầm, độ võng cáp, độ vồng vòm và bước panel ngoài chuỗi nhịp là RESEARCH_PLACEHOLDER_FOR_RENDER_ONLY",
+    "Không gán phần trăm chia tải ψ_a; phải trả UNKNOWN_UNTIL_STAGED_NONLINEAR_SOLVER",
+    "Không tuyên bố đạt khổ thông thuyền khi thiếu datum MNTK, hộp luồng được duyệt, võng, nhiệt và dung sai",
+    "Không dùng hình học PSC 45+75+45 m của đồ án làm basis cho concept hybrid này"
+  ],
+  "review_notes": [
+    "Người dùng đã xác nhận UD-01=K1 và UD-03=B1 bằng câu 'Chốt B1 – 1.440 m'.",
+    "Kế thừa cleanup Claude CL-R06-R2-01..04: edge-list nhất quán, mốc SAD, TN/SAD định danh rõ và ghi lại G0=FAIL.",
+    "APPROVE strictly at F0/IDEA. Claude xác nhận độc lập 7/7 acceptance criteria, không có blocking finding hoặc overclaim. G0/G1/G2 đều FAIL theo schema review và không được claimed. Review Claude dùng Read-only; Codex đã chạy generator, verifier độc lập, lab validate và 41 test orchestrator thành công. Carry forward: verifier đọc station từ seed thay literal; replay so thêm hai SVG; ghi rõ khe render 12.210000 m nằm trên nửa vòm biên gần CATB; engineering claims tiếp tục bị cấm cho tới khi G0/G1/G2 có bằng chứng. Claude session 7642f6e2-784b-4ef5-8e16-aee1815f4459."
+  ],
+  "source_brief_id": "RND-20260901-00fd963d",
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "research/orchestration/RND-20260901-00fd963d/tools/hgb_b1_generate.py"
+    ],
+    [
+      "python",
+      "research/orchestration/RND-20260901-00fd963d/tools/hgb_b1_verify.py"
+    ],
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false,
+  "runtime_scope": {
+    "structural_families": [
+      "arch_deck_v1"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  }
+}

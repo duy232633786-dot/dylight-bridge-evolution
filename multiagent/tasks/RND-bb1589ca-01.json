@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-bb1589ca-01",
+  "title": "Fictional bridge inspiration source catalog for SAGE-EvoBridge",
+  "research_question": "Which sourced fictional bridge forms can broaden the beam and truss inspiration library while keeping observations separate from unverified design ideas?",
+  "workstream": "design_basis",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "codex_research_reviewer",
+  "dependencies": [],
+  "required_gates": [
+    "G0"
+  ],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260923-bb1589ca/01_design_basis_and_evidence.md"
+  ],
+  "acceptance_criteria": [
+    "Catalog primary sources from games, film and animation with Vietnamese observations and proposed abstractions clearly separated.",
+    "Record page reading and image/video inspection limits, unknown dimensions/materials and rights status; no fictional mechanics become engineering evidence.",
+    "Publish the single reviewed source catalog additively in the authorized existing Obsidian vault and verify identical SHA256; preserve existing accepted artifacts."
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260923-bb1589ca/01_design_basis_and_evidence.md"
+  ],
+  "safety_notes": [
+    "User requests research only and explicitly adds game, film and animation bridge forms; no invention implementation or model training.",
+    "Claim ceiling IDEA; G0 applies to provenance and scope only, all engineering validation remains NOT_APPLICABLE for this literature collection.",
+    "Original planner write_scope is unchanged; one Markdown document holds catalog, selection method and limits.",
+    "No progress-saving automation is created or re-enabled."
+  ],
+  "review_notes": [
+    "Independent separate same-platform Codex reviewer; not the author and not a cross-provider review. Approval covers the bounded fictional-bridge source catalog and its additive Obsidian publication only. Independently checked primary-page statements, all 8 record identities, old vault preservation, and matching source/destination/handoff hashes. No images or videos were visually inspected, geometry extracted, invention implemented, simulation reproduced, engineering capacity approved, or global novelty proven."
+  ],
+  "source_brief_id": "RND-20260923-bb1589ca",
+  "preferred_provider": "claude",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

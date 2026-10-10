@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "brief_id": "RND-20260826-cc3d03b6",
+  "created_at": "2026-08-26T13:41:14.749751Z",
+  "topic": "Xây dựng cổng MCP độc lập cho MIDAS Civil 2022 qua MCT và adapter REST tùy chọn cho MIDAS CIVIL NX",
+  "objectives": [
+    "Cung cấp MCP server stdio để nhiều AI client có thể tạo, kiểm tra và xuất mô hình MIDAS theo cùng hợp đồng.",
+    "Civil 2022 dùng MCT fail-closed với dry-run mặc định; tạo được mô hình dầm mẫu gồm unit, vật liệu, tiết diện, node, element và gối.",
+    "CIVIL NX chỉ dùng REST API chính thức khi người dùng tự cung cấp base URL và MAPI-Key hợp lệ; khóa không được ghi vào log hay artifact."
+  ],
+  "constraints": [
+    "Không tự động hóa đăng nhập, mật khẩu, crack, patch license hoặc bất kỳ cơ chế vượt bản quyền nào.",
+    "Không tự chạy phân tích hay ghi vào mô hình đang mở nếu chưa có xác nhận rõ; mọi lệnh thay đổi phải có preview, hash và allowlist.",
+    "Không nâng kết quả tạo mô hình thành kết luận kỹ thuật; demand, capacity và an toàn vẫn cần solver và kỹ sư chịu trách nhiệm."
+  ],
+  "requested_by": "user-request-2026-08-26",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "budget": {
+    "max_tasks": 4,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 7200
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}

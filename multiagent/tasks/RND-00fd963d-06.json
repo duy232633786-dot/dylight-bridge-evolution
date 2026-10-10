@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-06",
+  "title": "Unblocker F0: chuẩn hóa topo HGB-B và HGB-D",
+  "research_question": "Có thể tạo một đặc tả topo không thứ nguyên, tái lập và fail-closed cho hai phương án HGB-B/HGB-D trước khi design basis G0 được khóa không?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "RND-00fd963d-02"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "write_scope": [
+    "research/orchestration/RND-20260901-00fd963d/03a_normalized_geometry_prescreen.md"
+  ],
+  "acceptance_criteria": [
+    "Định nghĩa hai graph topo HGB-B/HGB-D bằng node, member và đường truyền lực định danh; không tạo tọa độ tuyệt đối",
+    "Định nghĩa hệ biến không thứ nguyên, hệ tọa độ, đối xứng, domain và provenance cho từng biến",
+    "Đăng ký trước các kiểm span closure, cable closure, support closure, navigation exclusion, symmetry và connectivity",
+    "Đưa ra pseudo-code hoặc schema fail-closed để sinh node sau khi chuỗi khẩu độ canonical được khóa",
+    "Phân biệt rõ VERIFIED_SOURCE, USER_INTENT, CONCEPT_IMAGE, RESEARCH_PLACEHOLDER và MISSING_INPUT",
+    "G0/G1/G2 đều NOT_CLAIMED; nêu quyết định người dùng tối thiểu cần có để mở khóa hình học tuyệt đối"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260901-00fd963d/03a_normalized_geometry_prescreen.md"
+  ],
+  "safety_notes": [
+    "Task chuẩn bị này không thay thế RND-00fd963d-03 và không thỏa bất kỳ physics gate nào",
+    "Không dùng solver hoặc engine vòm giả; không gán kích thước thiết kế, vật liệu, tải trọng hay sức kháng",
+    "Chuỗi 1440/1490/1940 m phải được giữ như mâu thuẫn chưa giải quyết",
+    "HGB-B và HGB-D chỉ là hypothesis topology ở fidelity F0"
+  ],
+  "review_notes": [
+    "Task lineage chuẩn bị được tạo vì RND-00fd963d-01 chưa thể ACCEPTED khi G0 còn thiếu; không sửa lịch sử và không giả G0 PASS.",
+    "Claude independent review REVISE: CL-R06-01 bắt buộc bổ sung AB/PIER/BEARING và cạnh DK-LAND→support→ground cho B/D hoặc hạ connectivity; đồng thời khóa cùng chain/gối cho control D, thống nhất mốc landward tại saddle, sửa nhãn λ_AC và đăng ký các cao độ; kế thừa G0=FAIL thay vì chỉ NOT_CLAIMED.",
+    "APPROVE strictly at F0/IDEA: all five prior findings are CLOSED and all six task criteria are MET. G0 remains inherited FAIL; G1/G2 remain FAIL/NOT_CLAIMED. Carry CL-R06-R2-01..04 as non-blocking cleanup for the next geometry lineage; this is not engineering approval."
+  ],
+  "source_brief_id": "RND-20260901-00fd963d",
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false,
+  "runtime_scope": {
+    "structural_families": [
+      "arch_deck_v1"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  }
+}

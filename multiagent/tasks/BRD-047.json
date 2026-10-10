@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-047",
+  "title": "Lineage IDEA cho Safe Design Study: khóa authority, solver identity và bằng chứng bất định",
+  "research_question": "Làm sao bảo toàn implementation tốt từ BRD-038 nhưng đặt nó dưới hợp đồng IDEA đúng mức, đồng thời đóng các đường giả mạo evaluator, drift contract và uncertainty metadata trước khi bất kỳ miền L1 nào được phép VERIFIED?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "runtime_scope": {
+    "structural_families": [
+      "super_t_simple_v1",
+      "super_t_parametric_v2",
+      "i_girder_parametric_v1"
+    ],
+    "runtime_domain": "production_line_girder_l1"
+  },
+  "write_scope": [
+    "bridge_evolution/design_study.py",
+    "contracts/model_applicability.schema.json",
+    "docs/design_basis/model_applicability.json",
+    "tests/test_design_study.py"
+  ],
+  "acceptance_criteria": [
+    "Bảo toàn mọi fail-closed fix của BRD-038 r002: registry pin, domain_evidence block, source hash-locator, deferred solver blockers và evaluation cross-binding",
+    "Pin raw-byte SHA-256 của evaluation_result.schema.json và site_hazard_profile.schema.json; drift authority contract phải BLOCKED có mã và mọi result phải ghi các digest authority đã dùng",
+    "Evaluator truyền từ caller không bao giờ được cấp SCREENED; evaluator mặc định phải khớp solver name với state và solver_version với phiên bản allowlist chính xác",
+    "robust_pareto yêu cầu min_samples ít nhất 3, confidence_z ít nhất 1.0, tự tái tính input_digest từ perturbation canonical và đối chiếu seed/sample_id",
+    "Mọi objective cùng zero-variance bị chặn trừ khi có deterministic justification tường minh; literal replay và forged digest đều có test âm",
+    "Blocker giữ đúng severity; SOFT finding đi vào advisories và không bị đổi thành HARD hoặc biến mất khỏi SCREENED result",
+    "State không JSON-serializable trả REJECTED/IDEA theo contract thay vì ném exception",
+    "Test âm bao phủ solver-name/version forgery, schema drift, confidence downgrade, digest forgery, zero variance và SOFT advisory",
+    "Không tuyên bố bảo vệ system-wide; caller CLI/optimization legacy là task tích hợp riêng và mọi L1 canonical vẫn BLOCKED"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/design_study.py",
+    "tests/test_design_study.py"
+  ],
+  "safety_notes": [
+    "Đây là lineage mới sau BRD-038 REJECT; không sửa hoặc xóa handoff/review BRD-038",
+    "Không sửa evaluate.py, geometry.py, verifier.py hoặc nâng domain_evidence sang VERIFIED",
+    "Custom evaluator chỉ là seam kiểm thử và không có quyền cấp SCREENED",
+    "Kết quả tối đa của task này là IDEA dù test và G2 nội bộ có xanh"
+  ],
+  "review_notes": [
+    "Nguồn lineage: BRD-038.codex.r002, 4/4 hash khớp, Claude chạy 15/15 test và khoảng 30 probe; canonical REJECT vì task cũ yêu cầu G0/G1 nhưng cả hai FAIL.",
+    "Các finding cần đóng trước VERIFIED: solver identity, pin schema authority, robust parameter floor, recomputable sample digest, severity/advisory và malformed serialization.",
+    "Claude Opus read-only: 4/4 artifact hash và 2 authority schema pin đều khớp; target 24 passed; full suite tái hiện 7 failed/4 skipped, gồm 5 lỗi canonical provenance và 2 fixture BRD-999 thiếu runtime_scope, không có regression trực tiếp BRD-047. HIGH: BRD-047 làm drift hai artifact BRD-038 r002 nhưng chưa có snapshot/incident/correction và handoff chưa nhận trách nhiệm. MEDIUM: _outside/skew chưa NaN-safe; result BLOCKED nhúng lại evaluation NaN/Infinity/cyclic; nhánh L0 applicability-blocked mất SOLVER-*; robust samples chưa nối với assess_candidate/solver provenance; site locator vẫn cần human audit. LOW: zero-variance chỉ chặn khi cả ba objective bằng 0 tuyệt đối; public check_model_applicability không trả digest; chưa có output schema riêng. REVISE; task vẫn chỉ IDEA, G0-G2 chưa đạt và không có xác nhận kỹ thuật cầu.",
+    "APPROVE source ở claim IDEA בלבד; không phải phê duyệt thiết kế. Claude tự băm 4/4 artifact, tự chạy 26/26 target và 86/86 integration. Finding HIGH r001 về provenance BRD-038 đã đóng bằng hai snapshot/correction Claude APPROVE, còn BRD-038 giữ REJECT. Finding MEDIUM còn mở: robust samples chưa bound end-to-end với solver run; source hash-locator chưa chứng minh ngữ nghĩa locator. Finding LOW: public span coercion có thể ném exception với type sai; near/partial-zero variance; public applicability chưa trả authority digest và chưa có output schema. Claude không tự chạy full suite; Codex đã đo 7 failure nền. Legacy optimization chưa route authority, phải là task tích hợp riêng. G0/G1/G2 đều FAIL; G3-G7 NOT_APPLICABLE."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "evidence_safety_auditor",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_study.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

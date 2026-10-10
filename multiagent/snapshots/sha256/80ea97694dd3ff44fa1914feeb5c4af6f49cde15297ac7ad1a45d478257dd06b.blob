@@ -1,0 +1,213 @@
+from __future__ import annotations
+
+from copy import deepcopy
+
+import pytest
+
+import bridge_evolution.creative_shape as creative
+from bridge_evolution.creative_shape import (
+    CreativeShapeError,
+    build_load_path_graph,
+    evaluate_genome,
+    generate_arch_axis,
+    load_creative_domain,
+    load_path_connected,
+    run_constrained_map_elites,
+    validate_candidate,
+    validate_creative_domain,
+    validate_genome,
+)
+
+
+def base_genome(topology: str = "THROUGH_ARCH") -> dict:
+    return {
+        "topology": topology,
+        "span_m": 100.0,
+        "rise_ratio": 0.20,
+        "panel_count": 12,
+        "rib_count": 2,
+        "rib_depth_m": 2.0,
+        "deck_clearance_m": 5.0,
+        "shape_coefficients": [0.0, 0.0, 0.0],
+    }
+
+
+@pytest.fixture
+def technical_profile(tmp_path, monkeypatch) -> dict:
+    # Tệp này chỉ là fixture provenance; test không giả vờ các số dưới đây là
+    # giới hạn tiêu chuẩn. Runtime vẫn buộc người gọi thật cung cấp nguồn thật.
+    monkeypatch.setattr(creative, "REPO_ROOT", tmp_path)
+    (tmp_path / "evidence.json").write_text('{"purpose":"test-only"}', encoding="utf-8")
+    source = "evidence.json"
+    return {
+        "max_abs_slope": {"value": 3.0, "source_ref": source},
+        "min_curvature_radius_m": {"value": 1.0, "source_ref": source},
+        "max_panel_length_m": {"value": 40.0, "source_ref": source},
+        "max_member_slenderness": {"value": 50.0, "source_ref": source},
+        "min_vertical_clearance_m": {"value": 0.5, "source_ref": source},
+        "distributed_load_kN_m": {"value": 20.0, "source_ref": source},
+        "rib_area_m2": {"value": 2.0, "source_ref": source},
+        "allowable_compression_MPa": {"value": 100.0, "source_ref": source},
+    }
+
+
+def test_domain_is_only_search_space_not_a_design_limit_register():
+    domain = load_creative_domain()
+    assert domain["claim_ceiling"] == "IDEA"
+    assert domain["technical_scope"] == "SEARCH_BOUNDS_ONLY_NOT_DESIGN_LIMITS"
+    assert "max_abs_slope" not in domain
+    assert domain["topology_values"] == ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"]
+
+
+def test_special_axis_preserves_supports_monotonic_x_and_exact_rise():
+    genome = base_genome()
+    ordinary = generate_arch_axis(genome)
+    genome["shape_coefficients"] = [0.08, -0.08, 0.06]
+    special = generate_arch_axis(genome)
+
+    assert special[0]["x_m"] == 0.0
+    assert special[0]["y_m"] == 0.0
+    assert special[-1]["x_m"] == genome["span_m"]
+    assert special[-1]["y_m"] == 0.0
+    assert all(a["x_m"] < b["x_m"] for a, b in zip(special, special[1:]))
+    assert max(point["y_m"] for point in special) == pytest.approx(20.0, abs=1e-12)
+    assert [point["y_m"] for point in special] != [point["y_m"] for point in ordinary]
+
+
+@pytest.mark.parametrize("topology", ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"])
+def test_each_topology_has_a_support_reachable_load_path(topology):
+    genome = base_genome(topology)
+    graph = build_load_path_graph(genome)
+    assert graph["topology"] == topology
+    assert load_path_connected(graph)
+    if topology == "NETWORK_ARCH":
+        assert sum(edge["kind"] == "NETWORK_HANGER" for edge in graph["edges"]) >= genome["panel_count"]
+
+
+def test_disconnected_deck_node_is_detected():
+    genome = base_genome("NETWORK_ARCH")
+    graph = build_load_path_graph(genome)
+    graph["edges"] = [
+        edge for edge in graph["edges"]
+        if edge["from"] != "D6" and edge["to"] != "D6"
+    ]
+    assert not load_path_connected(graph)
+
+
+def test_deck_chain_alone_cannot_fake_an_arch_load_path():
+    graph = build_load_path_graph(base_genome("THROUGH_ARCH"))
+    graph["edges"] = [edge for edge in graph["edges"] if edge["kind"] != "HANGER"]
+    assert not load_path_connected(graph)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda genome: genome.__setitem__("span_m", float("nan")),
+        lambda genome: genome.__setitem__("shape_coefficients", [0.081, 0.0, 0.0]),
+        lambda genome: genome.__setitem__("panel_count", 11),
+    ],
+)
+def test_invalid_genomes_fail_before_generation(mutation):
+    genome = base_genome()
+    mutation(genome)
+    with pytest.raises(CreativeShapeError):
+        validate_genome(genome)
+
+
+def test_missing_threshold_is_unknown_and_never_all_known_pass(technical_profile):
+    profile = deepcopy(technical_profile)
+    del profile["max_abs_slope"]
+    candidate = evaluate_genome(base_genome(), profile)
+    assert candidate["screening_status"] == "UNKNOWN_INPUT_MISSING"
+    assert not candidate["all_known_pass"]
+    check = next(item for item in candidate["checks"] if item["check_id"] == "CQD-L0-02")
+    assert check["status"] == "UNKNOWN_INPUT_MISSING"
+
+
+def test_nonexistent_source_is_unknown_not_silently_trusted(technical_profile):
+    profile = deepcopy(technical_profile)
+    profile["min_curvature_radius_m"]["source_ref"] = "missing-source.json"
+    candidate = evaluate_genome(base_genome(), profile)
+    assert candidate["screening_status"] == "UNKNOWN_INPUT_MISSING"
+    assert any(
+        check["check_id"] == "CQD-L0-03" and check["status"] == "UNKNOWN_INPUT_MISSING"
+        for check in candidate["checks"]
+    )
+
+
+def test_profile_fingerprint_changes_when_source_bytes_drift(technical_profile, tmp_path):
+    before = evaluate_genome(base_genome(), technical_profile)
+    (tmp_path / "evidence.json").write_text('{"purpose":"test-only","revision":2}', encoding="utf-8")
+    after = evaluate_genome(base_genome(), technical_profile)
+    assert before["profile_sha256"] != after["profile_sha256"]
+    assert before["candidate_id"] != after["candidate_id"]
+    assert before["checks"][1]["source_sha256"] != after["checks"][1]["source_sha256"]
+
+
+def test_caller_supplied_domain_cannot_raise_claim_ceiling():
+    domain = deepcopy(load_creative_domain())
+    domain["claim_ceiling"] = "SCREENED"
+    with pytest.raises(CreativeShapeError):
+        validate_creative_domain(domain)
+
+
+def test_proxy_overload_rejects_candidate_and_is_explicitly_only_a_proxy(technical_profile):
+    profile = deepcopy(technical_profile)
+    profile["allowable_compression_MPa"]["value"] = 0.001
+    candidate = evaluate_genome(base_genome(), profile)
+    check = next(item for item in candidate["checks"] if item["check_id"] == "CQD-L0-07")
+    assert candidate["screening_status"] == "REJECTED"
+    assert not candidate["all_known_pass"]
+    assert check["status"] == "FAIL"
+    assert check["model_kind"] == "SCREENING_PROXY_PARABOLIC_THRUST_ENVELOPE"
+    assert candidate["claim_level"] == "IDEA"
+    assert "feasible" not in candidate
+    assert "verified" not in candidate
+
+
+def test_schema_rejects_feasible_or_verified_backdoors(technical_profile):
+    candidate = evaluate_genome(base_genome(), technical_profile)
+    for forbidden, value in (("feasible", True), ("verified", True)):
+        mutated = deepcopy(candidate)
+        mutated[forbidden] = value
+        with pytest.raises(CreativeShapeError):
+            validate_candidate(mutated)
+
+
+def test_weird_shape_cannot_trade_novelty_for_a_failed_technical_check(technical_profile):
+    profile = deepcopy(technical_profile)
+    profile["max_abs_slope"]["value"] = 0.10
+    genome = base_genome("NETWORK_ARCH")
+    genome["shape_coefficients"] = [0.08, -0.08, 0.08]
+    candidate = evaluate_genome(genome, profile)
+    assert candidate["descriptors"]["asymmetry"] > 0.0
+    assert candidate["screening_status"] == "REJECTED"
+    assert not candidate["all_known_pass"]
+
+
+def test_map_elites_is_deterministic_diverse_and_archives_only_safe_screening(technical_profile):
+    first = run_constrained_map_elites(technical_profile=technical_profile, seed=20260828, iterations=24)
+    second = run_constrained_map_elites(technical_profile=technical_profile, seed=20260828, iterations=24)
+    assert first == second
+    assert first["claim_level"] == "IDEA"
+    assert first["statistics"]["occupied_cells"] >= 3
+    assert {item["cell"]["topology"] for item in first["archive"]} == {
+        "DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"
+    }
+    for item in first["archive"]:
+        candidate = item["candidate"]
+        assert candidate["all_known_pass"]
+        assert candidate["screening_status"] == "L0_PASSED"
+        assert all(check["status"] == "PASS" for check in candidate["checks"])
+        assert "feasible" not in candidate
+        assert "verified" not in candidate
+
+
+def test_map_elites_archive_stays_empty_when_every_proxy_fails(technical_profile):
+    profile = deepcopy(technical_profile)
+    profile["allowable_compression_MPa"]["value"] = 0.0001
+    result = run_constrained_map_elites(technical_profile=profile, seed=7, iterations=8)
+    assert result["archive"] == []
+    assert result["statistics"]["rejected"] == result["statistics"]["evaluated"]
+    assert result["statistics"]["unknown"] == 0

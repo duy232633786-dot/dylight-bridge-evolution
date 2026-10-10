@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-046",
+  "agent_id": "codex",
+  "role": "orchestrator",
+  "summary": "Research intake 1.1 bắt buộc runtime_scope tường minh, truyền scope tới mọi task có machine gate và provider plan mới chỉ dùng Claude/Codex",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/orchestrator.py",
+      "sha256": "27f58c06ead0ec8fcc5927c82fe4bd9a7f0169e97000f5bb208c0b751e226181",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/cli.py",
+      "sha256": "21713733fd3571b11fd628cf5f49288ff659b9629b9112fdc080f026eabf8884",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/research_brief.schema.json",
+      "sha256": "bd33e1ba3da16b8ccfc2d5b04e0c86edf5b6779636c6ae121f95770cfafbfb76",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_orchestrator.py",
+      "sha256": "2ba53f50c6cffe2ae1ca7c82ee2537341b5ae16004d789167faa5c2cb035c2e9",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Brief schema 1.0 chỉ được giữ để đọc lịch sử; mọi brief mới do API sinh là 1.1 có runtime_scope"
+  ],
+  "unresolved_risks": [
+    "Không suy luận runtime scope từ topic; caller cũ không truyền scope sẽ bị từ chối và phải khai lại tường minh"
+  ],
+  "next_action": "Claude Code review độc lập BRD-046 sau khi hoàn tất phiên review BRD-038 đang chạy"
+}

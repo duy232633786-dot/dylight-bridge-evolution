@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-0ac1926af2c8488b",
+  "amendment_sha256": "1f0eb3192696a32c291055a3f312d21babab591311e6102bbf68ebd6bd33c655",
+  "created_at": "2026-09-23T18:34:11.423494Z",
+  "task_id": "RND-bb1589ca-04",
+  "authorized_by": "project_owner",
+  "reason": "Apply the user research-only scope and requested fictional bridge sources; defer unrelated invention work.",
+  "pre_task_sha256": "ce40ec0ee06ae436b251700056ef6a6a92c1cc6f5a60dfb778425a3b8aa2563a",
+  "post_task_sha256": "8e4916563b29850e8b630d155df910b7f099c16368fb83e7a028a716b0f8fd1a",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/ce40ec0ee06ae436b251700056ef6a6a92c1cc6f5a60dfb778425a3b8aa2563a.json",
+    "sha256": "ce40ec0ee06ae436b251700056ef6a6a92c1cc6f5a60dfb778425a3b8aa2563a"
+  },
+  "changes": [
+    {
+      "field": "safety_notes",
+      "before": [
+        "Thiếu solver/phương pháp độc lập phải ghi BLOCKED, không fake verification"
+      ],
+      "after": [
+        "Thiếu solver/phương pháp độc lập phải ghi BLOCKED, không fake verification",
+        "Deferred: user authorized literature/inspiration collection only; do not execute invention or screening tasks without a later request."
+      ]
+    },
+    {
+      "field": "status",
+      "before": "READY",
+      "after": "BACKLOG"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "BACKLOG",
+  "run_id": "RUN-20260923-bb1589ca"
+}

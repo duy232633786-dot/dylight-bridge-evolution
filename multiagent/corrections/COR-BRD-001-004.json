@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-001-004",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-004",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Nối correction head đã duyệt sang capability matrix hiện tại; docs/check_runtime_drift.py xác nhận tài liệu khớp runtime, không nâng claim.",
+  "original_handoff_path": "multiagent/handoffs/BRD-001.claude.r001.json",
+  "original_handoff_sha256": "42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28.blob",
+    "sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28"
+  },
+  "corrected_artifact": {
+    "path": "docs/runtime_capability_matrix.md",
+    "previous_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28",
+    "current_sha256": "cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-B",
+      "docs/check_runtime_drift.py"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction chỉ xử lý provenance; reviewer độc lập vẫn phải kiểm diff và giới hạn claim."
+  ],
+  "supersedes_correction_sha256": "8823c178b819cffe1cbb5d0a97754d12b0cacf3b3e35f757b63cafd0f42fca80"
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "recovery_id": "REC-c8eb7aaeafce484a",
+  "created_at": "2026-09-01T14:07:20.972945Z",
+  "run_id": "RUN-20260901-0aea5309",
+  "task_id": "RND-0aea5309-01",
+  "authorized_by": "project_owner",
+  "reason": "Claude quota da reset luc 21h; safe-mode probe tra READY va khong co permission denial",
+  "previous_run_status": "FAILED",
+  "next_run_status": "PLANNED",
+  "previous_task_status": "BLOCKED",
+  "next_task_status": "READY",
+  "previous_owner": "claude",
+  "previous_provider": "claude",
+  "next_provider": "claude",
+  "prior_attempts": 3,
+  "previous_run_sha256": "4703339a5e28d1fda4fbd7ff74e1b0ddc19787b4049a82a639bd51511375f950",
+  "previous_task_sha256": "e08231ab5fa542dddeddc93b753d7438f69c994bd568909ea34c20c639b7c6e8",
+  "attempt_records": [
+    {
+      "path": "runs/RUN-20260901-0aea5309/attempts/RND-0aea5309-01.work.r001.json",
+      "sha256": "6b3028af764835113170f7a7c9be0c383b79febbd4464759bd060278c56e0887"
+    },
+    {
+      "path": "runs/RUN-20260901-0aea5309/attempts/RND-0aea5309-01.work.r002.json",
+      "sha256": "c52c572c5d23b8568bff05e15d2bdc517d4506a5cf92be2b8775c1b7c8cedd2c"
+    },
+    {
+      "path": "runs/RUN-20260901-0aea5309/attempts/RND-0aea5309-01.work.r003.json",
+      "sha256": "f9b3ef6dad5374e94e60a9943c159228488307907f69767b1b119ca095b20bf5"
+    }
+  ],
+  "base_retry_budget": 1,
+  "base_attempt_budget": 2,
+  "prior_recovery_grants": 1,
+  "granted_attempts": 1,
+  "effective_attempt_budget_before_grant": 3,
+  "effective_attempt_budget_after_grant": 4,
+  "remaining_attempts_before_grant": 0,
+  "remaining_attempts_after_grant": 1,
+  "authorized_new_attempts": 1
+}

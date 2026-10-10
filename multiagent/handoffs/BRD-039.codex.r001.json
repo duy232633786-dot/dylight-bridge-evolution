@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-039",
+  "agent_id": "codex",
+  "role": "form_inventor",
+  "summary": "Constrained MAP-Elites sinh ba topology vòm đặc biệt với khóa gối, graph truyền lực, sàng hình học/proxy fail-closed và provenance băm theo bytes nguồn",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_shape.py",
+      "sha256": "cab07d4d49bf9876de69e1f8c9724ecb9376a098a97fcc1740f030e6a72cb494",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_shape_candidate.schema.json",
+      "sha256": "fc31b20a57bfe96396028e3416b39fbdb69f5c9a9f9d5ccf493cc2e2ad0ace86",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_shape_domain.json",
+      "sha256": "a4d79167aa130d375306ed6af69e983b39bef9a4657f52b5325e08b3210ac1e4",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_shape.py",
+      "sha256": "80ea97694dd3ff44fa1914feeb5c4af6f49cde15297ac7ad1a45d478257dd06b",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Miền JSON chỉ là biên tìm kiếm nghiên cứu, không phải giới hạn tiêu chuẩn",
+    "Người gọi phải cung cấp ngưỡng kỹ thuật theo dự án và source_ref cục bộ có nội dung áp dụng phù hợp"
+  ],
+  "unresolved_risks": [
+    "Chưa có solver vòm-giàn: ổn định, dao động, mỏi, liên kết, móng, gió và giai đoạn thi công chưa được kiểm chứng",
+    "Kiểm tra tồn tại và hash nguồn không tự chứng minh nguồn đó áp dụng đúng cho dự án; cần kỹ sư review"
+  ],
+  "next_action": "Review độc lập; sau đó bổ sung hồ sơ site và solver FEA trước mọi claim thiết kế kỹ thuật"
+}

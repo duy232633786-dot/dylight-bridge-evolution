@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-028-001",
+  "task_id": "BRD-028",
+  "incident_id": "INC-BRD-028-001",
+  "correction_sha256": "2c1b05b6dcee5dfcb8f3b0dc8f7046e53b9e5366a960fecc784f00efc7b6ae12",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Hash chain kiem chung doc lap bang sha256sum: correction file = 2c1b05b6dcee5dfcb8f3b0dc8f7046e53b9e5366a960fecc784f00efc7b6ae12; original handoff multiagent/handoffs/BRD-028.codex-gpt5.r002.json = 2ed1dd5c3950c82f7aed7f187f678c7dba4175e47107c11eabec658cf0410f2d khop original_handoff_sha256 va task_id=BRD-028; snapshot 0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28.blob hash dung bang ten file va bang previous_sha256; live docs/runtime_capability_matrix.md = cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e khop current_sha256.",
+    "INC-BRD-028-001 khop tung field bat buoc: task_id, original_handoff_path, original_handoff_sha256, artifact_path=docs/runtime_capability_matrix.md, recorded_sha256=0b3f417b = previous_sha256, observed_sha256=cb09e75b = bytes live. Schema provenance_correction.schema.json dat, filename trung correction_id, role=evidence_safety_auditor.",
+    "supersedes_correction_sha256=null nen day la goc chuoi, va goc neo dung: handoff BRD-028.codex-gpt5.r002 ghi artifact docs/runtime_capability_matrix.md voi sha256 0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28, trung khop previous_sha256 cua correction nay. Khong co buoc trung gian bi bo qua giua bytes da ky trong handoff va bytes duoc snapshot.",
+    "Doc lap: agent correction = codex, agent handoff goc BRD-028.codex-gpt5.r002 = codex-gpt5, reviewer = claude; Claude khong phai tac gia handoff goc lan correction. Chua ton tai review nao cho hash 2c1b05b6 nen khong co xung dot phan quyet.",
+    "Diff snapshot 0b3f417b -> live chi doi mot dong version-date va THEM hai hang bang COLUMN_NM_SECOND_ORDER (PARTIAL) va ARCH_RIB_STABILITY (ABSENT) voi gioi han fail-closed, SCREENED va design_verdict_authority=NONE. Khong entry nao duoc nang trang thai va khong dong nao bi xoa. Test gate tests/test_task_contract_reachability.py: 19 passed."
+  ],
+  "notes": "Provenance-only APPROVE cho COR-BRD-028-001. Chi xac nhan so ke toan bang chung: hash chain handoff-snapshot-incident-live va tinh doc lap reviewer. KHONG review noi dung ky thuat cua component audit BRD-028, KHONG nang claim: tran claim van la SCREENED, khong xac nhan ket qua hinh hoc, solver, suc chiu tai hay thiet ke cau nao."
+}

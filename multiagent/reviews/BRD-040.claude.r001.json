@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-040",
+  "handoff_sha256": "198b9729ccad36839e63a5c10fa6deff26b966a72643fc84dca5e850fc2b8cfa",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task có claim_ceiling=IDEA và required_gates rỗng. Reviewer xác minh 5/5 hash khớp, 37 tests đạt và tự đối chiếu ma trận Euler-Bernoulli, transformation, assembly cùng bốn nghiệm đóng; lõi toán tuyến tính đúng."
+    },
+    {
+      "gate": "G2",
+      "status": "FAIL",
+      "evidence": "Guard loại DOF theo inactive row trước khi kiểm rank nên nuốt cơ cấu không mang tải: một truss chỉ khóa ux ở N1 vẫn trả CONVERGED, rank=1 và sáu check PASS dù tự do tịnh tiến Y/quay. Condition number lấy trực tiếp trên ma trận trộn DOF tịnh tiến-quay chưa scale nên thay đổi nhiều bậc theo A/I và đồng dạng hình học; không phù hợp làm PASS/FAIL. Result cũng chưa neo SHA-256 bytes của source solver."
+    }
+  ],
+  "notes": "Review độc lập Claude: 5/5 hash khớp và lõi ma trận F1 đúng, nhưng guard nuốt cơ cấu không mang tải, condition number chưa scale không bất biến và result chưa neo source solver. Yêu cầu sửa guard/provenance, thêm regression tests rồi resubmit r002."
+}

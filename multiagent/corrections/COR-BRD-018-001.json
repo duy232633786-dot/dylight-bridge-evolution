@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-018-001",
+  "task_id": "BRD-018",
+  "incident_id": "INC-BRD-018-001",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Neo byte-exact test_collaboration.py của BRD-018 rồi nối provenance sang migration fixture BRD-048; không thay đổi phán quyết hay claim kỹ thuật của BRD-018.",
+  "original_handoff_path": "multiagent/handoffs/BRD-018.antigravity.r001.json",
+  "original_handoff_sha256": "5ba854cdf5261b9087882d19c08c74fa38bad428bfc32dde9a1d772baee30488",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/168e4118b36defe0b654320f1fbabbc5ff9193820b121404d224ebf8b7a76b3f.blob",
+    "sha256": "168e4118b36defe0b654320f1fbabbc5ff9193820b121404d224ebf8b7a76b3f"
+  },
+  "corrected_artifact": {
+    "path": "tests/test_collaboration.py",
+    "previous_sha256": "168e4118b36defe0b654320f1fbabbc5ff9193820b121404d224ebf8b7a76b3f",
+    "current_sha256": "e629377d9bf170ec62cc0a08d4a8f1e2e93ae0cb8cb51a73ef6c76c56aa20514"
+  },
+  "verification_commands": [
+    [
+      "C:\\Users\\ADMIN\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "-m",
+      "pytest",
+      "tests/test_collaboration.py::test_claim_level_cannot_skip_physics_gates",
+      "tests/test_collaboration.py::test_submit_handoff_blocks_claim_exceeding_project_claim_ceiling",
+      "tests/test_task_contract_reachability.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Snapshot được khôi phục cơ học bằng cách đảo đúng hai hunk BRD-048 và phục hồi blank line cuối file; SHA khớp handoff 168e4118b36defe0b654320f1fbabbc5ff9193820b121404d224ebf8b7a76b3f."
+  ],
+  "unresolved_risks": [
+    "Correction chỉ là provenance bookkeeping; test governance không chứng minh bất kỳ tính toán kết cấu cầu nào."
+  ],
+  "supersedes_correction_sha256": null
+}

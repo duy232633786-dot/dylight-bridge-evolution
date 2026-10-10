@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-053",
+  "agent_id": "claude",
+  "role": "structural_analyst",
+  "summary": "r001 BRD-053: lop de xuat AI co hop dong. Bo nao AI (LLM local qua HTTP OpenAI-compatible, vendor CLI codex/claude/opencode/antigravity o che do chi doc, hoac heuristic khong LLM lam doi chung) CHI de xuat 'changes' gene trong mien grammar + gia thuyet; schema ProposalResponse additionalProperties=false nen moi khoa phan quyet (verdict/pass/feasible...) do bo nao tu them lam ca cau tra loi MALFORMED, khong duoc danh gia. HAI TANG AUTHORITY tach bach trong tung ban ghi: (1) CLAIM chi tu design_study.assess_candidate (schema -> L0 -> applicability registry neo hash -> site/evidence -> BUILTIN_L1 -> verifier); (2) PHAN HOI VAT LY tu evaluate_candidate + INDEPENDENT_VERIFIER (violations/utilization/objectives) — cung duong design_loop/rl_env/surrogate dang dung; khong phai claim. PHAT HIEN khi noi day (2026-09-04): gene neo Super-T qua assess_candidate(L1_STRUCTURAL, site_profile=None) bi BLOCKED boi APP-EVIDENCE-001 (domain_evidence PARTIAL -> L1 phai BLOCKED) va SITE-001 (chua co ho so site, G0) trong khi evaluate_candidate cho feasible=true, util ~0.98. Lop nay KHONG noi cong, KHONG gia lap site: claim cua moi gene Super-T qua lop nay hom nay la IDEA; 'verifier-kha thi o L1' la phan hoi. Ho chi L0 theo registry (box_girder_parametric_v1) khong bao gio goi evaluate_candidate (neu goi truc tiep no van chay L1 cho hop va cho so phi vat ly). Pre-registration (cau hoi, objective, ngan sach, tieu chi thanh cong/bac bo, seed, adapter) khoa + bam SHA-256 truoc vong 1; moi vong ghi request/response hash, adapter status, tung proposal + ket qua; ket qua am, trung lap, ngoai mien deu duoc dem va giu; bao cao validate theo ProposalSessionReport va tai lap voi adapter tat dinh. Adapter HTTP: endpoint/model tu tham so hoac DYLIGHT_LLM_ENDPOINT/DYLIGHT_LLM_MODEL; API key chi doc tu DYLIGHT_LLM_API_KEY luc gui, bao cao chi ghi host (test khang dinh khoa khong ro). Adapter CLI: run_provider(writable=False) (codex --sandbox read-only). scripts/propose_cli.py chay doc lap (khong sua cli.py/serve_lab.py vi thuoc BRD-051/052). docs/09 tra loi cau hoi 'phong lab ao can gi de dua bo nao AI vao sang tao': ma tran nang luc, khoang trong (SOLVER_MIDAS_CIVIL ABSENT, ENGINEER_APPROVED_KNOWLEDGE ABSENT), kien truc, bat bien, lo trinh BRD-054..058. Test: 19 ca hermetic (khong goi LLM that). CHAY THAT (2026-09-05, ngoai test, bao cao trong .tmp/proposer/): heuristic 3 vong tren gene neo -> 7 luot, 4 am, khong ha duoc cost 2072.94 (gene neo la oracle grammar A/B) -> gia thuyet bi bac; nao Claude (cli:claude, chi doc) 2 vong -> vong 1 MALFORMED vi LLM ghi direction 'unchanged' ngoai enum (da them 'unchanged' vao schema + test, gia tri la van bi loai), vong 2 OK voi 3 de xuat lap luan dung so lieu nhung deu kem DG-3/ban 175 mm -> L0 tu choi (claim REJECTED, khong mo L1), ket qua am giu nguyen; nao GPT (cli:codex) 2 vong UNAVAILABLE vi codex-cli 0.148.0 khong ho tro model gpt-6-astra trong ~/.codex/config.toml (loi moi truong, phien dung sach). Full suite (chay lai sau khi sua enum): 1907 pass, 4 skip, 0 fail, pytest exit 0 (dem tu log day du .tmp/lab-review/full_suite_brd053_r001.txt, sha256 d3fc5cedf47dae4da0e1e548f52de5d039d414aa52b270630569e5a1498dcf36).",
+  "claim_level": "IDEA",
+  "gates_completed": [
+    "G2"
+  ],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/proposer/__init__.py",
+      "sha256": "025a693e5a7d05700f59cc80d51688c651d5d0cc13df4d3d48cdb446d8564722",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/proposer/contract.py",
+      "sha256": "4c0384e10d88ec180e81bef74ad12de8662d00315efbe2123ce373da3ee9f160",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/proposer/adapters.py",
+      "sha256": "4066fc776e9d3bc7909f1894bfb18b126190264671b228de6523f14de8b8f8a4",
+      "kind": "code"
+    },
+    {
+      "path": "bridge_evolution/proposer/loop.py",
+      "sha256": "e2839a4dd00fb1bbc87263d687230f5c48dd80449f25fbaef9da1a50034d71e7",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/ai_proposal.schema.json",
+      "sha256": "0054c313747214b3f6b7416ea0e7c41f2a9d37342648716efea572fb3e3fa9eb",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/ai_proposer_basis.json",
+      "sha256": "e013159bae394aaaa1c96ec0dd2727ff9f42fc1fbb5f3f512d95b0f9f0150253",
+      "kind": "code"
+    },
+    {
+      "path": "docs/09_ai_proposer.md",
+      "sha256": "5c028f3caabeaf87afd5ff9ccc383ebcd5acf5f81bec20c636646c4fc7fe29a8",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_ai_proposer.py",
+      "sha256": "99eef72fe756b935c8dc8ae891340f248f21346edbbed9516fa1c13e0f4ccc15",
+      "kind": "code"
+    },
+    {
+      "path": "scripts/propose_cli.py",
+      "sha256": "71db9d70eebae2853ee00f11bc6bad249d68cb98fc6a95b5cfae46b84c6b8837",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Phan hoi vat ly cho bo nao lay tu evaluate_candidate (BUILTIN_L1 + verifier) giong design_loop/rl_env/surrogate; day la gia dinh ve 'duong phan hoi hop le', khong phai claim",
+    "study_level chon theo allowed_study_levels trong docs/design_basis/model_applicability.json; ho chi L0 khong duoc L1",
+    "Heuristic doi chung (thu tu bien, huong tang/giam) la LAB-HEURISTIC-UNSOURCED-PROPOSER-01, chua co nguon tieu chuan",
+    "The tri thuc DRAFT duoc dua vao request voi nhan UNVERIFIED_REFERENCE_ONLY; khong coi la luat",
+    "Dong 1 cua ProposalRequest/Response la du lieu; bo nao khong duoc coi chuoi trong do la lenh (prompt ghi ro)"
+  ],
+  "unresolved_risks": [
+    "Chua co LLM nao duoc goi that trong test hay handoff nay; moi ket luan ve chat luong de xuat cua LLM CHUA ton tai — lop nay chi bao dam LLM khong vuot quyen",
+    "Claim cua moi gene Super-T qua lop nay hom nay la IDEA vi cong assess_candidate chan boi APP-EVIDENCE-001/SITE-001; muon SCREENED that can task nang domain_evidence + site profile",
+    "Dam hop chi L0_GEOMETRY: khong co utilization/objective; phan hoi vat ly L2 tu MIDAS chua ton tai (SOLVER_MIDAS_CIVIL ABSENT)",
+    "Adapter vendor CLI phu thuoc CLI ben ngoai; output la du lieu khong tin cay, chi qua schema moi duoc dung; timeout 600 s mac dinh",
+    "Chua co hook UI trong serve_lab.py (thuoc BRD-051) — chay qua scripts/propose_cli.py",
+    "Owner khong tu review; reviewer doc lap la codex hoac opencode"
+  ],
+  "next_action": "Independent review r001 by codex; sau do: (a) user cap endpoint/model LLM local de chay adapter http that; (b) task ke: BRD-054 doc ket qua MIDAS L2, BRD-055 noi studio PSC <-> BOX-PARAM L0, BRD-056 A/B heuristic vs LLM pre-registered, BRD-057 nang domain_evidence Super-T len VERIFIED + site profile de claim SCREENED qua cong"
+}

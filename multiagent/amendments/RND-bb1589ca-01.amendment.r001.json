@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-aa0c390c433c4635",
+  "amendment_sha256": "155e9556554d17e3eadeb76b25c16434f16c6eb77ea71a5c85e02eaac093eb75",
+  "created_at": "2026-09-23T18:34:11.378144Z",
+  "task_id": "RND-bb1589ca-01",
+  "authorized_by": "project_owner",
+  "reason": "Apply the user research-only scope and requested fictional bridge sources; defer unrelated invention work.",
+  "pre_task_sha256": "5cb1d8a7a36e8c2d711c905cf35e071b0724b754419995070b07faed9ae51fb6",
+  "post_task_sha256": "fdbe92df0177b5dccd67b408276ac264fcba509e9033e45beffbff047a9824b8",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/5cb1d8a7a36e8c2d711c905cf35e071b0724b754419995070b07faed9ae51fb6.json",
+    "sha256": "5cb1d8a7a36e8c2d711c905cf35e071b0724b754419995070b07faed9ae51fb6"
+  },
+  "changes": [
+    {
+      "field": "acceptance_criteria",
+      "before": [
+        "Phân biệt dữ liệu đã biết, chưa biết và giả định",
+        "Mỗi claim chính có nguồn/citation hoặc ghi UNVERIFIED",
+        "Có baseline, metric, ngân sách và falsification criterion"
+      ],
+      "after": [
+        "Catalog primary sources from games, film and animation with Vietnamese observations and proposed abstractions clearly separated.",
+        "Record page reading and image/video inspection limits, unknown dimensions/materials and rights status; no fictional mechanics become engineering evidence.",
+        "Publish the single reviewed source catalog additively in the authorized existing Obsidian vault and verify identical SHA256; preserve existing accepted artifacts."
+      ]
+    },
+    {
+      "field": "research_question",
+      "before": "Dữ liệu đầu vào, nguồn gốc và tiêu chí nào phải khóa trước khi nghiên cứu đề tài này?",
+      "after": "Which sourced fictional bridge forms can broaden the beam and truss inspiration library while keeping observations separate from unverified design ideas?"
+    },
+    {
+      "field": "safety_notes",
+      "before": [
+        "Không tự bịa site, tải, địa chất, thủy văn hay thuộc tính vật liệu"
+      ],
+      "after": [
+        "User requests research only and explicitly adds game, film and animation bridge forms; no invention implementation or model training.",
+        "Claim ceiling IDEA; G0 applies to provenance and scope only, all engineering validation remains NOT_APPLICABLE for this literature collection.",
+        "Original planner write_scope is unchanged; one Markdown document holds catalog, selection method and limits.",
+        "No progress-saving automation is created or re-enabled."
+      ]
+    },
+    {
+      "field": "title",
+      "before": "Khóa design basis, bằng chứng và tiêu chí bác bỏ",
+      "after": "Fictional bridge inspiration source catalog for SAGE-EvoBridge"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "READY",
+  "run_id": "RUN-20260923-bb1589ca"
+}

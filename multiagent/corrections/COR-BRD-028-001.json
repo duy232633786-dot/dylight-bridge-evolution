@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-028-001",
+  "task_id": "BRD-028",
+  "incident_id": "INC-BRD-028-001",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Nối lineage provenance từ snapshot đã duyệt sang capability matrix hiện tại; chỉ sửa sổ cái, không nâng claim kỹ thuật.",
+  "original_handoff_path": "multiagent/handoffs/BRD-028.codex-gpt5.r002.json",
+  "original_handoff_sha256": "2ed1dd5c3950c82f7aed7f187f678c7dba4175e47107c11eabec658cf0410f2d",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28.blob",
+    "sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28"
+  },
+  "corrected_artifact": {
+    "path": "docs/runtime_capability_matrix.md",
+    "previous_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28",
+    "current_sha256": "cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e"
+  },
+  "verification_commands": [
+    [
+      "C:\\Users\\ADMIN\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "-m",
+      "pytest",
+      "tests/test_task_contract_reachability.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction provenance không chứng minh tính đúng của mô hình hình học, solver hoặc thiết kế cầu."
+  ],
+  "supersedes_correction_sha256": null
+}

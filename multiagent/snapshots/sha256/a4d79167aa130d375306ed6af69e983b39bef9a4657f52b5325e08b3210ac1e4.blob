@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "domain_id": "CREATIVE-ARCH-QD-1.0.0",
+  "claim_ceiling": "IDEA",
+  "generator_version": "creative-shape/0.1.0",
+  "technical_scope": "SEARCH_BOUNDS_ONLY_NOT_DESIGN_LIMITS",
+  "topology_values": [
+    "DECK_ARCH",
+    "THROUGH_ARCH",
+    "NETWORK_ARCH"
+  ],
+  "span_m": {
+    "min": 40.0,
+    "max": 250.0
+  },
+  "rise_ratio": {
+    "min": 0.12,
+    "max": 0.35
+  },
+  "panel_count_values": [
+    8,
+    10,
+    12,
+    14,
+    16,
+    18,
+    20
+  ],
+  "rib_count_values": [
+    1,
+    2
+  ],
+  "rib_depth_m": {
+    "min": 1.0,
+    "max": 6.0
+  },
+  "deck_clearance_m": {
+    "min": 1.0,
+    "max": 12.0
+  },
+  "coefficient_count": 3,
+  "coefficient_bounds": {
+    "min": -0.08,
+    "max": 0.08
+  },
+  "axis_point_count": 101,
+  "bins": {
+    "rise_ratio": [
+      0.12,
+      0.18,
+      0.24,
+      0.30,
+      0.35
+    ],
+    "curvature_complexity": [
+      0.0,
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      100.0
+    ],
+    "asymmetry": [
+      0.0,
+      0.02,
+      0.05,
+      0.10,
+      0.25,
+      1.0
+    ]
+  },
+  "notes_vi": [
+    "Các giá trị trong tệp này chỉ giới hạn không gian tìm kiếm nghiên cứu, không phải giới hạn thiết kế theo tiêu chuẩn.",
+    "Mọi ngưỡng kỹ thuật phải được truyền riêng trong technical_profile và kèm source_ref tồn tại.",
+    "Ứng viên chỉ đạt sàng lọc L0/proxy ở mức IDEA; không được gọi là thiết kế khả thi hoặc đã kiểm chứng kết cấu."
+  ]
+}

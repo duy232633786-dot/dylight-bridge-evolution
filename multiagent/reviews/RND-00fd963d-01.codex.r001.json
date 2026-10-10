@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-01",
+  "handoff_sha256": "750f4b3b0d390117ba535f58b3d513e8e4a89b75f39a4108c002b97bf6bc4d8e",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Artifact hash matches handoff SHA-256 ba168286662cf8a5e26b013975d71924a2bc8f2b7ef3ee82c8fed340e60b5403. It explicitly records site, loads, codes/version, design life, geotechnical, hydraulic, wind, seismic and material basis as UNKNOWN/UNVERIFIED. Independent repo checks confirm arch_deck_v1 is non-evaluable, spans only 100–600 m, and ARCH_RIB_STABILITY plus relevant L2 solvers are ABSENT."
+    }
+  ],
+  "notes": "G0 design basis is incomplete; retain IDEA and obtain verified engineering inputs before technical claims."
+}

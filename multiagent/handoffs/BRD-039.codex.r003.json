@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-039",
+  "agent_id": "codex",
+  "role": "form_inventor",
+  "summary": "r003 khóa NOT_APPLICABLE theo topology/check/nội dung ở runtime và schema; thêm candidate-wide hash, limitations, clause provenance, fail-closed API và load-path theo vai trò. Target 66/66 xanh; full suite chỉ còn 5 lỗi BRD-036 tiền tồn tại.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/creative_shape.py",
+      "sha256": "f8e1b393ce0bd76b97b3af69053c8fe72d2902de7b6fab8d88e3879e26646e10",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/creative_shape_candidate.schema.json",
+      "sha256": "07e0ffc89ccfb662ab77ebcaa9db088e3c71df6f34c54b6fc0aaf4e41484da30",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/creative_shape_domain.json",
+      "sha256": "2dd43d7c02a65f04d1ce70b5ddfc4b7e084e32e05df3b98d8282f90a6f613b18",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_creative_shape.py",
+      "sha256": "70c23b1878ae3212289f264d6b0ad9e3f1396bf9ecaceebcb126897b8f5c5f67",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "technical_profile phải cung cấp mỗi ngưỡng với source_ref POSIX, expected_source_sha256 và clause_id; kỹ sư vẫn phải xác nhận applicability."
+  ],
+  "unresolved_risks": [
+    "THROUGH_ARCH và NETWORK_ARCH chưa có proxy cơ học F0 thay thế CQD-L0-07; candidate limitations khai rõ hiện chỉ qua sàng lọc hình học."
+  ],
+  "next_action": "Claude review độc lập r003; thử lại laundering FAIL thành NOT_APPLICABLE cả khi tự băm lại candidate và kiểm domain/limitations/clause provenance."
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-00fd963d-01",
+  "handoff_sha256": "bfc46448bb5bca4104e8f38b3d954c0a2f9d848775a2e2b0293f072462d70bed",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "FAIL",
+      "evidence": "Artifact SHA-256 9aa77cda74dad84e9bd1418bf78deabb62f6af3b6d495094628883e90ba54ad6 correctly integrates the six-page user DOCX and separates ASSIGNMENT_FIXED, ACADEMIC_ASSUMPTION, and MISSING inputs. G0 still fails for the 650 m hybrid because the real site, authority-approved clearance, design life/exposure, seismic basis, full loads/combinations, measured geotechnical/hydraulic/wind data, hybrid material/cable/anchor properties, and suitable nonlinear/aeroelastic solver remain missing."
+    }
+  ],
+  "notes": "r003 xử lý đúng nguồn Word và được chấp nhận về provenance; G0 của hybrid 650 m vẫn chưa thể PASS. Chỉ tiếp tục F0/IDEA và giữ lineage PSC 45+75+45 m tách biệt."
+}

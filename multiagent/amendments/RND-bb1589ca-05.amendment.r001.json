@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-a2497be548e1406a",
+  "amendment_sha256": "b872c6ee227dbb6927fa75c21e6ca12a0807713df4daf170c234c40931f0c475",
+  "created_at": "2026-09-23T18:34:11.439550Z",
+  "task_id": "RND-bb1589ca-05",
+  "authorized_by": "project_owner",
+  "reason": "Apply the user research-only scope and requested fictional bridge sources; defer unrelated invention work.",
+  "pre_task_sha256": "de61b6d970d66854114cfb81c514cd9178d04c8cb9d1e6e6d8fc9ad589d21603",
+  "post_task_sha256": "f98cb395f9a399e3d4610ac0139ea32fa6d32a3a47f4377089bbaf26b6c076a4",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/de61b6d970d66854114cfb81c514cd9178d04c8cb9d1e6e6d8fc9ad589d21603.json",
+    "sha256": "de61b6d970d66854114cfb81c514cd9178d04c8cb9d1e6e6d8fc9ad589d21603"
+  },
+  "changes": [
+    {
+      "field": "safety_notes",
+      "before": [
+        "Không gọi kết quả SCREENED là thiết kế thực hoặc build-ready"
+      ],
+      "after": [
+        "Không gọi kết quả SCREENED là thiết kế thực hoặc build-ready",
+        "Deferred: user authorized literature/inspiration collection only; do not execute invention or screening tasks without a later request."
+      ]
+    },
+    {
+      "field": "status",
+      "before": "READY",
+      "after": "BACKLOG"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "BACKLOG",
+  "run_id": "RUN-20260923-bb1589ca"
+}

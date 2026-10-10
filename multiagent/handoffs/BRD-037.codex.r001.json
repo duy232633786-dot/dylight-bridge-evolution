@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-037",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Thêm cổng claim fail-closed nối runtime_scope với capability matrix đã validate schema; khóa family-domain, ALL/ANY capability, chỉ PRESENT đạt; task mới đòi machine gate phải khai scope; allowlist migration khớp chính xác 82 task cũ; giữ lối thoát IDEA cho hợp đồng không thể đạt mà không sửa lịch sử.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/collaboration/lab.py",
+      "sha256": "331177b93c4d43fe3ca892ff2494c6a01c00ca60018a3c9e8a38807cdad4f172",
+      "kind": "report"
+    },
+    {
+      "path": "contracts/research_task.schema.json",
+      "sha256": "a45bb053dd525532e3d26eee7aadcda18543e494d1f27cd15d6d2018c534429a",
+      "kind": "report"
+    },
+    {
+      "path": "tests/test_task_contract_reachability.py",
+      "sha256": "784229446ba6ecd4bda0368c0f4a7b09563e0d68c62e7cd1101d629b9bc365ce",
+      "kind": "report"
+    }
+  ],
+  "assumptions": [
+    "Capability state trong matrix phản ánh probe hiện hành nhưng không thay thế thẩm định thiết kế."
+  ],
+  "unresolved_risks": [
+    "82 task legacy vẫn chỉ cảnh báo nếu thiếu runtime_scope; khi sửa hợp đồng cũ nên bổ sung scope bằng amendment thay vì mở rộng allowlist.",
+    "Mọi thay đổi lab.py tạo provenance drift và chỉ hợp lệ sau correction review độc lập."
+  ],
+  "next_action": "OpenCode review độc lập logic reachability và ba correction chain của lab.py."
+}

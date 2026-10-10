@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-b0a5fa1ce966451b",
+  "amendment_sha256": "00e1a823aaf3d08af61f063ed50f7b7f103280a7d2c771ad92e946028cbd7a6e",
+  "created_at": "2026-09-01T16:29:17.982443Z",
+  "task_id": "RND-00fd963d-03",
+  "authorized_by": "project_owner",
+  "reason": "Runtime hybrid-arch hiện không thể đạt G0/G1/G2; re-scope minh bạch thành tiền-sàng-lọc F0 để chuẩn hóa topo và các điều kiện STOP trước khi chạy solver thật",
+  "pre_task_sha256": "7a509fd22fc2efc6ac573e3cb67a2175f9f1be8ff7db942d1596282961d2d339",
+  "post_task_sha256": "c68affaf17a1b0e82c865f611bbbd7e51792738442a7f680ab19fdd88b481b69",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/7a509fd22fc2efc6ac573e3cb67a2175f9f1be8ff7db942d1596282961d2d339.json",
+    "sha256": "7a509fd22fc2efc6ac573e3cb67a2175f9f1be8ff7db942d1596282961d2d339"
+  },
+  "changes": [
+    {
+      "field": "acceptance_criteria",
+      "before": [
+        "Input, units, solver/version, seed và raw output truy vết được",
+        "Kiểm equilibrium/reactions và báo solver failure như STOP",
+        "Báo cả phương án bị loại và không suy diễn quá fidelity L1"
+      ],
+      "after": [
+        "Lập hai mô hình topo chuẩn hóa cho HGB-B và HGB-D bằng biến không thứ nguyên; chưa gán tọa độ tuyệt đối khi chuỗi khẩu độ còn mâu thuẫn",
+        "Nêu input, đơn vị, miền giá trị chỉ ở dạng placeholder nghiên cứu và phân biệt rõ giá trị từ ảnh, từ đề bài PSC, giả thuyết và dữ liệu còn thiếu",
+        "Đăng ký trước các kiểm tra hình học, cân bằng và lực khép kín sẽ dùng khi G0 được khóa; mọi kiểm tra chưa chạy phải ghi NOT_RUN hoặc NOT_TESTED",
+        "Tạo bộ kiểm fail-closed phát hiện chuỗi khẩu độ không khép kín, đường cáp không khép lực, xâm phạm khổ thông thuyền và topo thiếu nút neo",
+        "Không chạy hoặc giả lập solver vòm; G0, G1 và G2 đều ghi FAIL/PENDING hoặc NOT_CLAIMED theo bằng chứng runtime",
+        "Báo cả phương án bị giữ lại, bị loại và các quyết định người dùng còn thiếu; không suy diễn quá fidelity F0"
+      ]
+    },
+    {
+      "field": "claim_ceiling",
+      "before": "SCREENED",
+      "after": "IDEA"
+    },
+    {
+      "field": "required_gates",
+      "before": [
+        "G0",
+        "G1",
+        "G2"
+      ],
+      "after": []
+    },
+    {
+      "field": "research_question",
+      "before": "Các giả thuyết còn đứng vững sau kiểm tra đơn vị, cân bằng, hình học và L0/L1 nào?",
+      "after": "Có thể chuẩn hóa topo và biến hình học nào cho HGB-B/HGB-D, đồng thời xác định rõ điều gì phải STOP trước khi G0/G1/G2 có thể chạy?"
+    },
+    {
+      "field": "safety_notes",
+      "before": [
+        "Chỉ dùng runtime L0/L1 để SCREENED; không gắn NUMERICALLY_VERIFIED"
+      ],
+      "after": [
+        "Đây là tiền-sàng-lọc IDEA, không phải SCREENED, thiết kế cơ sở hay hồ sơ thi công",
+        "Runtime experimental_arch_frame không đánh giá được hybrid bridge; SOLVER_MIDAS_CIVIL, SOLVER_OPENSEESPY, GRILLAGE_3D và ARCH_RIB_STABILITY đều ABSENT",
+        "Không dùng số liệu PSC 45+75+45 m làm design basis cho hybrid 650 m",
+        "Không phát sinh tọa độ tuyệt đối cho tới khi người dùng khóa một chuỗi khẩu độ canonical và cơ chế khép lực của dây chủ",
+        "Mọi miền tham số chỉ phục vụ falsification và chuẩn bị mô hình; không phải kích thước được phê duyệt"
+      ]
+    },
+    {
+      "field": "title",
+      "before": "Sàng lọc physics-in-the-loop tái lập được",
+      "after": "Tiền-sàng-lọc hình học và vật lý fail-closed ở mức F0"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "READY",
+  "run_id": "RUN-20260901-00fd963d"
+}

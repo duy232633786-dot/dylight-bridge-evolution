@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creative_portfolio_study.schema.json",
+  "title": "CreativePortfolioStudy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "study_id",
+    "study_sha256",
+    "algorithm",
+    "claim_level",
+    "design_verdict_authority",
+    "technical_scope",
+    "status",
+    "seed",
+    "iterations",
+    "max_candidates",
+    "robustness_samples_per_candidate",
+    "perturbation_fraction",
+    "creative_domain",
+    "domain_sha256",
+    "technical_profile",
+    "technical_profile_sha256",
+    "search_manifest",
+    "source_digests",
+    "source_sha256",
+    "schema_sha256",
+    "basis_sha256",
+    "archive",
+    "blocked_candidates",
+    "statistics",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "study_id": { "type": "string", "pattern": "^CP-[0-9a-f]{16}$" },
+    "study_sha256": { "$ref": "#/$defs/sha256" },
+    "algorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "CONSTRAINED_CREATIVE_PORTFOLIO" },
+        "version": { "const": "creative-portfolio/0.1.0" }
+      }
+    },
+    "claim_level": { "const": "IDEA" },
+    "design_verdict_authority": { "const": "NONE" },
+    "technical_scope": {
+      "const": "F0_TO_F1_ARCH_RESEARCH_SCREENING_NO_CAPACITY_OR_DESIGN_VERDICT"
+    },
+    "status": { "const": "PORTFOLIO_COMPLETE" },
+    "seed": { "type": "integer" },
+    "iterations": { "type": "integer", "minimum": 0 },
+    "max_candidates": { "type": "integer", "minimum": 1 },
+    "robustness_samples_per_candidate": { "type": "integer", "minimum": 3 },
+    "perturbation_fraction": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 0.25
+    },
+    "creative_domain": { "type": "object" },
+    "domain_sha256": { "$ref": "#/$defs/sha256" },
+    "technical_profile": { "type": "object" },
+    "technical_profile_sha256": { "$ref": "#/$defs/sha256" },
+    "search_manifest": { "$ref": "#/$defs/search_manifest" },
+    "source_digests": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/source_digest" }
+    },
+    "source_sha256": { "$ref": "#/$defs/sha256" },
+    "schema_sha256": { "$ref": "#/$defs/sha256" },
+    "basis_sha256": { "$ref": "#/$defs/sha256" },
+    "archive": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/archive_entry" }
+    },
+    "blocked_candidates": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/blocked_candidate" }
+    },
+    "statistics": { "$ref": "#/$defs/statistics" },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nonnegative_number": { "type": "number", "minimum": 0 },
+    "source_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "enum": [
+            "bridge_evolution/creative_portfolio.py",
+            "bridge_evolution/creative_shape.py",
+            "bridge_evolution/creative_frame_adapter.py",
+            "bridge_evolution/frame_f1.py",
+            "bridge_evolution/arch_action_f1.py",
+            "bridge_evolution/funicular_reference.py"
+          ]
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "map_statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluated", "occupied_cells", "rejected", "unknown"],
+      "properties": {
+        "evaluated": { "type": "integer", "minimum": 0 },
+        "occupied_cells": { "type": "integer", "minimum": 0 },
+        "rejected": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "search_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "algorithm_version",
+        "domain_sha256",
+        "profile_sha256",
+        "statistics",
+        "selected_candidate_ids"
+      ],
+      "properties": {
+        "algorithm": { "const": "CONSTRAINED_MAP_ELITES_ARCH" },
+        "algorithm_version": { "type": "string", "minLength": 1 },
+        "domain_sha256": { "$ref": "#/$defs/sha256" },
+        "profile_sha256": { "$ref": "#/$defs/sha256" },
+        "statistics": { "$ref": "#/$defs/map_statistics" },
+        "selected_candidate_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" }
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topology", "rise_bin", "curvature_bin", "asymmetry_bin"],
+      "properties": {
+        "topology": { "enum": ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"] },
+        "rise_bin": { "type": "integer", "minimum": 0 },
+        "curvature_bin": { "type": "integer", "minimum": 0 },
+        "asymmetry_bin": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "reference_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_l0_margin",
+        "axis_rms_deviation_ratio",
+        "bending_proxy_max_abs_ratio",
+        "max_translation_ratio",
+        "max_condition_number",
+        "max_equilibrium_residual_relative"
+      ],
+      "properties": {
+        "minimum_l0_margin": { "$ref": "#/$defs/nonnegative_number" },
+        "axis_rms_deviation_ratio": { "$ref": "#/$defs/nonnegative_number" },
+        "bending_proxy_max_abs_ratio": { "$ref": "#/$defs/nonnegative_number" },
+        "max_translation_ratio": { "$ref": "#/$defs/nonnegative_number" },
+        "max_condition_number": { "type": "number", "minimum": 1 },
+        "max_equilibrium_residual_relative": { "$ref": "#/$defs/nonnegative_number" }
+      }
+    },
+    "robust_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "robustness_sample_count",
+        "minimum_l0_margin",
+        "inverse_minimum_l0_margin",
+        "worst_axis_rms_deviation_ratio",
+        "worst_bending_proxy_max_abs_ratio",
+        "worst_translation_ratio",
+        "worst_condition_number",
+        "worst_equilibrium_residual_relative"
+      ],
+      "properties": {
+        "robustness_sample_count": { "type": "integer", "minimum": 3 },
+        "minimum_l0_margin": { "$ref": "#/$defs/nonnegative_number" },
+        "inverse_minimum_l0_margin": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "worst_axis_rms_deviation_ratio": { "$ref": "#/$defs/nonnegative_number" },
+        "worst_bending_proxy_max_abs_ratio": { "$ref": "#/$defs/nonnegative_number" },
+        "worst_translation_ratio": { "$ref": "#/$defs/nonnegative_number" },
+        "worst_condition_number": { "type": "number", "minimum": 1 },
+        "worst_equilibrium_residual_relative": { "$ref": "#/$defs/nonnegative_number" }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "candidate_sha256",
+        "geometry_sha256",
+        "analysis_id",
+        "analysis_sha256",
+        "frame_model_sha256",
+        "frame_result_sha256",
+        "arch_action_study_id",
+        "arch_action_study_sha256",
+        "funicular_reference_id",
+        "funicular_reference_sha256"
+      ],
+      "properties": {
+        "candidate_id": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" },
+        "candidate_sha256": { "$ref": "#/$defs/sha256" },
+        "geometry_sha256": { "$ref": "#/$defs/sha256" },
+        "analysis_id": { "type": "string", "pattern": "^CFA-[0-9a-f]{16}$" },
+        "analysis_sha256": { "$ref": "#/$defs/sha256" },
+        "frame_model_sha256": { "$ref": "#/$defs/sha256" },
+        "frame_result_sha256": { "$ref": "#/$defs/sha256" },
+        "arch_action_study_id": { "type": "string", "pattern": "^AA-[0-9a-f]{16}$" },
+        "arch_action_study_sha256": { "$ref": "#/$defs/sha256" },
+        "funicular_reference_id": { "type": "string", "pattern": "^FR-[0-9a-f]{16}$" },
+        "funicular_reference_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "perturbation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "span_m",
+        "rise_ratio",
+        "rib_depth_m",
+        "deck_clearance_m",
+        "shape_coefficients"
+      ],
+      "properties": {
+        "span_m": { "type": "number" },
+        "rise_ratio": { "type": "number" },
+        "rib_depth_m": { "type": "number" },
+        "deck_clearance_m": { "type": "number" },
+        "shape_coefficients": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_id",
+        "sample_index",
+        "sample_seed",
+        "input_digest",
+        "perturbation",
+        "genome",
+        "status",
+        "reference",
+        "metrics",
+        "lineage"
+      ],
+      "properties": {
+        "sample_id": { "type": "string", "pattern": "^CP-S-[0-9a-f]{16}$" },
+        "sample_index": { "type": "integer", "minimum": 0 },
+        "sample_seed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+        "input_digest": { "$ref": "#/$defs/sha256" },
+        "perturbation": { "$ref": "#/$defs/perturbation" },
+        "genome": { "type": "object" },
+        "status": { "const": "RESEARCH_SCREENED" },
+        "reference": { "type": "object" },
+        "metrics": { "$ref": "#/$defs/reference_metrics" },
+        "lineage": { "$ref": "#/$defs/lineage" }
+      }
+    },
+    "archive_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "candidate_sha256",
+        "topology",
+        "cell",
+        "map_elites_quality_score",
+        "status",
+        "pareto_rank",
+        "pareto_front",
+        "base_reference",
+        "base_metrics",
+        "robustness_samples",
+        "robust_metrics",
+        "lineage"
+      ],
+      "properties": {
+        "candidate_id": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" },
+        "candidate_sha256": { "$ref": "#/$defs/sha256" },
+        "topology": { "enum": ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"] },
+        "cell": { "$ref": "#/$defs/cell" },
+        "map_elites_quality_score": { "$ref": "#/$defs/nonnegative_number" },
+        "status": { "const": "RESEARCH_SCREENED" },
+        "pareto_rank": { "type": "integer", "minimum": 0 },
+        "pareto_front": { "type": "boolean" },
+        "base_reference": { "type": "object" },
+        "base_metrics": { "$ref": "#/$defs/reference_metrics" },
+        "robustness_samples": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/sample" }
+        },
+        "robust_metrics": { "$ref": "#/$defs/robust_metrics" },
+        "lineage": { "$ref": "#/$defs/lineage" }
+      }
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "stage", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^CP-[A-Z0-9_-]+$" },
+        "stage": {
+          "enum": [
+            "STRUCTURAL_PROFILE",
+            "FRAME_ADAPTER",
+            "FRAME_F1",
+            "ARCH_ACTION",
+            "FUNICULAR",
+            "L0",
+            "ROBUSTNESS"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "blocked_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "candidate_sha256",
+        "topology",
+        "stage",
+        "blockers"
+      ],
+      "properties": {
+        "candidate_id": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" },
+        "candidate_sha256": { "$ref": "#/$defs/sha256" },
+        "topology": { "enum": ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"] },
+        "stage": { "enum": ["BASE_CHAIN", "ROBUSTNESS"] },
+        "blockers": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/blocker" }
+        }
+      }
+    },
+    "statistics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "map_elites_evaluated",
+        "map_elites_occupied_cells",
+        "selected_for_chain",
+        "research_screened",
+        "blocked",
+        "pareto_front"
+      ],
+      "properties": {
+        "map_elites_evaluated": { "type": "integer", "minimum": 0 },
+        "map_elites_occupied_cells": { "type": "integer", "minimum": 0 },
+        "selected_for_chain": { "type": "integer", "minimum": 0 },
+        "research_screened": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "integer", "minimum": 0 },
+        "pareto_front": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

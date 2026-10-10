@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-022-002",
+  "task_id": "BRD-022",
+  "incident_id": "INC-BRD-022-002",
+  "correction_sha256": "d6e0256ed2fb0bc24d618a575f976e2d371964994576608ecd4d5fe6666270fb",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "All hashes verified: COR-BRD-022-001 hashes to d810be84 (matches CRV approval chain 975f7c→6fd00a), COR-BRD-022-002 supersedes exactly d810be84, all three snapshot blobs and the live test match their filenames. Diff 6fd→5af is exactly one hunk: the top-level production grammar list updated from 2 entries to 5 (adding box_girder, composite_i_girder, i_girder from BRD-025 acceptance), while all BRD-022 sandbox isolation guards (loader block, flat name block, gene_order block, schema enum barrier, policy measured assertions) remain unchanged and strengthened. Tests pass 100%."
+  ],
+  "notes": "handoff=2d32204f, COR-001=d810be84, COR-002=d6e0256e, snap975=975f7ca4, snap6fd=6fd00ab0, snap5af=5af9df9, live=5af9df9 (matches); diff=1 hunk/6 added lines in test_experimental_grammar_lives_only_in_sandbox; pytest 1303 lines, 0 failures."
+}

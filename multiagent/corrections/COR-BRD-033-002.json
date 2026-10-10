@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-033-002",
+  "task_id": "BRD-033",
+  "incident_id": "INC-BRD-033-002",
+  "agent_id": "codex",
+  "role": "evidence_safety_auditor",
+  "summary": "Giữ nguyên bytes lịch sử bằng snapshot đúng hash và nối sang lab.py hiện tại có family/domain capability policy.",
+  "original_handoff_path": "multiagent/handoffs/BRD-033.claude.r002.json",
+  "original_handoff_sha256": "101c6bb469b241089cf71b1c5a64b412c77a42e4ec161b72ab47674a7b5b93fd",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5.blob",
+    "sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5"
+  },
+  "corrected_artifact": {
+    "path": "bridge_evolution/collaboration/lab.py",
+    "previous_sha256": "3ef02cb044998875ca15e25f8e7494980e542240388ba1669abc9e46ad9549d5",
+    "current_sha256": "0495f233ddaf65cf728d80e359d730102b0c2ebaf7147c27be9ad0a24e0db56d"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_task_contract_reachability.py",
+      "tests/test_task_contract_amendment.py",
+      "tests/test_correction_chain.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [],
+  "unresolved_risks": [
+    "Correction chỉ sửa provenance; cần reviewer không phải claude hoặc codex trước khi hợp lệ."
+  ],
+  "supersedes_correction_sha256": null
+}

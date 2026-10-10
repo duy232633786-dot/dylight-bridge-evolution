@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-023-003",
+  "task_id": "BRD-023",
+  "incident_id": "INC-BRD-023-003",
+  "correction_sha256": "b41c4815c2676d5ee1236564cc5124518d49e5a4a68826dcc87a51c36452c357",
+  "reviewer_id": "claude",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Hash chain kiem chung doc lap bang sha256sum: correction file = b41c4815c2676d5ee1236564cc5124518d49e5a4a68826dcc87a51c36452c357; original handoff multiagent/handoffs/BRD-023.codex.r001.json = d2de17e8c62a08877eb5e21458c43dcd09f35aaf392ccd05eb189723e4eebf1e khop original_handoff_sha256 va task_id=BRD-023; snapshot 12101a75dac7d4d5da411e4560809cfe9c34c48a3d6ba4da8de05a8d7d773ef2.blob hash dung bang ten file va bang previous_sha256; live docs/runtime_capability_matrix.json = 0060a464b1227e673672a7fa472869c3dc79bb9fc66cb26b2c643f5579a80e72 khop current_sha256.",
+    "INC-BRD-023-003 khop tung field bat buoc: task_id, original_handoff_path, original_handoff_sha256, artifact_path=docs/runtime_capability_matrix.json, recorded_sha256=12101a75 = previous_sha256, va observed_sha256=0060a464 = bytes live. Schema provenance_correction.schema.json dat: role=evidence_safety_auditor, filename trung correction_id, moi pattern SHA-256 hop le.",
+    "Chuoi supersede lien tuc va da duoc duyet doc lap: supersedes e807d8817ff21a0a48ffff8b8da6ab6a1ded2acd7cb11d4f235f61265c5e8bb0 = COR-BRD-023-002 (cung task, cung lineage handoff, cung artifact path), CRV-BRD-023-002 quyet dinh APPROVE va la review duy nhat cho hash do; current_sha256 cua no = 12101a75 dung bang previous_sha256 cua correction nay. Lui them mot buoc: COR-BRD-023-002 supersedes bc0fa025 = COR-BRD-023-001 da APPROVE boi CRV-BRD-023-001, va previous_sha256 a3d8273e cua COR-BRD-023-001 dung bang sha256 ma handoff BRD-023 ghi cho artifact — chuoi khep kin tu handoff goc toi bytes live.",
+    "Doc lap: agent correction = codex, agent handoff goc BRD-023.codex.r001 = codex, reviewer = claude; Claude khong phai tac gia handoff goc lan correction. Chua ton tai review nao cho hash b41c4815 nen khong co xung dot phan quyet.",
+    "Diff snapshot 12101a75 -> live chi THEM 28 dong, khong xoa dong nao: hai capability moi COLUMN_NM_SECOND_ORDER o PARTIAL va ARCH_RIB_STABILITY o ABSENT, deu khai gioi han fail-closed va ghi ro ket qua SCREENED, design_verdict_authority=NONE. Khong co entry nao duoc nang trang thai. Test gate tests/test_task_contract_reachability.py: 19 passed."
+  ],
+  "notes": "Provenance-only APPROVE cho COR-BRD-023-003. Chi xac nhan so ke toan bang chung: hash chain handoff-snapshot-incident-live, tinh doc lap reviewer va tinh lien tuc cua chuoi correction da duoc duyet. KHONG review noi dung ky thuat, KHONG nang claim: tran claim van la SCREENED, khong xac nhan bat ky ket qua hinh hoc, solver, suc chiu tai hay thiet ke cau nao."
+}

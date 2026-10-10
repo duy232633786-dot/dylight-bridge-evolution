@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-a8d49d2fae8845c5",
+  "amendment_sha256": "4b1fd197d5f2ee56e6e84b19e0da61b37432a583e60974c99bc1ce2c60d5eac0",
+  "created_at": "2026-08-29T13:59:01.057759Z",
+  "task_id": "BRD-043",
+  "authorized_by": "user+codex",
+  "reason": "Mở bậc kiểm chứng tĩnh học độc lập sau khi BRD-042 đã được Claude ACCEPTED; phạm vi chỉ gồm 4 artifact mới và không sửa upstream.",
+  "pre_task_sha256": "3a1bd72ba28b78021b6e186dd55449ae888a20358f16cf1357a02e829d43073e",
+  "post_task_sha256": "9d0532a11df49667aec07995e478dc839c15e2475209cdf7d7a87795ae722e16",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/3a1bd72ba28b78021b6e186dd55449ae888a20358f16cf1357a02e829d43073e.json",
+    "sha256": "3a1bd72ba28b78021b6e186dd55449ae888a20358f16cf1357a02e829d43073e"
+  },
+  "changes": [
+    {
+      "field": "status",
+      "before": "BACKLOG",
+      "after": "READY"
+    }
+  ],
+  "previous_status": "BACKLOG",
+  "next_status": "READY"
+}

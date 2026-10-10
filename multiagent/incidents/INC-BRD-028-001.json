@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-028-001",
+  "task_id": "BRD-028",
+  "detected_at_utc": "2026-08-30T11:23:08.507530Z",
+  "detected_by": "codex",
+  "original_handoff_path": "multiagent/handoffs/BRD-028.codex-gpt5.r002.json",
+  "original_handoff_sha256": "2ed1dd5c3950c82f7aed7f187f678c7dba4175e47107c11eabec658cf0410f2d",
+  "artifact_path": "docs/runtime_capability_matrix.md",
+  "recorded_sha256": "0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28",
+  "observed_sha256": "cb09e75b0320b829bac9d8b32649aac4136702c425d97dcce756482a52d8d58e",
+  "reason": "Capability matrix được mở rộng có kiểm soát bởi các task nghiên cứu sau; handoff lịch sử phải giữ nguyên bytes.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

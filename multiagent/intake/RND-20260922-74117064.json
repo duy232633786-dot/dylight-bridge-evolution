@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.1",
+  "brief_id": "RND-20260922-74117064",
+  "created_at": "2026-09-22T17:07:00.974407Z",
+  "topic": "SAGE-EvoBridge P0 audit and P1 P3 bounded beam evaluator intervention slice on existing frame_f1",
+  "objectives": [
+    "Reuse existing frame solver; immutable benchmark contract; verified failure intervention and raw evidence; no engineering approval"
+  ],
+  "constraints": [
+    "Workspace-only data; preserve dirty tree; no cloud or external solver calls; missing proposal sources remain missing"
+  ],
+  "requested_by": "project_owner",
+  "autonomy_mode": "DIGITAL_AUTO",
+  "claim_ceiling": "SCREENED",
+  "runtime_scope": {
+    "structural_families": [
+      "research_prismatic_beam"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  },
+  "budget": {
+    "max_tasks": 4,
+    "max_parallel": 1,
+    "max_retries": 1,
+    "task_timeout_seconds": 1800,
+    "wall_time_seconds": 21600
+  },
+  "human_gates": [
+    "G5",
+    "G6",
+    "G7",
+    "EXTERNAL_WRITE",
+    "TECHNICAL_RELEASE"
+  ],
+  "knowledge_sink": "OBSIDIAN_AND_CANONICAL_JSON"
+}

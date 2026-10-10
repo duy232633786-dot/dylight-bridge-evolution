@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-036-005",
+  "task_id": "BRD-036",
+  "incident_id": "INC-BRD-036-005",
+  "correction_sha256": "7b9ba99f3b01385c74ad7c26667b50b3e0efe10daf6e682a1ccc4b98c78df89c",
+  "reviewer_id": "opencode",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "COR-005 tests/test_revit_family.py: diff snapshot d1f0c7ff -> live c8daab94 adds tests for the corrected contract: BODY requires claim stamp, new [A3] pre_regen ordering tests with comment-stripping (_lenh), scaffold refuses .rfa without claim and rejects comment-only claim, SKETCH_DECLARED_OVERLOADS/GIA DINH OVERLOAD checks, inclined-workplane gating, _box_overlap_m3 geometry tests; all fail-closed and depend on corrected live code.",
+    "Hash chain: handoff 96fdd21d ok; snapshot blob byte-exact d1f0c7ff; live artifact equals recorded current_sha256; verify_brd036_provenance.py PASS (read-only).",
+    "pytest tests/test_revit_family.py: 624 passed."
+  ],
+  "notes": "Reviewer opencode is independent (not codex, not claude). Scope: IDEA claim level only; string-level self-checks are not proof a family ran in real Revit; this is not a structural-bridge audit. Approve correction."
+}

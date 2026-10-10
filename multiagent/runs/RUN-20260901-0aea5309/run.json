@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260901-0aea5309",
+  "brief_id": "RND-20260831-0aea5309",
+  "created_at": "2026-09-01T12:17:32.592791Z",
+  "updated_at": "2026-09-01T14:08:35.512223Z",
+  "status": "FAILED",
+  "planner": "deterministic-safety-template/1.0",
+  "task_ids": [
+    "RND-0aea5309-01",
+    "RND-0aea5309-02",
+    "RND-0aea5309-03",
+    "RND-0aea5309-04",
+    "RND-0aea5309-05"
+  ],
+  "provider_policy": "STRICT_MULTI_VENDOR",
+  "attempts": {
+    "RND-0aea5309-01": 4,
+    "RND-0aea5309-02": 0,
+    "RND-0aea5309-03": 0,
+    "RND-0aea5309-04": 0,
+    "RND-0aea5309-05": 0
+  },
+  "recovery_grants": {
+    "RND-0aea5309-01": 2,
+    "RND-0aea5309-02": 0,
+    "RND-0aea5309-03": 0,
+    "RND-0aea5309-04": 0,
+    "RND-0aea5309-05": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-01T12:17:32.592791Z",
+      "kind": "PLAN_CREATED",
+      "message": "Plan an toàn đã materialize"
+    },
+    {
+      "at": "2026-09-01T12:17:50.761923Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-09-01T12:18:52.025925Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 1 thất bại: MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-0aea5309-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T12:19:47.253735Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 2 thất bại: MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-0aea5309-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T12:19:47.255745Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-0aea5309-01 đã dùng hết attempt budget 2/2 (1 initial + 1 retries + 0 recovery grants)",
+      "task_id": "RND-0aea5309-01"
+    },
+    {
+      "at": "2026-09-01T12:19:51.337205Z",
+      "kind": "KNOWLEDGE_SYNC",
+      "message": "Obsidian mirror: SYNCED"
+    },
+    {
+      "at": "2026-09-01T12:26:10.806965Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-f846d9a831f4478a: authorized attempt 3..3 (+1); total attempt budget 2->3; claude -> claude",
+      "task_id": "RND-0aea5309-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T12:26:27.542176Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-09-01T12:26:31.748117Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 3 thất bại: PROVIDER_RESULT_UNSUCCESSFUL,MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-0aea5309-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T12:26:31.750299Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-0aea5309-01 đã dùng hết attempt budget 3/3 (1 initial + 1 retries + 1 recovery grants)",
+      "task_id": "RND-0aea5309-01"
+    },
+    {
+      "at": "2026-09-01T14:07:20.974336Z",
+      "kind": "TASK_RECOVERY_AUTHORIZED",
+      "message": "REC-c8eb7aaeafce484a: authorized attempt 4..4 (+1); total attempt budget 3->4; claude -> claude",
+      "task_id": "RND-0aea5309-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:07:40.755172Z",
+      "kind": "RUN_STARTED",
+      "message": "Digital auto loop bắt đầu"
+    },
+    {
+      "at": "2026-09-01T14:08:35.508968Z",
+      "kind": "TASK_ATTEMPT_FAILED",
+      "message": "attempt 4 thất bại: MISSING_REQUIRED_ARTIFACTS",
+      "task_id": "RND-0aea5309-01",
+      "provider": "claude"
+    },
+    {
+      "at": "2026-09-01T14:08:35.512223Z",
+      "kind": "RUN_FAILED",
+      "message": "RND-0aea5309-01 đã dùng hết attempt budget 4/4 (1 initial + 1 retries + 2 recovery grants)",
+      "task_id": "RND-0aea5309-01"
+    }
+  ],
+  "human_gate": "RND-0aea5309-01 đã dùng hết attempt budget 4/4 (1 initial + 1 retries + 2 recovery grants)",
+  "knowledge_sync": "SYNCED"
+}

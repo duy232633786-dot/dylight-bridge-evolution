@@ -1,0 +1,841 @@
+"""Sáng tạo hình thái vòm bằng Constrained MAP-Elites ở mức nghiên cứu F0.
+
+Module này tạo hình học và sàng lọc bằng các bất biến hình học, đồ thị đường
+truyền lực và proxy cơ học đơn giản. Nó KHÔNG phải solver kết cấu, không kiểm
+được ổn định, dao động, mỏi, liên kết, móng, thi công hoặc tổ hợp tải theo tiêu
+chuẩn. Vì vậy kết quả luôn có ``claim_level=IDEA`` và không có trường
+``feasible``/``verified``.
+
+Nguyên tắc fail-closed: độ mới hình thái không được bù cho một kiểm tra FAIL;
+thiếu ngưỡng hoặc thiếu tệp nguồn tạo ``UNKNOWN_INPUT_MISSING`` và ứng viên
+không được vào archive MAP-Elites.
+"""
+from __future__ import annotations
+
+import bisect
+import hashlib
+import json
+import math
+import random
+import statistics
+from copy import deepcopy
+from pathlib import Path
+from typing import Iterable
+
+import jsonschema
+
+from . import CONTRACTS_DIR, REPO_ROOT
+
+
+CLAIM_LEVEL = "IDEA"
+GENERATOR_ID = "CONSTRAINED_MAP_ELITES_ARCH"
+GENERATOR_VERSION = "creative-shape/0.1.0"
+TECHNICAL_SCOPE = "GEOMETRY_AND_SCREENING_PROXY_ONLY_NO_STRUCTURAL_VERIFICATION"
+
+_DEFAULT_DOMAIN = REPO_ROOT / "docs" / "design_basis" / "creative_shape_domain.json"
+_CANDIDATE_SCHEMA = CONTRACTS_DIR / "creative_shape_candidate.schema.json"
+_GENOME_KEYS = {
+    "topology",
+    "span_m",
+    "rise_ratio",
+    "panel_count",
+    "rib_count",
+    "rib_depth_m",
+    "deck_clearance_m",
+    "shape_coefficients",
+}
+_THRUST_PROFILE_KEYS = (
+    "distributed_load_kN_m",
+    "rib_area_m2",
+    "allowable_compression_MPa",
+)
+
+
+class CreativeShapeError(ValueError):
+    """Dữ liệu miền, genome hoặc output vi phạm hợp đồng nghiên cứu."""
+
+
+def _canonical(value: object) -> str:
+    try:
+        return json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as exc:
+        raise CreativeShapeError(f"Dữ liệu không thể canonical JSON: {exc}") from exc
+
+
+def _sha256(value: object) -> str:
+    return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
+
+
+def _is_finite_number(value: object) -> bool:
+    return not isinstance(value, bool) and isinstance(value, (int, float)) and math.isfinite(value)
+
+
+def _bounds_valid(bounds: object) -> bool:
+    return (
+        isinstance(bounds, dict)
+        and set(bounds) == {"min", "max"}
+        and _is_finite_number(bounds["min"])
+        and _is_finite_number(bounds["max"])
+        and float(bounds["min"]) < float(bounds["max"])
+    )
+
+
+def _strictly_increasing(values: object) -> bool:
+    return (
+        isinstance(values, list)
+        and len(values) >= 2
+        and all(_is_finite_number(value) for value in values)
+        and all(float(a) < float(b) for a, b in zip(values, values[1:]))
+    )
+
+
+def load_creative_domain(path: str | Path | None = None) -> dict:
+    """Đọc miền tìm kiếm; không suy diễn ngưỡng kỹ thuật từ miền này."""
+    source = Path(path) if path is not None else _DEFAULT_DOMAIN
+    if not source.is_file():
+        raise CreativeShapeError(f"Không tìm thấy miền sáng tạo: {source}")
+    try:
+        domain = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CreativeShapeError(f"Không đọc được miền sáng tạo: {exc}") from exc
+
+    return validate_creative_domain(domain)
+
+
+def validate_creative_domain(domain: dict) -> dict:
+    """Kiểm miền kể cả khi caller truyền object thay vì đọc tệp mặc định."""
+    if not isinstance(domain, dict):
+        raise CreativeShapeError("Miền sáng tạo phải là object")
+
+    required = {
+        "schema_version", "domain_id", "claim_ceiling", "generator_version",
+        "technical_scope", "topology_values", "span_m", "rise_ratio",
+        "panel_count_values", "rib_count_values", "rib_depth_m",
+        "deck_clearance_m", "coefficient_count", "coefficient_bounds",
+        "axis_point_count", "bins", "notes_vi",
+    }
+    if set(domain) != required:
+        raise CreativeShapeError(
+            f"Miền sáng tạo sai khóa; missing={sorted(required - set(domain))}, "
+            f"extra={sorted(set(domain) - required)}")
+    if domain["claim_ceiling"] != CLAIM_LEVEL:
+        raise CreativeShapeError("Miền sáng tạo không được nâng claim_ceiling khỏi IDEA")
+    if domain["generator_version"] != GENERATOR_VERSION:
+        raise CreativeShapeError("generator_version của miền không khớp runtime")
+    if domain["technical_scope"] != "SEARCH_BOUNDS_ONLY_NOT_DESIGN_LIMITS":
+        raise CreativeShapeError("Miền phải tự khai là biên tìm kiếm, không phải giới hạn thiết kế")
+    if domain["topology_values"] != ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"]:
+        raise CreativeShapeError("topology_values phải gồm đúng ba topology đã hỗ trợ")
+    for name in ("span_m", "rise_ratio", "rib_depth_m", "deck_clearance_m", "coefficient_bounds"):
+        if not _bounds_valid(domain[name]):
+            raise CreativeShapeError(f"{name} phải có min < max hữu hạn")
+    for name in ("panel_count_values", "rib_count_values"):
+        values = domain[name]
+        if (
+            not isinstance(values, list)
+            or not values
+            or any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in values)
+            or values != sorted(set(values))
+        ):
+            raise CreativeShapeError(f"{name} phải là danh sách số nguyên dương, tăng và duy nhất")
+    if any(value % 2 for value in domain["panel_count_values"]):
+        raise CreativeShapeError("panel_count_values phải chẵn để giữ một nút tại giữa nhịp")
+    count = domain["coefficient_count"]
+    if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+        raise CreativeShapeError("coefficient_count phải là số nguyên dương")
+    points = domain["axis_point_count"]
+    if isinstance(points, bool) or not isinstance(points, int) or points < 21 or points % 2 == 0:
+        raise CreativeShapeError("axis_point_count phải là số lẻ >= 21")
+    if set(domain["bins"]) != {"rise_ratio", "curvature_complexity", "asymmetry"}:
+        raise CreativeShapeError("bins thiếu hoặc thừa descriptor")
+    if any(not _strictly_increasing(edges) for edges in domain["bins"].values()):
+        raise CreativeShapeError("Mỗi dãy bin phải tăng nghiêm ngặt và hữu hạn")
+    if not isinstance(domain["notes_vi"], list) or not all(
+        isinstance(note, str) and note.strip() for note in domain["notes_vi"]
+    ):
+        raise CreativeShapeError("notes_vi phải là danh sách chuỗi không rỗng")
+    return domain
+
+
+def validate_genome(genome: dict, domain: dict | None = None) -> None:
+    """Fail-fast với genome ngoài miền hoặc chứa NaN/Infinity."""
+    if not isinstance(genome, dict) or set(genome) != _GENOME_KEYS:
+        actual = set(genome) if isinstance(genome, dict) else set()
+        raise CreativeShapeError(
+            f"Genome sai khóa; missing={sorted(_GENOME_KEYS - actual)}, "
+            f"extra={sorted(actual - _GENOME_KEYS)}")
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    if genome["topology"] not in domain["topology_values"]:
+        raise CreativeShapeError(f"Topology ngoài miền: {genome['topology']!r}")
+
+    for name in ("span_m", "rise_ratio", "rib_depth_m", "deck_clearance_m"):
+        value = genome[name]
+        if not _is_finite_number(value):
+            raise CreativeShapeError(f"{name} phải hữu hạn và không được là boolean")
+        bounds = domain[name]
+        if float(value) < float(bounds["min"]) or float(value) > float(bounds["max"]):
+            raise CreativeShapeError(f"{name}={value} nằm ngoài [{bounds['min']}, {bounds['max']}]")
+
+    for name in ("panel_count", "rib_count"):
+        value = genome[name]
+        if isinstance(value, bool) or not isinstance(value, int) or value not in domain[f"{name}_values"]:
+            raise CreativeShapeError(f"{name}={value!r} nằm ngoài tập cho phép")
+
+    coefficients = genome["shape_coefficients"]
+    if not isinstance(coefficients, list) or len(coefficients) != domain["coefficient_count"]:
+        raise CreativeShapeError(
+            f"shape_coefficients phải có đúng {domain['coefficient_count']} phần tử")
+    bounds = domain["coefficient_bounds"]
+    for index, value in enumerate(coefficients):
+        if not _is_finite_number(value):
+            raise CreativeShapeError(f"shape_coefficients[{index}] không hữu hạn")
+        if float(value) < float(bounds["min"]) or float(value) > float(bounds["max"]):
+            raise CreativeShapeError(
+                f"shape_coefficients[{index}]={value} ngoài [{bounds['min']}, {bounds['max']}]")
+
+
+def _raw_axis_ordinate(t: float, coefficients: Iterable[float]) -> float:
+    base = 4.0 * t * (1.0 - t)
+    modulation = 1.0 + sum(
+        float(coefficient) * math.sin(order * math.pi * t)
+        for order, coefficient in enumerate(coefficients, start=1)
+    )
+    return base * modulation
+
+
+def generate_arch_axis(genome: dict, domain: dict | None = None) -> list[dict]:
+    """Sinh trục vòm: đúng hai gối, x đơn điệu và đúng chiều cao mục tiêu."""
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    validate_genome(genome, domain)
+    count = domain["axis_point_count"]
+    raw = [
+        _raw_axis_ordinate(index / (count - 1), genome["shape_coefficients"])
+        for index in range(count)
+    ]
+    if any(value <= 0.0 for value in raw[1:-1]):
+        raise CreativeShapeError("Hệ số hình dạng tạo trục không dương trong lòng nhịp")
+    raw_max = max(raw)
+    if not math.isfinite(raw_max) or raw_max <= 0.0:
+        raise CreativeShapeError("Không xác định được chiều cao trục vòm")
+    span = float(genome["span_m"])
+    target_rise = span * float(genome["rise_ratio"])
+    scale = target_rise / raw_max
+    peak_index = raw.index(raw_max)
+    points: list[dict] = []
+    for index, ordinate in enumerate(raw):
+        t = index / (count - 1)
+        y = target_rise if index == peak_index else ordinate * scale
+        if index in (0, count - 1):
+            y = 0.0
+        points.append({"index": index, "t": t, "x_m": span * t, "y_m": y})
+    points[0]["x_m"] = 0.0
+    points[-1]["x_m"] = span
+    if not all(a["x_m"] < b["x_m"] for a, b in zip(points, points[1:])):
+        raise CreativeShapeError("Trục sinh ra không đơn điệu theo x")
+    return points
+
+
+def _interpolate_axis(points: list[dict], t: float) -> tuple[float, float]:
+    scaled = t * (len(points) - 1)
+    left = min(int(math.floor(scaled)), len(points) - 2)
+    fraction = scaled - left
+    a, b = points[left], points[left + 1]
+    return (
+        a["x_m"] + fraction * (b["x_m"] - a["x_m"]),
+        a["y_m"] + fraction * (b["y_m"] - a["y_m"]),
+    )
+
+
+def build_load_path_graph(genome: dict, axis_points: list[dict] | None = None,
+                          domain: dict | None = None) -> dict:
+    """Dựng graph khái niệm; graph này không thay thế mô hình phần tử hữu hạn."""
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    validate_genome(genome, domain)
+    axis_points = axis_points or generate_arch_axis(genome, domain)
+    panel_count = genome["panel_count"]
+    topology = genome["topology"]
+    arch_panel = [_interpolate_axis(axis_points, index / panel_count) for index in range(panel_count + 1)]
+    rise = max(point["y_m"] for point in axis_points)
+    deck_y = rise + float(genome["deck_clearance_m"]) if topology == "DECK_ARCH" else 0.0
+
+    nodes: list[dict] = []
+    for index, (x_m, y_m) in enumerate(arch_panel):
+        nodes.append({
+            "id": f"A{index}", "kind": "ARCH", "x_m": x_m, "y_m": y_m,
+            "support": index in (0, panel_count),
+        })
+    for index, (x_m, _y_m) in enumerate(arch_panel):
+        nodes.append({
+            "id": f"D{index}", "kind": "DECK", "x_m": x_m, "y_m": deck_y,
+            "support": False,
+        })
+
+    edges: list[dict] = []
+
+    def add_edge(a: str, b: str, kind: str) -> None:
+        edges.append({"id": f"E{len(edges):03d}", "from": a, "to": b, "kind": kind})
+
+    for index in range(panel_count):
+        add_edge(f"A{index}", f"A{index + 1}", "ARCH_RIB")
+        add_edge(f"D{index}", f"D{index + 1}", "DECK")
+    add_edge("D0", "A0", "END_POST")
+    add_edge(f"D{panel_count}", f"A{panel_count}", "END_POST")
+
+    if topology == "DECK_ARCH":
+        for index in range(1, panel_count):
+            add_edge(f"A{index}", f"D{index}", "SPANDREL")
+    elif topology == "THROUGH_ARCH":
+        for index in range(1, panel_count):
+            add_edge(f"D{index}", f"A{index}", "HANGER")
+    else:
+        offset = max(1, panel_count // 4)
+        for index in range(1, panel_count):
+            left = max(1, index - offset)
+            right = min(panel_count - 1, index + offset)
+            add_edge(f"D{index}", f"A{left}", "NETWORK_HANGER")
+            if right != left:
+                add_edge(f"D{index}", f"A{right}", "NETWORK_HANGER")
+    return {"topology": topology, "nodes": nodes, "edges": edges}
+
+
+def load_path_connected(graph: dict) -> bool:
+    """Mọi nút mặt cầu phải truyền tải sang vòm rồi nối được tới gối."""
+    if not isinstance(graph, dict) or not isinstance(graph.get("nodes"), list) or not isinstance(graph.get("edges"), list):
+        return False
+    node_ids = [node.get("id") for node in graph["nodes"] if isinstance(node, dict)]
+    if len(node_ids) != len(graph["nodes"]) or len(set(node_ids)) != len(node_ids):
+        return False
+    known = set(node_ids)
+    adjacency = {node_id: set() for node_id in known}
+    for edge in graph["edges"]:
+        if not isinstance(edge, dict):
+            return False
+        a, b = edge.get("from"), edge.get("to")
+        if a not in known or b not in known or a == b:
+            return False
+        adjacency[a].add(b)
+        adjacency[b].add(a)
+    supports = {
+        node["id"] for node in graph["nodes"]
+        if node.get("support") is True
+    }
+    deck_nodes = [node["id"] for node in graph["nodes"] if node.get("kind") == "DECK"]
+    if not supports or not deck_nodes:
+        return False
+    transfer_kinds = {"SPANDREL", "HANGER", "NETWORK_HANGER"}
+    transfer_nodes = set()
+    for edge in graph["edges"]:
+        if edge.get("kind") in transfer_kinds:
+            if edge["from"].startswith("D"):
+                transfer_nodes.add(edge["from"])
+            if edge["to"].startswith("D"):
+                transfer_nodes.add(edge["to"])
+    interior_deck_nodes = [node_id for node_id in deck_nodes if node_id not in {"D0", f"D{len(deck_nodes) - 1}"}]
+    if any(node_id not in transfer_nodes for node_id in interior_deck_nodes):
+        return False
+    reached = set(supports)
+    frontier = list(supports)
+    while frontier:
+        current = frontier.pop()
+        for neighbour in adjacency[current] - reached:
+            reached.add(neighbour)
+            frontier.append(neighbour)
+    return all(node_id in reached for node_id in deck_nodes)
+
+
+def _distance(a: dict, b: dict) -> float:
+    return math.hypot(float(b["x_m"]) - float(a["x_m"]), float(b["y_m"]) - float(a["y_m"]))
+
+
+def _circumradius(a: dict, b: dict, c: dict) -> float | None:
+    ab, bc, ca = _distance(a, b), _distance(b, c), _distance(c, a)
+    twice_area = abs(
+        (float(b["x_m"]) - float(a["x_m"])) * (float(c["y_m"]) - float(a["y_m"]))
+        - (float(b["y_m"]) - float(a["y_m"])) * (float(c["x_m"]) - float(a["x_m"]))
+    )
+    if twice_area <= 1e-12:
+        return None
+    radius = ab * bc * ca / (2.0 * twice_area)
+    return radius if math.isfinite(radius) and radius > 0.0 else None
+
+
+def describe_shape(genome: dict, axis_points: list[dict], graph: dict) -> dict:
+    """Tính descriptor hình thái và đại lượng sàng lọc thuần hình học."""
+    segments = list(zip(axis_points, axis_points[1:]))
+    lengths = [_distance(a, b) for a, b in segments]
+    slopes = [
+        (float(b["y_m"]) - float(a["y_m"])) / (float(b["x_m"]) - float(a["x_m"]))
+        for a, b in segments
+    ]
+    radii = [
+        radius for radius in (
+            _circumradius(a, b, c) for a, b, c in zip(axis_points, axis_points[1:], axis_points[2:])
+        ) if radius is not None
+    ]
+    if not radii:
+        raise CreativeShapeError("Không tính được bán kính cong của trục vòm")
+    curvatures = [1.0 / radius for radius in radii]
+    mean_curvature = statistics.fmean(curvatures)
+    curvature_complexity = (
+        statistics.pstdev(curvatures) / mean_curvature if mean_curvature > 0.0 else 0.0
+    )
+    rise = max(float(point["y_m"]) for point in axis_points)
+    paired = zip(axis_points[1:len(axis_points) // 2 + 1], reversed(axis_points[len(axis_points) // 2:-1]))
+    asymmetry = statistics.fmean(
+        abs(float(left["y_m"]) - float(right["y_m"])) / rise for left, right in paired
+    ) if rise > 0.0 else 0.0
+
+    nodes = {node["id"]: node for node in graph["nodes"]}
+    arch_edges = [edge for edge in graph["edges"] if edge["kind"] == "ARCH_RIB"]
+    panel_lengths = [_distance(nodes[edge["from"]], nodes[edge["to"]]) for edge in arch_edges]
+    if graph["topology"] == "DECK_ARCH":
+        clearance = min(
+            nodes[f"D{index}"]["y_m"] - nodes[f"A{index}"]["y_m"]
+            for index in range(genome["panel_count"] + 1)
+        )
+    else:
+        central = [
+            index for index in range(1, genome["panel_count"])
+            if 0.25 <= index / genome["panel_count"] <= 0.75
+        ]
+        clearance = min(
+            nodes[f"A{index}"]["y_m"] - nodes[f"D{index}"]["y_m"]
+            for index in central
+        )
+    max_panel = max(panel_lengths)
+    return {
+        "rise_ratio": rise / float(genome["span_m"]),
+        "curvature_complexity": curvature_complexity,
+        "asymmetry": asymmetry,
+        "arc_length_m": sum(lengths),
+        "max_abs_slope": max(abs(value) for value in slopes),
+        "min_curvature_radius_m": min(radii),
+        "max_panel_length_m": max_panel,
+        "max_member_slenderness": max_panel / float(genome["rib_depth_m"]),
+        "vertical_clearance_m": clearance,
+    }
+
+
+def _source_path(source_ref: object) -> Path | None:
+    if not isinstance(source_ref, str) or not source_ref.strip():
+        return None
+    path_text = source_ref.split("#", 1)[0]
+    supplied = Path(path_text)
+    if supplied.is_absolute():
+        return None
+    resolved = (REPO_ROOT / supplied).resolve(strict=False)
+    try:
+        resolved.relative_to(REPO_ROOT.resolve())
+    except ValueError:
+        return None
+    return resolved if resolved.is_file() else None
+
+
+def _source_sha256(source_ref: object) -> str | None:
+    path = _source_path(source_ref)
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path is not None else None
+
+
+def _profile_snapshot(profile: dict) -> dict:
+    """Hash cả giá trị profile lẫn bytes nguồn để nguồn drift đổi fingerprint."""
+    refs = sorted({
+        item.get("source_ref")
+        for item in profile.values()
+        if isinstance(item, dict) and isinstance(item.get("source_ref"), str)
+    })
+    return {
+        "profile": profile,
+        "source_sha256": {source_ref: _source_sha256(source_ref) for source_ref in refs},
+    }
+
+
+def _profile_value(profile: dict, key: str) -> tuple[float | None, str | None, str | None, str | None]:
+    item = profile.get(key)
+    if not isinstance(item, dict):
+        return None, None, None, f"Thiếu technical_profile.{key}"
+    if set(item) != {"value", "source_ref"}:
+        source_ref = item.get("source_ref")
+        return (
+            None,
+            source_ref if isinstance(source_ref, str) else None,
+            _source_sha256(source_ref),
+            f"technical_profile.{key} phải có đúng value và source_ref",
+        )
+    value, source_ref = item["value"], item["source_ref"]
+    if not _is_finite_number(value) or float(value) <= 0.0:
+        return (
+            None,
+            source_ref if isinstance(source_ref, str) else None,
+            _source_sha256(source_ref),
+            f"technical_profile.{key}.value phải > 0 và hữu hạn",
+        )
+    source_sha256 = _source_sha256(source_ref)
+    if source_sha256 is None:
+        return None, source_ref if isinstance(source_ref, str) else None, None, f"source_ref của {key} không tồn tại trong repo"
+    return float(value), source_ref, source_sha256, None
+
+
+def _unknown_check(check_id: str, demand: float | None, model_kind: str,
+                   source_ref: str | None, source_sha256: str | None, issue: str) -> dict:
+    return {
+        "check_id": check_id,
+        "status": "UNKNOWN_INPUT_MISSING",
+        "demand": demand,
+        "limit": None,
+        "utilization": None,
+        "margin": None,
+        "model_kind": model_kind,
+        "source_ref": source_ref,
+        "source_sha256": source_sha256,
+        "message": issue,
+    }
+
+
+def _limit_check(check_id: str, demand: float, profile: dict, key: str, *,
+                 upper: bool, model_kind: str) -> dict:
+    limit, source_ref, source_sha256, issue = _profile_value(profile, key)
+    if issue is not None or limit is None:
+        return _unknown_check(
+            check_id, demand, model_kind, source_ref, source_sha256, issue or "Thiếu ngưỡng")
+    if upper:
+        utilization = demand / limit
+        margin = (limit - demand) / limit
+        passed = demand <= limit
+        relation = "không vượt"
+    else:
+        utilization = limit / demand if demand > 0.0 else None
+        margin = (demand - limit) / limit
+        passed = demand >= limit
+        relation = "không nhỏ hơn"
+    status = "PASS" if passed else "FAIL"
+    return {
+        "check_id": check_id,
+        "status": status,
+        "demand": demand,
+        "limit": limit,
+        "utilization": utilization,
+        "margin": margin,
+        "model_kind": model_kind,
+        "source_ref": source_ref,
+        "source_sha256": source_sha256,
+        "message": f"{key}: demand={demand:.6g} phải {relation} limit={limit:.6g}",
+    }
+
+
+def technical_checks(genome: dict, graph: dict, descriptors: dict,
+                     technical_profile: dict) -> list[dict]:
+    """Sàng lọc fail-closed; proxy không mang thẩm quyền kết luận thiết kế."""
+    if not isinstance(technical_profile, dict):
+        raise CreativeShapeError("technical_profile phải là object")
+    connected = load_path_connected(graph)
+    checks = [{
+        "check_id": "CQD-L0-01",
+        "status": "PASS" if connected else "FAIL",
+        "demand": 1.0 if connected else 0.0,
+        "limit": 1.0,
+        "utilization": 0.0 if connected else 1.0,
+        "margin": 1.0 if connected else -1.0,
+        "model_kind": "EXACT_GRAPH_INVARIANT",
+        "source_ref": None,
+        "source_sha256": None,
+        "message": "Mọi nút mặt cầu nối được tới gối" if connected else "Graph không có đường từ mọi nút mặt cầu tới gối",
+    }]
+    checks.extend([
+        _limit_check("CQD-L0-02", descriptors["max_abs_slope"], technical_profile,
+                     "max_abs_slope", upper=True, model_kind="GEOMETRY_SCREEN"),
+        _limit_check("CQD-L0-03", descriptors["min_curvature_radius_m"], technical_profile,
+                     "min_curvature_radius_m", upper=False, model_kind="GEOMETRY_SCREEN"),
+        _limit_check("CQD-L0-04", descriptors["max_panel_length_m"], technical_profile,
+                     "max_panel_length_m", upper=True, model_kind="GEOMETRY_SCREEN"),
+        _limit_check("CQD-L0-05", descriptors["max_member_slenderness"], technical_profile,
+                     "max_member_slenderness", upper=True,
+                     model_kind="SCREENING_PROXY_GEOMETRIC_L_OVER_DEPTH"),
+        _limit_check("CQD-L0-06", descriptors["vertical_clearance_m"], technical_profile,
+                     "min_vertical_clearance_m", upper=False, model_kind="GEOMETRY_SCREEN"),
+    ])
+
+    thrust_inputs = [_profile_value(technical_profile, key) for key in _THRUST_PROFILE_KEYS]
+    issues = [issue for _value, _source, _sha, issue in thrust_inputs if issue is not None]
+    sources = [source for _value, source, _sha, _issue in thrust_inputs if source is not None]
+    source_hashes = [sha for _value, _source, sha, _issue in thrust_inputs if sha is not None]
+    if len(set(sources)) > 1:
+        issues.append("Ba input thrust proxy phải cùng source_ref để giữ provenance một nghĩa")
+    if issues:
+        checks.append(_unknown_check(
+            "CQD-L0-07", None, "SCREENING_PROXY_PARABOLIC_THRUST_ENVELOPE",
+            sources[0] if len(set(sources)) == 1 else None,
+            source_hashes[0] if len(set(source_hashes)) == 1 else None,
+            "; ".join(issues)))
+    else:
+        distributed_load, rib_area, allowable = (item[0] for item in thrust_inputs)
+        assert distributed_load is not None and rib_area is not None and allowable is not None
+        span = float(genome["span_m"])
+        rise = span * float(genome["rise_ratio"])
+        horizontal = distributed_load * span ** 2 / (8.0 * rise)
+        vertical = distributed_load * span / 2.0
+        compression_kN = math.hypot(horizontal, vertical) / int(genome["rib_count"])
+        stress_MPa = compression_kN / (rib_area * 1000.0)
+        utilization = stress_MPa / allowable
+        checks.append({
+            "check_id": "CQD-L0-07",
+            "status": "PASS" if utilization <= 1.0 else "FAIL",
+            "demand": stress_MPa,
+            "limit": allowable,
+            "utilization": utilization,
+            "margin": 1.0 - utilization,
+            "model_kind": "SCREENING_PROXY_PARABOLIC_THRUST_ENVELOPE",
+            "source_ref": sources[0],
+            "source_sha256": source_hashes[0],
+            "message": (
+                "Proxy bao lực xô parabol dưới tải phân bố; không phải phân tích vòm/giàn: "
+                f"stress_proxy={stress_MPa:.6g} MPa, limit={allowable:.6g} MPa"
+            ),
+        })
+    return checks
+
+
+def validate_candidate(candidate: dict) -> None:
+    """Kiểm schema output và từ chối cả NaN trước jsonschema."""
+    _canonical(candidate)
+    try:
+        schema = json.loads(_CANDIDATE_SCHEMA.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CreativeShapeError(f"Không đọc được candidate schema: {exc}") from exc
+    errors = sorted(
+        jsonschema.Draft202012Validator(schema).iter_errors(candidate),
+        key=lambda error: list(error.absolute_path),
+    )
+    if errors:
+        details = "; ".join(
+            f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+            for error in errors[:12]
+        )
+        raise CreativeShapeError(f"Creative candidate sai schema: {details}")
+
+
+def evaluate_genome(genome: dict, technical_profile: dict,
+                    domain: dict | None = None) -> dict:
+    """Tạo và sàng một hình thái; không trả verdict thiết kế kỹ thuật."""
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    validate_genome(genome, domain)
+    profile_sha256 = _sha256(_profile_snapshot(technical_profile))
+    axis_points = generate_arch_axis(genome, domain)
+    graph = build_load_path_graph(genome, axis_points, domain)
+    descriptors = describe_shape(genome, axis_points, graph)
+    checks = technical_checks(genome, graph, descriptors, technical_profile)
+    has_fail = any(check["status"] == "FAIL" for check in checks)
+    has_unknown = any(check["status"] == "UNKNOWN_INPUT_MISSING" for check in checks)
+    all_known_pass = not has_fail and not has_unknown and all(check["status"] == "PASS" for check in checks)
+    status = "REJECTED" if has_fail else "UNKNOWN_INPUT_MISSING" if has_unknown else "L0_PASSED"
+    identity = {
+        "generator_id": GENERATOR_ID,
+        "generator_version": GENERATOR_VERSION,
+        "domain_id": domain["domain_id"],
+        "domain_sha256": _sha256(domain),
+        "genome": genome,
+        "profile_sha256": profile_sha256,
+    }
+    candidate = {
+        "schema_version": "1.0",
+        "candidate_id": f"CS-{_sha256(identity)[:16]}",
+        "claim_level": CLAIM_LEVEL,
+        "generator": {
+            "id": GENERATOR_ID,
+            "version": GENERATOR_VERSION,
+            "domain_id": domain["domain_id"],
+        },
+        "genome": deepcopy(genome),
+        "domain_sha256": _sha256(domain),
+        "profile_sha256": profile_sha256,
+        "geometry_sha256": _sha256({"axis_points": axis_points, "graph": graph}),
+        "axis_points": axis_points,
+        "graph": graph,
+        "descriptors": descriptors,
+        "checks": checks,
+        "screening_status": status,
+        "all_known_pass": all_known_pass,
+        "technical_scope": TECHNICAL_SCOPE,
+    }
+    validate_candidate(candidate)
+    return candidate
+
+
+def anchor_genomes(domain: dict | None = None) -> list[dict]:
+    """Ba mốc topology bảo đảm lần chạy nhỏ vẫn thăm đủ họ hình thái."""
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    middle_panel = domain["panel_count_values"][len(domain["panel_count_values"]) // 2]
+    base = {
+        "span_m": (domain["span_m"]["min"] + domain["span_m"]["max"]) / 2.0,
+        "rise_ratio": (domain["rise_ratio"]["min"] + domain["rise_ratio"]["max"]) / 2.0,
+        "panel_count": middle_panel,
+        "rib_count": max(domain["rib_count_values"]),
+        "rib_depth_m": (domain["rib_depth_m"]["min"] + domain["rib_depth_m"]["max"]) / 2.0,
+        "deck_clearance_m": (domain["deck_clearance_m"]["min"] + domain["deck_clearance_m"]["max"]) / 2.0,
+        "shape_coefficients": [0.0] * domain["coefficient_count"],
+    }
+    return [{"topology": topology, **deepcopy(base)} for topology in domain["topology_values"]]
+
+
+def random_genome(rng: random.Random, domain: dict | None = None) -> dict:
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    coefficient_bounds = domain["coefficient_bounds"]
+    genome = {
+        "topology": rng.choice(domain["topology_values"]),
+        "span_m": rng.uniform(domain["span_m"]["min"], domain["span_m"]["max"]),
+        "rise_ratio": rng.uniform(domain["rise_ratio"]["min"], domain["rise_ratio"]["max"]),
+        "panel_count": rng.choice(domain["panel_count_values"]),
+        "rib_count": rng.choice(domain["rib_count_values"]),
+        "rib_depth_m": rng.uniform(domain["rib_depth_m"]["min"], domain["rib_depth_m"]["max"]),
+        "deck_clearance_m": rng.uniform(domain["deck_clearance_m"]["min"], domain["deck_clearance_m"]["max"]),
+        "shape_coefficients": [
+            rng.uniform(coefficient_bounds["min"], coefficient_bounds["max"])
+            for _ in range(domain["coefficient_count"])
+        ],
+    }
+    validate_genome(genome, domain)
+    return genome
+
+
+def _clip(value: float, bounds: dict) -> float:
+    return min(float(bounds["max"]), max(float(bounds["min"]), value))
+
+
+def mutate_genome(parent: dict, rng: random.Random, domain: dict | None = None) -> dict:
+    """Biến dị có chiếu về miền; không sửa candidate sau khi kiểm kỹ thuật."""
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    validate_genome(parent, domain)
+    child = deepcopy(parent)
+    if rng.random() < 0.15:
+        child["topology"] = rng.choice(domain["topology_values"])
+    if rng.random() < 0.35:
+        child["panel_count"] = rng.choice(domain["panel_count_values"])
+    if rng.random() < 0.20:
+        child["rib_count"] = rng.choice(domain["rib_count_values"])
+    for key, sigma_fraction in (
+        ("span_m", 0.08), ("rise_ratio", 0.10), ("rib_depth_m", 0.12), ("deck_clearance_m", 0.12),
+    ):
+        if rng.random() < 0.65:
+            bounds = domain[key]
+            sigma = (float(bounds["max"]) - float(bounds["min"])) * sigma_fraction
+            child[key] = _clip(float(child[key]) + rng.gauss(0.0, sigma), bounds)
+    coefficient_bounds = domain["coefficient_bounds"]
+    coefficient_sigma = (coefficient_bounds["max"] - coefficient_bounds["min"]) * 0.12
+    for index in range(len(child["shape_coefficients"])):
+        if rng.random() < 0.75:
+            child["shape_coefficients"][index] = _clip(
+                float(child["shape_coefficients"][index]) + rng.gauss(0.0, coefficient_sigma),
+                coefficient_bounds,
+            )
+    validate_genome(child, domain)
+    return child
+
+
+def _bin_index(value: float, edges: list[float]) -> int:
+    return max(0, min(len(edges) - 2, bisect.bisect_right(edges, value) - 1))
+
+
+def _cell(candidate: dict, domain: dict) -> tuple[str, int, int, int]:
+    descriptors = candidate["descriptors"]
+    bins = domain["bins"]
+    return (
+        candidate["genome"]["topology"],
+        _bin_index(descriptors["rise_ratio"], bins["rise_ratio"]),
+        _bin_index(descriptors["curvature_complexity"], bins["curvature_complexity"]),
+        _bin_index(descriptors["asymmetry"], bins["asymmetry"]),
+    )
+
+
+def _quality(candidate: dict) -> float:
+    margins = [
+        float(check["margin"]) for check in candidate["checks"]
+        if check["status"] == "PASS" and check["margin"] is not None
+    ]
+    return min(margins) if margins else 0.0
+
+
+def run_constrained_map_elites(*, technical_profile: dict, seed: int,
+                               iterations: int = 100,
+                               domain: dict | None = None) -> dict:
+    """Chạy QD có safety shield; archive chỉ nhận all-known-pass.
+
+    ``iterations`` là số biến dị sau ba anchor topology. Cùng domain, profile,
+    seed và số vòng lặp cho output byte-canonical giống nhau.
+    """
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise CreativeShapeError("seed phải là số nguyên")
+    if isinstance(iterations, bool) or not isinstance(iterations, int) or iterations < 0:
+        raise CreativeShapeError("iterations phải là số nguyên không âm")
+    domain = load_creative_domain() if domain is None else validate_creative_domain(domain)
+    rng = random.Random(seed)
+    archive: dict[tuple[str, int, int, int], dict] = {}
+    rejected: list[str] = []
+    unknown: list[str] = []
+
+    def consider(candidate: dict) -> None:
+        if not candidate["all_known_pass"]:
+            target = rejected if candidate["screening_status"] == "REJECTED" else unknown
+            target.append(candidate["candidate_id"])
+            return
+        cell = _cell(candidate, domain)
+        quality = _quality(candidate)
+        incumbent = archive.get(cell)
+        if (
+            incumbent is None
+            or quality > incumbent["quality_score"]
+            or (
+                math.isclose(quality, incumbent["quality_score"], rel_tol=0.0, abs_tol=1e-15)
+                and candidate["candidate_id"] < incumbent["candidate"]["candidate_id"]
+            )
+        ):
+            archive[cell] = {"quality_score": quality, "candidate": candidate}
+
+    for genome in anchor_genomes(domain):
+        consider(evaluate_genome(genome, technical_profile, domain))
+    for _ in range(iterations):
+        if archive:
+            parents = [archive[key]["candidate"]["genome"] for key in sorted(archive)]
+            genome = mutate_genome(rng.choice(parents), rng, domain)
+        else:
+            genome = random_genome(rng, domain)
+        consider(evaluate_genome(genome, technical_profile, domain))
+
+    archive_items = []
+    for (topology, rise_bin, curvature_bin, asymmetry_bin), item in sorted(archive.items()):
+        archive_items.append({
+            "cell": {
+                "topology": topology,
+                "rise_bin": rise_bin,
+                "curvature_bin": curvature_bin,
+                "asymmetry_bin": asymmetry_bin,
+            },
+            "quality_score": item["quality_score"],
+            "candidate": item["candidate"],
+        })
+    result = {
+        "schema_version": "1.0",
+        "algorithm": GENERATOR_ID,
+        "algorithm_version": GENERATOR_VERSION,
+        "claim_level": CLAIM_LEVEL,
+        "technical_scope": TECHNICAL_SCOPE,
+        "seed": seed,
+        "iterations": iterations,
+        "domain_sha256": _sha256(domain),
+        "profile_sha256": _sha256(_profile_snapshot(technical_profile)),
+        "archive": archive_items,
+        "rejected_candidate_ids": rejected,
+        "unknown_candidate_ids": unknown,
+        "statistics": {
+            "evaluated": len(domain["topology_values"]) + iterations,
+            "occupied_cells": len(archive_items),
+            "rejected": len(rejected),
+            "unknown": len(unknown),
+        },
+    }
+    _canonical(result)
+    return result

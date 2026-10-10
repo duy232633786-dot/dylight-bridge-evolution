@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-052",
+  "handoff_sha256": "059025cc7e916b152dc3e375fb87e3da352dc41ecced6477e507040264eb0a4e",
+  "reviewer_id": "codex",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G1",
+      "status": "FAIL",
+      "evidence": "HARD fabrication violation vẫn đi vào payload PSC-Value; DBUSER có thể sinh chiều dày âm và MCT/TSV chưa fail-closed với tên không an toàn."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Task chỉ ở claim IDEA và không chạy solver hoặc phát verdict chịu lực."
+    }
+  ],
+  "notes": "REVISE tren live bytes r004: 10/10 hash khop; hai lenh pytest NOT_RUN vi khong co executable python, khong tinh la test fail. Log owner co hash dung, dem duoc 1881 pass, 4 skip, exit 0. Claim van IDEA va khong co verdict chiu luc, nhung G1 FAIL do gene Super-T HARD van xuat duoc, DBUSER co the sinh day suon am, ten co the pha MCT/TSV, va output FCM co the stale. | Ky thuat: CX-052-01 NOTE: Containment hiện kiểm cả giao cắt, tiếp xúc đầu mút và đoạn trùng của các vòng kín.; CX-052-02 NOTE: Endpoint được bảo toàn; JO3/JI3 hoặc sườn không song song làm web_parallel_preserved=false và phát cảnh báo.; CX-052-03 NOTE: JSON db/SECT có PSC_OPT1/2 và các mặc định đã khai provenance trong basis.; CX-052-04 NOTE: Ba bằng chứng DBUSER ngoài repo tồn tại và SHA-256 khớp basis; các verification flag có trong output.; CX-052-05 MINOR: vSIZE do API cung cấp chỉ được kiểm kiểu và độ dài; số âm hoặc [0,0,0,0] vẫn được gắn USER_PROVIDED tại bridge_evolution/midas_section.py:982-991 và scripts/serve_lab.py:610-614.; CX-052-06 MAJOR: Proposal thành công gán fam-L trực tiếp tại dashboard/midas_section.html:345 nhưng không gọi invalidateFamily; bảng, MCT và elevation của family cũ vẫn hiện và sao chép được.; CX-052-07 NOTE: Test đã dispatch LabHandler thật cho đủ các route MIDAS tại tests/test_midas_section.py:488-545.; CX-052-08 MINOR: _section_id chuyển chuỗi qua float tại bridge_evolution/midas_section.py:97-106, có thể làm tròn số lớn hoặc phát OverflowError thành HTTP 500; UI chưa kiểm Number.isSafeInteger.; CX-052-09 NOTE: Hash log owner khớp; nội dung đếm được 1881 pass, 4 skip và exit 0. Reviewer không chạy lại được vì không có executable python.; CX-052-10 NOTE: Miền heuristic đã thu về 40-250 m × 6-16 m và các mẫu lưới hiện sinh family hợp lệ ở mức IDEA.; CX-052-11 MINOR: Backend đã đồng nhất polygon, properties và export bằng HI3 hiệu dụng, nhưng viewer vẽ geometry hiệu dụng trong khi nhãn kích thước đọc bundle.params.dims HI3 gốc tại dashboard/midas_section.html:238,247-268.; CX-052-12 MINOR: Schema cấm BI4 khác 0 cho 1CELL tại contracts/midas_psc_section.schema.json:42-43, nhưng runtime không từ chối và size_arrays âm thầm xuất 0 tại bridge_evolution/midas_section.py:261-266,607-614.; CX-052-13 BLOCKER: Gene Super-T có FAB-001/HARD vẫn được dựng polygon và xuất PSC-Value vì wrapper chỉ kiểm polygon, bỏ violations: scripts/serve_lab.py:363-375,597-617; ví dụ web_thickness_mm=90 vi phạm bridge_evolution/section.py:389-395.; CX-052-14 MAJOR: DBUSER dùng t_web=(BO2+BO3)-BI1 tại bridge_evolution/midas_section.py:724-745 thay vì bề rộng ngoài-trong cùng cao độ; tiết diện PSC hợp lệ có thể xuất t_web âm dưới trạng thái VERIFIED_BY_EXTERNAL_EVIDENCE.; CX-052-15 MAJOR: name và name_prefix chỉ bị cắt độ dài rồi nội suy thẳng vào TSV/MCT tại bridge_evolution/midas_section.py:146,638-646,699-714,851-867; tab, phẩy hoặc CRLF có thể phá dòng hay chèn lệnh MCT. | hash_verified=True tests_run_by_reviewer=NOT_RUN | Chi tiet: .tmp/lab-review/codex_BRD-052_review_findings.json"
+}

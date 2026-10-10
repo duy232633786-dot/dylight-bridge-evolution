@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-042",
+  "agent_id": "codex",
+  "role": "structural_analyst",
+  "summary": "Đã triển khai study topology-specific từ parent BRD-041: DECK_ARCH dùng hai chân khóa ux-uy để lộ lực xô móng; THROUGH/NETWORK giữ pin-roller và đo tie action nội bộ. Diagnostic yêu cầu toàn ARCH_RIB nén, toàn tie DECK kéo, phản lực đúng hướng/cân bằng; thiếu cơ chế kỳ vọng trả EXPECTED_ACTION_NOT_DETECTED. 34 test task và 130 test chuỗi đều xanh.",
+  "claim_level": "IDEA",
+  "gates_completed": [],
+  "artifacts": [
+    {
+      "path": "bridge_evolution/arch_action_f1.py",
+      "sha256": "9ef18b029ad021d1ccfd696c96cc4a9a295c552663e28a5332f925220b76bace",
+      "kind": "code"
+    },
+    {
+      "path": "contracts/arch_action_f1_study.schema.json",
+      "sha256": "7668708b508b12baf45fbb1ec0b68c964b7b51afdb62226a22b2754b041c2636",
+      "kind": "code"
+    },
+    {
+      "path": "docs/design_basis/arch_action_f1_basis.json",
+      "sha256": "95723cf7cbd6aad6b51cb8dc6afb52a09da4d23036f36aea3f25e3764c0ccf8a",
+      "kind": "code"
+    },
+    {
+      "path": "tests/test_arch_action_f1.py",
+      "sha256": "385497ff1492480cbc94757812262e453683b1d0df7522785e0eae0726f6063b",
+      "kind": "code"
+    }
+  ],
+  "assumptions": [
+    "Quy ước signed axial F1 là (axial_j-axial_i)/2, dương kéo và âm nén; test tái tính trực tiếp từ mọi element end force.",
+    "DECK_ARCH hai chân khóa chuyển vị chỉ là lý tưởng hóa F1 tương tự vòm hai khớp; tied arch dùng DECK frame làm đường tie nội bộ."
+  ],
+  "unresolved_risks": [
+    "Chưa đối chiếu thrust/tie force với solver độc lập hoặc mô hình nonlinear; output chỉ IDEA và không có capacity/design verdict.",
+    "Mô hình chưa có độ cứng gối, mố, móng hay đất; phản lực xô chưa phải tải thiết kế nền móng.",
+    "Full suite còn đúng 5 lỗi tests/test_collaboration.py do provenance BRD-036 tiền tồn tại; không có lỗi mới BRD-042."
+  ],
+  "next_action": "Claude review độc lập: băm 4 artifact, chạy 34/130 test, tự tính phản lực và signed axial, tấn công continuity classifier, parent/source/basis/manifest hashes và xác nhận không có verdict thiết kế."
+}

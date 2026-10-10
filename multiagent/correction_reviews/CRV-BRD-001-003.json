@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-001-003",
+  "task_id": "BRD-001",
+  "incident_id": "INC-BRD-001-003",
+  "correction_sha256": "8823c178b819cffe1cbb5d0a97754d12b0cacf3b3e35f757b63cafd0f42fca80",
+  "reviewer_id": "provenance-review-aug26",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Hash chain khớp độc lập: handoff BRD-001.claude.r001 = 42ee50ac1814d985b849455f716db8c161c568224820a2fa0166cceb1e6a7874; snapshot = previous = 1bec348519f2e032e95db16598c4ecc61455c5bcc3236ef75eed91502dd6932f; artifact live = incident observed = correction current = 0b3f417bd41bbf8d568cca9922f9479b6904bb301b00105ebc1bcdaa1650ea28.",
+    "Chuỗi supersede hợp lệ: hash 5476348eca9cc3ad85105e481f4da989ecf19efc7ea3977f81edb5f4756a87ed trỏ đúng COR-BRD-001-002 đã được independent review APPROVE, và current hash của correction trước chính là snapshot của correction này.",
+    "Diff snapshot -> live chỉ bổ sung COMPONENT_AUDIT_ORCHESTRATION ở trạng thái PARTIAL với giới hạn fail-closed và cập nhật catalog từ 3 Super-T sang 6 tiết diện production; claim ceiling vẫn SCREENED. python -B docs/check_runtime_drift.py trả OK và correction/incident đều hợp lệ theo schema."
+  ],
+  "notes": "APPROVE độc lập cho COR-BRD-001-003 sau khi kiểm snapshot, handoff, live hash, correction chain và toàn bộ diff; không review nội dung kỹ thuật ngoài phạm vi provenance và không nâng claim."
+}

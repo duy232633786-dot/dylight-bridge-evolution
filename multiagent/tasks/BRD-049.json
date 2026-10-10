@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-049",
+  "title": "Creative portfolio shield cho hình thái cầu đặc biệt có kiểm tra cơ học nhiều tầng",
+  "research_question": "Làm sao nối thuật toán MAP-Elites sáng tạo hình dạng với chuỗi kiểm hình học, load path, F1, tác dụng vòm, tham chiếu funicular và thử nhiễu deterministic để chỉ giữ các phương án nghiên cứu đa dạng không có lỗi kỹ thuật đã biết, nhưng không rửa screening thành verdict thiết kế?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "ACCEPTED",
+  "owner": "codex",
+  "reviewer": "claude",
+  "dependencies": [
+    "BRD-039",
+    "BRD-040",
+    "BRD-041",
+    "BRD-042",
+    "BRD-043"
+  ],
+  "required_gates": [],
+  "claim_ceiling": "IDEA",
+  "runtime_scope": {
+    "structural_families": [
+      "arch_deck_v1",
+      "through_arch",
+      "network_arch"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  },
+  "write_scope": [
+    "bridge_evolution/creative_portfolio.py",
+    "contracts/creative_portfolio_study.schema.json",
+    "docs/design_basis/creative_portfolio_basis.json",
+    "tests/test_creative_portfolio.py"
+  ],
+  "acceptance_criteria": [
+    "Portfolio gọi đúng chuỗi canonical MAP-Elites -> creative frame adapter -> arch-action F1 -> funicular reference và giữ manifest/hash của từng tầng",
+    "Chỉ candidate L0_PASSED, F1 CONVERGED, ACTION_DIAGNOSTIC_COMPLETE và funicular comparison trong order band mới được vào research archive",
+    "Mỗi candidate phải qua tối thiểu ba perturbation deterministic khác nhau; replay, duplicate digest, UNKNOWN, FAIL hoặc lỗi solver ở bất kỳ mẫu nào đều chặn candidate",
+    "Xếp hạng Pareto dùng tối thiểu độ lệch funicular, bending proxy và margin L0; novelty không được bù một check kỹ thuật thất bại",
+    "Output deterministic theo seed, schema additionalProperties=false, có source/basis digests và hash toàn payload",
+    "Output cấm feasible, verified, design_pass và luôn khóa claim_level=IDEA, design_verdict_authority=NONE",
+    "Sai type, NaN/Infinity, profile factory lỗi, lineage bị sửa hoặc dependency drift đều fail-closed bằng record BLOCKED thay vì phát verdict",
+    "Test âm phủ tamper-reseal, sample replay, solver non-convergence, action không phát hiện, funicular ngoài band và perturbation làm hỏng hình học"
+  ],
+  "required_artifacts": [
+    "bridge_evolution/creative_portfolio.py",
+    "contracts/creative_portfolio_study.schema.json",
+    "docs/design_basis/creative_portfolio_basis.json",
+    "tests/test_creative_portfolio.py"
+  ],
+  "safety_notes": [
+    "Đây là research screening ở mức IDEA; không kiểm sức kháng, ổn định phi tuyến, mỏi, động lực, gió, động đất, địa chất, thủy văn, thi công hoặc tổ hợp tiêu chuẩn",
+    "Không dùng từ feasible/verified/design pass trong output; kỹ sư chịu trách nhiệm vẫn phải lập design basis dự án và kiểm độc lập fidelity cao",
+    "Không sửa lab.py, runtime capability matrix, evaluate.py, verifier.py hoặc các artifact đã được task upstream sở hữu",
+    "Không gọi OpenCode; reviewer độc lập của handoff là Claude Code"
+  ],
+  "review_notes": [
+    "4/4 artifact SHA-256 khop raw bytes. 19 target test va 200 integration test PASS. HIGH: thieu test Pareto/round-robin nhieu candidate - ca 8 lan goi run_creative_portfolio deu dung max_candidates=1 va iterations=0 nen _dominates, xep hang nhieu front va round-robin topology khong bao gio duoc chay. MEDIUM: thieu negative test cho F1 non-convergence (CP-F1-001/002/003), arch action khong phat hien co che (CP-ACTION-002/003), funicular ngoai band (CP-FUNICULAR-002 la cong song duy nhat vi run_funicular_reference tra status khong dat ma khong raise) va L0 that bai khi perturbation (CP-PERTURB-001); thieu minimum_perturbation_fraction nen perturbation_fraction=1e-12 van thoa man yeu cau 3 mau; thieu kiem comparability structural profile giua cac candidate trong khi Pareto so sanh cheo archive. LOW: _candidate_minimum_margin bo qua im lang check PASS co margin null (tiem an, chua song); blocked evidence khong tai lap duoc vi validate chi kiem danh tinh chu khong kiem blocker; working tree dirty nen khong co lap duoc diff BRD-049 bang git. Xac minh phu: khong co backdoor authority (creative_portfolio khong duoc tham chieu boi lab.py, evaluate.py, verifier.py, cli.py hay runtime capability matrix), claim IDEA va design_verdict_authority NONE bi ep o 3 tang, Pareto chi chay sau moi hard check va moi perturbation. Day chi la review phan mem o muc IDEA, KHONG phai phe duyet thiet ke cau; RESEARCH_SCREENED chi co nghia khong bi chan doan F0/F1 da cai dat bac bo.",
+    "REVISE r002. 4/4 artifact hash va hai basis pin khop live bytes. Test execution cua reviewer bi permission block nen 36/217 va full-suite owner khai chua duoc reviewer xac minh. MEDIUM CP-R002-01: robustness comparability voi archive rong lam run raise thay vi BLOCKED. LOW CP-R002-02: raw upstream exception thoat validator. LOW CP-R002-03: blocked stage khong rederive. LOW CP-R002-04: thieu end-to-end PERTURBATION_L0. Cac loi deu fail-closed, khong co verdict bypass; claim van IDEA/NONE. Day la software review, khong phai phe duyet thiet ke cau.",
+    "APPROVE r003 chi cho software contract muc IDEA. Reviewer tu xac minh 4/4 artifact hash, 2/2 basis pin, 39 target test va 220 integration test deu pass. CP-R002-01..04 da CLOSED. Residual LOW fail-closed: group hash khi archive rong chi tu nhat quan voi evidence; raw CreativeShapeError co the thoat o invalid creative_domain/search; thieu tamper test group hash archive-rong va chieu ROBUSTNESS->BASE_CHAIN. Khong residual nao cho candidate lot archive hay nang IDEA/NONE. Full-suite 1799/4/5 do owner khai nam ngoai allowlist reviewer. Day khong phai phe duyet thiet ke cau; G0-G7 NOT_APPLICABLE."
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "form_inventor",
+  "review_provider": "claude",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_portfolio.py",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_creative_shape.py",
+      "tests/test_frame_f1.py",
+      "tests/test_creative_frame_adapter.py",
+      "tests/test_arch_action_f1.py",
+      "tests/test_funicular_reference.py",
+      "tests/test_creative_portfolio.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

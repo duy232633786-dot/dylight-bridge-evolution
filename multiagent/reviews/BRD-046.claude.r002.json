@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-046",
+  "handoff_sha256": "05f31ae1b0164bf72877107fd2e98ac295680c3a30c2768ce2aaeb87ad1b67a2",
+  "reviewer_id": "claude",
+  "decision": "REVISE",
+  "independence_confirmed": true,
+  "gate_findings": [
+    {
+      "gate": "G0",
+      "status": "NOT_APPLICABLE",
+      "evidence": "BRD-046 là governance IDEA, không khóa design basis cầu."
+    },
+    {
+      "gate": "G1",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không tạo hoặc thẩm tra hình học cầu."
+    },
+    {
+      "gate": "G2",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không chạy solver, không có kết luận mô hình kỹ thuật."
+    },
+    {
+      "gate": "G3",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không kiểm trạng thái giới hạn kết cấu."
+    },
+    {
+      "gate": "G4",
+      "status": "FAIL",
+      "evidence": "Phiên Claude xác nhận 4/4 raw-byte hash nhưng sandbox từ chối pytest và ngân sách 12 tool call cạn trước khi tự đọc đủ source diff; blind re-verification chưa hoàn tất."
+    },
+    {
+      "gate": "G5",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có thử nghiệm vật lý."
+    },
+    {
+      "gate": "G6",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Không có dữ liệu vật liệu hoặc exposure."
+    },
+    {
+      "gate": "G7",
+      "status": "NOT_APPLICABLE",
+      "evidence": "Claim IDEA, không có quyền phát hành kỹ thuật; governance không xác nhận kỹ thuật cầu."
+    }
+  ],
+  "notes": "Claude Sonnet xác nhận 4/4 raw-byte hash. Phiên review không chạy được pytest vì sandbox Claude từ chối Bash và cạn giới hạn 12 tool call trước khi tự đọc đủ source diff, nên không thể đóng independent verification. Không kết luận code sai; yêu cầu r003 kèm log test làm artifact/evidence, cho Claude quyền đọc và chạy test không tương tác, đồng thời nêu rõ SCREENED của task mẫu chỉ là limited-scope G0-G2, không ngang cấp kết quả qua G3-G4."
+}

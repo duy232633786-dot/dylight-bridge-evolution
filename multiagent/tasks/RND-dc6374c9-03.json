@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-dc6374c9-03",
+  "title": "Sàng lọc physics-in-the-loop tái lập được",
+  "research_question": "Các giả thuyết còn đứng vững sau kiểm tra đơn vị, cân bằng, hình học và L0/L1 nào?",
+  "workstream": "structural_physics",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-dc6374c9-01",
+    "RND-dc6374c9-02"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "research/orchestration/RND-20260826-dc6374c9/03_physics_screening.md"
+  ],
+  "acceptance_criteria": [
+    "Input, units, solver/version, seed và raw output truy vết được",
+    "Kiểm equilibrium/reactions và báo solver failure như STOP",
+    "Báo cả phương án bị loại và không suy diễn quá fidelity L1"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260826-dc6374c9/03_physics_screening.md"
+  ],
+  "safety_notes": [
+    "Chỉ dùng runtime L0/L1 để SCREENED; không gắn NUMERICALLY_VERIFIED"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260826-dc6374c9",
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "opencode",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false
+}

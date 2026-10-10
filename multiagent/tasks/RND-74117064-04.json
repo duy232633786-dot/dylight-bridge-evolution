@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "task_id": "RND-74117064-04",
+  "title": "Tái lập độc lập và audit sai lệch",
+  "research_question": "Một agent/phương pháp độc lập có tái lập được kết quả và phát hiện confound nào?",
+  "workstream": "integration",
+  "priority": "P0",
+  "status": "READY",
+  "owner": null,
+  "reviewer": null,
+  "dependencies": [
+    "RND-74117064-03"
+  ],
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2"
+  ],
+  "claim_ceiling": "SCREENED",
+  "write_scope": [
+    "research/orchestration/RND-20260922-74117064/04_independent_reproduction.md"
+  ],
+  "acceptance_criteria": [
+    "Tái tính blind từ input canonical và so tolerance đăng ký trước",
+    "Không lấy trung bình các sai lệch chưa reconcile",
+    "Kiểm solver budget, duplicate/cache, mục tiêu suy biến và provenance"
+  ],
+  "required_artifacts": [
+    "research/orchestration/RND-20260922-74117064/04_independent_reproduction.md"
+  ],
+  "safety_notes": [
+    "Thiếu solver/phương pháp độc lập phải ghi BLOCKED, không fake verification"
+  ],
+  "review_notes": [],
+  "source_brief_id": "RND-20260922-74117064",
+  "preferred_provider": "claude",
+  "preferred_role": "independent_reproducer",
+  "review_provider": "codex",
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "bridge_evolution.cli",
+      "lab",
+      "validate"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_orchestrator.py",
+      "-q"
+    ]
+  ],
+  "human_gate": false,
+  "runtime_scope": {
+    "structural_families": [
+      "research_prismatic_beam"
+    ],
+    "runtime_domain": "experimental_arch_frame"
+  }
+}

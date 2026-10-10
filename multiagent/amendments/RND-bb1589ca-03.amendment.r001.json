@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "amendment_id": "AMD-e0a75a06495b4dda",
+  "amendment_sha256": "7f2cce9cd10bb761cf8ae7da7aa6c03442debe6218ac0fa3997c6b4767fe7472",
+  "created_at": "2026-09-23T18:34:11.407799Z",
+  "task_id": "RND-bb1589ca-03",
+  "authorized_by": "project_owner",
+  "reason": "Apply the user research-only scope and requested fictional bridge sources; defer unrelated invention work.",
+  "pre_task_sha256": "a9a04f64238a16279a5a7bb6f8f37d89922929be0efb81f075f571edaf87b43d",
+  "post_task_sha256": "63a41181be3e0b5a03006f39abfa82e0835a6bfb25e7f6b35cbf4ae65eb72175",
+  "previous_amendment_sha256": null,
+  "snapshot": {
+    "path": "multiagent/task_contract_snapshots/sha256/a9a04f64238a16279a5a7bb6f8f37d89922929be0efb81f075f571edaf87b43d.json",
+    "sha256": "a9a04f64238a16279a5a7bb6f8f37d89922929be0efb81f075f571edaf87b43d"
+  },
+  "changes": [
+    {
+      "field": "safety_notes",
+      "before": [
+        "Chỉ dùng runtime L0/L1 để SCREENED; không gắn NUMERICALLY_VERIFIED"
+      ],
+      "after": [
+        "Chỉ dùng runtime L0/L1 để SCREENED; không gắn NUMERICALLY_VERIFIED",
+        "Deferred: user authorized literature/inspiration collection only; do not execute invention or screening tasks without a later request."
+      ]
+    },
+    {
+      "field": "status",
+      "before": "READY",
+      "after": "BACKLOG"
+    }
+  ],
+  "previous_status": "READY",
+  "next_status": "BACKLOG",
+  "run_id": "RUN-20260923-bb1589ca"
+}
