@@ -1,0 +1,18 @@
+{
+  "content": "Khởi tạo liên kết hai chiều cho đồ án cầu vượt sông. Context chuẩn: cầu đường cấp III đồng bằng, phương án nghiên cứu dầm hộp BTCT DƯL liên tục 45+75+45 m, thi công đúc hẫng cân bằng. Hãy dùng tài liệu nguồn trong notebook, nêu rõ tài liệu và phần chưa đủ bằng chứng; không tự điền số liệu thiếu.",
+  "content_sha256": "92d5a73150321cf5ba86f5645f03b3095bebd37ac40d16d73d9c8121bc2f2d8d",
+  "created_at": "2026-08-31T16:20:07Z",
+  "direction": "codex_to_notebooklm",
+  "error": null,
+  "message_id": "NBS-20260831T162007Z-409a9c9a955f",
+  "notebook_id": "1d26b485-1eb2-4698-9a6c-6b5c5b6c3e79",
+  "origin": "codex-project-bootstrap",
+  "project": "do-an-cau-vuot-song",
+  "remote_ref": null,
+  "schema_version": 1,
+  "source_refs": [
+    "Projects/Do an cau vuot song/00 - Do an cau vuot song - Dashboard.md"
+  ],
+  "status": "PENDING",
+  "updated_at": "2026-08-31T16:20:07Z"
+}
