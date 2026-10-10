@@ -1,0 +1,20 @@
+{
+  "profile_id": "LAB-CREATIVE-DEFAULT-0.1",
+  "claim_level": "IDEA",
+  "note": "GIỚI HẠN TÌM KIẾM MẶC ĐỊNH CỦA PHÒNG LAB cho MAP-Elites hình thái vòm. Đây KHÔNG phải điều khoản tiêu chuẩn, không phải số liệu dự án và chưa được kỹ sư duyệt; mỗi giá trị được gắn clause_id LAB-DEFAULT-UNSOURCED-<khoá> để mọi kết quả sinh ra tự khai là chưa có nguồn. Thay bằng technical profile có source_ref thật trước khi diễn giải bất kỳ hình thái nào.",
+  "values": {
+    "max_abs_slope": 3.0,
+    "min_curvature_radius_m": 0.5,
+    "max_member_length_m": 120.0,
+    "max_member_slenderness": 250.0,
+    "deck_member_depth_m": 2.0,
+    "spandrel_member_depth_m": 1.0,
+    "end_post_member_depth_m": 1.0,
+    "hanger_member_depth_m": 0.5,
+    "min_deck_arch_separation_m": 0.25,
+    "min_through_arch_clearance_m": 0.25,
+    "distributed_load_kN_m": 20.0,
+    "rib_area_m2": 3.0,
+    "allowable_compression_MPa": 150.0
+  }
+}

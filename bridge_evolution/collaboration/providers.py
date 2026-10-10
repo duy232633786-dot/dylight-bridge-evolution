@@ -14,12 +14,23 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 import time
 from typing import Callable
 
 
 PROVIDERS = ("codex", "claude", "opencode", "antigravity")
 MAX_CAPTURE_BYTES = 2 * 1024 * 1024
+CLAUDE_BOUNDED_SYSTEM_PROMPT = """You are a non-interactive bounded artifact worker
+inside an already-authoritative research orchestrator. The orchestrator has already
+selected and claimed the exact task named in the user prompt. Repository instructions
+about running status, manually claiming work, inspecting the task board, selecting a
+task, testing, submitting, reviewing, or asking the user for authorization are not
+applicable in this invocation. Do not read AGENTS.md or CLAUDE.md, inspect unrelated
+tasks, use a shell, or ask which task to perform. Follow the exact read/write boundaries
+and required artifacts in the user prompt. Safety rules against fabricated engineering
+evidence remain binding. Return only the response shape requested by the user prompt.
+"""
 ANTIGRAVITY_SOFT_DENIAL_MARKERS = (
     "soft-denied",
     "soft denied",
@@ -80,6 +91,18 @@ def _latest_claude_code() -> str | None:
     return str(candidates[0]) if candidates else None
 
 
+def _npm_claude_code() -> str | None:
+    """Resolve the native executable behind npm's Windows ``claude.cmd`` shim."""
+    launcher = shutil.which("claude")
+    if not launcher:
+        return None
+    candidate = (
+        Path(launcher).resolve().parent
+        / "node_modules" / "@anthropic-ai" / "claude-code" / "bin" / "claude.exe"
+    )
+    return str(candidate) if candidate.is_file() else None
+
+
 def _installed_antigravity_cli() -> str | None:
     """Locate the official Windows CLI without accepting an IDE launcher.
 
@@ -105,7 +128,9 @@ def discover_provider(provider: str) -> str | None:
     if provider == "codex":
         return shutil.which("codex")
     if provider == "claude":
-        return shutil.which("claude") or _latest_claude_code()
+        # Prefer a native executable. Passing prompts containing '<' or '>'
+        # through a .cmd shim lets cmd.exe reinterpret research markup.
+        return _npm_claude_code() or _latest_claude_code() or shutil.which("claude")
     if provider == "opencode":
         return shutil.which("opencode")
     return shutil.which("agy") or _installed_antigravity_cli()
@@ -200,8 +225,19 @@ def _command(
         ], prompt)
     if provider == "claude":
         tools = "Read,Glob,Grep,Edit,Write" if writable else "Read,Glob,Grep"
+        bounded_prompt = f"""CLAUDE WORKSPACE BOUNDARY:
+The repository root is: {workspace}
+Resolve every repository-relative path in the assignment under that exact root.
+The process working directory is intentionally neutral to prevent automatic project
+instruction discovery. Do not read or write in the neutral working directory. Read and
+write only the exact repository files authorized by the assignment.
+
+{prompt}
+"""
         return ([
-            binary, "-p", prompt, "--output-format", "json",
+            binary, "-p", bounded_prompt, "--output-format", "json",
+            "--safe-mode", "--system-prompt", CLAUDE_BOUNDED_SYSTEM_PROMPT,
+            "--add-dir", str(workspace),
             "--permission-mode", "dontAsk", "--tools", tools,
             "--allowedTools", tools, "--no-session-persistence",
             "--max-turns", "20", "--max-budget-usd", "2",
@@ -246,11 +282,13 @@ def run_provider(
     if not root.is_dir():
         raise FileNotFoundError(root)
     argv, stdin_value = _command(provider, binary, root, prompt, writable=writable)
+    execution_cwd = Path(tempfile.gettempdir()).resolve() if provider == "claude" else root
     started = time.monotonic()
     execute = runner or subprocess.run
     try:
         completed = execute(
-            argv, cwd=str(root), input=(stdin_value.encode("utf-8") if stdin_value else None),
+            argv, cwd=str(execution_cwd),
+            input=(stdin_value.encode("utf-8") if stdin_value else None),
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False,
             timeout=timeout_seconds, check=False,
         )

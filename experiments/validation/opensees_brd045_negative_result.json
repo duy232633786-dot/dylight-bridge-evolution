@@ -1,0 +1,430 @@
+{
+  "schema_version": "2.0",
+  "record_type": "NEGATIVE_RESULT",
+  "record_id": "OSR2-NEG-a180e117579a2482",
+  "claim_level": "IDEA",
+  "design_verdict_authority": "NONE",
+  "technical_scope": "HARDENED_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT",
+  "gates_completed": [],
+  "status": "NEGATIVE_RESULT_RECORDED",
+  "failure_status": "SOLVER_FAILED",
+  "basis_sha256": "7cef3a8582dbe5f3fd01b8ff208b7de46e94292a1907f28740f330468515746d",
+  "reference_source_sha256": "ac149ab2a3958334804a2c20ada3b1c147ed91df4518ab2ae33eecb63687cb56",
+  "reference_source_digests": [
+    {
+      "path": "experiments/validation/opensees_frame_reference_v2.py",
+      "sha256": "b82998948c1e64892ed43e0c655a2967c222497374528c142ba0aa10c72b51d3"
+    },
+    {
+      "path": "experiments/validation/opensees_frame_reference.py",
+      "sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915"
+    },
+    {
+      "path": "bridge_evolution/creative_shape.py",
+      "sha256": "f8e1b393ce0bd76b97b3af69053c8fe72d2902de7b6fab8d88e3879e26646e10"
+    },
+    {
+      "path": "bridge_evolution/frame_f1.py",
+      "sha256": "1ebbd5defb47b58eb5eb9171d28c52b1db721c10c2fbfefe083f86fba756720c"
+    },
+    {
+      "path": "bridge_evolution/creative_frame_adapter.py",
+      "sha256": "cb331daeeac877471632ca693b53fb1e65b08dd63e802af3c5b18745507b8507"
+    },
+    {
+      "path": "bridge_evolution/arch_action_f1.py",
+      "sha256": "9ef18b029ad021d1ccfd696c96cc4a9a295c552663e28a5332f925220b76bace"
+    },
+    {
+      "path": "bridge_evolution/funicular_reference.py",
+      "sha256": "0483ea7383e5ba5821c34d064b74f7927768c152000e242b789f95772f0342de"
+    }
+  ],
+  "task_artifact_digests": [
+    {
+      "path": "contracts/opensees_frame_reference_v2.schema.json",
+      "sha256": "b3d189a07ef5fec5029d6283ea6bf84c3d3285b3a6841d124cabf918164474be"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference_v2.py",
+      "sha256": "fabaf48625acb0591ef814ab5b0da876a1168245154776ecb975e998feee8e4a"
+    }
+  ],
+  "upstream_brd044_artifacts": [
+    {
+      "path": "experiments/validation/opensees_frame_reference.py",
+      "sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915"
+    },
+    {
+      "path": "experiments/validation/opensees_brd044_benchmarks.json",
+      "sha256": "d4031a4d704f6acbc7d3c3895fe62f977e4cbcf725c905858cca4db96bbc5ef2"
+    },
+    {
+      "path": "contracts/opensees_frame_reference.schema.json",
+      "sha256": "f573c6471447c4ec45c1589bb0ee65af0a2e33b653a2919e4657ce5a7b7799d7"
+    },
+    {
+      "path": "docs/design_basis/opensees_frame_reference_basis.json",
+      "sha256": "c90f857b0d81c8f1d2c210a4eaf192d6b033b3e72c4f1713daedeffe0c02c594"
+    },
+    {
+      "path": "tests/test_opensees_frame_reference.py",
+      "sha256": "62c3446e63db82b905ddbdd56762749f1a1bee71b91ea9a4b5b1a4c81cd45193"
+    }
+  ],
+  "model": {
+    "schema_version": "1.0",
+    "model_id": "F1M-BRD045-unstable-negative",
+    "analysis_type": "LINEAR_ELASTIC_2D_SMALL_DISPLACEMENT",
+    "units": {
+      "length": "m",
+      "force": "kN",
+      "moment": "kN_m",
+      "elastic_modulus": "GPa",
+      "area": "m2",
+      "inertia": "m4"
+    },
+    "nodes": [
+      {
+        "id": "N1",
+        "x_m": 0.0,
+        "y_m": 0.0
+      },
+      {
+        "id": "N2",
+        "x_m": 2.0,
+        "y_m": 0.0
+      }
+    ],
+    "materials": [
+      {
+        "id": "MAT1",
+        "elastic_modulus_GPa": 200.0,
+        "source_ref": "docs/design_basis/opensees_frame_reference_v2_basis.json"
+      }
+    ],
+    "sections": [
+      {
+        "id": "SEC1",
+        "area_m2": 0.02,
+        "inertia_m4": 0.002,
+        "source_ref": "docs/design_basis/opensees_frame_reference_v2_basis.json"
+      }
+    ],
+    "elements": [
+      {
+        "id": "E1",
+        "kind": "TRUSS_2D",
+        "node_i": "N1",
+        "node_j": "N2",
+        "material_id": "MAT1",
+        "section_id": "SEC1"
+      }
+    ],
+    "supports": [
+      {
+        "node_id": "N1",
+        "ux": true,
+        "uy": true,
+        "rz": true
+      }
+    ],
+    "load_cases": [
+      {
+        "id": "LC1",
+        "combination_status": "RESEARCH_BENCHMARK",
+        "source_ref": "docs/design_basis/opensees_frame_reference_v2_basis.json",
+        "nodal_loads": [
+          {
+            "node_id": "N2",
+            "fx_kN": 0.0,
+            "fy_kN": -1.0,
+            "mz_kNm": 0.0
+          }
+        ]
+      }
+    ]
+  },
+  "input_capture": {
+    "capture_kind": "CANONICAL_JSON",
+    "payload_text": "{\"analysis_type\":\"LINEAR_ELASTIC_2D_SMALL_DISPLACEMENT\",\"elements\":[{\"id\":\"E1\",\"kind\":\"TRUSS_2D\",\"material_id\":\"MAT1\",\"node_i\":\"N1\",\"node_j\":\"N2\",\"section_id\":\"SEC1\"}],\"load_cases\":[{\"combination_status\":\"RESEARCH_BENCHMARK\",\"id\":\"LC1\",\"nodal_loads\":[{\"fx_kN\":0.0,\"fy_kN\":-1.0,\"mz_kNm\":0.0,\"node_id\":\"N2\"}],\"source_ref\":\"docs/design_basis/opensees_frame_reference_v2_basis.json\"}],\"materials\":[{\"elastic_modulus_GPa\":200.0,\"id\":\"MAT1\",\"source_ref\":\"docs/design_basis/opensees_frame_reference_v2_basis.json\"}],\"model_id\":\"F1M-BRD045-unstable-negative\",\"nodes\":[{\"id\":\"N1\",\"x_m\":0.0,\"y_m\":0.0},{\"id\":\"N2\",\"x_m\":2.0,\"y_m\":0.0}],\"schema_version\":\"1.0\",\"sections\":[{\"area_m2\":0.02,\"id\":\"SEC1\",\"inertia_m4\":0.002,\"source_ref\":\"docs/design_basis/opensees_frame_reference_v2_basis.json\"}],\"supports\":[{\"node_id\":\"N1\",\"rz\":true,\"ux\":true,\"uy\":true}],\"units\":{\"area\":\"m2\",\"elastic_modulus\":\"GPa\",\"force\":\"kN\",\"inertia\":\"m4\",\"length\":\"m\",\"moment\":\"kN_m\"}}",
+    "payload_sha256": "ba6cd118a5cdf4eaef1aaeec49f792328499c649611257ace129c197efed2d64"
+  },
+  "model_payload_sha256": "ba6cd118a5cdf4eaef1aaeec49f792328499c649611257ace129c197efed2d64",
+  "worker_envelope": {
+    "failure_status": "SOLVER_FAILED",
+    "hardening_audit": {
+      "artificial_rotation_audits": [
+        {
+          "artificial_rotation_constraints": [],
+          "artificial_rotation_positive_control": null,
+          "artificial_rotation_reactions": [],
+          "audit_status": "NOT_AVAILABLE",
+          "domain_fingerprint": null,
+          "issues": [],
+          "load_case_id": "LC1",
+          "truss_local_force_responses": [],
+          "wipe_proxy": {
+            "forwarded_wipes": 1,
+            "suppressed_wipes": 1,
+            "total_wipe_calls": 2
+          }
+        }
+      ],
+      "base_worker_source_sha256": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915",
+      "engine_module_contract": {
+        "binary_owner_module": "openseespywin.opensees",
+        "binary_relative_path": "openseespywin/opensees.pyd",
+        "callable_bindings": [
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "algorithm",
+            "qualname": "algorithm"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "analysis",
+            "qualname": "analysis"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "analyze",
+            "qualname": "analyze"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "constraints",
+            "qualname": "constraints"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "eleResponse",
+            "qualname": "eleResponse"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "element",
+            "qualname": "element"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "fix",
+            "qualname": "fix"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "geomTransf",
+            "qualname": "geomTransf"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "getEleTags",
+            "qualname": "getEleTags"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "getFixedDOFs",
+            "qualname": "getFixedDOFs"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "getFixedNodes",
+            "qualname": "getFixedNodes"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "getNodeTags",
+            "qualname": "getNodeTags"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "integrator",
+            "qualname": "integrator"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "load",
+            "qualname": "load"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "model",
+            "qualname": "model"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "node",
+            "qualname": "node"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "nodeCoord",
+            "qualname": "nodeCoord"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "nodeDisp",
+            "qualname": "nodeDisp"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "nodeReaction",
+            "qualname": "nodeReaction"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "numberer",
+            "qualname": "numberer"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "pattern",
+            "qualname": "pattern"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "reactions",
+            "qualname": "reactions"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "system",
+            "qualname": "system"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "timeSeries",
+            "qualname": "timeSeries"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "uniaxialMaterial",
+            "qualname": "uniaxialMaterial"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "version",
+            "qualname": "version"
+          },
+          {
+            "kind": "builtin_function_or_method",
+            "module": "openseespywin.opensees",
+            "name": "wipe",
+            "qualname": "wipe"
+          }
+        ],
+        "shim_module": "openseespy.opensees",
+        "shim_package_name": "openseespy",
+        "shim_package_version": "3.8.0.0",
+        "shim_relative_path": "openseespy/opensees/__init__.py",
+        "shim_sha256": "8bd3a626052bb33e372dc9c38844098efd25cdb9d1548533ff2cb7b0abc9868d"
+      },
+      "loaded_forbidden_modules": [],
+      "loaded_forbidden_origins": [],
+      "origin": "WORKER",
+      "runtime_path_audit": {
+        "binary_file": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\BRD045-openseespywin-3.8.0.0\\openseespywin\\opensees.pyd",
+        "binary_under_site_packages": true,
+        "shim_file": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\BRD045-openseespywin-3.8.0.0\\openseespy\\opensees\\__init__.py",
+        "shim_under_site_packages": true,
+        "site_packages_index": 5,
+        "site_packages_path": "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\BRD045-openseespywin-3.8.0.0",
+        "sys_path": [
+          "D:\\DevCache\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python312.zip",
+          "D:\\DevCache\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\DLLs",
+          "D:\\DevCache\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib",
+          "D:\\DevCache\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python",
+          "D:\\DevCache\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib\\site-packages",
+          "C:\\Users\\ADMIN\\AppData\\Local\\Temp\\BRD045-openseespywin-3.8.0.0"
+        ],
+        "sys_path_sha256": "989ebc07c978d4304eb5d1be2fb85b3113cf90fcd5f756424db2e4bd9e59c732"
+      },
+      "site_packages_policy": "APPEND_AFTER_EXISTING_PATHS",
+      "worker_attestation_verified": true,
+      "worker_isolation_verified": true,
+      "worker_v2_source_sha256": "b82998948c1e64892ed43e0c655a2967c222497374528c142ba0aa10c72b51d3"
+    },
+    "raw_result": {
+      "engine": {
+        "binary_file_name": "opensees.pyd",
+        "binary_sha256": "25ba42e1672526137d765d9c3631d1403e091f54f5afcdb9242f9243c63c3a96",
+        "engine_version": "3.8.0",
+        "name": "OpenSees",
+        "package_name": "openseespywin",
+        "package_version": "3.8.0.0",
+        "python_executable_sha256": "d8e3f0adf246db00358c0c4ed349cf714898178f9558fb0e944f79f5c07f8eaa",
+        "python_implementation": "CPython",
+        "python_version": "3.12.13",
+        "worker_source_sha256": "b82998948c1e64892ed43e0c655a2967c222497374528c142ba0aa10c72b51d3"
+      },
+      "issues": [
+        "OpenSees analyze trả mã -3"
+      ],
+      "load_case_results": [
+        {
+          "analyze_return_code": -3,
+          "element_end_forces": [],
+          "issues": [
+            "OpenSees analyze trả mã -3"
+          ],
+          "load_case_id": "LC1",
+          "max_rotation_rad": null,
+          "max_translation_m": null,
+          "nodal_displacements": [],
+          "reactions": [],
+          "status": "SOLVER_FAILED"
+        }
+      ],
+      "model_id": "F1M-BRD045-unstable-negative",
+      "model_payload_sha256": "ba6cd118a5cdf4eaef1aaeec49f792328499c649611257ace129c197efed2d64",
+      "raw_result_sha256": "176683748985f408fb1f51cf0ad78e7c9eab9d08972c6eee52ecbe7ad1b73df5",
+      "schema_version": "1.0",
+      "status": "SOLVER_FAILED"
+    },
+    "status": "SOLVER_FAILED",
+    "worker_envelope_sha256": "7def795f07b4c691df6ebc796c561f927faa52730ada6deb82faace8fb2ee0cf"
+  },
+  "issues": [
+    "OpenSees analyze trả mã -3"
+  ],
+  "limitations": [
+    "This is an immutable hardening layer over BRD-044, not a replacement or mutation of the accepted BRD-044 evidence.",
+    "This artifact compares linear-elastic 2D implementations sharing idealized geometry, sections, loads and boundary conditions; agreement cannot validate omitted physics.",
+    "This is not F2 or L2: no 3D grillage, shell or solid model, moving-load analysis, mesh convergence, bearing-foundation-soil interaction or bridge-code load combination is present.",
+    "No strength, serviceability, stability, fatigue, robustness, durability, construction-stage or hazard capacity is calculated; no safe, feasible, verified, design-pass or utilization verdict is permitted.",
+    "The backend identity is pinned to one Python executable and OpenSees binary. Trust remains bounded by the operator-selected executable and site-packages directory, whose bytes are recorded and checked but whose publisher authenticity is not established here.",
+    "The worker runs with Python safe-path mode, appends the operator-selected site-packages path at the end of sys.path, pins both the openseespy shim and native openseespywin binary, and records each invoked callable owner. Any Python code executed from repo/bridge_evolution under any alias is a persisted ISOLATION_BREACH; no fallback to frame_f1 is permitted.",
+    "Artificial rz constraints are audited by tag, coordinates and fixed DOFs. A separate +1 kNm positive control must create a nonzero balancing reaction; this is a software observability control, not a physical bridge load case.",
+    "Persisted JSON artifacts are not digitally signed. The random worker nonce is verified in-process and then removed to keep canonical reruns deterministic; offline SHA-256 chains detect byte drift but cannot independently prove process origin. Trust therefore requires rerunning with the pinned interpreter, shim and native binary.",
+    "Any non-converged worker envelope encountered while generating the benchmark suite must be schema-validated and written as a negative-result artifact before the suite generator stops; failure evidence must never disappear into an exception-only path.",
+    "The absolute-plus-relative tolerances are deterministic code-verification tolerances, not acceptance limits from a bridge design standard.",
+    "G2 and G4 are not passed: model-quality and independent-design gates require a real bridge design basis, higher-fidelity model, blind reproduction and discrepancy reconciliation."
+  ],
+  "record_sha256": "179f6abc6a4b7c8b8b04b48d0a8b600ece33dc1cb65477642823345a06e3d73f"
+}

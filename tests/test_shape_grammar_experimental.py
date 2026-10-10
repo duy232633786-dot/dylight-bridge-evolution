@@ -369,7 +369,13 @@ def test_experimental_grammar_lives_only_in_sandbox():
     assert GRAMMAR_PATH.exists()
     top_level = sorted(p.name for p in (ROOT / "bridge_grammar").glob("*.json"))
     assert "arch_deck_v1.json" not in top_level
-    assert top_level == ["super_t_parametric_v2.json", "super_t_simple_v1.json"]
+    assert top_level == [
+        "box_girder_parametric_v1.json",
+        "composite_i_girder_parametric_v1.json",
+        "i_girder_parametric_v1.json",
+        "super_t_parametric_v2.json",
+        "super_t_simple_v1.json",
+    ]
 
 
 def test_flat_grammar_name_does_not_reach_the_experimental_grammar():

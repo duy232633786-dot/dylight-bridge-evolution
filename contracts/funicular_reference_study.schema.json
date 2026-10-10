@@ -1,0 +1,292 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "funicular_reference_study.schema.json",
+  "title": "FunicularReferenceStudy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "reference_id",
+    "reference_sha256",
+    "reference",
+    "reference_source_sha256",
+    "reference_source_digests",
+    "claim_level",
+    "design_verdict_authority",
+    "technical_scope",
+    "status",
+    "topology",
+    "parent_study",
+    "reference_input",
+    "reference_result",
+    "manifest",
+    "upstream_basis_hashes",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "reference_id": { "type": "string", "pattern": "^FR-[0-9a-f]{16}$" },
+    "reference_sha256": { "$ref": "#/$defs/sha256" },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "FUNICULAR_STATIC_REFERENCE" },
+        "version": { "const": "funicular-reference/0.1.0" }
+      }
+    },
+    "reference_source_sha256": { "$ref": "#/$defs/sha256" },
+    "reference_source_digests": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "#/$defs/source_digest" }
+    },
+    "claim_level": { "const": "IDEA" },
+    "design_verdict_authority": { "const": "NONE" },
+    "technical_scope": {
+      "const": "STATIC_FUNICULAR_REFERENCE_ONLY_NO_CAPACITY_OR_DESIGN_VERDICT"
+    },
+    "status": { "const": "REFERENCE_COMPLETE" },
+    "topology": { "enum": ["DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"] },
+    "parent_study": { "type": "object" },
+    "reference_input": { "$ref": "#/$defs/reference_input" },
+    "reference_result": { "$ref": "#/$defs/reference_result" },
+    "manifest": { "$ref": "#/$defs/manifest" },
+    "upstream_basis_hashes": { "$ref": "#/$defs/upstream_basis_hashes" },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "positive_number": { "type": "number", "exclusiveMinimum": 0 },
+    "source_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "enum": [
+            "bridge_evolution/funicular_reference.py",
+            "bridge_evolution/arch_action_f1.py"
+          ]
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "axis_point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "x_m", "y_m"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "x_m": { "type": "number" },
+        "y_m": { "type": "number" }
+      }
+    },
+    "reference_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "load_model",
+        "load_direction",
+        "total_vertical_load_kN",
+        "equivalent_uniform_load_kN_m",
+        "deck_length_m",
+        "span_m",
+        "rise_m",
+        "support_elevation_m",
+        "arch_axis"
+      ],
+      "properties": {
+        "load_case_id": { "type": "string", "minLength": 1 },
+        "load_model": {
+          "const": "EQUIVALENT_UNIFORM_VERTICAL_LOAD_OVER_HORIZONTAL_SPAN"
+        },
+        "load_direction": { "const": "GLOBAL_NEGATIVE_Y" },
+        "total_vertical_load_kN": { "$ref": "#/$defs/positive_number" },
+        "equivalent_uniform_load_kN_m": { "$ref": "#/$defs/positive_number" },
+        "deck_length_m": { "$ref": "#/$defs/positive_number" },
+        "span_m": { "$ref": "#/$defs/positive_number" },
+        "rise_m": { "$ref": "#/$defs/positive_number" },
+        "support_elevation_m": { "type": "number" },
+        "arch_axis": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/axis_point" }
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "x_from_left_m",
+        "actual_ordinate_m",
+        "reference_ordinate_m",
+        "axis_deviation_m",
+        "simple_beam_moment_kNm",
+        "bending_proxy_kNm",
+        "reference_shear_kN",
+        "reference_compression_kN"
+      ],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "x_from_left_m": { "type": "number", "minimum": 0 },
+        "actual_ordinate_m": { "type": "number" },
+        "reference_ordinate_m": { "type": "number", "minimum": 0 },
+        "axis_deviation_m": { "type": "number" },
+        "simple_beam_moment_kNm": { "type": "number", "minimum": 0 },
+        "bending_proxy_kNm": { "type": "number" },
+        "reference_shear_kN": { "type": "number" },
+        "reference_compression_kN": { "$ref": "#/$defs/positive_number" }
+      }
+    },
+    "f1_comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measured_action",
+        "reference_force_kN",
+        "measured_force_min_kN",
+        "measured_force_max_kN",
+        "measured_to_reference_ratio_min",
+        "measured_to_reference_ratio_max",
+        "order_band_minimum_ratio",
+        "order_band_maximum_ratio",
+        "agreement_status",
+        "reason_codes"
+      ],
+      "properties": {
+        "measured_action": {
+          "enum": [
+            "FOUNDATION_THRUST_MAGNITUDE",
+            "DECK_TIE_TENSION_ENVELOPE"
+          ]
+        },
+        "reference_force_kN": { "$ref": "#/$defs/positive_number" },
+        "measured_force_min_kN": { "$ref": "#/$defs/positive_number" },
+        "measured_force_max_kN": { "$ref": "#/$defs/positive_number" },
+        "measured_to_reference_ratio_min": { "$ref": "#/$defs/positive_number" },
+        "measured_to_reference_ratio_max": { "$ref": "#/$defs/positive_number" },
+        "order_band_minimum_ratio": { "$ref": "#/$defs/positive_number" },
+        "order_band_maximum_ratio": { "$ref": "#/$defs/positive_number" },
+        "agreement_status": {
+          "enum": [
+            "AGREEMENT_WITHIN_ORDER_BAND",
+            "AGREEMENT_OUTSIDE_ORDER_BAND",
+            "NOT_COMPARABLE"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z0-9_-]+$" }
+        }
+      }
+    },
+    "reference_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "reference_model",
+        "horizontal_thrust_reference_kN",
+        "simple_beam_max_moment_kNm",
+        "axis_rms_deviation_m",
+        "axis_max_abs_deviation_m",
+        "axis_rms_deviation_ratio",
+        "axis_max_abs_deviation_ratio",
+        "bending_proxy_max_abs_kNm",
+        "bending_proxy_max_abs_ratio",
+        "canonical_funicular_within_tolerance",
+        "samples",
+        "f1_comparison"
+      ],
+      "properties": {
+        "load_case_id": { "type": "string", "minLength": 1 },
+        "reference_model": {
+          "const": "TWO_HINGED_PARABOLIC_FUNICULAR_UNDER_HORIZONTAL_UDL"
+        },
+        "horizontal_thrust_reference_kN": { "$ref": "#/$defs/positive_number" },
+        "simple_beam_max_moment_kNm": { "$ref": "#/$defs/positive_number" },
+        "axis_rms_deviation_m": { "type": "number", "minimum": 0 },
+        "axis_max_abs_deviation_m": { "type": "number", "minimum": 0 },
+        "axis_rms_deviation_ratio": { "type": "number", "minimum": 0 },
+        "axis_max_abs_deviation_ratio": { "type": "number", "minimum": 0 },
+        "bending_proxy_max_abs_kNm": { "type": "number", "minimum": 0 },
+        "bending_proxy_max_abs_ratio": { "type": "number", "minimum": 0 },
+        "canonical_funicular_within_tolerance": { "type": "boolean" },
+        "samples": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/sample" }
+        },
+        "f1_comparison": { "$ref": "#/$defs/f1_comparison" }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parent_study_id",
+        "parent_study_sha256",
+        "parent_analysis_id",
+        "parent_analysis_sha256",
+        "candidate_id",
+        "candidate_sha256",
+        "geometry_sha256",
+        "candidate_profile_sha256",
+        "structural_profile_sha256",
+        "parent_study_model_sha256",
+        "parent_study_result_sha256",
+        "arch_action_basis_sha256",
+        "funicular_basis_sha256",
+        "funicular_source_sha256",
+        "reference_input_sha256",
+        "reference_result_sha256"
+      ],
+      "properties": {
+        "parent_study_id": { "type": "string", "pattern": "^AA-[0-9a-f]{16}$" },
+        "parent_study_sha256": { "$ref": "#/$defs/sha256" },
+        "parent_analysis_id": { "type": "string", "pattern": "^CFA-[0-9a-f]{16}$" },
+        "parent_analysis_sha256": { "$ref": "#/$defs/sha256" },
+        "candidate_id": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" },
+        "candidate_sha256": { "$ref": "#/$defs/sha256" },
+        "geometry_sha256": { "$ref": "#/$defs/sha256" },
+        "candidate_profile_sha256": { "$ref": "#/$defs/sha256" },
+        "structural_profile_sha256": { "$ref": "#/$defs/sha256" },
+        "parent_study_model_sha256": { "$ref": "#/$defs/sha256" },
+        "parent_study_result_sha256": { "$ref": "#/$defs/sha256" },
+        "arch_action_basis_sha256": { "$ref": "#/$defs/sha256" },
+        "funicular_basis_sha256": { "$ref": "#/$defs/sha256" },
+        "funicular_source_sha256": { "$ref": "#/$defs/sha256" },
+        "reference_input_sha256": { "$ref": "#/$defs/sha256" },
+        "reference_result_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "upstream_basis_hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "creative_domain_sha256",
+        "adapter_basis_sha256",
+        "frame_basis_sha256",
+        "arch_action_basis_sha256"
+      ],
+      "properties": {
+        "creative_domain_sha256": { "$ref": "#/$defs/sha256" },
+        "adapter_basis_sha256": { "$ref": "#/$defs/sha256" },
+        "frame_basis_sha256": { "$ref": "#/$defs/sha256" },
+        "arch_action_basis_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

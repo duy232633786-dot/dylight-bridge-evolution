@@ -30,6 +30,10 @@ def _lab_copy(tmp_path: Path) -> Path:
         "workstream": "integration", "priority": "P0", "status": "READY",
         "owner": None, "reviewer": None, "dependencies": [],
         "required_gates": ["G0"], "claim_ceiling": "IDEA",
+        "runtime_scope": {
+            "structural_families": ["super_t_simple_v1"],
+            "runtime_domain": "production_line_girder_l1",
+        },
         "write_scope": ["tests/"],
         "acceptance_criteria": ["Transition được kiểm thử trong bản sao tạm"],
         "required_artifacts": ["README.md"],
@@ -428,13 +432,31 @@ def test_approved_handoff_cannot_use_bare_snapshot_to_hide_drift(tmp_path, monke
     assert validate_lab(lab)["valid"] is False
 
 
-def test_submit_handoff_blocks_claim_exceeding_project_claim_ceiling(tmp_path):
+def test_submit_handoff_blocks_claim_exceeding_project_claim_ceiling(
+    tmp_path, monkeypatch,
+):
     lab = _lab_copy(tmp_path)
     path = lab / "tasks" / "BRD-999.json"
     task = json.loads(path.read_text(encoding="utf-8"))
     task["claim_ceiling"] = "NUMERICALLY_VERIFIED"
     task["required_gates"] = ["G0", "G1", "G2", "G3", "G4"]
     path.write_text(json.dumps(task, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    # Test này cô lập project-claim ceiling, không kiểm runtime reachability.
+    # Bổ sung policy CHỈ trong process test để G3/G4 không chặn sớm hơn guard
+    # cần quan sát; policy production trong lab.py vẫn fail-closed và bất biến.
+    line_policy = lab_module.RUNTIME_SCOPE_POLICIES["production_line_girder_l1"]
+    monkeypatch.setattr(lab_module, "RUNTIME_SCOPE_POLICIES", {
+        **lab_module.RUNTIME_SCOPE_POLICIES,
+        "production_line_girder_l1": {
+            **line_policy,
+            "gates": {
+                **line_policy["gates"],
+                "G3": (("ALL", ("L0_LAYOUT_RULES",)),),
+                "G4": (("ALL", ("L0_LAYOUT_RULES",)),),
+            },
+        },
+    })
     claim_task("BRD-999", "codex", lab)
     with pytest.raises(ValueError, match="vượt trần cấp dự án"):
         submit_handoff(
@@ -465,4 +487,3 @@ def test_validate_lab_catches_handoff_exceeding_project_ceiling(tmp_path):
     validation = validate_lab(lab)
     assert validation["valid"] is False
     assert any("vượt trần cấp dự án (SCREENED)" in err for err in validation["errors"])
-

@@ -90,6 +90,33 @@ tiết diện thuôn dựng được bằng **một phép**, không phải chia 
 
 **[R1] `NewRevolution` đòi trục NẰM TRONG mặt phẳng phác thảo.** Trục vuông góc → hỏng.
 
+**[S2] VOID trong family SKETCH KHÔNG tự cắt, và `SolidSolidCutUtils` TỪ CHỐI ở đó.**
+Đo trên `FAM_BeMong.rfa`: khối 10.0 × 8.0 × 2.5 m cộng một void 1.2 × 1.2 × 3.0 m xuyên qua.
+```
+form solid=1  void=1                    <- void CÓ tồn tại
+thể tích      = 200.000 m3              <- ĐÚNG BẰNG 10x8x2.5, tức KHÔNG cắt
+                                           (nếu cắt phải còn 196.400)
+CanElementCutElement = False   reason = CutNotAppropriateForElements
+AddCutBetweenSolids  -> ArgumentException:
+  "The element must be in a project document or in a conceptual model,
+   pattern based curtain panel, or adaptive component family."
+```
+**Nguy hiểm vì nó IM LẶNG:** `NewExtrusion(false, ...)` trả về đối tượng bình thường, không lỗi,
+và void hiện diện trong file — nhưng khối không bị khoét. Nhìn danh sách phần tử thì thấy đủ;
+chỉ **đo thể tích** mới lộ ra.
+**Quy tắc:** sau khi tạo void, PHẢI đối chiếu thể tích với giá trị kỳ vọng đã trừ phần khoét.
+**CHƯA ĐO:** cách làm void cắt được trong family SKETCH (tham số "Cuts Geometry", hoặc phải dựng
+void trong cùng sketch với solid). Chưa biết thì **đừng dùng void trong thế giới SKETCH**.
+
+**[S3] Template family SHIP SẴN HÌNH HỌC — phải xoá trước khi dựng.**
+Đo trên `FAM_DotVanhVom.rfa` (template `Metric Structural Framing - Beams and Braces.rft`):
+```
+Extrusion  id=999   vol=0.150 m3   <- CỦA TEMPLATE, không ai tạo
+SweptBlend id=4816  vol=71.392 m3  <- của mình
+```
+Nếu chỉ đếm `GenericForm` rồi kết luận "đã dựng xong" thì con số bị nhiễm khối rác của template.
+**Quy tắc:** ngay sau `NewFamilyDocument`, quét `GenericForm` có sẵn và **xoá hết** trước khi dựng.
+
 ---
 
 ## 3. Thế giới MASSING / ADAPTIVE — `Form` + điểm thích ứng
@@ -126,6 +153,91 @@ CHẠY THEO          = True
 **[A1]** `IsAdaptiveComponentFamily` nhận `Family` chứ không phải `Document` → dùng `fd.OwnerFamily`.
 **[A2]** Không có `AdaptiveComponentFamilyUtils.GetPlacementPoints`. Tên đúng **CHƯA ĐO**.
 
+**[A3] Điểm hosted trên đường: TIẾP TUYẾN nằm ở `BasisX`, nên mặt phẳng TIẾT DIỆN là `YZ`.**
+Và hệ toạ độ **chỉ đúng SAU `Regenerate()`**. Đo trên spine hướng (0.6, 0.8, 0):
+```
+TRƯỚC Regenerate: BasisZ=(0,0,1)                    ← ma trận đơn vị, CHƯA tính
+SAU   Regenerate: BasisX=(0.600,0.800,0.000)        ← chính là tiếp tuyến
+                  BasisY=(-0.800,0.600,0.000)
+                  BasisZ=(0.000,0.000,1.000)
+```
+Dùng `GetCoordinatePlaneReferenceXY()` là **SAI** — mặt phẳng đó CHỨA đường dẫn, nên profile
+song song path và `NewLoftForm` ném `InvalidOperationException: Cannot create loft form.`
+Phải dùng **`GetCoordinatePlaneReferenceYZ()`**.
+
+**[A4] `NewLoftForm` qua API KHÔNG giữ liên kết tham số với điểm thích ứng — KẾT QUẢ ÂM.**
+
+Dựng đúng theo [A3] thì form **tạo được** (`isSolid=True`, 54.533 m³). Nhưng FLEX TEST **HỎNG**:
+```
+TRƯỚC:  spine=10.000 m   hostB=null   form=1   vol=54.533 m3
+SAU  :  spine=24.104 m   hostB=null   form=1   vol=54.533 m3
+```
+Spine **có** flex (10.000 → 24.104 m, đúng √(22²+9²+4²)). Nhưng thể tích form **đứng yên**, và
+`hostB` trả `null` **ngay từ trước khi flex** — các `ReferencePoint` hosted bị **nuốt vào form**
+lúc tạo. Form giữ bản sao hình học riêng và **đứt liên kết ngược** về điểm thích ứng.
+
+Đổi sang profile đặt trên mặt phẳng của **chính điểm thích ứng** (bỏ điểm hosted trung gian)
+cũng **không cứu được**: form dựng OK nhưng FLEX vẫn hỏng, tỷ lệ thể tích 1.0000.
+
+**[A5] `NewSweptBlendForm` GIỮ ĐƯỢC liên kết tham số — ĐÂY LÀ LỐI ĐÚNG.**
+
+Cùng nền adaptive, cùng mặt phẳng `YZ` theo [A3], chỉ đổi `NewLoftForm` → `NewSweptBlendForm`
+và truyền **spine làm path**:
+
+```csharp
+var pathRa = new ReferenceArray();
+pathRa.Append(spine.GeometryCurve.Reference);       // <-- MẤU CHỐT: có PATH
+var raa = new ReferenceArrayArray();
+raa.Append(prof(hostA, halfStart));                 // profile trên mp YZ của điểm hosted
+raa.Append(prof(hostB, halfEnd));
+fd.FamilyCreate.NewSweptBlendForm(true, pathRa, raa);
+```
+
+FLEX TEST **ĐẠT**:
+```
+vol 54.533 -> 131.447 m3    tỷ lệ = 2.4104
+chiều dài 10.000 -> 24.104  tỷ lệ = 2.4104     <-- KHỚP CHÍNH XÁC
+```
+
+**Vì sao khác nhau:** `NewSweptBlendForm` nhận **path**, nên form bị ràng buộc vào spine — mà
+spine do điểm thích ứng điều khiển. `NewLoftForm` **không có path**, nên nó chỉ loft hình học
+tại thời điểm tạo rồi đứt liên kết.
+
+**Quy tắc rút ra:** trong môi trường adaptive, muốn hình **flex** thì phải dùng phép dựng **CÓ
+PATH**. Phép không path cho ra khối tĩnh — hình đúng, tham số giả.
+
+Ghi chú: chủ dự án từng ghi lại rằng family panel adaptive **4 điểm** đặt tự động bị **méo** và
+phải lùi về DirectShape. Ca 4 điểm **CHƯA ĐO** ở đây; kết quả [A5] chỉ áp cho **2 điểm**.
+
+**[A6] Thành phần UV THỨ NHẤT luôn rơi vào trục ĐỨNG nhất — phải hoán vị `w`↔`h`.**
+
+`NewPointOnPlane(planeRef, UV(u,v), ...)` trên mặt phẳng YZ của điểm hosted: Revit tự chọn
+hướng U/V, và hướng đó **đổi theo phương của spine**. Đo bằng tiết diện bất đối xứng 10 × 2 m
+đặt theo bốn phương, rồi đọc bao của instance thật:
+
+| Phương spine (Revit) | 10 m rơi vào | 2 m rơi vào |
+|---|---|---|
+| X — dọc cầu | **Z (đứng)** | Y (ngang) |
+| Y — ngang cầu | **Z (đứng)** | X (ngang) |
+| Z — thẳng đứng | Y | X |
+
+**Quy luật: `UV[0]` → trục đứng nhất; `UV[1]` → trục ngang còn lại.** Quy ước DirectShape thì
+ngược (`w` ngang, `h` đứng), nên khi sinh family phải đặt **`h` vào `UV[0]` và `w` vào `UV[1]`**.
+
+**Cách phát hiện:** hậu quả im lặng — hình vẫn dựng, số lượng vẫn đúng, chỉ **bao cao độ** sai.
+Thanh thềm đá 63.0 × 7.5 m nằm ngang cầu bị dựng 63 m theo phương **đứng**:
+```
+TRƯỚC: SEC_035 span X=7.50   Y=44.00  Z=63.00   -> z_min toàn cầu = -57.75 m  SAI
+SAU  : SEC_035 span X=63.00  Y=44.00  Z=7.50    -> z_min toàn cầu = -30.00 m  ĐÚNG
+```
+Sau khi hoán vị, bao toàn cầu của bản FAMILY **trùng khít** bản DirectShape:
+`x -34..214 | y -22..22 | z -30..67.23`.
+
+**Bài học phương pháp:** phép đo vector U/V (đặt một điểm ở U=1, một ở V=1 rồi đọc hướng) cho
+kết quả **MÂU THUẪN** với hành vi thật của instance. Chỉ phép đo trên **cái quan sát được cuối
+cùng** — bao của instance đã đặt — mới đúng. Khi hai phép đo đá nhau, tin phép đo gần với thứ
+mình thật sự quan tâm.
+
 ---
 
 ## 4. Ghi chú phương pháp — quan trọng ngang số liệu
@@ -151,6 +263,9 @@ phải ABSENT — nhiều khả năng profile chưa đặt đúng vị trí dọ
 | Connectors (Electrical/Duct/Pipe/Cable Tray/Conduit) | trong ribbon; **không liên quan cầu**, cố ý bỏ |
 | Family adaptive **4 điểm** | skill của chủ dự án ghi panel 4 điểm đặt tự động bị **MÉO**, đã phải lùi về DirectShape. Ranh giới **chưa rõ** — phải đo trước khi dùng |
 | Titleblock, Annotation, Baluster, Railing Support/Termination, Curtain Wall Panel | chưa đo |
+| `FamilyManager.AddParameter` trong family **ADAPTIVE / MASSING** | chỉ đo trên `Metric Generic Model` (§2). **Hệ quả nặng:** dấu claim BẮT BUỘC (`DYLIGHT_ClaimLevel`) do đó CHƯA dán được vào family adaptive — phải đo trước khi dựng dầm chủ / gờ lan can |
+| `SaveAs` .rfa từ template **Mass** hoặc template **2D** | mới lưu .rfa từ SKETCH (475.136 B) và ADAPTIVE (499.712 B). Rất có thể chạy được vì SaveAs là API mức `Document`, nhưng SUY RA không phải ĐO |
+| `NewBlend` / `NewSweep` / `NewSweptBlend` / `NewRevolution` **ngoài** thế giới SKETCH | §1 chỉ đo ĐÍCH DANH `NewExtrusion` ngoài SKETCH. Kết luận §0 rất có thể phủ cả nhóm `FamilyItemFactory`, nhưng suy ra không phải đo |
 
 ---
 
@@ -187,3 +302,22 @@ solver cho vòm. Mỗi family và mỗi instance phải mang dấu claim level *
 
 Khi lệnh MCP timeout: **mở lại `.rfa` và đếm đối tượng theo kiểu** thay vì chạy lại probe.
 Đã dùng đúng cách đó một lần trong đợt đo này.
+
+---
+
+## 8. Pha 2 — ma trận này đã thành mã chạy được
+
+`bridge_evolution/revit_family/` mã hoá đúng tài liệu này thành **cổng chặn**, để
+không ai sinh ra C# mà ta đã đo là hỏng:
+
+| Thành phần | Vai |
+|---|---|
+| `worlds.py` — `TEMPLATES` | 12 hàng của §1: template → thế giới, category, cờ `IsAdaptiveComponentFamily` |
+| `worlds.py` — `OPERATIONS` | mỗi phép ghi trạng thái theo **từng thế giới**: `MEASURED_OK` / `MEASURED_FAIL` / `NOT_MEASURED` |
+| `worlds.py` — `require_operation(op, template)` | RAISE chứ không trả bool. Đã đo hỏng → `UnsupportedInWorldError` kèm lỗi Revit nguyên văn; chưa đo → `NotMeasuredError` kèm lý do và trỏ về mục 5 ở trên |
+| `csharp.py` — `family_scaffold` | khuôn `NewFamilyDocument` → `Transaction` riêng → `Regenerate()` **trong** transaction → `SaveAs` → `Close(false)`, tự kiểm lại thứ tự đó trên chính chuỗi vừa sinh |
+| `csharp.py` — `CSharpBuilder` | từ chối phát dòng mở `new Transaction(document…)`, dòng `Guid.NewGuid()`, dòng `document.Close(…)` và mọi ký tự ngoài ASCII |
+| `tests/test_revit_family.py` | 207 test đối chiếu từng ô của tài liệu này; không test nào cần Revit chạy |
+
+**Ranh giới claim không đổi: F0 IDEA.** Thư viện chỉ phát được mức claim
+`F0_IDEA` — nâng mức là việc của hợp đồng nhiệm vụ, không phải của bộ sinh mã.

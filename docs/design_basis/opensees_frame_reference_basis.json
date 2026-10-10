@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0",
+  "reference": {
+    "id": "OPENSEES_FRAME_2D_REFERENCE",
+    "version": "opensees-frame-reference/0.1.0"
+  },
+  "claim_ceiling": "IDEA",
+  "design_verdict_authority": "NONE",
+  "technical_scope": "CROSS_IMPLEMENTATION_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT",
+  "units": {
+    "length": "m",
+    "force": "kN",
+    "moment": "kN_m",
+    "elastic_modulus": "GPa",
+    "area": "m2",
+    "inertia": "m4"
+  },
+  "formulations": {
+    "FRAME_2D": "OpenSees elasticBeamColumn 2D, Euler-Bernoulli, Linear geometric transformation",
+    "TRUSS_2D": "OpenSees Truss with Elastic uniaxial material, small displacement",
+    "analysis": "Static Linear, one LoadControl step per clean domain",
+    "truss_rotation_policy": "Fix rz at every node incident only to TRUSS_2D because rotation is outside the truss formulation"
+  },
+  "minimum_element_length_m": 1e-09,
+  "comparison_tolerances": {
+    "displacement_absolute_m": 1e-10,
+    "displacement_relative": 1e-06,
+    "rotation_absolute_rad": 1e-12,
+    "rotation_relative": 1e-06,
+    "force_absolute_kN": 1e-06,
+    "force_relative": 1e-06,
+    "moment_absolute_kNm": 1e-06,
+    "moment_relative": 1e-06,
+    "equilibrium_force_absolute_kN": 1e-06,
+    "equilibrium_force_relative": 1e-08,
+    "equilibrium_moment_absolute_kNm": 1e-06,
+    "equilibrium_moment_relative": 1e-08
+  },
+  "benchmark_inputs": {
+    "analytical": {
+      "elastic_modulus_GPa": 200.0,
+      "area_m2": 0.02,
+      "inertia_m4": 0.002,
+      "axial_bar": {
+        "length_m": 2.0,
+        "force_kN": 100.0
+      },
+      "cantilever": {
+        "length_m": 3.0,
+        "tip_force_kN": -10.0
+      },
+      "simple_beam": {
+        "span_m": 10.0,
+        "midspan_force_kN": -20.0
+      }
+    },
+    "creative": {
+      "topologies": [
+        "DECK_ARCH",
+        "THROUGH_ARCH",
+        "NETWORK_ARCH"
+      ],
+      "genome": {
+        "span_m": 145.0,
+        "rise_ratio": 0.2,
+        "panel_count": 12,
+        "rib_count": 2,
+        "rib_depth_m": 2.0,
+        "deck_clearance_m": 6.5,
+        "shape_coefficients": [0.0, 0.0, 0.0]
+      },
+      "technical_thresholds": {
+        "max_abs_slope": 4.0,
+        "min_curvature_radius_m": 1.0,
+        "max_member_length_m": 200.0,
+        "max_member_slenderness": 500.0,
+        "deck_member_depth_m": 2.0,
+        "spandrel_member_depth_m": 1.0,
+        "end_post_member_depth_m": 1.0,
+        "hanger_member_depth_m": 0.5,
+        "min_deck_arch_separation_m": 0.5,
+        "min_through_arch_clearance_m": 0.5,
+        "distributed_load_kN_m": 25.0,
+        "rib_area_m2": 5.0,
+        "allowable_compression_MPa": 100.0
+      },
+      "elastic_modulus_GPa": 200.0,
+      "section_area_m2": 5.0,
+      "section_inertia_m4": 100.0,
+      "deck_line_load_kN_m": 25.0,
+      "support_policy": "LEFT_PIN_RIGHT_VERTICAL_ROLLER"
+    }
+  },
+  "official_method_sources": [
+    {
+      "title": "OpenSees model command",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/model.html"
+    },
+    {
+      "title": "OpenSees Truss element",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/elements/Truss.html"
+    },
+    {
+      "title": "OpenSees elasticBeamColumn element",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/elements/elasticBeamColumn.html"
+    },
+    {
+      "title": "OpenSees nodal load command",
+      "url": "https://opensees.github.io/OpenSeesDocumentation/user/manual/model/pattern/PlainPatternloadcommands/load.html"
+    }
+  ],
+  "reference_source_files": [
+    "experiments/validation/opensees_frame_reference.py",
+    "bridge_evolution/creative_shape.py",
+    "bridge_evolution/frame_f1.py",
+    "bridge_evolution/creative_frame_adapter.py",
+    "bridge_evolution/arch_action_f1.py",
+    "bridge_evolution/funicular_reference.py"
+  ],
+  "reference_source_sha256": "b11bc53d44e39f627998fcbd2fe098c58ebd646c92e8547f36ebf663ae1598c5",
+  "explicit_limitations": [
+    "This artifact compares two linear-elastic 2D implementations that share the same idealized geometry, sections, loads and boundary conditions; agreement can reveal implementation errors but cannot validate omitted physics.",
+    "This is not F2 or L2: there is no 3D grillage, shell or solid model, moving-load analysis, mesh convergence, bearing-foundation-soil interaction or bridge-code load combination.",
+    "No strength, serviceability, stability, fatigue, robustness, durability, construction-stage or hazard capacity is calculated; no safe, feasible, verified, design-pass or utilization verdict is permitted.",
+    "OpenSeesPy 3.8.0 on this host requires a Python 3.12 ABI-compatible worker; an unavailable or failed backend is a STOP and may not fall back to frame_f1.",
+    "The registered absolute-plus-relative tolerances are code-verification tolerances for these deterministic benchmarks, not acceptance limits from a bridge design standard.",
+    "G4 is not automatically passed: independent analyst review, blind reproduction and reconciliation of every discrepancy remain mandatory."
+  ]
+}

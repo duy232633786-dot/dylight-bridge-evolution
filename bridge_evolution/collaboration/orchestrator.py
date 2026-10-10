@@ -36,6 +36,7 @@ from .providers import PROVIDERS, provider_doctor, result_as_dict, run_provider
 
 RUN_TERMINAL = {"DIGITAL_COMPLETE", "FAILED", "CANCELLED"}
 MAX_RECOVERY_GRANTS_PER_TASK = 2
+ACTIVE_RESEARCH_PROVIDERS = ("codex", "claude")
 ALLOWED_TEST_PREFIXES = (
     ("python", "-m", "bridge_evolution.cli", "lab", "validate"),
     ("python", "-m", "pytest"),
@@ -88,6 +89,7 @@ def _run_path(root: Path, run_id: str) -> Path:
 def create_research_brief(
     topic: str,
     *,
+    runtime_scope: dict | None = None,
     objectives: list[str] | None = None,
     constraints: list[str] | None = None,
     requested_by: str = "project_owner",
@@ -104,13 +106,18 @@ def create_research_brief(
     normalized = topic.strip()
     if len(normalized) < 10:
         raise ValueError("Đề tài phải có ít nhất 10 ký tự")
+    if runtime_scope is None:
+        raise ValueError(
+            "Brief mới phải khai runtime_scope; không được suy đoán "
+            "structural_families/runtime_domain từ topic"
+        )
     created = _now()
     token = hashlib.sha256(
         f"{created}|{uuid.uuid4().hex}|{normalized}".encode("utf-8")
     ).hexdigest()[:8]
     brief_id = f"RND-{created[:10].replace('-', '')}-{token}"
     value = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "brief_id": brief_id,
         "created_at": created,
         "topic": normalized,
@@ -127,6 +134,7 @@ def create_research_brief(
         "requested_by": requested_by,
         "autonomy_mode": autonomy_mode,
         "claim_ceiling": claim_ceiling,
+        "runtime_scope": json.loads(json.dumps(runtime_scope)),
         "budget": {
             "max_tasks": max_tasks,
             "max_parallel": max_parallel,
@@ -161,7 +169,7 @@ def _planned_tasks(brief: dict) -> list[dict]:
         role: str, reviewer: str, artifact: str, criteria: list[str], safety: list[str],
     ) -> dict:
         artifact_path = f"{base}/{artifact}"
-        return {
+        value = {
             "schema_version": "1.0",
             "task_id": f"RND-{key}-{number:02d}",
             "title": title,
@@ -189,6 +197,10 @@ def _planned_tasks(brief: dict) -> list[dict]:
             ],
             "human_gate": False,
         }
+        implied_machine_gate = bool(set(gates) - {"G0", "G7"}) or ceiling != "IDEA"
+        if implied_machine_gate:
+            value["runtime_scope"] = json.loads(json.dumps(brief["runtime_scope"]))
+        return value
 
     tasks = [
         task(
@@ -206,8 +218,8 @@ def _planned_tasks(brief: dict) -> list[dict]:
         task(
             2, "Sinh tập giả thuyết và concept đa dạng",
             "Những concept nào có load path/cơ chế vật liệu hợp lý và khác biệt thực sự?",
-            kind, "P1", [], ["G1"], "IDEA", "antigravity",
-            inventor_role, "claude", "02_concept_portfolio.md",
+            kind, "P1", [], ["G1"], "IDEA", "claude",
+            inventor_role, "codex", "02_concept_portfolio.md",
             [
                 "Tối thiểu ba concept khác cơ chế, không chỉ đổi kích thước",
                 "Mỗi concept nêu load path, novelty, chế tạo, bảo trì và failure hypothesis",
@@ -219,7 +231,7 @@ def _planned_tasks(brief: dict) -> list[dict]:
             3, "Sàng lọc physics-in-the-loop tái lập được",
             "Các giả thuyết còn đứng vững sau kiểm tra đơn vị, cân bằng, hình học và L0/L1 nào?",
             "structural_physics", "P0", [1, 2], ["G0", "G1", "G2"],
-            "SCREENED", "codex", "structural_analyst", "opencode",
+            "SCREENED", "codex", "structural_analyst", "claude",
             "03_physics_screening.md",
             [
                 "Input, units, solver/version, seed và raw output truy vết được",
@@ -231,8 +243,8 @@ def _planned_tasks(brief: dict) -> list[dict]:
         task(
             4, "Tái lập độc lập và audit sai lệch",
             "Một agent/phương pháp độc lập có tái lập được kết quả và phát hiện confound nào?",
-            "integration", "P0", [3], ["G0", "G1", "G2", "G3", "G4"],
-            "SCREENED", "opencode", "independent_reproducer", "claude",
+            "integration", "P0", [3], ["G0", "G1", "G2"],
+            "SCREENED", "claude", "independent_reproducer", "codex",
             "04_independent_reproduction.md",
             [
                 "Tái tính blind từ input canonical và so tolerance đăng ký trước",
@@ -266,6 +278,12 @@ def plan_research(
     root = _lab_dir(lab_dir)
     brief = _load_json(_brief_path(root, brief_id))
     _validate("research_brief.schema.json", brief)
+    if "runtime_scope" not in brief:
+        raise ValueError(
+            f"Brief legacy {brief_id} không có runtime_scope và chỉ được đọc lịch sử; "
+            "hãy tạo brief schema 1.1 mới với runtime_domain/structural_families, "
+            "không được suy đoán scope khi re-plan"
+        )
     tasks = _planned_tasks(brief)
     for value in tasks:
         _validate("research_task.schema.json", value)
@@ -362,12 +380,16 @@ def _provider_ready(item: dict) -> bool:
 def _choose_provider(task: dict, doctor: dict, *, review: bool, policy: str) -> str | None:
     preferred = task["review_provider" if review else "preferred_provider"]
     excluded = {task.get("owner")} if review else set()
-    if preferred not in excluded and _provider_ready(doctor[preferred]):
+    if (
+        preferred in ACTIVE_RESEARCH_PROVIDERS
+        and preferred not in excluded
+        and _provider_ready(doctor.get(preferred, {}))
+    ):
         return preferred
     if policy == "STRICT_MULTI_VENDOR":
         return None
-    for provider in ("codex", "claude", "opencode", "antigravity"):
-        if provider not in excluded and _provider_ready(doctor[provider]):
+    for provider in ACTIVE_RESEARCH_PROVIDERS:
+        if provider not in excluded and _provider_ready(doctor.get(provider, {})):
             return provider
     return None
 
@@ -755,8 +777,11 @@ def recover_failed_task(
             raise ValueError("Run không có RUN_FAILED event cho task; từ chối recovery")
 
         next_provider = provider or task.get("preferred_provider")
-        if next_provider not in PROVIDERS:
-            raise ValueError(f"Provider không được hỗ trợ: {next_provider}")
+        if next_provider not in ACTIVE_RESEARCH_PROVIDERS:
+            raise ValueError(
+                f"Provider không được phép cho recovery mới: {next_provider}; "
+                f"chỉ cho {', '.join(ACTIVE_RESEARCH_PROVIDERS)}"
+            )
         if next_provider == task.get("review_provider"):
             raise ValueError("Worker recovery không được trùng independent review provider")
         doctor = provider_doctor()

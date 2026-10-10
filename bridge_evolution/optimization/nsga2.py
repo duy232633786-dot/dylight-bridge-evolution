@@ -67,9 +67,61 @@ def _crowding(pop: list[dict], front: list[int]) -> dict[int, float]:
     return dist
 
 
+#: Toán tử được hỗ trợ. ``legacy`` là bản gốc, đóng băng vì thí nghiệm grammar
+#: A/B đã pre-register và ``experiments/run_grammar_ab._restricted_nsga2`` phải
+#: cho lịch sử trùng khớp. ``repaired`` (BRD-059) sửa bốn lỗi đo được:
+#:   1. quần thể khởi tạo/immigrant chỉ nhận cá thể qua L0 (legacy: 37–39/40
+#:      cá thể ban đầu là L0-reject);
+#:   2. khử trùng lặp gene (legacy: thế hệ ~50 chỉ còn 2 gene khác nhau/40);
+#:   3. immigrant thay đúng phần đuôi quần thể đã xếp hạng (legacy thay chỉ số
+#:      ngẫu nhiên, có thể xóa cá thể front 0, và không lọc L0);
+#:   4. đột biến luôn đổi gene được chọn: reset chọn giá trị KHÁC giá trị cũ,
+#:      bước ±1 phản xạ ở biên thay vì bị kẹp (legacy: 45,5% con giống cha).
+#: L0-reject không tiêu solver call nên sửa 1 không đổi định nghĩa ngân sách.
+OPERATORS = ("legacy", "repaired")
+
+
+def _passes_l0(ind: dict | None) -> bool:
+    """Record đã qua L0 và được solver đánh giá (kể cả lấy lại từ cache)."""
+    return ind is not None and ind.get("solver_status") != "NOT_RUN"
+
+
+def _mutate_vector(x: list[int], sizes: list[int], p_mut: float,
+                   rng: random.Random, repaired: bool) -> list[int]:
+    """Đột biến vector chỉ số; nửa bước ±1 (local), nửa reset (exploration).
+
+    Legacy kẹp ±1 ở biên và reset có thể trúng lại giá trị cũ, nên gene "được
+    chọn" nhiều khi không đổi. Repaired phản xạ ±1 ở biên và reset sang giá trị
+    khác, nên mọi gene được chọn (miền > 1 giá trị) đều thật sự đổi. Thứ tự rút
+    số của nhánh legacy giữ nguyên để lịch sử cũ tái lập từng byte.
+    """
+    y = list(x)
+    for j in range(len(sizes)):
+        if rng.random() < p_mut:
+            if rng.random() < 0.5:  # bước ±1 trên lưới (local move)
+                step = rng.choice((-1, 1))
+                if not repaired:
+                    y[j] = min(sizes[j] - 1, max(0, y[j] + step))
+                elif sizes[j] > 1:
+                    # Phản xạ ở biên: đang ở 0 mà bước −1 thì đi +1.
+                    if not 0 <= y[j] + step < sizes[j]:
+                        step = -step
+                    y[j] += step
+            elif not repaired:      # reset ngẫu nhiên (exploration)
+                y[j] = rng.randrange(sizes[j])
+            elif sizes[j] > 1:      # reset sang giá trị KHÁC giá trị cũ
+                k = rng.randrange(sizes[j] - 1)
+                y[j] = k if k < y[j] else k + 1
+    return y
+
+
 def nsga2(budget: int, seed: int, pop_size: int = 40,
           p_crossover: float = 0.9,
-          grammar_id: str = DEFAULT_GRAMMAR_ID) -> dict:
+          grammar_id: str = DEFAULT_GRAMMAR_ID,
+          operators: str = "legacy") -> dict:
+    if operators not in OPERATORS:
+        raise ValueError(f"operators phải thuộc {OPERATORS}, nhận {operators!r}")
+    repaired = operators == "repaired"
     rng = random.Random(seed)
     # Chiều dài gene lấy từ grammar; p_mut = 1/n_var nên tự co giãn khi grammar
     # v2 thêm 6 biến hình dạng. Với v1, order == GENE_ORDER ⇒ hành vi không đổi.
@@ -83,6 +135,12 @@ def nsga2(budget: int, seed: int, pop_size: int = 40,
                            grammar_id=grammar_id)
     archive = ParetoArchive()
     max_proposals = max(10_000, budget * 1000)
+    # Mỗi thế hệ repaired được thử tối đa chừng này proposal để lấp offspring
+    # không trùng; hết lượt thì chấp nhận lứa nhỏ hơn thay vì lặp vô hạn.
+    max_attempts_per_generation = 50 * pop_size
+    # Trần số lần rút ngẫu nhiên cho một immigrant (gene trùng không tăng
+    # n_proposals nên cần guard riêng để không lặp vô hạn khi miền cạn).
+    max_random_draws = 100_000
 
     def decode(idx_vec):
         return {k: domains[k][i] for k, i in zip(order, idx_vec)}
@@ -96,14 +154,7 @@ def nsga2(budget: int, seed: int, pop_size: int = 40,
         return {**rec, "x": list(idx_vec)}
 
     def mutate(x):
-        y = list(x)
-        for j in range(n_var):
-            if rng.random() < p_mut:
-                if rng.random() < 0.5:  # bước ±1 trên lưới (local move)
-                    y[j] = min(sizes[j] - 1, max(0, y[j] + rng.choice((-1, 1))))
-                else:                   # reset ngẫu nhiên (exploration)
-                    y[j] = rng.randrange(sizes[j])
-        return y
+        return _mutate_vector(x, sizes, p_mut, rng, repaired)
 
     def crossover(a, b):
         if rng.random() > p_crossover:
@@ -114,19 +165,47 @@ def nsga2(budget: int, seed: int, pop_size: int = 40,
                 c1[j], c2[j] = c2[j], c1[j]
         return c1, c2
 
+    def budget_left():
+        return not ev.exhausted and ev.n_proposals < max_proposals
+
+    def random_l0_individual(taken: set):
+        """Repaired: rút ngẫu nhiên tới khi gặp gene mới qua L0 (L0 miễn phí)."""
+        draws = 0
+        while budget_left() and draws < max_random_draws:
+            draws += 1
+            x = [rng.randrange(s) for s in sizes]
+            if tuple(x) in taken:
+                continue
+            taken.add(tuple(x))
+            ind = evaluate(x)
+            if _passes_l0(ind):
+                return ind
+            if ind is None:
+                return None
+        return None
+
     # --- khởi tạo
     pop = []
     seen = set()
-    while (len(pop) < pop_size and not ev.exhausted
-           and ev.n_proposals < max_proposals):
-        x = [rng.randrange(s) for s in sizes]
-        if tuple(x) in seen:
-            continue
-        seen.add(tuple(x))
-        ind = evaluate(x)
-        if ind:
+    if repaired:
+        while len(pop) < pop_size and budget_left():
+            ind = random_l0_individual(seen)
+            if ind is None:
+                break
             pop.append(ind)
+    else:
+        while (len(pop) < pop_size and not ev.exhausted
+               and ev.n_proposals < max_proposals):
+            x = [rng.randrange(s) for s in sizes]
+            if tuple(x) in seen:
+                continue
+            seen.add(tuple(x))
+            ind = evaluate(x)
+            if ind:
+                pop.append(ind)
     generations = 0
+    duplicates_rejected = 0
+    l0_rejected_offspring = 0
 
     # --- vòng tiến hóa
     while not ev.exhausted and pop and ev.n_proposals < max_proposals:
@@ -146,11 +225,25 @@ def nsga2(budget: int, seed: int, pop_size: int = 40,
             return pop[i] if crowd[i] >= crowd[j] else pop[j]
 
         offspring = []
+        taken = {tuple(ind["x"]) for ind in pop}
+        attempts = 0
         while (len(offspring) < pop_size and not ev.exhausted
                and ev.n_proposals < max_proposals):
+            if repaired:
+                if attempts >= max_attempts_per_generation:
+                    break
             c1, c2 = crossover(tournament()["x"], tournament()["x"])
             for c in (mutate(c1), mutate(c2)):
+                if repaired:
+                    attempts += 1
+                    if tuple(c) in taken:
+                        duplicates_rejected += 1
+                        continue
+                    taken.add(tuple(c))
                 ind = evaluate(c)
+                if repaired and ind is not None and not _passes_l0(ind):
+                    l0_rejected_offspring += 1
+                    continue
                 if ind:
                     offspring.append(ind)
                 if (len(offspring) >= pop_size or ev.exhausted
@@ -172,23 +265,45 @@ def nsga2(budget: int, seed: int, pop_size: int = 40,
         generations += 1
 
         # Chống kẹt ngân sách: quần thể hội tụ → toàn cache hit, không tiêu solver call.
-        # Bơm cá thể ngẫu nhiên (random immigrants) thay 25% cuối để tiếp tục khám phá.
+        # Bơm cá thể ngẫu nhiên (random immigrants) để tiếp tục khám phá.
         if (ev.n_solver_calls == calls_before_gen and not ev.exhausted
                 and ev.n_proposals < max_proposals):
             n_inject = max(1, pop_size // 4)
-            for _ in range(n_inject):
-                ind = evaluate([rng.randrange(s) for s in sizes])
-                if ind:
-                    pop[rng.randrange(len(pop))] = ind
-                if ev.exhausted:
-                    break
+            if repaired:
+                # new_pop xếp theo front rồi crowding giảm dần ⇒ đuôi là cá thể
+                # kém nhất; chỉ thay đuôi, immigrant phải qua L0 và không trùng.
+                taken = {tuple(ind["x"]) for ind in pop}
+                for k in range(min(n_inject, len(pop))):
+                    ind = random_l0_individual(taken)
+                    if ind is None:
+                        break
+                    pop[len(pop) - 1 - k] = ind
+            else:
+                # Legacy (giữ nguyên để tái lập): thay chỉ số ngẫu nhiên.
+                for _ in range(n_inject):
+                    ind = evaluate([rng.randrange(s) for s in sizes])
+                    if ind:
+                        pop[rng.randrange(len(pop))] = ind
+                    if ev.exhausted:
+                        break
 
     config = {**ev.config, "algorithm": "nsga2", "pop_size": pop_size,
               "p_crossover": p_crossover, "p_mutation": p_mut,
               "max_proposals": max_proposals}
-    return {"algorithm": "nsga2", "seed": seed, "grammar_id": grammar_id,
-            "pop_size": pop_size,
-            "generations": generations, "config": config, "counters": ev.counters,
-            "history": ev.history, "proposal_history": ev.proposal_history,
-            "archive": archive,
-            "termination": "budget_exhausted" if ev.exhausted else "proposal_guard"}
+    result = {"algorithm": "nsga2", "seed": seed, "grammar_id": grammar_id,
+              "pop_size": pop_size,
+              "generations": generations, "config": config, "counters": ev.counters,
+              "history": ev.history, "proposal_history": ev.proposal_history,
+              "archive": archive,
+              "termination": "budget_exhausted" if ev.exhausted else "proposal_guard"}
+    if repaired:
+        # Chỉ thêm khóa khi bật repaired để output legacy giữ nguyên từng byte.
+        config["operators"] = operators
+        config["max_attempts_per_generation"] = max_attempts_per_generation
+        result["operator_diagnostics"] = {
+            "duplicates_rejected": duplicates_rejected,
+            "l0_rejected_offspring": l0_rejected_offspring,
+            "final_population_unique_genes": len({tuple(i["x"]) for i in pop}),
+            "final_population_l0_rejected": sum(1 for i in pop if not _passes_l0(i)),
+        }
+    return result

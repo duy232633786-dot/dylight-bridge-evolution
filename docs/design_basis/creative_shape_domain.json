@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.1",
+  "domain_id": "CREATIVE-ARCH-QD-1.1.0",
+  "claim_ceiling": "IDEA",
+  "generator_version": "creative-shape/0.3.0",
+  "technical_scope": "SEARCH_BOUNDS_ONLY_NOT_DESIGN_LIMITS",
+  "topology_values": [
+    "DECK_ARCH",
+    "THROUGH_ARCH",
+    "NETWORK_ARCH"
+  ],
+  "span_m": {
+    "min": 40.0,
+    "max": 250.0
+  },
+  "rise_ratio": {
+    "min": 0.12,
+    "max": 0.35
+  },
+  "panel_count_values": [
+    8,
+    10,
+    12,
+    14,
+    16,
+    18,
+    20
+  ],
+  "rib_count_values": [
+    1,
+    2
+  ],
+  "rib_depth_m": {
+    "min": 1.0,
+    "max": 6.0
+  },
+  "deck_clearance_m": {
+    "min": 1.0,
+    "max": 12.0
+  },
+  "coefficient_count": 3,
+  "coefficient_bounds": {
+    "min": -0.08,
+    "max": 0.08
+  },
+  "axis_point_count": 101,
+  "bins": {
+    "rise_ratio": [
+      0.12,
+      0.18,
+      0.24,
+      0.30,
+      0.35
+    ],
+    "curvature_complexity": [
+      0.0,
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      100.0
+    ],
+    "asymmetry": [
+      0.0,
+      0.02,
+      0.05,
+      0.10,
+      0.25,
+      1.0
+    ]
+  },
+  "not_applicable_justifications": {
+    "CQD-L0-07": {
+      "topologies": [
+        "THROUGH_ARCH",
+        "NETWORK_ARCH"
+      ],
+      "check_id": "CQD-L0-07",
+      "status": "NOT_APPLICABLE",
+      "model_kind": "NOT_APPLICABLE_TIED_ARCH_THRUST_PROXY",
+      "reason_vi": "Proxy lực xô của vòm parabol không áp dụng cho tied/through/network arch vì lực xô được thanh kéo tiếp nhận thay vì truyền trực tiếp xuống móng.",
+      "consequence_vi": "Chưa có proxy thay thế nên hai topology này hiện không có sàng lọc cơ học F0; archive chỉ chứng minh đã qua các sàng lọc hình học được khai."
+    }
+  },
+  "notes_vi": [
+    "Các giá trị trong tệp này chỉ giới hạn không gian tìm kiếm nghiên cứu, không phải giới hạn thiết kế theo tiêu chuẩn.",
+    "Mọi ngưỡng kỹ thuật phải được truyền riêng trong technical_profile và kèm source_ref tồn tại.",
+    "Mọi source_ref của technical_profile phải là đường dẫn POSIX tương đối, kèm expected_source_sha256 khớp bytes nguồn và clause_id chỉ rõ điều khoản sinh ngưỡng.",
+    "source_ref và hash chỉ chứng minh provenance, không chứng minh tài liệu hoặc điều khoản đó áp dụng cho dự án đang xét; applicability vẫn phải được kỹ sư xác nhận.",
+    "Độ mảnh proxy được kiểm trên mọi edge với member depth theo từng loại; thiếu depth trả UNKNOWN_INPUT_MISSING.",
+    "Tĩnh không through/network lấy giá trị nhỏ nhất trên toàn bộ điểm trục bên trong; DECK_ARCH chỉ kiểm khoảng cách deck-to-arch, không giả là tĩnh không giao thông dưới cầu.",
+    "THROUGH_ARCH và NETWORK_ARCH miễn CQD-L0-07 theo biện minh đã khai, vì vậy hiện không có sàng lọc cơ học F0 và chỉ được sàng lọc hình học.",
+    "Ứng viên chỉ đạt sàng lọc L0/proxy ở mức IDEA; không được gọi là thiết kế khả thi hoặc đã kiểm chứng kết cấu."
+  ]
+}

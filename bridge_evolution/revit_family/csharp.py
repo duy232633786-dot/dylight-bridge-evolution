@@ -1,0 +1,668 @@
+"""Hạ tầng phát mã C# cho family Revit — khuôn ĐÃ KIỂM CHỨNG, không sáng tác.
+
+===========================================================================
+KHUÔN HOST — KHÔNG ĐƯỢC ĐỔI
+===========================================================================
+``send_code_to_revit`` gói đoạn mã vào::
+
+    Execute(Document document, object[] parameters)
+
+và host **ĐÃ MỞ SẴN một transaction trên biến ``document``**. Vì vậy:
+
+* mở ``new Transaction(document, ...)`` -> ``InvalidOperationException`` (đã đo
+  trong BRD-017, và chính vì thế MCP ở chế độ rollback-only);
+* đường vòng ĐÃ ĐO ĐƯỢC cho family là
+  ``app.NewFamilyDocument(template)`` -> ``Transaction`` riêng trên **family
+  document** -> ``SaveAs`` ``.rfa`` -> ``Close(false)``.
+
+:class:`CSharpBuilder` **từ chối phát** dòng nào mở transaction trên
+``document``. Đây là bất biến cứng, kiểm ngay lúc sinh chuỗi chứ không đợi
+Revit ném lỗi.
+
+SÁU BẤT BIẾN ĐƯỢC MÃ HOÁ THÀNH KIỂM TRA FAIL-CLOSED
+---------------------------------------------------
+1. **KHÔNG** ``new Transaction(document`` — host giữ transaction đó.
+2. **KHÔNG** ``Guid.NewGuid()`` — dấu định danh phải TIỀN ĐỊNH thì hai lần
+   chạy mới so được với nhau (cùng nguyên tắc với ``tmp/rvt_loader_csharp.py``).
+3. ``Document.Regenerate()`` **PHẢI nằm TRONG** transaction. Đặt sau
+   ``Commit()`` -> ``InvalidOperationException`` (đã đo). :func:`family_scaffold`
+   kiểm lại thứ tự đó trên CHÍNH chuỗi vừa sinh.
+4. Mã C# phát ra phải **ASCII thuần**. Đoạn mã đi qua đường MCP và console
+   Windows cp1252 trên máy này; một ký tự có dấu là một lần mã hỏng khó đọc.
+   Chú thích tiếng Việt trong C# viết KHÔNG DẤU.
+5. **DẤU CLAIM BẮT BUỘC.** Chuỗi nào phát ``fd.SaveAs(...)`` mà không mang
+   ``DYLIGHT_ClaimLevel`` qua ``FamilyManager.AddParameter`` thì raise. Đây là
+   điều khoản 4 của BRD-036, và :func:`family_scaffold` là hàm DUY NHẤT trong
+   gói ghi ra ``.rfa`` nên nó phải là chỗ gác.
+6. **[A3] ĐỌC HỆ TOẠ ĐỘ SAU ``Regenerate()``.** RFC-1.1.0 §3 đo được: trước
+   ``Regenerate()``, ``ReferencePoint.GetCoordinateSystem()`` trả **ma trận đơn
+   vị** — sai kiểu IM LẶNG. Nên :func:`family_scaffold` có ``pre_regen_lines``
+   (giai đoạn dựng điểm/đường) và tự kiểm rằng mọi ``GetCoordinateSystem``
+   trong chuỗi vừa sinh đứng SAU một ``fd.Regenerate();`` — kiểm trên bản đã
+   bỏ chú thích, để một dòng cảnh báo không thoả mãn được kiểm tra thi hành.
+
+ĐƠN VỊ VÀ ÁNH XẠ TRỤC
+---------------------
+Đơn vị nội bộ Revit là **FEET**. Hệ toạ độ cầu trong repo này là
+``(x dọc, y cao, z ngang)`` — cùng quy ước ``tmp/arch_massing/bars.json``.
+Revit lấy **Z làm cao độ**, nên::
+
+    (x, y, z)_cau  ->  new XYZ(x_ft, z_ft, y_ft)
+
+:func:`xyz` làm đúng phép hoán vị đó và đổi mét -> feet trong một bước, để
+không ai phải nhớ thứ tự bằng tay.
+
+RANH GIỚI CLAIM
+---------------
+Family tham số hoá trông giống hồ sơ kỹ thuật thật hơn DirectShape rất nhiều,
+nên rủi ro đọc nhầm **CAO HƠN**. :func:`claim_parameters_cs` chỉ nhận mức claim
+``F0_IDEA`` — trần claim của BRD-036 là IDEA, và một thư viện sinh mã không
+phải chỗ để nâng mức claim.
+"""
+from __future__ import annotations
+
+import math
+import re
+from contextlib import contextmanager
+from typing import Iterable, Iterator, Sequence
+
+from .worlds import require_operation, require_operations, template_path
+
+__all__ = [
+    "FT",
+    "m_to_ft",
+    "xyz",
+    "cs_string",
+    "CSharpBuilder",
+    "family_scaffold",
+    "guarded_family_scaffold",
+    "claim_parameters_cs",
+    "CLAIM_LEVEL_PARAM",
+    "CLAIM_STATEMENT_PARAM",
+    "ALLOWED_CLAIM_LEVELS",
+    "DEFAULT_CLAIM_STATEMENT",
+    "CSharpEmitError",
+    "ForbiddenCSharpError",
+    "CSharpStructureError",
+    "NonAsciiCSharpError",
+    "ClaimCeilingError",
+]
+
+#: Hệ số đổi mét -> feet (đơn vị nội bộ Revit). Cùng hằng với tmp/rvt_loader_csharp.py.
+FT = 3.280839895013
+
+#: Số chữ số thập phân khi in số vào C#. 1e-9 ft ~ 3e-10 m — dư sức cho Revit.
+_DECIMALS = 9
+
+CLAIM_LEVEL_PARAM = "DYLIGHT_ClaimLevel"
+CLAIM_STATEMENT_PARAM = "DYLIGHT_ClaimStatement"
+
+#: Trần claim của BRD-036 là IDEA. Không mức nào khác được phát.
+ALLOWED_CLAIM_LEVELS: frozenset[str] = frozenset({"F0_IDEA"})
+
+#: Câu claim mặc định — KHÔNG DẤU vì nó đi thẳng vào chuỗi C# (bất biến 4).
+DEFAULT_CLAIM_STATEMENT = (
+    "F0 IDEA - khoi hinh thai nghien cuu. KHONG phai ho so thiet ke, "
+    "chua qua solver va chua kiem theo TCVN. Khong dung de thi cong."
+)
+
+
+# ---------------------------------------------------------------------------
+# Lỗi
+# ---------------------------------------------------------------------------
+
+class CSharpEmitError(ValueError):
+    """Gốc của mọi lỗi phát mã C#. MRO: ``CSharpEmitError -> ValueError``."""
+
+
+class ForbiddenCSharpError(CSharpEmitError):
+    """Dòng C# vi phạm một bất biến đã đo (transaction của host, Guid ngẫu nhiên...)."""
+
+
+class CSharpStructureError(CSharpEmitError):
+    """Cấu trúc mã sinh ra sai (ngoặc lệch, Regenerate sai chỗ, tham số rỗng...)."""
+
+
+class NonAsciiCSharpError(CSharpEmitError):
+    """Mã C# chứa ký tự ngoài ASCII — không được đẩy qua đường MCP."""
+
+
+class ClaimCeilingError(CSharpEmitError):
+    """Xin phát một mức claim vượt trần IDEA của BRD-036."""
+
+
+# ---------------------------------------------------------------------------
+# Bất biến cứng — kiểm trên CHÍNH chuỗi sinh ra
+# ---------------------------------------------------------------------------
+
+#: (regex, vì sao cấm). Áp cho MỌI dòng đi qua :class:`CSharpBuilder`.
+FORBIDDEN_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"new\s+Transaction\s*\(\s*document\b"),
+     "Host DA MO SAN transaction tren `document`. Mo them mot cai nua nem "
+     "InvalidOperationException (da do, BRD-017). Family document (`fd`) thi "
+     "mo transaction duoc binh thuong."),
+    (re.compile(r"\bdocument\s*\.\s*Close\s*\("),
+     "`document` la document cua HOST. Dong no la pha phien lam viec cua "
+     "nguoi dung. Chi duoc Close family document (`fd`)."),
+    (re.compile(r"Guid\s*\.\s*NewGuid\s*\("),
+     "Dinh danh phai TIEN DINH thi hai lan chay moi so duoc voi nhau. "
+     "Dung hash cua chinh du lieu dau vao, khong dung Guid ngau nhien."),
+)
+
+#: Cấm THÊM, chỉ áp cho ``body_lines`` do người gọi truyền vào.
+BODY_FORBIDDEN_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\btx\s*\.\s*(Start|Commit|RollBack)\s*\("),
+     "Transaction `tx` do family_scaffold so huu. Than mã KHONG duoc "
+     "Start/Commit/RollBack no — lam vay la day Regenerate() ra ngoai "
+     "transaction, dung cai loi da do."),
+    (re.compile(r"\bfd\s*\.\s*(SaveAs|Close)\s*\("),
+     "SaveAs va Close do family_scaffold so huu, phat sau khi Commit."),
+    (re.compile(r"\bfd\s*\.\s*Regenerate\s*\("),
+     "Regenerate() do family_scaffold phat, TRONG transaction va ngay truoc "
+     "Commit. Than mã tu goi them la lam nhoe bat bien do."),
+)
+
+
+def _check_forbidden(text: str,
+                     patterns: Sequence[tuple[re.Pattern[str], str]]) -> None:
+    for pattern, reason in patterns:
+        if pattern.search(text):
+            raise ForbiddenCSharpError(
+                f"Dòng C# vi phạm bất biến đã đo:\n"
+                f"  dòng: {text.strip()}\n"
+                f"  mẫu cấm: {pattern.pattern}\n"
+                f"  vì sao: {reason}"
+            )
+
+
+def _check_ascii(text: str, what: str) -> None:
+    try:
+        text.encode("ascii")
+    except UnicodeEncodeError as exc:
+        bad = text[exc.start:exc.end]
+        raise NonAsciiCSharpError(
+            f"{what} chứa ký tự ngoài ASCII {bad!r} (vị trí {exc.start}).\n"
+            f"  Mã C# đi qua đường MCP và console cp1252 trên máy này — chú "
+            f"thích tiếng Việt trong C# phải viết KHÔNG DẤU.\n"
+            f"  nội dung: {text.strip()}"
+        ) from None
+
+
+# ---------------------------------------------------------------------------
+# Số và chuỗi
+# ---------------------------------------------------------------------------
+
+def m_to_ft(x_m: float) -> float:
+    """Đổi mét sang feet (đơn vị nội bộ Revit). Chặn ``nan``/``inf``."""
+    value = float(x_m)
+    if not math.isfinite(value):
+        raise CSharpEmitError(
+            f"Giá trị {x_m!r} không hữu hạn. Không bao giờ phát 'NaN'/'Infinity' "
+            f"vào mã C#: Revit sẽ dựng hình rác hoặc ném lỗi ở chỗ khác, rất "
+            f"khó lần ngược."
+        )
+    return value * FT
+
+
+def _num(value: float) -> str:
+    """In một double thành literal C# xác định (deterministic), không mũ."""
+    if not math.isfinite(value):
+        raise CSharpEmitError(f"Giá trị {value!r} không hữu hạn.")
+    if value == 0.0:
+        return "0.0"
+    text = f"{value:.{_DECIMALS}f}".rstrip("0")
+    if text.endswith("."):
+        text += "0"
+    if text in ("-0.0", "-0."):
+        return "0.0"
+    return text
+
+
+def xyz(x_m: float, y_m: float, z_m: float) -> str:
+    """``(x, y, z)`` hệ CẦU tính bằng MÉT -> literal ``new XYZ(...)`` tính bằng FEET.
+
+    Hệ cầu của repo này là ``x`` dọc cầu, ``y`` CAO ĐỘ, ``z`` NGANG cầu (cùng
+    quy ước ``tmp/arch_massing/bars.json``). Revit lấy **Z làm cao độ**, nên
+    phép hoán vị là::
+
+        (x, y, z)_cau -> new XYZ(x_ft, z_ft, y_ft)
+
+    Ví dụ ``xyz(1, 2, 3)`` -> ``new XYZ(3.280839895, 9.842519685, 6.56167979)``:
+    số đầu là 1 m, số giữa là 3 m (ngang), số cuối là 2 m (cao).
+    """
+    return (f"new XYZ({_num(m_to_ft(x_m))}, "
+            f"{_num(m_to_ft(z_m))}, "
+            f"{_num(m_to_ft(y_m))})")
+
+
+def cs_string(value: str) -> str:
+    """Chuỗi verbatim C# ``@"..."`` — an toàn với đường dẫn Windows đầy ``\\``."""
+    text = str(value)
+    if "\n" in text or "\r" in text:
+        raise CSharpEmitError(
+            "Chuỗi C# không được chứa xuống dòng — nó phá cả dòng lệnh và "
+            "làm kiểm tra bất biến theo dòng mất tác dụng."
+        )
+    _check_ascii(text, "Chuỗi hằng C#")
+    return '@"' + text.replace('"', '""') + '"'
+
+
+# ---------------------------------------------------------------------------
+# Builder
+# ---------------------------------------------------------------------------
+
+class CSharpBuilder:
+    """Gom dòng C#, quản lý thụt lề, và CHẶN các dòng vi phạm bất biến.
+
+    Dùng::
+
+        b = CSharpBuilder()
+        b.line("int n = 0;")
+        with b.block("if (n == 0)"):
+            b.line("n = 1;")
+        code = b.build()
+
+    Mỗi dòng đi qua :meth:`line` đều bị soi bằng :data:`FORBIDDEN_PATTERNS`.
+    Đó là điểm mà "không thể sinh ra C# đã đo là hỏng" trở thành mã chạy được,
+    chứ không phải một câu trong tài liệu.
+    """
+
+    def __init__(self, *, indent: str = "    ", ascii_only: bool = True,
+                 check: bool = True) -> None:
+        self._indent_unit = indent
+        self._depth = 0
+        self._lines: list[str] = []
+        self._ascii_only = ascii_only
+        self._check = check
+
+    # -- phát dòng ---------------------------------------------------------
+    def line(self, text: str = "") -> "CSharpBuilder":
+        """Phát một dòng ở mức thụt lề hiện tại. Raise nếu dòng vi phạm bất biến."""
+        if not isinstance(text, str):
+            raise CSharpEmitError(
+                f"line() nhận str, không nhận {type(text).__name__}")
+        if "\n" in text or "\r" in text:
+            raise CSharpEmitError(
+                "line() nhận MỘT dòng. Nhiều dòng thì dùng lines() — nếu không, "
+                "kiểm tra bất biến theo dòng sẽ bỏ sót."
+            )
+        if text.strip():
+            if self._check:
+                _check_forbidden(text, FORBIDDEN_PATTERNS)
+            if self._ascii_only:
+                _check_ascii(text, "Dòng C#")
+            self._lines.append(self._indent_unit * self._depth + text.rstrip())
+        else:
+            self._lines.append("")
+        return self
+
+    def lines(self, texts: Iterable[str]) -> "CSharpBuilder":
+        """Phát nhiều dòng."""
+        for text in texts:
+            self.line(text)
+        return self
+
+    def blank(self) -> "CSharpBuilder":
+        """Một dòng trắng."""
+        return self.line("")
+
+    def comment(self, text: str) -> "CSharpBuilder":
+        """Chú thích ``//`` (vẫn phải ASCII — viết tiếng Việt KHÔNG DẤU)."""
+        return self.line("// " + text)
+
+    @contextmanager
+    def block(self, header: str = "") -> Iterator["CSharpBuilder"]:
+        """Khối ``header { ... }`` tự đóng ngoặc và tự thụt lề."""
+        if header:
+            self.line(header)
+        self.line("{")
+        self._depth += 1
+        try:
+            yield self
+        finally:
+            self._depth -= 1
+        self.line("}")
+        return
+
+    # -- kết xuất ----------------------------------------------------------
+    def build(self) -> str:
+        """Chuỗi C# hoàn chỉnh. Raise nếu ngoặc nhọn lệch."""
+        code = "\n".join(self._lines).rstrip() + "\n"
+        opened, closed = _count_braces(code)
+        if opened != closed:
+            raise CSharpStructureError(
+                f"Ngoặc nhọn lệch: {opened} '{{' và {closed} '}}'. "
+                f"Dùng block() thay vì tự phát ngoặc bằng tay."
+            )
+        if self._depth != 0:
+            raise CSharpStructureError(
+                f"Còn {self._depth} khối chưa đóng khi build().")
+        return code
+
+    def __len__(self) -> int:
+        return len(self._lines)
+
+
+def _strip_cs_literals_and_comments(code: str) -> str:
+    """Bỏ chuỗi hằng và chú thích để đếm ngoặc cho đúng."""
+    out: list[str] = []
+    for raw in code.splitlines():
+        line = raw
+        idx = line.find("//")
+        if idx >= 0 and line.count('"', 0, idx) % 2 == 0:
+            line = line[:idx]
+        # bỏ mọi đoạn nằm giữa hai dấu " (kể cả verbatim @"..." với "" bên trong)
+        line = re.sub(r'"(?:[^"]|"")*"', "", line)
+        out.append(line)
+    return "\n".join(out)
+
+
+def _count_braces(code: str) -> tuple[int, int]:
+    """Đếm ``{`` và ``}`` NGOÀI chuỗi hằng và chú thích."""
+    clean = _strip_cs_literals_and_comments(code)
+    return clean.count("{"), clean.count("}")
+
+
+# ---------------------------------------------------------------------------
+# Dấu claim — đọc được NGAY TRONG REVIT
+# ---------------------------------------------------------------------------
+
+def claim_parameters_cs(claim_level: str = "F0_IDEA",
+                        statement: str = DEFAULT_CLAIM_STATEMENT,
+                        *, template_key: str | None = None) -> list[str]:
+    """Các dòng C# dán dấu claim vào family — ``FamilyManager.AddParameter``.
+
+    Vì sao bắt buộc: family tham số hoá trông giống hồ sơ kỹ thuật thật, nên
+    mức claim phải đọc được **ngay trong Revit** (bảng Family Types), không chỉ
+    nằm trong tài liệu của lab.
+
+    ``template_key`` (tuỳ chọn) bật cổng chặn: gọi
+    :func:`~bridge_evolution.revit_family.worlds.require_operation` cho phép
+    ``AddParameter``. RFC-1.1.0 chỉ đo AddParameter trong thế giới SKETCH, nên
+    truyền một template adaptive/mass/2D vào đây sẽ raise ``NotMeasuredError``
+    — đúng như thiết kế, và đó là một câu hỏi mở của Pha 2.
+
+    Nạp overload ``AddParameter(string, ForgeTypeId, ForgeTypeId, bool)``:
+    RFC-1.1.0 §2 ghi AddParameter + Set chạy được nhưng KHÔNG ghi lại overload
+    nào; đây là overload không-deprecated của Revit 2026. Tham số phát ra là
+    tham số TYPE (``isInstance = false``), cùng kiểu với ``DYLIGHT_ChieuCao``
+    đã đo còn nguyên sau khi lưu.
+    """
+    if template_key is not None:
+        require_operation("AddParameter", template_key)
+    if claim_level not in ALLOWED_CLAIM_LEVELS:
+        raise ClaimCeilingError(
+            f"Mức claim '{claim_level}' KHÔNG được phát.\n"
+            f"  Trần claim của BRD-036 là IDEA; mức hợp lệ duy nhất: "
+            f"{', '.join(sorted(ALLOWED_CLAIM_LEVELS))}.\n"
+            f"  Family đẹp và tham số hoá KHÔNG nâng mức claim. Muốn nâng thì "
+            f"sửa hợp đồng nhiệm vụ, không sửa bộ sinh mã."
+        )
+    if not statement or not statement.strip():
+        raise CSharpEmitError(
+            "Câu claim rỗng. Dấu claim phải NÓI ĐƯỢC nó là gì, không chỉ là "
+            "một mã ngắn."
+        )
+    level_lit = cs_string(claim_level)
+    stmt_lit = cs_string(statement)
+    return [
+        "// --- DAU CLAIM: doc duoc NGAY TRONG REVIT, khong chi trong tai lieu ---",
+        "// Family tham so hoa trong giong ho so ky thuat that hon DirectShape,",
+        "// nen rui ro doc nham CAO HON. Muc claim di kem chinh file .rfa.",
+        "FamilyManager fm = fd.FamilyManager;",
+        f"FamilyParameter pClaimLevel = fm.AddParameter({cs_string(CLAIM_LEVEL_PARAM)},",
+        "    GroupTypeId.IdentityData, SpecTypeId.String.Text, false);",
+        f"fm.Set(pClaimLevel, {level_lit});",
+        f"FamilyParameter pClaimStatement = fm.AddParameter({cs_string(CLAIM_STATEMENT_PARAM)},",
+        "    GroupTypeId.IdentityData, SpecTypeId.String.Text, false);",
+        f"fm.Set(pClaimStatement, {stmt_lit});",
+    ]
+
+
+# ---------------------------------------------------------------------------
+# Khuôn family — bản ĐÃ KIỂM CHỨNG
+# ---------------------------------------------------------------------------
+
+def family_scaffold(template_path_str: str, out_rfa: str,
+                    body_lines: Iterable[str],
+                    tx_name: str = "DYLIGHT family F0 IDEA",
+                    *,
+                    pre_regen_lines: Iterable[str] | None = None) -> str:
+    """Khuôn C# đầy đủ: mở family document -> dựng -> Regenerate -> SaveAs.
+
+    Thứ tự phát ra (mỗi bước là một điều ĐÃ ĐO, không phải một lựa chọn thẩm mỹ):
+
+    1. ``var app = document.Application;`` — **đọc** host, không sửa.
+    2. ``Document fd = app.NewFamilyDocument(tplPath);``
+    3. ``using (Transaction tx = new Transaction(fd, ...))`` — transaction trên
+       **family document**, không bao giờ trên ``document``.
+    4. ``pre_regen_lines`` (nếu có) -> ``fd.Regenerate();`` GIỮA transaction;
+    5. thân mã do người gọi truyền vào;
+    6. ``fd.Regenerate();`` **TRONG** transaction — đặt sau ``Commit()`` thì
+       Revit ném ``InvalidOperationException`` (đã đo);
+    7. ``tx.Commit();`` rồi mới ``SaveAs`` + ``Close(false)``;
+    8. ``catch`` thì đóng family document và trả chuỗi lỗi có tên kiểu ngoại lệ.
+
+    ``pre_regen_lines`` — VÌ SAO CÓ BƯỚC 4
+    --------------------------------------
+    RFC-1.1.0 §3 **[A3]**: hệ toạ độ của ``ReferencePoint`` **chỉ đúng SAU**
+    ``Regenerate()``; đọc ``GetCoordinateSystem()`` trước đó trả về **ma trận
+    đơn vị** — sai kiểu IM LẶNG (profile đặt lệch mà không có ngoại lệ nào).
+    Vì :data:`BODY_FORBIDDEN_PATTERNS` cấm thân mã tự phát ``fd.Regenerate(``,
+    khuôn phải cho một điểm Regenerate GIỮA CHỪNG **có kiểm soát**: dựng điểm
+    và đường ở ``pre_regen_lines``, đọc hệ toạ độ ở ``body_lines``.
+
+    :func:`_self_check_scaffold` khẳng định điều đó **trên chính chuỗi vừa
+    sinh**: mọi ``GetCoordinateSystem`` phải đứng SAU một ``fd.Regenerate();``.
+
+    Hàm này là **hạ tầng**, nó KHÔNG gác thế giới — nó chỉ nhận một đường dẫn
+    ``.rft``. Muốn có cổng chặn thì gọi :func:`guarded_family_scaffold`. Nhưng
+    nó **có** gác dấu claim: chuỗi sinh ra mà không mang
+    :data:`CLAIM_LEVEL_PARAM` thì raise, vì hàm này là hàm DUY NHẤT trong gói
+    phát ``fd.SaveAs(...)`` — một ``.rfa`` không dấu claim ra khỏi đây là hỏng
+    đúng cái điều khoản 4 của hợp đồng nhiệm vụ.
+
+    Args:
+        template_path_str: đường dẫn tuyệt đối tới ``.rft``.
+        out_rfa: đường dẫn tuyệt đối file ``.rfa`` sẽ ghi ra.
+        body_lines: các dòng C# dựng hình, chạy TRONG transaction, SAU
+            ``fd.Regenerate();`` giữa chừng nếu có ``pre_regen_lines``.
+        tx_name: tên transaction (hiện trong undo stack của Revit).
+        pre_regen_lines: các dòng C# chạy TRƯỚC ``Regenerate()`` giữa chừng —
+            chỗ dựng ``ReferencePoint`` / ``CurveByPoints``. ``None`` = không
+            có Regenerate giữa chừng.
+
+    Returns:
+        Chuỗi C# ASCII, sẵn sàng đẩy qua ``send_code_to_revit``.
+    """
+    tpl = _require_path(template_path_str, ".rft", "template")
+    out = _require_path(out_rfa, ".rfa", "file .rfa xuất ra")
+    if not isinstance(tx_name, str) or not tx_name.strip():
+        raise CSharpEmitError("tx_name rỗng — transaction phải có tên đọc được.")
+    _check_ascii(tx_name, "tx_name")
+
+    body = list(body_lines)
+    pre = list(pre_regen_lines) if pre_regen_lines is not None else []
+    if not body and not pre:
+        raise CSharpStructureError(
+            "body_lines rỗng: khuôn này sẽ tạo ra một family TRỐNG rồi lưu nó. "
+            "Một file .rfa rỗng trông y hệt một file .rfa dựng hỏng — không "
+            "phát."
+        )
+    for label, chunk in (("pre_regen_lines", pre), ("body_lines", body)):
+        for line in chunk:
+            if not isinstance(line, str):
+                raise CSharpEmitError(
+                    f"{label} phải toàn str, gặp {type(line).__name__}")
+            _check_forbidden(line, BODY_FORBIDDEN_PATTERNS)
+
+    b = CSharpBuilder()
+    b.line("// " + "=" * 70)
+    b.comment("DYLIGHT BRD-036 - sinh boi bridge_evolution/revit_family/csharp.py")
+    b.comment("MUC CLAIM: F0 IDEA. Family tham so hoa KHONG nang muc claim.")
+    b.line("// " + "-" * 70)
+    b.comment("Template host: Execute(Document document, object[] parameters).")
+    b.comment("Host DA MO SAN transaction tren `document` -> TUYET DOI khong mo")
+    b.comment("Transaction moi tren no (nem InvalidOperationException, da do).")
+    b.comment("Family document `fd` thi mo transaction rieng duoc.")
+    b.comment("Regenerate() PHAI nam TRONG transaction: dat sau Commit() thi Revit")
+    b.comment("nem InvalidOperationException (da do).")
+    b.line("// " + "=" * 70)
+    b.line(f"string tplPath = {cs_string(tpl)};")
+    b.line(f"string outRfa  = {cs_string(out)};")
+    b.blank()
+    with b.block("if (!System.IO.File.Exists(tplPath))"):
+        b.line('return "LOI: khong thay template " + tplPath;')
+    b.blank()
+    b.comment("Chi DOC document cua host de lay Application - khong sua gi tren no.")
+    b.line("var app = document.Application;")
+    b.line("Document fd = app.NewFamilyDocument(tplPath);")
+    with b.block("if (fd == null)"):
+        b.line('return "LOI: NewFamilyDocument tra ve null cho " + tplPath;')
+    b.blank()
+    b.line("long rfaBytes = 0;")
+    with b.block("try"):
+        with b.block(f"using (Transaction tx = new Transaction(fd, {cs_string(tx_name)}))"):
+            b.line("tx.Start();")
+            b.blank()
+            b.comment("--- than ma do nguoi goi truyen vao ---")
+            if pre:
+                b.comment("[A3] GIAI DOAN 1 - dung DIEM va DUONG. Chua duoc doc")
+                b.comment("     he toa do cua diem o day.")
+                b.lines(pre)
+                b.blank()
+                b.comment("[A3] REGENERATE GIUA TRANSACTION. He toa do cua")
+                b.comment("     ReferencePoint CHI DUNG SAU buoc nay; doc")
+                b.comment("     GetCoordinateSystem() truoc do tra ve MA TRAN")
+                b.comment("     DON VI - sai kieu IM LANG, khong ngoai le nao.")
+                b.line("fd.Regenerate();")
+                b.blank()
+                b.comment("[A3] GIAI DOAN 2 - doc he toa do, dung tiet dien/khoi.")
+            b.lines(body)
+            b.comment("--- het than ma ---")
+            b.blank()
+            b.comment("Regenerate TRONG transaction - bat bien da do.")
+            b.line("fd.Regenerate();")
+            b.line("tx.Commit();")
+        b.blank()
+        b.line("SaveAsOptions so = new SaveAsOptions();")
+        b.line("so.OverwriteExistingFile = true;")
+        b.line("fd.SaveAs(outRfa, so);")
+        b.line("fd.Close(false);")
+        b.comment("Doc lai kich thuoc TREN DIA - khong tin gia tri tra ve suong.")
+        b.line("rfaBytes = new System.IO.FileInfo(outRfa).Length;")
+    with b.block("catch (Exception ex)"):
+        b.line("try { fd.Close(false); } catch { }")
+        b.line('return "LOI: " + ex.GetType().Name + ": " + ex.Message;')
+    b.blank()
+    with b.block("if (rfaBytes <= 0)"):
+        b.line('return "LOI: da SaveAs nhung file rong: " + outRfa;')
+    b.line('return "OK: " + outRfa + " (" + rfaBytes + " bytes)";')
+
+    code = b.build()
+    _self_check_scaffold(code)
+    return code
+
+
+def guarded_family_scaffold(template_key: str, out_rfa: str,
+                            operations: Iterable[str],
+                            body_lines: Iterable[str],
+                            tx_name: str = "DYLIGHT family F0 IDEA",
+                            *, claim_level: str = "F0_IDEA",
+                            claim_statement: str = DEFAULT_CLAIM_STATEMENT,
+                            pre_regen_lines: Iterable[str] | None = None) -> str:
+    """:func:`family_scaffold` CÓ CỔNG CHẶN — đường dùng mặc định.
+
+    Người gọi phải khai báo mình dùng những phép nào; mỗi phép đi qua
+    :func:`~bridge_evolution.revit_family.worlds.require_operation` với thế
+    giới của ``template_key`` TRƯỚC khi phát một dòng nào. Xin phép sai thế
+    giới -> ``UnsupportedInWorldError``. Xin phép chưa đo -> ``NotMeasuredError``.
+
+    Dấu claim là **bắt buộc**, nên hàm này cũng gác ``AddParameter``. Hệ quả
+    đã biết: RFC-1.1.0 chưa đo AddParameter trong thế giới ADAPTIVE/MASSING,
+    nên hiện tại hàm này CHỈ dựng được family thế giới SKETCH. Đó là một chặn
+    thật, không phải thiếu sót — muốn mở thì đo AddParameter trên template
+    adaptive rồi cập nhật bảng.
+
+    ``pre_regen_lines`` đi thẳng xuống :func:`family_scaffold` — xem [A3] ở đó.
+    """
+    ops = list(operations)
+    require_operations(ops, template_key)
+    claim_lines = claim_parameters_cs(claim_level, claim_statement,
+                                      template_key=template_key)
+    body = list(body_lines)
+    return family_scaffold(template_path(template_key), out_rfa,
+                           body + [""] + claim_lines, tx_name,
+                           pre_regen_lines=pre_regen_lines)
+
+
+def _require_path(value: str, suffix: str, what: str) -> str:
+    """Đường dẫn Windows hợp lệ cho mã C# verbatim."""
+    if not isinstance(value, str) or not value.strip():
+        raise CSharpEmitError(f"Đường dẫn {what} rỗng.")
+    text = value.strip()
+    if not text.lower().endswith(suffix):
+        raise CSharpEmitError(
+            f"Đường dẫn {what} phải kết thúc bằng '{suffix}', nhận: {text}")
+    if '"' in text:
+        raise CSharpEmitError(
+            f"Đường dẫn {what} chứa dấu nháy kép — không phát vào chuỗi C#.")
+    _check_ascii(text, f"Đường dẫn {what}")
+    return text
+
+
+def _self_check_scaffold(code: str) -> None:
+    """Kiểm bất biến TRÊN CHÍNH chuỗi vừa sinh — không tin docstring."""
+    if re.search(r"new\s+Transaction\s*\(\s*document\b", code):
+        raise ForbiddenCSharpError(
+            "Mã sinh ra mở Transaction trên `document` của host.")
+    if "new Transaction(fd" not in code:
+        raise CSharpStructureError(
+            "Mã sinh ra không mở Transaction trên family document `fd`.")
+
+    i_regen = code.find("fd.Regenerate();")
+    i_commit = code.find("tx.Commit();")
+    i_saveas = code.find("fd.SaveAs(")
+    if i_regen < 0 or i_commit < 0 or i_saveas < 0:
+        raise CSharpStructureError(
+            "Thiếu một trong ba mốc bắt buộc: Regenerate / Commit / SaveAs.")
+    if not (i_regen < i_commit < i_saveas):
+        raise CSharpStructureError(
+            f"Sai thứ tự bắt buộc. Regenerate@{i_regen} phải TRƯỚC "
+            f"Commit@{i_commit}, và Commit phải trước SaveAs@{i_saveas}. "
+            f"Regenerate sau Commit -> InvalidOperationException (đã đo)."
+        )
+    if "fd.Close(false);" not in code:
+        raise CSharpStructureError("Mã sinh ra không đóng family document.")
+
+    # -- dấu claim: hàm này là chỗ DUY NHẤT trong gói phát fd.SaveAs(...) ----
+    if CLAIM_LEVEL_PARAM not in code or "AddParameter(" not in code:
+        raise CSharpStructureError(
+            f"Mã sinh ra ghi ra một .rfa mà KHÔNG mang dấu claim "
+            f"({CLAIM_LEVEL_PARAM} qua FamilyManager.AddParameter).\n"
+            f"  Điều khoản 4 của BRD-036: mọi family sinh ra phải mang mức "
+            f"claim ĐỌC ĐƯỢC TRONG REVIT. Family tham số hoá trông giống hồ sơ "
+            f"kỹ thuật thật hơn DirectShape nên rủi ro đọc nhầm CAO HƠN.\n"
+            f"  Cách đúng: gọi guarded_family_scaffold (nó tự dán dấu claim), "
+            f"hoặc nối claim_parameters_cs(...) vào body_lines.")
+
+    # -- [A3] hệ toạ độ của ReferencePoint chỉ đúng SAU Regenerate ----------
+    # Kiểm trên bản đã BỎ chú thích và chuỗi hằng: các thân mã adaptive NHẮC
+    # tên GetCoordinateSystem trong chú thích cảnh báo, và một lời cảnh báo
+    # không được phép làm thoả mãn một kiểm tra thứ tự thi hành.
+    clean = _strip_cs_literals_and_comments(code)
+    i_first_regen = clean.find("fd.Regenerate();")
+    i_coord = clean.find("GetCoordinateSystem")
+    if i_coord >= 0 and (i_first_regen < 0 or i_coord < i_first_regen):
+        raise CSharpStructureError(
+            f"[A3] Mã sinh ra ĐỌC GetCoordinateSystem@{i_coord} TRƯỚC "
+            f"fd.Regenerate()@{i_first_regen}.\n"
+            f"  RFC-1.1.0 §3 [A3] đo được: trước Regenerate(), "
+            f"ReferencePoint.GetCoordinateSystem() trả về MA TRẬN ĐƠN VỊ. "
+            f"Profile dựng từ Transform đó bị đặt lệch khỏi mặt phẳng tiết "
+            f"diện thật — hỏng IM LẶNG, không ngoại lệ nào báo.\n"
+            f"  Ca spine dọc trục X trùng đúng ma trận đơn vị nên nhìn mã sẽ "
+            f"KHÔNG thấy gì sai; spine chéo mới lộ.\n"
+            f"  Cách đúng: đưa phần dựng ĐIỂM/ĐƯỜNG vào pre_regen_lines của "
+            f"family_scaffold, phần ĐỌC hệ toạ độ vào body_lines.")
+    _check_ascii(code, "Mã C# sinh ra")

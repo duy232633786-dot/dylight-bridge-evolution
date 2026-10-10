@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DYLIGHT Lab Cockpit v2</title>
+  <meta name="description" content="Cockpit thử nghiệm đọc dữ liệu sống từ DYLIGHT Research Lab">
+  <script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <style>
+    html, body { margin: 0; min-height: 100%; background: #070b12; }
+    body { overflow-x: hidden; }
+    [data-lucide] { width: 1em; height: 1em; }
+  </style>
+</head>
+<body>
+<div id="lab-cockpit-v2">
+  <div class="dl-window" aria-label="DYLIGHT Research Lab cockpit proposal">
+    <aside class="dl-rail" aria-label="Điều hướng phòng lab">
+      <div class="dl-brand">
+        <span class="dl-mark" aria-hidden="true">D</span>
+        <span class="dl-brand-copy"><strong>DYLIGHT</strong><small>RESEARCH LAB</small></span>
+      </div>
+      <nav class="dl-nav" aria-label="Khu vực chính">
+        <button type="button" class="dl-nav-item is-active" data-view="overview" aria-pressed="true"><i data-lucide="layout-dashboard" aria-hidden="true"></i><span>Tổng quan</span></button>
+        <button type="button" class="dl-nav-item" data-view="bench" aria-pressed="false"><i data-lucide="drafting-compass" aria-hidden="true"></i><span>Bàn thiết kế</span></button>
+        <button type="button" class="dl-nav-item" data-view="compare" aria-pressed="false"><i data-lucide="git-compare-arrows" aria-hidden="true"></i><span>So sánh run</span></button>
+        <button type="button" class="dl-nav-item" data-view="evidence" aria-pressed="false"><i data-lucide="shield-check" aria-hidden="true"></i><span>Bằng chứng</span></button>
+        <button type="button" class="dl-nav-item" data-view="tasks" aria-pressed="false"><i data-lucide="workflow" aria-hidden="true"></i><span>Task board</span><em id="dl-task-total">—</em></button>
+        <button type="button" class="dl-nav-item" data-view="knowledge" aria-pressed="false"><i data-lucide="library-big" aria-hidden="true"></i><span>Não 2</span></button>
+      </nav>
+      <div class="dl-rail-foot">
+        <div class="dl-runtime"><span class="dl-live-dot" aria-hidden="true"></span><span><strong>LOCAL RUNTIME</strong><small>127.0.0.1:8790</small></span></div>
+        <button type="button" class="dl-icon-action" aria-label="Cài đặt phòng lab"><i data-lucide="settings-2" aria-hidden="true"></i></button>
+      </div>
+    </aside>
+
+    <section class="dl-shell">
+      <header class="dl-topbar">
+        <div class="dl-title-row">
+          <button type="button" class="dl-menu" aria-label="Thu gọn điều hướng"><i data-lucide="panel-left-close" aria-hidden="true"></i></button>
+          <div><small>BRIDGE EVOLUTION /</small><strong data-page-title>Tổng quan</strong></div>
+        </div>
+        <div class="dl-top-actions">
+          <span class="dl-freshness" id="dl-freshness"><i data-lucide="radio" aria-hidden="true"></i> Đang kết nối dữ liệu sống…</span>
+          <button type="button" class="dl-command-open"><i data-lucide="search" aria-hidden="true"></i><span>Lệnh nhanh</span><kbd>Ctrl K</kbd></button>
+          <button type="button" class="dl-sync"><i data-lucide="refresh-cw" aria-hidden="true"></i><span>Làm mới</span></button>
+        </div>
+      </header>
+
+      <div class="dl-health" aria-label="Trạng thái năng lực hiện tại">
+        <div><span>TRẦN CLAIM</span><strong class="dl-cyan" id="dl-claim">SCREENED</strong></div>
+        <div><span>PHYSICS</span><strong>L0 + L1</strong></div>
+        <div><span>SOLVER</span><strong>BUILTIN_L1</strong></div>
+        <div><span>G0 SITE DATA</span><strong class="dl-amber">CHƯA ĐỦ</strong></div>
+        <div class="dl-health-note"><i data-lucide="shield-alert" aria-hidden="true"></i><span>Không có L2/L3, thử nghiệm lab hoặc field evidence.</span></div>
+      </div>
+
+      <main class="dl-content">
+        <section class="dl-view is-visible" data-panel="overview" aria-label="Tổng quan phòng lab">
+          <div class="dl-heading">
+            <div><p class="dl-eyebrow">CONTROL ROOM</p><h1>Phòng lab đang biết gì, thiếu gì, làm gì tiếp?</h1></div>
+            <div class="dl-heading-actions"><button type="button" class="dl-secondary" data-jump="evidence"><i data-lucide="scan-search" aria-hidden="true"></i>Kiểm tra gates</button><button type="button" class="dl-primary" data-jump="bench"><i data-lucide="play" aria-hidden="true"></i>Mở bàn thiết kế</button></div>
+          </div>
+
+          <div class="dl-kpis" aria-label="Chỉ số task hiện tại">
+            <article><span>ACCEPTED</span><strong data-live-kpi="ACCEPTED">—</strong><small>Task đã qua review độc lập</small><i data-lucide="circle-check-big" aria-hidden="true"></i></article>
+            <article><span>ACTIVE</span><strong data-live-kpi="ACTIVE">—</strong><small>Task đang có owner thực thi</small><i data-lucide="activity" aria-hidden="true"></i></article>
+            <article><span>READY</span><strong data-live-kpi="READY">—</strong><small>Sẵn sàng sau dependency</small><i data-lucide="list-start" aria-hidden="true"></i></article>
+            <article><span>BLOCKED</span><strong data-live-kpi="BLOCKED">—</strong><small>Cần người hoặc bằng chứng ngoài</small><i data-lucide="octagon-pause" aria-hidden="true"></i></article>
+          </div>
+
+          <div class="dl-overview-grid">
+            <section class="dl-surface dl-priority">
+              <div class="dl-section-title"><div><p class="dl-eyebrow">NEXT BEST ACTION</p><h2>Việc cần xử lý</h2></div><span>3 mục</span></div>
+              <button type="button" class="dl-action-row" data-jump="tasks">
+                <b>01</b><span><strong>Đóng 6 finding của BRD-050</strong><small>Design loop · owner Claude · đang ACTIVE</small></span><em class="dl-sev-high">BLOCKER</em><i data-lucide="chevron-right" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="dl-action-row" data-jump="tasks">
+                <b>02</b><span><strong>Giải phóng BRD-051 để nâng giao diện</strong><small>Chờ BRD-050 được ACCEPTED</small></span><em class="dl-sev-wait">WAITING</em><i data-lucide="chevron-right" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="dl-action-row" data-jump="evidence">
+                <b>03</b><span><strong>Nạp thử PSC MCT trên Civil 2022</strong><small>Cú pháp hiện vẫn SYNTAX_UNVERIFIED</small></span><em class="dl-sev-human">HUMAN GATE</em><i data-lucide="chevron-right" aria-hidden="true"></i>
+              </button>
+            </section>
+
+            <section class="dl-surface dl-capability">
+              <div class="dl-section-title"><div><p class="dl-eyebrow">CAPABILITY ENVELOPE</p><h2>Năng lực thực tế</h2></div><button type="button" class="dl-quiet" data-jump="evidence">Chi tiết</button></div>
+              <div class="dl-ladder" aria-label="Thang năng lực">
+                <div class="is-on"><span>L0</span><b>Hình học & chế tạo</b><em>Production</em></div>
+                <div class="is-on"><span>L1</span><b>Line-girder screening</b><em>Available</em></div>
+                <div><span>L2</span><b>Grillage / frame</b><em>Not implemented</em></div>
+                <div><span>L3</span><b>3D nonlinear</b><em>Not implemented</em></div>
+                <div><span>G5+</span><b>Lab / pilot / release</b><em>Human evidence</em></div>
+              </div>
+            </section>
+
+            <section class="dl-surface dl-evidence-feed">
+              <div class="dl-section-title"><div><p class="dl-eyebrow">EVIDENCE STREAM</p><h2>Dòng bằng chứng</h2></div><span class="dl-live"><span></span>LIVE</span></div>
+              <ol id="dl-evidence-stream">
+                <li><i data-lucide="badge-check" aria-hidden="true"></i><span><strong>BRD-052 · review r006</strong><small>10/10 artifact hash · 48/48 target tests · claim IDEA</small></span><time>mới</time></li>
+                <li><i data-lucide="file-warning" aria-hidden="true"></i><span><strong>PSC MCT giữ fail-safe label</strong><small>Official header provenance · chưa import Civil 2022</small></span><time>mới</time></li>
+                <li><i data-lucide="triangle-alert" aria-hidden="true"></i><span><strong>BRD-050 · review r001</strong><small>G1 FAIL · G2 FAIL · 6 finding cần sửa</small></span><time>1 ngày</time></li>
+              </ol>
+            </section>
+
+            <section class="dl-surface dl-quick">
+              <div class="dl-section-title"><div><p class="dl-eyebrow">TOOLS</p><h2>Thao tác nhanh</h2></div></div>
+              <div class="dl-tool-grid">
+                <button type="button" data-jump="compare"><i data-lucide="columns-3" aria-hidden="true"></i><span><strong>So sánh 2 run</strong><small>Cost · mass · carbon · D/C</small></span></button>
+                <button type="button" data-jump="evidence"><i data-lucide="package-check" aria-hidden="true"></i><span><strong>Evidence packet</strong><small>Artifact · SHA · gates · risks</small></span></button>
+                <button type="button" data-jump="knowledge"><i data-lucide="book-open-check" aria-hidden="true"></i><span><strong>Tìm trong Não 2</strong><small>Link + metadata + clause</small></span></button>
+                <button type="button" data-jump="bench"><i data-lucide="box" aria-hidden="true"></i><span><strong>Mặt cắt MIDAS</strong><small>PSC 1CELL / 2CELL · IDEA</small></span></button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="dl-view" data-panel="bench" aria-label="Bàn thiết kế">
+          <div class="dl-heading"><div><p class="dl-eyebrow">DESIGN BENCH</p><h1>Một nơi để sinh, kiểm và bàn giao phương án</h1></div><button type="button" class="dl-primary" data-run-design-loop><i data-lucide="play" aria-hidden="true"></i>Chạy design loop</button></div>
+          <div class="dl-module-grid">
+            <article class="dl-module is-ready"><div><i data-lucide="route" aria-hidden="true"></i><span>SCREENED</span></div><h2>Super-T · L1</h2><p>Grammar → L0 → line-girder verifier → component audit.</p><footer><strong>Đang khóa bởi BRD-050</strong><button type="button">Mở module</button></footer></article>
+            <article class="dl-module is-idea"><div><i data-lucide="landmark" aria-hidden="true"></i><span>IDEA</span></div><h2>PSC / MIDAS</h2><p>1CELL, 2CELL, section properties, FCM family và các khối xuất.</p><footer><strong>MCT chưa nạp Civil 2022</strong><button type="button">Mở module</button></footer></article>
+            <article class="dl-module is-idea"><div><i data-lucide="orbit" aria-hidden="true"></i><span>EXPERIMENTAL</span></div><h2>Arch MAP-Elites</h2><p>Khám phá hình thái, giữ novelty và boundary của solver.</p><footer><strong>Không phải thiết kế phát hành</strong><button type="button">Mở studio</button></footer></article>
+          </div>
+          <section class="dl-surface dl-run-strip"><div><p class="dl-eyebrow">RUN CONFIGURATION</p><h2>Chạy có ngân sách và provenance</h2></div><label>Grammar<select id="dl-run-grammar"><option value="super_t_simple_v1">super_t_simple_v1</option><option value="super_t_parametric_v2">super_t_parametric_v2</option></select></label><label>Solver budget<input id="dl-run-budget" type="number" value="20" min="0" max="400"></label><label>Utilization ceiling<input id="dl-run-target" type="number" value="0.90" min="0.1" max="1" step="0.01"></label><button type="button" class="dl-primary" data-run-design-loop>Tạo run mới</button></section>
+          <output class="dl-surface dl-live-output" id="dl-run-output" aria-live="polite">Chọn grammar, ngân sách và mục tiêu D/C rồi tạo run. Mọi phép tính đi qua API cục bộ.</output>
+        </section>
+
+        <section class="dl-view" data-panel="compare" aria-label="So sánh run">
+          <div class="dl-heading"><div><p class="dl-eyebrow">RUN COMPARATOR</p><h1>So sánh đúng cùng fidelity và solver budget</h1></div><span class="dl-guard"><i data-lucide="lock-keyhole" aria-hidden="true"></i>Guarded comparison</span></div>
+          <section class="dl-compare-picker">
+            <label>Run A<select id="dl-run-a"><option value="a">Run gần nhất · REPAIR</option><option value="b">Baseline · seed</option></select></label><span>VS</span><label>Run B<select id="dl-run-b"><option value="b">Baseline · seed</option><option value="a">Run gần nhất · REPAIR</option></select></label><button type="button" class="dl-secondary" id="dl-swap"><i data-lucide="arrow-left-right" aria-hidden="true"></i>Đổi bên</button>
+          </section>
+          <div class="dl-compare-empty" id="dl-compare-output" aria-live="polite"><i data-lucide="git-compare-arrows" aria-hidden="true"></i><h2>Sẵn sàng so sánh</h2><p>Hệ thống chỉ mở chênh lệch khi hai run cùng grammar, fidelity, solver budget và basis hash.</p><div><span><i data-lucide="check" aria-hidden="true"></i>Inputs</span><span><i data-lucide="check" aria-hidden="true"></i>Cost / mass / carbon</span><span><i data-lucide="check" aria-hidden="true"></i>D/C theo rule</span><span><i data-lucide="check" aria-hidden="true"></i>Lineage</span></div><button type="button" class="dl-primary" id="dl-compare">Kiểm điều kiện so sánh</button></div>
+        </section>
+
+        <section class="dl-view" data-panel="evidence" aria-label="Bằng chứng và cổng">
+          <div class="dl-heading"><div><p class="dl-eyebrow">TRUST CENTER</p><h1>Gates, capability và giới hạn claim</h1></div><button type="button" class="dl-secondary"><i data-lucide="download" aria-hidden="true"></i>Xuất evidence packet</button></div>
+          <div class="dl-gates" id="dl-gates">
+            <article class="is-pass"><header><span>G0</span><strong>Data & provenance</strong><em>PARTIAL</em></header><p>Canonical JSON và hash có; site, exposure, survey và load basis còn thiếu.</p><footer>Claim ceiling: SCREENED</footer></article>
+            <article class="is-pass"><header><span>G1</span><strong>Geometry & constructability</strong><em>AVAILABLE</em></header><p>L0 verifier cho các family đã đăng ký. Family ngoài allowlist phải fail closed.</p><footer>Không thay kiểm tra kỹ sư</footer></article>
+            <article class="is-pass"><header><span>G2</span><strong>Model quality</strong><em>L1 ONLY</em></header><p>Budget, lineage và solver evidence cần tái lập; BRD-050 còn finding mở.</p><footer>Không có L2/L3 backend</footer></article>
+            <article><header><span>G5</span><strong>Physical lab</strong><em>NOT CONNECTED</em></header><p>Chưa có raw data, thiết bị, calibration metadata hay acceptance record.</p><footer>Human gate</footer></article>
+            <article><header><span>G6–G7</span><strong>Pilot & release</strong><em>BLOCKED</em></header><p>Không tự động hóa phát hành kỹ thuật hoặc xác nhận công trình thật.</p><footer>Responsible engineer required</footer></article>
+          </div>
+        </section>
+
+        <section class="dl-view" data-panel="tasks" aria-label="Task board">
+          <div class="dl-heading"><div><p class="dl-eyebrow">MARP BOARD</p><h1>Task, owner và dependency nhìn trong một màn hình</h1></div><div class="dl-board-filter"><button type="button" class="is-on">Ưu tiên</button><button type="button">Tất cả</button></div></div>
+          <div class="dl-board" id="dl-task-board">
+            <section><header><span>ACTIVE</span><b>11</b></header><article><strong>BRD-050</strong><p>Vòng lặp thiết kế cấu kiện</p><small>Owner · Claude</small><em>6 findings</em></article><article><strong>BRD-044</strong><p>OpenSees evidence boundary</p><small>Owner · agent</small></article></section>
+            <section><header><span>READY</span><b>42</b></header><article class="is-blocked"><strong>BRD-051</strong><p>Lab UI + design studio</p><small>Depends · BRD-050</small><em>WAITING</em></article><article><strong>BRD-016</strong><p>Obsidian contamination repair</p><small>No dependency</small></article></section>
+            <section><header><span>REVIEW</span><b>0</b></header><div class="dl-column-empty">Không có handoff chờ review</div></section>
+            <section><header><span>ACCEPTED</span><b>44</b></header><article class="is-accepted"><strong>BRD-052</strong><p>MIDAS PSC section bridge</p><small>Reviewer · Codex</small><em>IDEA</em></article></section>
+          </div>
+        </section>
+
+        <section class="dl-view" data-panel="knowledge" aria-label="Não 2">
+          <div class="dl-heading"><div><p class="dl-eyebrow">KNOWLEDGE SYSTEM</p><h1>Nguồn, clause và bằng chứng nằm cùng quyết định</h1></div><label class="dl-search"><i data-lucide="search" aria-hidden="true"></i><input type="search" placeholder="Tìm source, clause_id, task…"></label></div>
+          <div class="dl-knowledge-grid" id="dl-knowledge-grid">
+            <section class="dl-surface"><div class="dl-section-title"><div><p class="dl-eyebrow">CANONICAL</p><h2>Nguồn đang dùng</h2></div><span>JSON truth</span></div><ul><li><i data-lucide="file-json" aria-hidden="true"></i><span><strong>Design basis</strong><small>Hash-pinned, machine readable</small></span></li><li><i data-lucide="scroll-text" aria-hidden="true"></i><span><strong>Acceptance criteria</strong><small>Gắn task và review</small></span></li><li><i data-lucide="database" aria-hidden="true"></i><span><strong>Run evidence</strong><small>Raw results + lineage</small></span></li></ul></section>
+            <section class="dl-surface"><div class="dl-section-title"><div><p class="dl-eyebrow">LIBRARY</p><h2>Recent sources</h2></div><button type="button" class="dl-quiet">Mở thư viện</button></div><ul><li><i data-lucide="book-marked" aria-hidden="true"></i><span><strong>MIDAS PSC Section Properties</strong><small>Link + metadata · official manual</small></span></li><li><i data-lucide="book-marked" aria-hidden="true"></i><span><strong>FCM General tutorial</strong><small>Geometry convention reference</small></span></li><li><i data-lucide="circle-dashed" aria-hidden="true"></i><span><strong>Site design basis</strong><small>UNVERIFIED · dữ liệu còn thiếu</small></span></li></ul></section>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <div class="dl-palette" hidden>
+      <button type="button" class="dl-palette-backdrop" aria-label="Đóng lệnh nhanh"></button>
+      <section role="dialog" aria-modal="true" aria-label="Lệnh nhanh">
+        <label><i data-lucide="search" aria-hidden="true"></i><input type="search" placeholder="Đi tới, chạy, tìm bằng chứng…" aria-label="Tìm lệnh"></label>
+        <small>ĐI TỚI</small>
+        <button type="button" data-command-view="bench"><i data-lucide="drafting-compass" aria-hidden="true"></i><span><strong>Mở bàn thiết kế</strong><em>Design bench</em></span><kbd>B</kbd></button>
+        <button type="button" data-command-view="compare"><i data-lucide="git-compare-arrows" aria-hidden="true"></i><span><strong>So sánh hai run</strong><em>Run comparator</em></span><kbd>C</kbd></button>
+        <button type="button" data-command-view="evidence"><i data-lucide="shield-check" aria-hidden="true"></i><span><strong>Kiểm tra gates</strong><em>Evidence center</em></span><kbd>E</kbd></button>
+        <button type="button" data-command-view="tasks"><i data-lucide="workflow" aria-hidden="true"></i><span><strong>Mở task board</strong><em>MARP lifecycle</em></span><kbd>T</kbd></button>
+      </section>
+    </div>
+    <div class="dl-toast" role="status" aria-live="polite" hidden></div>
+  </div>
+
+  <style>
+    #lab-cockpit-v2 {
+      color-scheme: light dark;
+      --dl-accent: #18b7d8;
+      --dl-accent-soft: color-mix(in srgb, var(--dl-accent) 13%, transparent);
+      --dl-bg: light-dark(#edf2f7, #070b12);
+      --dl-panel: light-dark(#ffffff, #101722);
+      --dl-panel-2: light-dark(#f7f9fc, #131c28);
+      --dl-ink: light-dark(#13202f, #eef5fb);
+      --dl-muted: light-dark(#687789, #92a3b5);
+      --dl-line: light-dark(#dbe3eb, #233141);
+      --dl-rail: light-dark(#101b27, #090e15);
+      --dl-rail-ink: #eaf4fb;
+      --dl-amber: light-dark(#9a6200, #ffbd4a);
+      --dl-red: light-dark(#b43b3b, #ff6f6f);
+      --dl-green: light-dark(#14795d, #42d2a2);
+      --dl-radius: 14px;
+      color: var(--dl-ink);
+      font-family: Inter, "IBM Plex Sans", "Segoe UI", sans-serif;
+      background: transparent;
+      width: 100%;
+    }
+    #lab-cockpit-v2 * { box-sizing: border-box; }
+    #lab-cockpit-v2 button, #lab-cockpit-v2 input, #lab-cockpit-v2 select { font: inherit; }
+    #lab-cockpit-v2 button { color: inherit; }
+    #lab-cockpit-v2 .dl-window { position: relative; display: grid; grid-template-columns: 230px minmax(0, 1fr); min-height: 760px; overflow: hidden; background: var(--dl-bg); border: 1px solid var(--dl-line); border-radius: var(--dl-radius); box-shadow: 0 24px 70px light-dark(rgba(19,32,47,.16), rgba(0,0,0,.42)); }
+    #lab-cockpit-v2 .dl-rail { display: flex; flex-direction: column; min-width: 0; padding: 20px 14px 14px; background: var(--dl-rail); color: var(--dl-rail-ink); }
+    #lab-cockpit-v2 .dl-brand { display: flex; align-items: center; gap: 11px; padding: 2px 8px 24px; }
+    #lab-cockpit-v2 .dl-mark { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--dl-accent) 60%, transparent); border-radius: 9px; color: var(--dl-accent); font-weight: 700; background: color-mix(in srgb, var(--dl-accent) 12%, transparent); }
+    #lab-cockpit-v2 .dl-brand-copy { display: flex; flex-direction: column; letter-spacing: .08em; white-space: nowrap; }
+    #lab-cockpit-v2 .dl-brand-copy strong { font-size: 13px; }
+    #lab-cockpit-v2 .dl-brand-copy small { margin-top: 2px; color: #8292a3; font-size: 9px; letter-spacing: .18em; }
+    #lab-cockpit-v2 .dl-nav { display: grid; gap: 5px; }
+    #lab-cockpit-v2 .dl-nav-item { display: grid; grid-template-columns: 20px minmax(0,1fr) auto; align-items: center; gap: 10px; min-height: 42px; padding: 0 11px; border: 0; border-radius: 9px; background: transparent; color: #96a5b4; text-align: left; cursor: pointer; }
+    #lab-cockpit-v2 .dl-nav-item:hover { color: #edf7fd; background: rgba(255,255,255,.055); }
+    #lab-cockpit-v2 .dl-nav-item.is-active { color: #f4fbff; background: color-mix(in srgb, var(--dl-accent) 16%, transparent); box-shadow: inset 2px 0 var(--dl-accent); }
+    #lab-cockpit-v2 .dl-nav-item svg { width: 17px; height: 17px; }
+    #lab-cockpit-v2 .dl-nav-item span { white-space: nowrap; }
+    #lab-cockpit-v2 .dl-nav-item em { min-width: 24px; padding: 2px 7px; border-radius: 999px; color: #9eabb8; background: rgba(255,255,255,.07); font-size: 11px; font-style: normal; text-align: center; }
+    #lab-cockpit-v2 .dl-rail-foot { display: flex; align-items: center; gap: 8px; margin-top: auto; padding: 14px 7px 0; border-top: 1px solid rgba(255,255,255,.08); }
+    #lab-cockpit-v2 .dl-runtime { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    #lab-cockpit-v2 .dl-runtime > span:last-child { display: flex; min-width: 0; flex-direction: column; }
+    #lab-cockpit-v2 .dl-runtime strong { color: #dce7ef; font-size: 9px; letter-spacing: .08em; }
+    #lab-cockpit-v2 .dl-runtime small { overflow: hidden; margin-top: 2px; color: #718090; font-size: 9px; text-overflow: ellipsis; }
+    #lab-cockpit-v2 .dl-live-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--dl-green); box-shadow: 0 0 0 4px color-mix(in srgb, var(--dl-green) 14%, transparent); }
+    #lab-cockpit-v2 .dl-icon-action { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 8px; background: transparent; color: #8393a3; cursor: pointer; }
+    #lab-cockpit-v2 .dl-icon-action:hover { background: rgba(255,255,255,.06); color: #fff; }
+    #lab-cockpit-v2 .dl-icon-action svg { width: 16px; }
+    #lab-cockpit-v2 .dl-shell { min-width: 0; }
+    #lab-cockpit-v2 .dl-topbar { display: flex; align-items: center; justify-content: space-between; min-height: 62px; padding: 0 24px; border-bottom: 1px solid var(--dl-line); background: color-mix(in srgb, var(--dl-panel) 93%, transparent); }
+    #lab-cockpit-v2 .dl-title-row, #lab-cockpit-v2 .dl-top-actions { display: flex; align-items: center; gap: 12px; }
+    #lab-cockpit-v2 .dl-title-row > div { display: flex; align-items: baseline; gap: 7px; }
+    #lab-cockpit-v2 .dl-title-row small { color: var(--dl-muted); font-size: 10px; letter-spacing: .06em; }
+    #lab-cockpit-v2 .dl-title-row strong { font-size: 13px; }
+    #lab-cockpit-v2 .dl-menu { display: none; place-items: center; width: 36px; height: 36px; border: 1px solid var(--dl-line); border-radius: 8px; background: var(--dl-panel); cursor: pointer; }
+    #lab-cockpit-v2 .dl-menu svg { width: 16px; }
+    #lab-cockpit-v2 .dl-freshness { display: inline-flex; align-items: center; gap: 6px; color: var(--dl-green); font-size: 11px; }
+    #lab-cockpit-v2 .dl-freshness svg { width: 13px; }
+    #lab-cockpit-v2 .dl-command-open, #lab-cockpit-v2 .dl-sync, #lab-cockpit-v2 .dl-secondary, #lab-cockpit-v2 .dl-primary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 12px; border: 1px solid var(--dl-line); border-radius: 8px; background: var(--dl-panel); cursor: pointer; white-space: nowrap; }
+    #lab-cockpit-v2 .dl-command-open:hover, #lab-cockpit-v2 .dl-sync:hover, #lab-cockpit-v2 .dl-secondary:hover { border-color: color-mix(in srgb, var(--dl-accent) 48%, var(--dl-line)); }
+    #lab-cockpit-v2 .dl-primary { border-color: var(--dl-accent); background: var(--dl-accent); color: #061015; font-weight: 600; }
+    #lab-cockpit-v2 .dl-primary:hover { filter: brightness(1.06); }
+    #lab-cockpit-v2 .dl-command-open svg, #lab-cockpit-v2 .dl-sync svg, #lab-cockpit-v2 .dl-secondary svg, #lab-cockpit-v2 .dl-primary svg { width: 15px; }
+    #lab-cockpit-v2 kbd { padding: 2px 5px; border: 1px solid var(--dl-line); border-radius: 4px; color: var(--dl-muted); background: var(--dl-panel-2); font: 10px/1.3 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-health { display: grid; grid-template-columns: repeat(4, max-content) minmax(220px, 1fr); align-items: center; gap: 0; min-height: 48px; padding: 0 24px; border-bottom: 1px solid var(--dl-line); background: var(--dl-panel-2); }
+    #lab-cockpit-v2 .dl-health > div { display: flex; align-items: baseline; gap: 8px; padding: 0 17px; border-right: 1px solid var(--dl-line); }
+    #lab-cockpit-v2 .dl-health > div:first-child { padding-left: 0; }
+    #lab-cockpit-v2 .dl-health span { color: var(--dl-muted); font-size: 9px; letter-spacing: .06em; }
+    #lab-cockpit-v2 .dl-health strong { font: 600 10px/1.2 ui-monospace, monospace; letter-spacing: .03em; }
+    #lab-cockpit-v2 .dl-cyan { color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-amber { color: var(--dl-amber); }
+    #lab-cockpit-v2 .dl-health .dl-health-note { justify-content: flex-end; gap: 7px; padding-right: 0; border: 0; }
+    #lab-cockpit-v2 .dl-health-note svg { width: 14px; color: var(--dl-amber); }
+    #lab-cockpit-v2 .dl-content { padding: 26px; }
+    #lab-cockpit-v2 .dl-view { display: none; }
+    #lab-cockpit-v2 .dl-view.is-visible { display: block; }
+    #lab-cockpit-v2 .dl-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+    #lab-cockpit-v2 .dl-heading h1 { max-width: 720px; margin: 3px 0 0; font-size: clamp(21px, 2.5vw, 30px); line-height: 1.2; letter-spacing: -.035em; }
+    #lab-cockpit-v2 .dl-heading-actions { display: flex; gap: 8px; }
+    #lab-cockpit-v2 .dl-eyebrow { margin: 0; color: var(--dl-accent); font-size: 9px; font-weight: 700; letter-spacing: .14em; }
+    #lab-cockpit-v2 .dl-kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 12px; }
+    #lab-cockpit-v2 .dl-kpis article { position: relative; min-width: 0; padding: 16px 17px; border: 1px solid var(--dl-line); border-radius: var(--dl-radius); background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-kpis article > span { color: var(--dl-muted); font-size: 9px; font-weight: 700; letter-spacing: .1em; }
+    #lab-cockpit-v2 .dl-kpis article > strong { display: block; margin-top: 7px; font: 600 26px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-kpis article > small { display: block; overflow: hidden; margin-top: 8px; color: var(--dl-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    #lab-cockpit-v2 .dl-kpis article > svg { position: absolute; top: 16px; right: 16px; width: 17px; color: var(--dl-accent); opacity: .75; }
+    #lab-cockpit-v2 .dl-overview-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(290px, .8fr); gap: 12px; }
+    #lab-cockpit-v2 .dl-surface { min-width: 0; padding: 18px; border: 1px solid var(--dl-line); border-radius: var(--dl-radius); background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-section-title { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
+    #lab-cockpit-v2 .dl-section-title h2 { margin: 3px 0 0; font-size: 15px; }
+    #lab-cockpit-v2 .dl-section-title > span { padding: 4px 8px; border-radius: 999px; color: var(--dl-muted); background: var(--dl-panel-2); font-size: 9px; }
+    #lab-cockpit-v2 .dl-action-row { display: grid; grid-template-columns: 28px minmax(0,1fr) auto 16px; align-items: center; gap: 11px; width: 100%; min-height: 61px; padding: 8px 3px; border: 0; border-top: 1px solid var(--dl-line); background: transparent; text-align: left; cursor: pointer; }
+    #lab-cockpit-v2 .dl-action-row:hover { background: var(--dl-accent-soft); }
+    #lab-cockpit-v2 .dl-action-row b { color: var(--dl-muted); font: 500 10px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-action-row > span { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+    #lab-cockpit-v2 .dl-action-row strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    #lab-cockpit-v2 .dl-action-row small { color: var(--dl-muted); font-size: 10px; }
+    #lab-cockpit-v2 .dl-action-row em { padding: 4px 7px; border-radius: 5px; font: 600 8px/1 ui-monospace, monospace; font-style: normal; letter-spacing: .06em; }
+    #lab-cockpit-v2 .dl-sev-high { color: var(--dl-red); background: color-mix(in srgb, var(--dl-red) 11%, transparent); }
+    #lab-cockpit-v2 .dl-sev-wait { color: var(--dl-amber); background: color-mix(in srgb, var(--dl-amber) 11%, transparent); }
+    #lab-cockpit-v2 .dl-sev-human { color: var(--dl-accent); background: var(--dl-accent-soft); }
+    #lab-cockpit-v2 .dl-action-row > svg { width: 14px; color: var(--dl-muted); }
+    #lab-cockpit-v2 .dl-quiet { padding: 0; border: 0; background: transparent; color: var(--dl-accent); font-size: 10px; cursor: pointer; }
+    #lab-cockpit-v2 .dl-ladder { display: grid; gap: 0; }
+    #lab-cockpit-v2 .dl-ladder > div { position: relative; display: grid; grid-template-columns: 35px minmax(0,1fr) auto; align-items: center; min-height: 43px; padding-left: 18px; border-left: 1px solid var(--dl-line); }
+    #lab-cockpit-v2 .dl-ladder > div::before { position: absolute; left: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dl-line); content: ""; }
+    #lab-cockpit-v2 .dl-ladder > div.is-on::before { background: var(--dl-accent); box-shadow: 0 0 0 4px var(--dl-accent-soft); }
+    #lab-cockpit-v2 .dl-ladder span { color: var(--dl-muted); font: 600 10px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-ladder b { font-size: 11px; }
+    #lab-cockpit-v2 .dl-ladder em { color: var(--dl-muted); font-size: 9px; font-style: normal; }
+    #lab-cockpit-v2 .dl-evidence-feed ol { margin: 0; padding: 0; list-style: none; }
+    #lab-cockpit-v2 .dl-evidence-feed li { display: grid; grid-template-columns: 28px minmax(0,1fr) auto; align-items: center; gap: 10px; min-height: 58px; border-top: 1px solid var(--dl-line); }
+    #lab-cockpit-v2 .dl-evidence-feed li > svg { width: 16px; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-evidence-feed li > span { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+    #lab-cockpit-v2 .dl-evidence-feed strong { font-size: 11px; }
+    #lab-cockpit-v2 .dl-evidence-feed small, #lab-cockpit-v2 .dl-evidence-feed time { color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 .dl-evidence-feed small { display: -webkit-box; overflow: hidden; line-height: 1.4; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    #lab-cockpit-v2 .dl-live { display: flex; align-items: center; gap: 5px; color: var(--dl-green) !important; background: transparent !important; }
+    #lab-cockpit-v2 .dl-live span { width: 6px; height: 6px; border-radius: 50%; background: var(--dl-green); }
+    #lab-cockpit-v2 .dl-tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #lab-cockpit-v2 .dl-tool-grid button { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 10px; border: 1px solid var(--dl-line); border-radius: 9px; background: var(--dl-panel-2); text-align: left; cursor: pointer; }
+    #lab-cockpit-v2 .dl-tool-grid button:hover { border-color: color-mix(in srgb, var(--dl-accent) 55%, var(--dl-line)); transform: translateY(-1px); }
+    #lab-cockpit-v2 .dl-tool-grid svg { width: 18px; flex: 0 0 auto; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-tool-grid span { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+    #lab-cockpit-v2 .dl-tool-grid strong { font-size: 10px; }
+    #lab-cockpit-v2 .dl-tool-grid small { color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 .dl-module-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    #lab-cockpit-v2 .dl-module { padding: 20px; border: 1px solid var(--dl-line); border-radius: var(--dl-radius); background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-module > div { display: flex; align-items: center; justify-content: space-between; }
+    #lab-cockpit-v2 .dl-module > div svg { width: 22px; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-module > div span { color: var(--dl-accent); font: 600 9px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-module h2 { margin: 24px 0 8px; font-size: 18px; }
+    #lab-cockpit-v2 .dl-module p { min-height: 43px; margin: 0; color: var(--dl-muted); font-size: 11px; line-height: 1.55; }
+    #lab-cockpit-v2 .dl-module footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--dl-line); }
+    #lab-cockpit-v2 .dl-module footer strong { color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 .dl-module footer button { padding: 6px 8px; border: 1px solid var(--dl-line); border-radius: 7px; background: var(--dl-panel-2); font-size: 9px; cursor: pointer; }
+    #lab-cockpit-v2 .dl-run-strip { display: grid; grid-template-columns: minmax(230px,1fr) repeat(3,minmax(120px,.55fr)) auto; align-items: end; gap: 13px; margin-top: 12px; }
+    #lab-cockpit-v2 .dl-run-strip h2 { margin: 4px 0 0; font-size: 15px; }
+    #lab-cockpit-v2 .dl-run-strip label, #lab-cockpit-v2 .dl-compare-picker label { display: grid; gap: 5px; color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 select, #lab-cockpit-v2 input { min-width: 0; height: 36px; padding: 0 9px; border: 1px solid var(--dl-line); border-radius: 7px; background: var(--dl-panel-2); color: var(--dl-ink); }
+    #lab-cockpit-v2 .dl-live-output { display: block; margin-top: 12px; padding: 14px 16px; color: var(--dl-muted); font: 500 10px/1.6 ui-monospace, monospace; white-space: normal; }
+    #lab-cockpit-v2 .dl-live-output.is-running { color: var(--dl-amber); }
+    #lab-cockpit-v2 .dl-live-output.is-success { color: var(--dl-green); }
+    #lab-cockpit-v2 .dl-live-output.is-error { color: var(--dl-red); }
+    #lab-cockpit-v2 .dl-metric-table { width: min(620px, 100%); border-collapse: collapse; margin: 18px auto; text-align: left; }
+    #lab-cockpit-v2 .dl-metric-table th, #lab-cockpit-v2 .dl-metric-table td { padding: 9px 11px; border-bottom: 1px solid var(--dl-line); font: 500 10px/1.3 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-metric-table th { color: var(--dl-muted); text-transform: uppercase; font-size: 8px; letter-spacing: .08em; }
+    #lab-cockpit-v2 .dl-metric-table td:first-child { color: var(--dl-muted); }
+    #lab-cockpit-v2 .dl-guard { display: inline-flex; align-items: center; gap: 7px; color: var(--dl-green); font-size: 10px; }
+    #lab-cockpit-v2 .dl-guard svg { width: 15px; }
+    #lab-cockpit-v2 .dl-compare-picker { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) auto; align-items: end; gap: 12px; padding: 18px; border: 1px solid var(--dl-line); border-radius: var(--dl-radius); background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-compare-picker > span { align-self: center; color: var(--dl-muted); font: 600 10px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-compare-empty { display: grid; place-items: center; min-height: 370px; margin-top: 12px; padding: 35px; border: 1px dashed var(--dl-line); border-radius: var(--dl-radius); text-align: center; }
+    #lab-cockpit-v2 .dl-compare-empty > svg { width: 36px; height: 36px; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-compare-empty h2 { margin: 12px 0 6px; font-size: 17px; }
+    #lab-cockpit-v2 .dl-compare-empty p { max-width: 570px; margin: 0; color: var(--dl-muted); font-size: 11px; line-height: 1.55; }
+    #lab-cockpit-v2 .dl-compare-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 18px 0; }
+    #lab-cockpit-v2 .dl-compare-empty > div span { display: inline-flex; align-items: center; gap: 5px; color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 .dl-compare-empty > div svg { width: 13px; color: var(--dl-green); }
+    #lab-cockpit-v2 .dl-gates { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 11px; }
+    #lab-cockpit-v2 .dl-gates article { padding: 18px; border: 1px solid var(--dl-line); border-radius: var(--dl-radius); background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-gates header { display: grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 8px; }
+    #lab-cockpit-v2 .dl-gates header > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; color: var(--dl-muted); background: var(--dl-panel-2); font: 600 10px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-gates header strong { font-size: 11px; }
+    #lab-cockpit-v2 .dl-gates header em { color: var(--dl-muted); font: 600 8px/1 ui-monospace, monospace; font-style: normal; }
+    #lab-cockpit-v2 .dl-gates article.is-pass header > span { color: var(--dl-accent); background: var(--dl-accent-soft); }
+    #lab-cockpit-v2 .dl-gates p { min-height: 50px; margin: 16px 0; color: var(--dl-muted); font-size: 10px; line-height: 1.55; }
+    #lab-cockpit-v2 .dl-gates footer { padding-top: 10px; border-top: 1px solid var(--dl-line); color: var(--dl-muted); font: 9px/1.3 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-board-filter { display: flex; gap: 4px; padding: 3px; border: 1px solid var(--dl-line); border-radius: 8px; background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-board-filter button { padding: 6px 9px; border: 0; border-radius: 5px; background: transparent; color: var(--dl-muted); font-size: 9px; cursor: pointer; }
+    #lab-cockpit-v2 .dl-board-filter button.is-on { background: var(--dl-panel-2); color: var(--dl-ink); }
+    #lab-cockpit-v2 .dl-board { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+    #lab-cockpit-v2 .dl-board > section { min-width: 0; padding: 10px; border-radius: var(--dl-radius); background: color-mix(in srgb, var(--dl-panel) 56%, transparent); }
+    #lab-cockpit-v2 .dl-board > section > header { display: flex; align-items: center; justify-content: space-between; padding: 4px 3px 11px; color: var(--dl-muted); font-size: 9px; letter-spacing: .08em; }
+    #lab-cockpit-v2 .dl-board > section > header b { font: 500 11px/1 ui-monospace, monospace; }
+    #lab-cockpit-v2 .dl-board article { position: relative; margin-bottom: 8px; padding: 13px; border: 1px solid var(--dl-line); border-radius: 9px; background: var(--dl-panel); }
+    #lab-cockpit-v2 .dl-board article strong { font: 600 10px/1 ui-monospace, monospace; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-board article p { margin: 8px 0 16px; font-size: 11px; line-height: 1.35; }
+    #lab-cockpit-v2 .dl-board article small { color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 .dl-board article em { position: absolute; right: 10px; bottom: 11px; color: var(--dl-amber); font: 600 8px/1 ui-monospace, monospace; font-style: normal; }
+    #lab-cockpit-v2 .dl-board article.is-accepted em { color: var(--dl-green); }
+    #lab-cockpit-v2 .dl-column-empty { display: grid; place-items: center; min-height: 115px; border: 1px dashed var(--dl-line); border-radius: 9px; color: var(--dl-muted); font-size: 9px; text-align: center; }
+    #lab-cockpit-v2 .dl-search { position: relative; min-width: min(320px, 100%); }
+    #lab-cockpit-v2 .dl-search svg { position: absolute; top: 10px; left: 10px; width: 15px; color: var(--dl-muted); }
+    #lab-cockpit-v2 .dl-search input { width: 100%; padding-left: 33px; }
+    #lab-cockpit-v2 .dl-knowledge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    #lab-cockpit-v2 .dl-knowledge-grid ul { margin: 0; padding: 0; list-style: none; }
+    #lab-cockpit-v2 .dl-knowledge-grid li { display: flex; align-items: center; gap: 11px; min-height: 60px; border-top: 1px solid var(--dl-line); }
+    #lab-cockpit-v2 .dl-knowledge-grid li > svg { width: 17px; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-knowledge-grid li > span { display: flex; flex-direction: column; gap: 4px; }
+    #lab-cockpit-v2 .dl-knowledge-grid li strong { font-size: 11px; }
+    #lab-cockpit-v2 .dl-knowledge-grid li small { color: var(--dl-muted); font-size: 9px; }
+    #lab-cockpit-v2 .dl-palette { position: absolute; z-index: 20; inset: 0; display: grid; place-items: start center; padding-top: 95px; }
+    #lab-cockpit-v2 .dl-palette[hidden] { display: none; }
+    #lab-cockpit-v2 .dl-palette-backdrop { position: absolute; inset: 0; border: 0; background: rgba(1,6,12,.66); backdrop-filter: blur(3px); cursor: default; }
+    #lab-cockpit-v2 .dl-palette > section { position: relative; width: min(540px, calc(100% - 32px)); overflow: hidden; border: 1px solid var(--dl-line); border-radius: 13px; background: var(--dl-panel); box-shadow: 0 24px 80px rgba(0,0,0,.35); }
+    #lab-cockpit-v2 .dl-palette label { position: relative; display: block; border-bottom: 1px solid var(--dl-line); }
+    #lab-cockpit-v2 .dl-palette label svg { position: absolute; top: 18px; left: 17px; width: 17px; color: var(--dl-muted); }
+    #lab-cockpit-v2 .dl-palette input { width: 100%; height: 52px; padding: 0 16px 0 46px; border: 0; border-radius: 0; background: transparent; font-size: 13px; }
+    #lab-cockpit-v2 .dl-palette section > small { display: block; padding: 13px 16px 7px; color: var(--dl-muted); font-size: 8px; letter-spacing: .12em; }
+    #lab-cockpit-v2 .dl-palette section > button { display: grid; grid-template-columns: 24px minmax(0,1fr) auto; align-items: center; gap: 10px; width: calc(100% - 16px); min-height: 48px; margin: 0 8px 4px; padding: 5px 9px; border: 0; border-radius: 8px; background: transparent; text-align: left; cursor: pointer; }
+    #lab-cockpit-v2 .dl-palette section > button:hover { background: var(--dl-accent-soft); }
+    #lab-cockpit-v2 .dl-palette section > button svg { width: 16px; color: var(--dl-accent); }
+    #lab-cockpit-v2 .dl-palette section > button span { display: flex; flex-direction: column; gap: 3px; }
+    #lab-cockpit-v2 .dl-palette section > button strong { font-size: 11px; }
+    #lab-cockpit-v2 .dl-palette section > button em { color: var(--dl-muted); font-size: 9px; font-style: normal; }
+    #lab-cockpit-v2 .dl-toast { position: absolute; z-index: 30; right: 18px; bottom: 18px; max-width: 360px; padding: 11px 14px; border: 1px solid color-mix(in srgb, var(--dl-green) 40%, var(--dl-line)); border-radius: 8px; background: var(--dl-panel); color: var(--dl-green); box-shadow: 0 14px 40px rgba(0,0,0,.22); font-size: 10px; }
+    #lab-cockpit-v2.dl-compact .dl-content { padding: 19px; }
+    #lab-cockpit-v2.dl-compact .dl-window { grid-template-columns: 72px minmax(0,1fr); }
+    #lab-cockpit-v2.dl-compact .dl-brand-copy, #lab-cockpit-v2.dl-compact .dl-nav-item span, #lab-cockpit-v2.dl-compact .dl-nav-item em, #lab-cockpit-v2.dl-compact .dl-runtime > span:last-child { display: none; }
+    #lab-cockpit-v2.dl-compact .dl-brand { justify-content: center; padding-inline: 0; }
+    #lab-cockpit-v2.dl-compact .dl-nav-item { display: grid; grid-template-columns: 1fr; place-items: center; padding: 0; }
+    #lab-cockpit-v2.dl-compact .dl-rail-foot { justify-content: center; padding-inline: 0; }
+    #lab-cockpit-v2.dl-compact .dl-runtime { display: none; }
+    #lab-cockpit-v2.dl-dense .dl-kpis article { padding-block: 12px; }
+    #lab-cockpit-v2.dl-dense .dl-action-row { min-height: 52px; }
+    @media (max-width: 980px) {
+      #lab-cockpit-v2 .dl-window { grid-template-columns: 72px minmax(0,1fr); }
+      #lab-cockpit-v2 .dl-brand-copy, #lab-cockpit-v2 .dl-nav-item span, #lab-cockpit-v2 .dl-nav-item em, #lab-cockpit-v2 .dl-runtime > span:last-child { display: none; }
+      #lab-cockpit-v2 .dl-brand { justify-content: center; padding-inline: 0; }
+      #lab-cockpit-v2 .dl-nav-item { grid-template-columns: 1fr; place-items: center; padding: 0; }
+      #lab-cockpit-v2 .dl-rail-foot { justify-content: center; padding-inline: 0; }
+      #lab-cockpit-v2 .dl-runtime { display: none; }
+      #lab-cockpit-v2 .dl-health { grid-template-columns: repeat(4,1fr); padding-block: 8px; }
+      #lab-cockpit-v2 .dl-health > div { padding-inline: 10px; }
+      #lab-cockpit-v2 .dl-health .dl-health-note { grid-column: 1 / -1; justify-content: flex-start; margin-top: 8px; padding: 7px 0 0; border-top: 1px solid var(--dl-line); }
+      #lab-cockpit-v2 .dl-overview-grid { grid-template-columns: 1fr; }
+      #lab-cockpit-v2 .dl-module-grid { grid-template-columns: 1fr 1fr; }
+      #lab-cockpit-v2 .dl-run-strip { grid-template-columns: 1fr 1fr; }
+      #lab-cockpit-v2 .dl-run-strip > div { grid-column: 1 / -1; }
+      #lab-cockpit-v2 .dl-gates { grid-template-columns: 1fr 1fr; }
+      #lab-cockpit-v2 .dl-board { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      #lab-cockpit-v2 .dl-window { display: block; min-height: 0; }
+      #lab-cockpit-v2 .dl-rail { flex-direction: row; align-items: center; padding: 9px 10px; }
+      #lab-cockpit-v2 .dl-brand { padding: 0 9px 0 0; }
+      #lab-cockpit-v2 .dl-mark { width: 32px; height: 32px; }
+      #lab-cockpit-v2 .dl-nav { display: flex; min-width: 0; flex: 1; justify-content: flex-end; gap: 2px; }
+      #lab-cockpit-v2 .dl-nav-item { width: 38px; min-height: 38px; }
+      #lab-cockpit-v2 .dl-nav-item:nth-child(n+5) { display: none; }
+      #lab-cockpit-v2 .dl-rail-foot { display: none; }
+      #lab-cockpit-v2 .dl-topbar { min-height: 54px; padding: 0 14px; }
+      #lab-cockpit-v2 .dl-title-row small, #lab-cockpit-v2 .dl-freshness, #lab-cockpit-v2 .dl-command-open span, #lab-cockpit-v2 .dl-command-open kbd, #lab-cockpit-v2 .dl-sync span { display: none; }
+      #lab-cockpit-v2 .dl-command-open, #lab-cockpit-v2 .dl-sync { width: 36px; padding: 0; }
+      #lab-cockpit-v2 .dl-health { grid-template-columns: 1fr 1fr; padding: 8px 14px; }
+      #lab-cockpit-v2 .dl-health > div { min-height: 32px; padding: 4px 8px; border-bottom: 1px solid var(--dl-line); }
+      #lab-cockpit-v2 .dl-health > div:nth-child(even) { border-right: 0; }
+      #lab-cockpit-v2 .dl-content { padding: 18px 14px; }
+      #lab-cockpit-v2 .dl-heading { align-items: flex-start; flex-direction: column; }
+      #lab-cockpit-v2 .dl-heading-actions { width: 100%; }
+      #lab-cockpit-v2 .dl-heading-actions button { flex: 1; }
+      #lab-cockpit-v2 .dl-kpis { grid-template-columns: 1fr 1fr; }
+      #lab-cockpit-v2 .dl-action-row { grid-template-columns: 24px minmax(0,1fr) 14px; }
+      #lab-cockpit-v2 .dl-action-row em { display: none; }
+      #lab-cockpit-v2 .dl-tool-grid, #lab-cockpit-v2 .dl-module-grid, #lab-cockpit-v2 .dl-gates, #lab-cockpit-v2 .dl-board, #lab-cockpit-v2 .dl-knowledge-grid { grid-template-columns: 1fr; }
+      #lab-cockpit-v2 .dl-run-strip { grid-template-columns: 1fr; }
+      #lab-cockpit-v2 .dl-run-strip > div { grid-column: auto; }
+      #lab-cockpit-v2 .dl-compare-picker { grid-template-columns: 1fr; }
+      #lab-cockpit-v2 .dl-compare-picker > span { display: none; }
+    }
+    @media (max-width: 430px) {
+      #lab-cockpit-v2 .dl-nav-item:nth-child(n+4) { display: none; }
+      #lab-cockpit-v2 .dl-kpis { grid-template-columns: 1fr; }
+      #lab-cockpit-v2 .dl-heading-actions { flex-direction: column; }
+      #lab-cockpit-v2 .dl-health { grid-template-columns: 1fr; }
+      #lab-cockpit-v2 .dl-health > div { border-right: 0; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      #lab-cockpit-v2 .dl-tool-grid button, #lab-cockpit-v2 .dl-primary { transition: transform .16s ease, filter .16s ease, border-color .16s ease; }
+    }
+  </style>
+
+  <script>
+    (() => {
+      const root = document.getElementById('lab-cockpit-v2');
+      if (!root) return;
+      const titles = { overview: 'Tổng quan', bench: 'Bàn thiết kế', compare: 'So sánh run', evidence: 'Bằng chứng & cổng', tasks: 'Task board', knowledge: 'Não 2' };
+      const navItems = [...root.querySelectorAll('[data-view]')];
+      const panels = [...root.querySelectorAll('[data-panel]')];
+      const pageTitle = root.querySelector('[data-page-title]');
+      const palette = root.querySelector('.dl-palette');
+      const paletteInput = palette.querySelector('input');
+      const paletteCommands = [...palette.querySelectorAll('[data-command-view]')];
+      const toast = root.querySelector('.dl-toast');
+      let toastTimer;
+      const liveState = { overview: null, live: null, runs: [], catalog: null, cards: [] };
+      const statusOrder = ['ACTIVE', 'READY', 'REVIEW', 'ACCEPTED'];
+
+      const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[char]);
+      const number = (value, digits = 2) => value == null || !Number.isFinite(Number(value))
+        ? '—' : Number(value).toLocaleString('vi-VN', { maximumFractionDigits: digits });
+
+      async function api(path, body) {
+        const response = await fetch(path, body === undefined ? undefined : {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const payload = await response.json().catch(() => ({ error: 'Phản hồi không phải JSON' }));
+        if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+        return payload;
+      }
+
+      function refreshIcons() {
+        if (globalThis.lucide && typeof globalThis.lucide.createIcons === 'function') {
+          globalThis.lucide.createIcons({ attrs: { 'stroke-width': 1.7 } });
+        }
+      }
+
+      function renderOverview(overview) {
+        liveState.overview = overview;
+        root.querySelector('#dl-claim').textContent = overview.claim_ceiling || 'SCREENED';
+        const counts = overview.lab_status && overview.lab_status.tasks || {};
+        root.querySelectorAll('[data-live-kpi]').forEach(node => {
+          node.textContent = counts[node.dataset.liveKpi] == null ? '—' : counts[node.dataset.liveKpi];
+        });
+        root.querySelector('#dl-task-total').textContent = Object.values(counts)
+          .reduce((total, value) => total + Number(value || 0), 0) || '—';
+        root.querySelector('#dl-freshness').innerHTML = '<i data-lucide="radio" aria-hidden="true"></i> Dữ liệu sống · '
+          + esc(overview.lab_version) + ' · vừa cập nhật';
+
+        const gates = overview.gates || [];
+        root.querySelector('#dl-gates').innerHTML = gates.map(gate => {
+          const good = gate.status === 'PASSED' || gate.status === 'AVAILABLE';
+          return `<article class="${good ? 'is-pass' : ''}"><header><span>${esc(gate.gate)}</span><strong>${esc(gate.label)}</strong><em>${esc(gate.status)}</em></header><p>${esc(gate.detail)}</p><footer>Claim ceiling: ${esc(overview.claim_ceiling)}</footer></article>`;
+        }).join('');
+      }
+
+      function renderTasks(taskMap) {
+        const tasks = Object.values(taskMap || {});
+        const board = root.querySelector('#dl-task-board');
+        board.innerHTML = statusOrder.map(status => {
+          const group = tasks.filter(task => task.status === status)
+            .sort((a, b) => String(a.task_id).localeCompare(String(b.task_id)));
+          const cards = group.slice(0, 5).map(task => {
+            const waiting = (task.dependencies || []).length && status === 'READY';
+            const owner = task.owner ? `Owner · ${task.owner}` : 'Chưa có owner';
+            return `<article class="${status === 'ACCEPTED' ? 'is-accepted' : waiting ? 'is-blocked' : ''}"><strong>${esc(task.task_id)}</strong><p>${esc(task.title)}</p><small>${esc(owner)}</small><em>${waiting ? 'DEPENDENCY' : esc(task.claim_ceiling || task.priority || '')}</em></article>`;
+          }).join('') || '<div class="dl-column-empty">Không có task</div>';
+          return `<section><header><span>${status}</span><b>${group.length}</b></header>${cards}</section>`;
+        }).join('');
+      }
+
+      function renderEvidence(live) {
+        const reviews = [...(live.reviews || [])].reverse().slice(0, 3);
+        const stream = root.querySelector('#dl-evidence-stream');
+        stream.innerHTML = reviews.map(review => {
+          const decision = review.decision || review.status || 'REVIEW';
+          const raw = String(review.summary || review.notes || 'Bản ghi review canonical');
+          const concise = raw.split('|')[0].trim().slice(0, 220);
+          return `<li><i data-lucide="${decision === 'APPROVE' ? 'badge-check' : 'file-warning'}" aria-hidden="true"></i><span><strong>${esc(review.task_id || review.filename)} · ${esc(decision)}</strong><small title="${esc(raw)}">${esc(concise)}</small></span><time>live</time></li>`;
+        }).join('') || '<li><span><strong>Chưa có review</strong><small>Dữ liệu review canonical đang trống.</small></span></li>';
+      }
+
+      function renderKnowledge(cards) {
+        const recent = (cards || []).slice(0, 5);
+        const target = root.querySelector('#dl-knowledge-grid');
+        const statusCounts = (cards || []).reduce((acc, card) => {
+          const key = card.status || 'UNKNOWN'; acc[key] = (acc[key] || 0) + 1; return acc;
+        }, {});
+        target.innerHTML = `<section class="dl-surface"><div class="dl-section-title"><div><p class="dl-eyebrow">CANONICAL</p><h2>Knowledge cards</h2></div><span>${cards.length} cards</span></div><ul>${recent.map(card => `<li><i data-lucide="file-json" aria-hidden="true"></i><span><strong>${esc(card.card_id || card.id || 'CARD')}</strong><small>${esc(card.title || card.claim || 'Canonical JSON')}</small></span></li>`).join('')}</ul></section><section class="dl-surface"><div class="dl-section-title"><div><p class="dl-eyebrow">EVIDENCE STATUS</p><h2>Trạng thái tri thức</h2></div><span>live</span></div><ul>${Object.entries(statusCounts).map(([key, value]) => `<li><i data-lucide="circle-dashed" aria-hidden="true"></i><span><strong>${esc(key)}</strong><small>${value} thẻ</small></span></li>`).join('')}</ul></section>`;
+      }
+
+      function renderRuns(runs) {
+        liveState.runs = runs || [];
+        const selects = [root.querySelector('#dl-run-a'), root.querySelector('#dl-run-b')];
+        selects.forEach((select, index) => {
+          select.innerHTML = liveState.runs.map((run, runIndex) => `<option value="${esc(run.name)}" ${runIndex === index ? 'selected' : ''}>${esc(run.name)} · ${esc(run.termination || '—')}</option>`).join('');
+        });
+      }
+
+      async function loadLive() {
+        const results = await Promise.allSettled([
+          api('/api/lab/overview'), api('/api/live-data'), api('/api/design-loop/runs'),
+          api('/api/catalog'), api('/api/knowledge/cards')
+        ]);
+        if (results[0].status === 'fulfilled') renderOverview(results[0].value);
+        if (results[1].status === 'fulfilled') {
+          liveState.live = results[1].value;
+          renderTasks(results[1].value.tasks);
+          renderEvidence(results[1].value);
+        }
+        if (results[2].status === 'fulfilled') renderRuns(results[2].value.runs);
+        if (results[3].status === 'fulfilled') liveState.catalog = results[3].value;
+        if (results[4].status === 'fulfilled') {
+          liveState.cards = results[4].value.cards || [];
+          renderKnowledge(liveState.cards);
+        }
+        const failed = results.filter(result => result.status === 'rejected');
+        root.querySelector('.dl-live-dot').style.background = failed.length ? 'var(--dl-amber)' : 'var(--dl-green)';
+        refreshIcons();
+        if (failed.length) throw new Error(`${failed.length}/5 nguồn live chưa đọc được`);
+      }
+
+      function showView(name) {
+        panels.forEach(panel => panel.classList.toggle('is-visible', panel.dataset.panel === name));
+        navItems.forEach(item => {
+          const active = item.dataset.view === name;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        pageTitle.textContent = titles[name] || 'DYLIGHT Lab';
+        closePalette();
+      }
+
+      function openPalette() {
+        palette.hidden = false;
+        paletteInput.value = '';
+        paletteCommands.forEach(button => { button.hidden = false; });
+        requestAnimationFrame(() => paletteInput.focus());
+      }
+
+      function closePalette() {
+        palette.hidden = true;
+      }
+
+      function notify(message) {
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.hidden = false;
+        toastTimer = setTimeout(() => { toast.hidden = true; }, 2400);
+      }
+
+      async function runDesignLoop() {
+        const output = root.querySelector('#dl-run-output');
+        const buttons = [...root.querySelectorAll('[data-run-design-loop]')];
+        const grammar = root.querySelector('#dl-run-grammar').value;
+        const budget = Number(root.querySelector('#dl-run-budget').value);
+        const target = Number(root.querySelector('#dl-run-target').value);
+        output.className = 'dl-surface dl-live-output is-running';
+        output.textContent = 'Đang chạy evaluator → solver → independent verifier → component audit…';
+        buttons.forEach(button => { button.disabled = true; });
+        try {
+          if (!liveState.catalog) liveState.catalog = await api('/api/catalog');
+          const gene = liveState.catalog.anchor_genes && liveState.catalog.anchor_genes[grammar];
+          if (!gene) throw new Error(`Không có anchor gene cho ${grammar}`);
+          const result = await api('/api/design-loop', {
+            gene, grammar_id: grammar, budget,
+            policy: { utilization_target: target, trim_order: 'recent_reject_last' }
+          });
+          const report = result.report;
+          const final = report.final || {};
+          output.className = 'dl-surface dl-live-output is-success';
+          output.textContent = `${result.saved_as} · ${report.termination.reason} · ${report.claim_level} · D/C ${number(final.max_utilization, 4)} · cost ${number(final.objectives && final.objectives.relative_cost)} · ${report.counters.evaluator.solver_calls} solver calls · SHA ${report.report_sha256.slice(0, 12)}…`;
+          notify('Run đã lưu với SHA-256 và verification records.');
+          renderRuns((await api('/api/design-loop/runs')).runs);
+        } catch (error) {
+          output.className = 'dl-surface dl-live-output is-error';
+          output.textContent = `Không tạo được run: ${error.message}`;
+        } finally {
+          buttons.forEach(button => { button.disabled = false; });
+        }
+      }
+
+      function reportMetric(report, key) {
+        const objectives = report.final && report.final.objectives || {};
+        const values = {
+          cost: objectives.relative_cost,
+          mass: objectives.material_mass_t,
+          carbon: objectives.embodied_carbon_kgCO2e,
+          utilization: report.final && report.final.max_utilization,
+          steps: (report.lineage || []).length,
+          solver: report.counters && report.counters.evaluator && report.counters.evaluator.solver_calls
+        };
+        return values[key];
+      }
+
+      async function compareRuns() {
+        const nameA = root.querySelector('#dl-run-a').value;
+        const nameB = root.querySelector('#dl-run-b').value;
+        const output = root.querySelector('#dl-compare-output');
+        if (!nameA || !nameB || nameA === nameB) {
+          notify('Chọn hai run khác nhau.');
+          return;
+        }
+        output.querySelector('h2').textContent = 'Đang kiểm tra điều kiện so sánh…';
+        try {
+          const [a, b] = await Promise.all([
+            api(`/api/design-loop/runs/${encodeURIComponent(nameA)}`),
+            api(`/api/design-loop/runs/${encodeURIComponent(nameB)}`)
+          ]);
+          const reportA = a.report, reportB = b.report;
+          const analysisA = reportA.final && reportA.final.design_state && reportA.final.design_state.analysis || {};
+          const analysisB = reportB.final && reportB.final.design_state && reportB.final.design_state.analysis || {};
+          const guards = [
+            ['grammar', reportA.grammar_id, reportB.grammar_id],
+            ['fidelity', analysisA.fidelity, analysisB.fidelity],
+            ['solver', analysisA.solver, analysisB.solver],
+            ['budget', reportA.budget_solver_calls, reportB.budget_solver_calls],
+            ['basis hash', reportA.basis && reportA.basis.sha256, reportB.basis && reportB.basis.sha256]
+          ];
+          const mismatches = guards.filter(([, left, right]) => left !== right);
+          if (mismatches.length) {
+            output.querySelector('h2').textContent = 'So sánh bị khóa';
+            output.querySelector('p').textContent = 'Không cùng ' + mismatches.map(item => item[0]).join(', ') + '. Không diễn giải chênh lệch giữa hai mô hình khác điều kiện.';
+            notify('Guarded comparison đã chặn hai run không tương thích.');
+            return;
+          }
+          const rows = [
+            ['Chi phí tương đối', 'cost', 2], ['Khối lượng (t)', 'mass', 2],
+            ['Carbon (kgCO₂e)', 'carbon', 1], ['Max D/C', 'utilization', 4],
+            ['Lineage steps', 'steps', 0], ['Solver calls', 'solver', 0]
+          ];
+          output.querySelector('h2').textContent = 'Hai run đủ điều kiện so sánh';
+          output.querySelector('p').textContent = `${reportA.grammar_id} · ${analysisA.fidelity} · budget ${reportA.budget_solver_calls} · basis ${reportA.basis.sha256.slice(0, 10)}…`;
+          output.querySelector('div').innerHTML = `<table class="dl-metric-table"><thead><tr><th>Metric</th><th>Run A</th><th>Run B</th><th>Δ B−A</th></tr></thead><tbody>${rows.map(([label, key, digits]) => {
+            const left = reportMetric(reportA, key), right = reportMetric(reportB, key);
+            const delta = left == null || right == null ? null : Number(right) - Number(left);
+            return `<tr><td>${label}</td><td>${number(left, digits)}</td><td>${number(right, digits)}</td><td>${delta == null ? '—' : (delta > 0 ? '+' : '') + number(delta, digits)}</td></tr>`;
+          }).join('')}</tbody></table>`;
+          notify('Guard pass: cùng grammar, fidelity, solver, budget và basis.');
+        } catch (error) {
+          output.querySelector('h2').textContent = 'Không đọc được run';
+          output.querySelector('p').textContent = error.message;
+        }
+      }
+
+      navItems.forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
+      root.querySelectorAll('[data-jump]').forEach(item => item.addEventListener('click', () => showView(item.dataset.jump)));
+      root.querySelector('.dl-command-open').addEventListener('click', openPalette);
+      root.querySelector('.dl-palette-backdrop').addEventListener('click', closePalette);
+      paletteCommands.forEach(item => item.addEventListener('click', () => showView(item.dataset.commandView)));
+      paletteInput.addEventListener('input', () => {
+        const query = paletteInput.value.trim().toLowerCase();
+        paletteCommands.forEach(button => { button.hidden = query && !button.textContent.toLowerCase().includes(query); });
+      });
+      root.querySelector('.dl-sync').addEventListener('click', async event => {
+        const icon = event.currentTarget.querySelector('svg');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+        try {
+          await loadLive();
+          notify('Đã làm mới task, gates, runs và evidence index.');
+        } catch (error) {
+          notify(error.message);
+        } finally {
+          if (icon) icon.style.transform = '';
+        }
+      });
+      root.querySelector('#dl-swap').addEventListener('click', () => {
+        const a = root.querySelector('#dl-run-a');
+        const b = root.querySelector('#dl-run-b');
+        [a.value, b.value] = [b.value, a.value];
+      });
+      root.querySelector('#dl-compare').addEventListener('click', compareRuns);
+      root.querySelectorAll('[data-run-design-loop]').forEach(button => button.addEventListener('click', runDesignLoop));
+      root.querySelectorAll('.dl-board-filter button').forEach(button => button.addEventListener('click', () => {
+        root.querySelectorAll('.dl-board-filter button').forEach(peer => peer.classList.toggle('is-on', peer === button));
+      }));
+      document.addEventListener('keydown', event => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openPalette(); }
+        if (event.key === 'Escape') closePalette();
+      });
+
+      const styleState = { accent: '#18b7d8', radius: 14, navigation: 'expanded', density: 'balanced' };
+      function renderStyle() {
+        root.style.setProperty('--dl-accent', styleState.accent);
+        root.style.setProperty('--dl-radius', `${styleState.radius}px`);
+        root.classList.toggle('dl-compact', styleState.navigation === 'compact');
+        root.classList.toggle('dl-dense', styleState.density === 'compact');
+      }
+      renderStyle();
+      if (globalThis.Tweak) {
+        const tweak = new Tweak({ container: root.querySelector('.dl-window'), onChange: renderStyle });
+        tweak.addColorPicker(styleState, 'accent', { label: 'Màu nhận diện', reference: '--dl-accent' });
+        tweak.addSlider(styleState, 'radius', { label: 'Bo góc', min: 4, max: 22, unit: 'px', reference: '--dl-radius' });
+        tweak.addSelect(styleState, 'navigation', { label: 'Điều hướng', options: [{label:'Đầy đủ',value:'expanded'},{label:'Thu gọn',value:'compact'}], reference: 'lab.navigation' });
+        tweak.addSelect(styleState, 'density', { label: 'Mật độ', options: [{label:'Cân bằng',value:'balanced'},{label:'Gọn',value:'compact'}], reference: 'lab.density' });
+      }
+      loadLive().catch(error => {
+        root.querySelector('#dl-freshness').textContent = `Mất kết nối live · ${error.message}`;
+        notify('Không đọc đủ dữ liệu live; hãy chạy scripts/serve_lab.py.');
+      });
+      window.addEventListener('load', refreshIcons, { once: true });
+    })();
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,873 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opensees_frame_reference_v2.schema.json",
+  "title": "BRD045HardenedOpenSeesReference",
+  "oneOf": [
+    {"$ref": "#/$defs/benchmark_suite"},
+    {"$ref": "#/$defs/negative_result"}
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "enum": [
+            "experiments/validation/opensees_frame_reference_v2.py",
+            "experiments/validation/opensees_frame_reference.py",
+            "bridge_evolution/creative_shape.py",
+            "bridge_evolution/frame_f1.py",
+            "bridge_evolution/creative_frame_adapter.py",
+            "bridge_evolution/arch_action_f1.py",
+            "bridge_evolution/funicular_reference.py"
+          ]
+        },
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "task_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "enum": [
+            "contracts/opensees_frame_reference_v2.schema.json",
+            "tests/test_opensees_frame_reference_v2.py"
+          ]
+        },
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "upstream_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "enum": [
+            "experiments/validation/opensees_frame_reference.py",
+            "experiments/validation/opensees_brd044_benchmarks.json",
+            "contracts/opensees_frame_reference.schema.json",
+            "docs/design_basis/opensees_frame_reference_basis.json",
+            "tests/test_opensees_frame_reference.py"
+          ]
+        },
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "callable_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "module", "qualname", "kind"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "module": {"const": "openseespywin.opensees"},
+        "qualname": {"type": "string", "minLength": 1},
+        "kind": {"const": "builtin_function_or_method"}
+      }
+    },
+    "engine_module_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shim_module",
+        "shim_package_name",
+        "shim_package_version",
+        "shim_relative_path",
+        "shim_sha256",
+        "binary_owner_module",
+        "binary_relative_path",
+        "callable_bindings"
+      ],
+      "properties": {
+        "shim_module": {"const": "openseespy.opensees"},
+        "shim_package_name": {"const": "openseespy"},
+        "shim_package_version": {"type": "string", "minLength": 1},
+        "shim_relative_path": {"const": "openseespy/opensees/__init__.py"},
+        "shim_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_owner_module": {"const": "openseespywin.opensees"},
+        "binary_relative_path": {"const": "openseespywin/opensees.pyd"},
+        "callable_bindings": {
+          "type": "array",
+          "minItems": 27,
+          "maxItems": 27,
+          "items": {"$ref": "#/$defs/callable_binding"}
+        }
+      }
+    },
+    "engine_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "engine_version",
+        "package_name",
+        "package_version",
+        "python_version",
+        "python_implementation",
+        "python_executable_sha256",
+        "binary_owner_module",
+        "binary_file_name",
+        "binary_sha256",
+        "shim_module",
+        "shim_package_name",
+        "shim_package_version",
+        "shim_relative_path",
+        "shim_sha256",
+        "binary_relative_path",
+        "callable_bindings"
+      ],
+      "properties": {
+        "name": {"const": "OpenSees"},
+        "engine_version": {"type": "string", "minLength": 1},
+        "package_name": {"const": "openseespywin"},
+        "package_version": {"type": "string", "minLength": 1},
+        "python_version": {"type": "string", "minLength": 1},
+        "python_implementation": {"const": "CPython"},
+        "python_executable_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_owner_module": {"const": "openseespywin.opensees"},
+        "binary_file_name": {"const": "opensees.pyd"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "shim_module": {"const": "openseespy.opensees"},
+        "shim_package_name": {"const": "openseespy"},
+        "shim_package_version": {"type": "string", "minLength": 1},
+        "shim_relative_path": {"const": "openseespy/opensees/__init__.py"},
+        "shim_sha256": {"$ref": "#/$defs/sha256"},
+        "binary_relative_path": {"const": "openseespywin/opensees.pyd"},
+        "callable_bindings": {
+          "type": "array",
+          "minItems": 27,
+          "maxItems": 27,
+          "items": {"$ref": "#/$defs/callable_binding"}
+        }
+      }
+    },
+    "forbidden_origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module_name", "origin", "origin_state", "sha256"],
+      "properties": {
+        "module_name": {"type": "string", "minLength": 1},
+        "origin": {"type": "string", "pattern": "^bridge_evolution/.+"},
+        "origin_state": {"enum": ["PRESENT", "MISSING_AT_AUDIT"]},
+        "sha256": {
+          "oneOf": [
+            {"$ref": "#/$defs/sha256"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"origin_state": {"const": "PRESENT"}}},
+          "then": {"properties": {"sha256": {"$ref": "#/$defs/sha256"}}}
+        },
+        {
+          "if": {"properties": {"origin_state": {"const": "MISSING_AT_AUDIT"}}},
+          "then": {"properties": {"sha256": {"type": "null"}}}
+        }
+      ]
+    },
+    "runtime_path_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "site_packages_path",
+        "site_packages_index",
+        "sys_path",
+        "sys_path_sha256",
+        "shim_file",
+        "binary_file",
+        "shim_under_site_packages",
+        "binary_under_site_packages"
+      ],
+      "properties": {
+        "site_packages_path": {"type": ["string", "null"]},
+        "site_packages_index": {"type": ["integer", "null"], "minimum": 0},
+        "sys_path": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        },
+        "sys_path_sha256": {"$ref": "#/$defs/sha256"},
+        "shim_file": {"type": ["string", "null"]},
+        "binary_file": {"type": ["string", "null"]},
+        "shim_under_site_packages": {"type": "boolean"},
+        "binary_under_site_packages": {"type": "boolean"}
+      }
+    },
+    "wipe_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total_wipe_calls", "forwarded_wipes", "suppressed_wipes"],
+      "properties": {
+        "total_wipe_calls": {"type": "integer", "minimum": 0},
+        "forwarded_wipes": {"type": "integer", "minimum": 0},
+        "suppressed_wipes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "node_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "node_tag", "x_m", "y_m", "fixed_dofs"],
+      "properties": {
+        "node_id": {"type": "string", "minLength": 1},
+        "node_tag": {"type": "integer", "minimum": 1},
+        "x_m": {"type": "number"},
+        "y_m": {"type": "number"},
+        "fixed_dofs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": [1, 2, 3]}
+        }
+      }
+    },
+    "element_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element_id", "element_tag"],
+      "properties": {
+        "element_id": {"type": "string", "minLength": 1},
+        "element_tag": {"type": "integer", "minimum": 1}
+      }
+    },
+    "domain_fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_tags",
+        "element_tags",
+        "node_bindings",
+        "element_bindings",
+        "fingerprint_sha256"
+      ],
+      "properties": {
+        "node_tags": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "element_tags": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "node_bindings": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/node_binding"}
+        },
+        "element_bindings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/element_binding"}
+        },
+        "fingerprint_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "artificial_rotation_reaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "mz_kNm"],
+      "properties": {
+        "node_id": {"type": "string", "minLength": 1},
+        "mz_kNm": {"type": "number"}
+      }
+    },
+    "artificial_rotation_constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "node_tag", "x_m", "y_m", "fixed_dofs"],
+      "properties": {
+        "node_id": {"type": "string", "minLength": 1},
+        "node_tag": {"type": "integer", "minimum": 1},
+        "x_m": {"type": "number"},
+        "y_m": {"type": "number"},
+        "fixed_dofs": {
+          "type": "array",
+          "contains": {"const": 3},
+          "uniqueItems": true,
+          "items": {"enum": [1, 2, 3]}
+        }
+      }
+    },
+    "truss_local_force_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element_id", "element_tag", "component_count", "raw_local_force"],
+      "properties": {
+        "element_id": {"type": "string", "minLength": 1},
+        "element_tag": {"type": "integer", "minimum": 1},
+        "component_count": {"const": 6},
+        "raw_local_force": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {"type": "number"}
+        }
+      }
+    },
+    "positive_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "control_id",
+        "node_id",
+        "node_tag",
+        "applied_mz_kNm",
+        "observed_reaction_mz_kNm",
+        "equilibrium_residual_kNm",
+        "control_outcome",
+        "domain_fingerprint_sha256",
+        "wipe_proxy"
+      ],
+      "properties": {
+        "control_id": {"const": "ARTIFICIAL_RZ_NONZERO_REACTION"},
+        "node_id": {"type": "string", "minLength": 1},
+        "node_tag": {"type": "integer", "minimum": 1},
+        "applied_mz_kNm": {"type": "number"},
+        "observed_reaction_mz_kNm": {"type": "number"},
+        "equilibrium_residual_kNm": {"type": "number"},
+        "control_outcome": {"const": "EXPECTED_NONZERO_REACTION_OBSERVED"},
+        "domain_fingerprint_sha256": {"$ref": "#/$defs/sha256"},
+        "wipe_proxy": {"$ref": "#/$defs/wipe_audit"}
+      }
+    },
+    "rotation_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "audit_status",
+        "artificial_rotation_reactions",
+        "artificial_rotation_constraints",
+        "domain_fingerprint",
+        "truss_local_force_responses",
+        "artificial_rotation_positive_control",
+        "wipe_proxy",
+        "issues"
+      ],
+      "properties": {
+        "load_case_id": {"type": "string", "minLength": 1},
+        "audit_status": {"enum": ["COMPLETE", "NOT_AVAILABLE", "AUDIT_FAILED"]},
+        "artificial_rotation_reactions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/artificial_rotation_reaction"}
+        },
+        "artificial_rotation_constraints": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/artificial_rotation_constraint"}
+        },
+        "domain_fingerprint": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/domain_fingerprint"}
+          ]
+        },
+        "truss_local_force_responses": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/truss_local_force_response"}
+        },
+        "artificial_rotation_positive_control": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/positive_control"}
+          ]
+        },
+        "wipe_proxy": {"$ref": "#/$defs/wipe_audit"},
+        "issues": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "hardening_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin",
+        "worker_attestation_verified",
+        "worker_isolation_verified",
+        "loaded_forbidden_modules",
+        "loaded_forbidden_origins",
+        "site_packages_policy",
+        "runtime_path_audit",
+        "engine_module_contract",
+        "worker_v2_source_sha256",
+        "base_worker_source_sha256",
+        "artificial_rotation_audits"
+      ],
+      "properties": {
+        "origin": {"enum": ["HOST", "WORKER"]},
+        "worker_attestation_verified": {"type": "boolean"},
+        "worker_isolation_verified": {"type": ["boolean", "null"]},
+        "loaded_forbidden_modules": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            }
+          ]
+        },
+        "loaded_forbidden_origins": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"$ref": "#/$defs/forbidden_origin"}
+            }
+          ]
+        },
+        "site_packages_policy": {"const": "APPEND_AFTER_EXISTING_PATHS"},
+        "runtime_path_audit": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/runtime_path_audit"}
+          ]
+        },
+        "engine_module_contract": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/engine_module_contract"}
+          ]
+        },
+        "worker_v2_source_sha256": {"$ref": "#/$defs/sha256"},
+        "base_worker_source_sha256": {"$ref": "#/$defs/sha256"},
+        "artificial_rotation_audits": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/rotation_audit"}
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benchmark_name",
+        "topology",
+        "candidate_sha256",
+        "analysis_sha256",
+        "arch_action_study_sha256",
+        "funicular_reference_sha256"
+      ],
+      "properties": {
+        "benchmark_name": {
+          "enum": [
+            "AXIAL_BAR",
+            "CANTILEVER",
+            "SIMPLE_BEAM",
+            "CREATIVE_ARCH_ACTION_MODEL",
+            "INCLINED_TWO_BAR_TRUSS"
+          ]
+        },
+        "topology": {
+          "type": ["string", "null"],
+          "enum": [null, "DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"]
+        },
+        "candidate_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "analysis_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "arch_action_study_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "funicular_reference_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "closed_form_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "response_kind",
+        "load_case_id",
+        "entity_id",
+        "component",
+        "expected_value",
+        "observed_value",
+        "absolute_tolerance",
+        "relative_tolerance",
+        "normalized_error",
+        "comparison_state"
+      ],
+      "properties": {
+        "response_kind": {
+          "enum": [
+            "NODE_DISPLACEMENT",
+            "SUPPORT_REACTION",
+            "ELEMENT_END_FORCE",
+            "MAX_ABS_ELEMENT_MOMENT"
+          ]
+        },
+        "load_case_id": {"type": "string", "minLength": 1},
+        "entity_id": {"type": "string", "minLength": 1},
+        "component": {"type": "string", "minLength": 1},
+        "expected_value": {"type": "number"},
+        "observed_value": {"type": "number"},
+        "absolute_tolerance": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.001
+        },
+        "relative_tolerance": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.0001
+        },
+        "normalized_error": {"type": "number", "minimum": 0},
+        "comparison_state": {"enum": ["WITHIN_TOLERANCE", "OUTSIDE_TOLERANCE"]}
+      }
+    },
+    "analytical_check": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["equation_id", "status", "checks"],
+          "properties": {
+            "equation_id": {"type": "string", "minLength": 1},
+            "status": {
+              "enum": [
+                "CLOSED_FORM_WITHIN_PREREGISTERED_TOLERANCE",
+                "CLOSED_FORM_DISCREPANCY"
+              ]
+            },
+            "checks": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"$ref": "#/$defs/closed_form_check"}
+            }
+          }
+        }
+      ]
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "case_kind",
+        "lineage",
+        "model",
+        "model_payload_sha256",
+        "frame_f1_result",
+        "opensees_result",
+        "hardening_audit",
+        "worker_failure_status",
+        "worker_envelope_sha256",
+        "comparison",
+        "analytical_check",
+        "software_self_check_label",
+        "case_sha256"
+      ],
+      "properties": {
+        "case_id": {"type": "string", "pattern": "^BRD0(44|45)-[A-Z0-9_-]+$"},
+        "case_kind": {"enum": ["ANALYTICAL", "CREATIVE_PIPELINE"]},
+        "lineage": {"$ref": "#/$defs/lineage"},
+        "model": {"$ref": "frame_f1_model.schema.json"},
+        "model_payload_sha256": {"$ref": "#/$defs/sha256"},
+        "frame_f1_result": {"$ref": "frame_f1_result.schema.json"},
+        "opensees_result": {"$ref": "opensees_frame_reference.schema.json#/$defs/raw_result"},
+        "hardening_audit": {"$ref": "#/$defs/hardening_audit"},
+        "worker_failure_status": {"type": "null"},
+        "worker_envelope_sha256": {"$ref": "#/$defs/sha256"},
+        "comparison": {"$ref": "opensees_frame_reference.schema.json#/$defs/comparison"},
+        "analytical_check": {"$ref": "#/$defs/analytical_check"},
+        "software_self_check_label": {
+          "const": "SOFTWARE_CODE_VERIFICATION_ONLY_NOT_A_DESIGN_VERDICT"
+        },
+        "case_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "benchmark_suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "suite_id",
+        "suite_sha256",
+        "reference",
+        "claim_level",
+        "design_verdict_authority",
+        "technical_scope",
+        "gates_completed",
+        "status",
+        "basis_sha256",
+        "reference_source_sha256",
+        "reference_source_digests",
+        "task_artifact_digests",
+        "upstream_brd044_artifacts",
+        "expected_backend_identity",
+        "backend_identity",
+        "comparison_tolerances",
+        "cases",
+        "limitations"
+      ],
+      "properties": {
+        "schema_version": {"const": "2.0"},
+        "record_type": {"const": "BENCHMARK_SUITE"},
+        "suite_id": {"type": "string", "pattern": "^OSR2-[0-9a-f]{16}$"},
+        "suite_sha256": {"$ref": "#/$defs/sha256"},
+        "reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version"],
+          "properties": {
+            "id": {"const": "OPENSEES_FRAME_2D_REFERENCE_HARDENED"},
+            "version": {"const": "opensees-frame-reference/0.2.0"}
+          }
+        },
+        "claim_level": {"const": "IDEA"},
+        "design_verdict_authority": {"const": "NONE"},
+        "technical_scope": {"const": "HARDENED_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT"},
+        "gates_completed": {"type": "array", "maxItems": 0},
+        "status": {"enum": ["BENCHMARK_SUITE_COMPLETE", "RECONCILIATION_REQUIRED"]},
+        "basis_sha256": {"$ref": "#/$defs/sha256"},
+        "reference_source_sha256": {"$ref": "#/$defs/sha256"},
+        "reference_source_digests": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {"$ref": "#/$defs/source_digest"}
+        },
+        "task_artifact_digests": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/task_digest"}
+        },
+        "upstream_brd044_artifacts": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {"$ref": "#/$defs/upstream_digest"}
+        },
+        "expected_backend_identity": {"$ref": "#/$defs/engine_contract"},
+        "backend_identity": {"$ref": "#/$defs/engine_contract"},
+        "comparison_tolerances": {"$ref": "opensees_frame_reference.schema.json#/$defs/tolerances"},
+        "cases": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {"$ref": "#/$defs/case"}
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "solver_failure_load_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "status",
+        "analyze_return_code",
+        "nodal_displacements",
+        "reactions",
+        "element_end_forces",
+        "max_translation_m",
+        "max_rotation_rad",
+        "issues"
+      ],
+      "properties": {
+        "load_case_id": {"type": "string", "minLength": 1},
+        "status": {"const": "SOLVER_FAILED"},
+        "analyze_return_code": {"type": ["integer", "null"]},
+        "nodal_displacements": {"type": "array", "maxItems": 0},
+        "reactions": {"type": "array", "maxItems": 0},
+        "element_end_forces": {"type": "array", "maxItems": 0},
+        "max_translation_m": {"type": "null"},
+        "max_rotation_rad": {"type": "null"},
+        "issues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "failure_raw_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "model_id",
+        "model_payload_sha256",
+        "engine",
+        "load_case_results",
+        "issues",
+        "raw_result_sha256"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "status": {"enum": ["SOLVER_FAILED", "BACKEND_UNAVAILABLE"]},
+        "model_id": {"type": "string", "minLength": 1},
+        "model_payload_sha256": {"$ref": "#/$defs/sha256"},
+        "engine": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "opensees_frame_reference.schema.json#/$defs/engine"}
+          ]
+        },
+        "load_case_results": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"$ref": "#/$defs/solver_failure_load_case"},
+              {"$ref": "opensees_frame_reference.schema.json#/$defs/raw_load_case"}
+            ]
+          }
+        },
+        "issues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "raw_result_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "failure_envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "failure_status",
+        "raw_result",
+        "hardening_audit",
+        "worker_envelope_sha256"
+      ],
+      "properties": {
+        "status": {"enum": ["SOLVER_FAILED", "BACKEND_UNAVAILABLE"]},
+        "failure_status": {
+          "enum": [
+            "AUDIT_FAILED",
+            "BACKEND_UNAVAILABLE",
+            "HOST_VALIDATION_FAILED",
+            "INVALID_INPUT",
+            "ISOLATION_BREACH",
+            "SOLVER_FAILED",
+            "WORKER_CRASHED",
+            "WORKER_ENVELOPE_INVALID",
+            "WORKER_OUTPUT_INVALID",
+            "WORKER_TIMEOUT"
+          ]
+        },
+        "raw_result": {"$ref": "#/$defs/failure_raw_result"},
+        "hardening_audit": {"$ref": "#/$defs/hardening_audit"},
+        "worker_envelope_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "input_capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capture_kind", "payload_text", "payload_sha256"],
+      "properties": {
+        "capture_kind": {"enum": ["CANONICAL_JSON", "PYTHON_REPR"]},
+        "payload_text": {"type": "string", "minLength": 1},
+        "payload_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "negative_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "record_type",
+        "record_id",
+        "record_sha256",
+        "claim_level",
+        "design_verdict_authority",
+        "technical_scope",
+        "gates_completed",
+        "status",
+        "failure_status",
+        "basis_sha256",
+        "reference_source_sha256",
+        "reference_source_digests",
+        "task_artifact_digests",
+        "upstream_brd044_artifacts",
+        "model",
+        "input_capture",
+        "model_payload_sha256",
+        "worker_envelope",
+        "issues",
+        "limitations"
+      ],
+      "properties": {
+        "schema_version": {"const": "2.0"},
+        "record_type": {"const": "NEGATIVE_RESULT"},
+        "record_id": {"type": "string", "pattern": "^OSR2-NEG-[0-9a-f]{16}$"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "claim_level": {"const": "IDEA"},
+        "design_verdict_authority": {"const": "NONE"},
+        "technical_scope": {"const": "HARDENED_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT"},
+        "gates_completed": {"type": "array", "maxItems": 0},
+        "status": {"const": "NEGATIVE_RESULT_RECORDED"},
+        "failure_status": {
+          "enum": [
+            "AUDIT_FAILED",
+            "BACKEND_UNAVAILABLE",
+            "HOST_VALIDATION_FAILED",
+            "INVALID_INPUT",
+            "ISOLATION_BREACH",
+            "SOLVER_FAILED",
+            "WORKER_CRASHED",
+            "WORKER_ENVELOPE_INVALID",
+            "WORKER_OUTPUT_INVALID",
+            "WORKER_TIMEOUT"
+          ]
+        },
+        "basis_sha256": {"$ref": "#/$defs/sha256"},
+        "reference_source_sha256": {"$ref": "#/$defs/sha256"},
+        "reference_source_digests": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {"$ref": "#/$defs/source_digest"}
+        },
+        "task_artifact_digests": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/task_digest"}
+        },
+        "upstream_brd044_artifacts": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {"$ref": "#/$defs/upstream_digest"}
+        },
+        "model": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "frame_f1_model.schema.json"}
+          ]
+        },
+        "input_capture": {"$ref": "#/$defs/input_capture"},
+        "model_payload_sha256": {"$ref": "#/$defs/sha256"},
+        "worker_envelope": {"$ref": "#/$defs/failure_envelope"},
+        "issues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

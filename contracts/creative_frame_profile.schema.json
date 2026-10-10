@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creative_frame_profile.schema.json",
+  "title": "CreativeFrameStructuralProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "candidate_id",
+    "candidate_profile_sha256",
+    "support_policy",
+    "edge_properties",
+    "deck_line_load"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "profile_id": { "type": "string", "pattern": "^CFP-[A-Za-z0-9._-]{1,64}$" },
+    "candidate_id": { "type": "string", "pattern": "^CS-[0-9a-f]{16}$" },
+    "candidate_profile_sha256": { "$ref": "#/$defs/sha256" },
+    "support_policy": { "const": "LEFT_PIN_RIGHT_VERTICAL_ROLLER" },
+    "edge_properties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ARCH_RIB",
+        "DECK",
+        "SPANDREL",
+        "END_POST",
+        "HANGER",
+        "NETWORK_HANGER"
+      ],
+      "properties": {
+        "ARCH_RIB": { "$ref": "#/$defs/edge_property" },
+        "DECK": { "$ref": "#/$defs/edge_property" },
+        "SPANDREL": { "$ref": "#/$defs/edge_property" },
+        "END_POST": { "$ref": "#/$defs/edge_property" },
+        "HANGER": { "$ref": "#/$defs/edge_property" },
+        "NETWORK_HANGER": { "$ref": "#/$defs/edge_property" }
+      }
+    },
+    "deck_line_load": { "$ref": "#/$defs/deck_line_load" }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "clause_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "elastic_modulus_GPa",
+        "source_ref",
+        "expected_source_sha256",
+        "clause_id"
+      ],
+      "properties": {
+        "elastic_modulus_GPa": { "type": "number", "exclusiveMinimum": 0 },
+        "source_ref": { "$ref": "#/$defs/source_ref" },
+        "expected_source_sha256": { "$ref": "#/$defs/sha256" },
+        "clause_id": { "$ref": "#/$defs/clause_id" }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "area_m2",
+        "inertia_m4",
+        "source_ref",
+        "expected_source_sha256",
+        "clause_id"
+      ],
+      "properties": {
+        "area_m2": { "type": "number", "exclusiveMinimum": 0 },
+        "inertia_m4": { "type": "number", "exclusiveMinimum": 0 },
+        "source_ref": { "$ref": "#/$defs/source_ref" },
+        "expected_source_sha256": { "$ref": "#/$defs/sha256" },
+        "clause_id": { "$ref": "#/$defs/clause_id" }
+      }
+    },
+    "edge_property": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material", "section"],
+      "properties": {
+        "material": { "$ref": "#/$defs/material" },
+        "section": { "$ref": "#/$defs/section" }
+      }
+    },
+    "deck_line_load": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "q_kN_m",
+        "direction",
+        "source_ref",
+        "expected_source_sha256",
+        "clause_id"
+      ],
+      "properties": {
+        "q_kN_m": { "type": "number", "exclusiveMinimum": 0 },
+        "direction": { "const": "GLOBAL_NEGATIVE_Y" },
+        "source_ref": { "$ref": "#/$defs/source_ref" },
+        "expected_source_sha256": { "$ref": "#/$defs/sha256" },
+        "clause_id": { "$ref": "#/$defs/clause_id" }
+      }
+    }
+  }
+}

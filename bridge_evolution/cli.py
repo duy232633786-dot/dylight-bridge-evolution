@@ -88,6 +88,36 @@ def main(argv=None):
     knb.add_argument("--managed-folder", default="DYLIGHT Bridge Evolution")
     knb.add_argument("--dry-run", action="store_true")
 
+    nbs = sub.add_parser(
+        "notebooklm-sync", help="hàng đợi đồng bộ hai chiều Codex/Obsidian <-> NotebookLM")
+    nbs_sub = nbs.add_subparsers(dest="notebooklm_sync_cmd", required=True)
+    nbs_enqueue = nbs_sub.add_parser("enqueue", help="đưa nội dung Codex vào outbox")
+    nbs_enqueue.add_argument("--notebook-id", required=True)
+    nbs_enqueue.add_argument("--content", default=None)
+    nbs_enqueue.add_argument("--content-file", default=None)
+    nbs_enqueue.add_argument("--project", default="do-an-cau-vuot-song")
+    nbs_enqueue.add_argument("--origin", default="codex-chat")
+    nbs_enqueue.add_argument("--source-ref", action="append", default=[])
+    nbs_enqueue.add_argument("--store", default=None)
+    nbs_ingest = nbs_sub.add_parser("ingest", help="nhập capture NotebookLM vào inbox")
+    nbs_ingest.add_argument("capture_file")
+    nbs_ingest.add_argument("--store", default=None)
+    nbs_status = nbs_sub.add_parser("status", help="xem trạng thái hàng đợi")
+    nbs_status.add_argument("--store", default=None)
+    nbs_mark = nbs_sub.add_parser("mark", help="cập nhật trạng thái sau transport/xử lý")
+    nbs_mark.add_argument("message_id")
+    nbs_mark.add_argument("--status", required=True,
+                          choices=["PENDING", "DELIVERED", "CAPTURED", "ACKNOWLEDGED", "FAILED"])
+    nbs_mark.add_argument("--remote-ref", default=None)
+    nbs_mark.add_argument("--error", default=None)
+    nbs_mark.add_argument("--store", default=None)
+    nbs_export = nbs_sub.add_parser("export-obsidian", help="xuất dashboard sync vào Obsidian")
+    nbs_export.add_argument("--vault", default=None)
+    nbs_export.add_argument("--store", default=None)
+    nbs_export.add_argument("--managed-folder", default="DYLIGHT Bridge Evolution")
+    nbs_export.add_argument("--project", default="do-an-cau-vuot-song")
+    nbs_export.add_argument("--dry-run", action="store_true")
+
     kl = sub.add_parser(
         "knowledge-import-library",
         help="nhập thư viện tài liệu kỹ thuật cục bộ (ổ trong máy + USB) vào Obsidian")
@@ -129,6 +159,14 @@ def main(argv=None):
     lab_intake.add_argument("--objective", action="append", default=[])
     lab_intake.add_argument("--constraint", action="append", default=[])
     lab_intake.add_argument("--requested-by", default="project_owner")
+    lab_intake.add_argument(
+        "--runtime-domain", required=True,
+        choices=[
+            "production_line_girder_l1", "production_l0_only",
+            "experimental_arch_frame", "straight_prismatic_column",
+        ],
+    )
+    lab_intake.add_argument("--structural-family", action="append", required=True)
     lab_intake.add_argument("--plan-only", action="store_true")
     lab_intake.add_argument("--max-tasks", type=int, default=5)
     lab_intake.add_argument("--max-parallel", type=int, default=1)
@@ -148,6 +186,14 @@ def main(argv=None):
     lab_orchestrate.add_argument("--objective", action="append", default=[])
     lab_orchestrate.add_argument("--constraint", action="append", default=[])
     lab_orchestrate.add_argument("--requested-by", default="project_owner")
+    lab_orchestrate.add_argument(
+        "--runtime-domain", required=True,
+        choices=[
+            "production_line_girder_l1", "production_l0_only",
+            "experimental_arch_frame", "straight_prismatic_column",
+        ],
+    )
+    lab_orchestrate.add_argument("--structural-family", action="append", required=True)
     lab_orchestrate.add_argument("--max-tasks", type=int, default=5)
     lab_orchestrate.add_argument("--max-parallel", type=int, default=1)
     lab_orchestrate.add_argument("--max-retries", type=int, default=1)
@@ -172,7 +218,7 @@ def main(argv=None):
                              help="phải khớp requested_by của research brief")
     lab_recover.add_argument("--reason", required=True)
     lab_recover.add_argument(
-        "--provider", choices=["codex", "claude", "opencode", "antigravity"],
+        "--provider", choices=["codex", "claude"],
         default=None, help="giữ provider hiện tại nếu bỏ trống")
     lab_recover.add_argument("--grant-attempts", type=int, default=1)
 
@@ -396,6 +442,41 @@ def main(argv=None):
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 3 if result["conflicts"] else 0
 
+    if args.cmd == "notebooklm-sync":
+        from .knowledge.notebooklm_sync import (
+            enqueue_codex_message, export_sync_dashboard,
+            ingest_notebooklm_capture, sync_status, update_message_status,
+        )
+        try:
+            if args.notebooklm_sync_cmd == "enqueue":
+                if bool(args.content) == bool(args.content_file):
+                    raise ValueError("chọn đúng một trong --content hoặc --content-file")
+                content = (args.content if args.content is not None else
+                           open(args.content_file, encoding="utf-8-sig").read())
+                result = enqueue_codex_message(
+                    args.notebook_id, content, project=args.project,
+                    origin=args.origin, source_refs=args.source_ref, store_dir=args.store)
+            elif args.notebooklm_sync_cmd == "ingest":
+                result = ingest_notebooklm_capture(args.capture_file, store_dir=args.store)
+            elif args.notebooklm_sync_cmd == "status":
+                result = sync_status(args.store)
+            elif args.notebooklm_sync_cmd == "mark":
+                result = update_message_status(
+                    args.message_id, args.status, remote_ref=args.remote_ref,
+                    error=args.error, store_dir=args.store)
+            else:
+                result = export_sync_dashboard(
+                    args.vault, store_dir=args.store,
+                    managed_folder=args.managed_folder, project=args.project,
+                    dry_run=args.dry_run)
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            print(json.dumps({"status": "ERROR", "error": str(exc)},
+                             indent=2, ensure_ascii=False), file=sys.stderr)
+            return 2
+        result["status"] = result.get("status", "SUCCESS")
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+
     if args.cmd == "knowledge-import-library":
         from .knowledge import import_local_library
         reporter = None if args.quiet else (
@@ -454,6 +535,10 @@ def main(argv=None):
             if args.lab_cmd == "intake":
                 result = create_research_brief(
                     args.topic,
+                    runtime_scope={
+                        "structural_families": args.structural_family,
+                        "runtime_domain": args.runtime_domain,
+                    },
                     objectives=args.objective or None,
                     constraints=args.constraint or None,
                     requested_by=args.requested_by,
@@ -471,6 +556,10 @@ def main(argv=None):
             if args.lab_cmd == "orchestrate":
                 created = intake_and_plan(
                     args.topic,
+                    runtime_scope={
+                        "structural_families": args.structural_family,
+                        "runtime_domain": args.runtime_domain,
+                    },
                     objectives=args.objective or None,
                     constraints=args.constraint or None,
                     requested_by=args.requested_by,

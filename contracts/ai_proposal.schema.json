@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dylight.local/contracts/ai_proposal.schema.json",
+  "title": "AIProposalContract",
+  "description": "Hợp đồng ba chiều giữa 'bộ não AI' (LLM local, vendor CLI hoặc heuristic đối chứng) và phòng lab. ProposalRequest là những gì bộ não được nhận; ProposalResponse là những gì nó được phép trả (chỉ THAY ĐỔI GENE + giả thuyết — additionalProperties=false nên mọi khóa phán quyết như verdict/pass/feasible do bộ não tự thêm đều bị từ chối); ProposalSessionReport là lineage đầy đủ của một phiên. Hai tầng authority tách bạch: claim (status/claim_level/blockers) do design_study.assess_candidate cấp; phản hồi vật lý (feedback_status/verifier_feasible/feedback_violations/responses/objectives) do evaluate_candidate + independent verifier cấp và KHÔNG phải claim. Root của file này validate ProposalSessionReport; request/response validate qua $defs.",
+  "$ref": "#/$defs/ProposalSessionReport",
+  "$defs": {
+    "Sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "Gene": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": ["string", "integer"]}
+    },
+    "Changes": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 8,
+      "additionalProperties": {"type": ["string", "integer"]}
+    },
+    "DomainSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "domain"],
+      "properties": {
+        "type": {"enum": ["catalog", "int", "grid"]},
+        "domain": {"type": "array", "minItems": 1, "items": {"type": ["string", "integer"]}}
+      }
+    },
+    "Finding": {
+      "type": "object",
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": {"type": "string"},
+        "severity": {"type": "string"},
+        "message": {"type": "string"},
+        "margin": {"type": ["number", "null"]}
+      }
+    },
+    "AssessmentSummary": {
+      "type": "object",
+      "required": ["status", "claim_level", "blockers", "advisories", "feedback_status", "verifier_feasible", "feedback_violations", "feedback_authority", "objective_value"],
+      "properties": {
+        "status": {"type": "string"},
+        "claim_level": {"enum": ["IDEA", "SCREENED"]},
+        "study_level": {"enum": ["L0_GEOMETRY", "L1_STRUCTURAL"]},
+        "blockers": {"type": "array", "items": {"$ref": "#/$defs/Finding"}},
+        "advisories": {"type": "array", "items": {"$ref": "#/$defs/Finding"}},
+        "feedback_status": {"type": ["string", "null"]},
+        "verifier_feasible": {"type": ["boolean", "null"]},
+        "feedback_violations": {"type": "array", "items": {"$ref": "#/$defs/Finding"}},
+        "feedback_authority": {"type": "string"},
+        "responses": {"type": "object", "additionalProperties": {"type": ["number", "string", "null"]}},
+        "objectives": {"type": "object", "additionalProperties": {"type": ["number", "null"]}},
+        "objective_value": {"type": ["number", "null"]},
+        "max_utilization": {"type": ["number", "null"]},
+        "case_id": {"type": ["string", "null"]}
+      }
+    },
+    "KnowledgeCardBrief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["card_id", "title", "guidance", "status", "applies_to", "score", "trust"],
+      "properties": {
+        "card_id": {"type": "string"},
+        "title": {"type": "string"},
+        "guidance": {"type": "string"},
+        "status": {"type": "string"},
+        "applies_to": {"type": "object"},
+        "score": {"type": "number"},
+        "trust": {"const": "UNVERIFIED_REFERENCE_ONLY"}
+      }
+    },
+    "HistoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["round", "changes", "in_domain", "status", "claim_level", "verifier_feasible", "objective_value", "max_utilization", "blocker_codes"],
+      "properties": {
+        "round": {"type": "integer", "minimum": 1},
+        "changes": {"type": "object"},
+        "in_domain": {"type": "boolean"},
+        "status": {"type": "string"},
+        "claim_level": {"type": ["string", "null"]},
+        "verifier_feasible": {"type": ["boolean", "null"]},
+        "objective_value": {"type": ["number", "null"]},
+        "max_utilization": {"type": ["number", "null"]},
+        "blocker_codes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "ProposalRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "request_id", "session_id", "round", "mode", "family", "grammar_version",
+        "study_level", "objective", "design_space", "current_gene", "current_assessment",
+        "history", "knowledge_cards", "budget", "rules_for_the_proposer", "response_format"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "request_id": {"$ref": "#/$defs/Sha256"},
+        "session_id": {"type": "string", "pattern": "^[a-f0-9]{16}$"},
+        "round": {"type": "integer", "minimum": 1},
+        "mode": {"enum": ["REPAIR", "TRIM", "EXPLORE_L0"]},
+        "family": {"type": "string"},
+        "grammar_version": {"type": "string"},
+        "study_level": {"enum": ["L0_GEOMETRY", "L1_STRUCTURAL"]},
+        "objective": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["key", "direction", "available_at_study_level"],
+          "properties": {
+            "key": {"type": "string"},
+            "direction": {"enum": ["min", "max"]},
+            "available_at_study_level": {"type": "boolean"}
+          }
+        },
+        "design_space": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/DomainSpec"}},
+        "current_gene": {"$ref": "#/$defs/Gene"},
+        "current_assessment": {"$ref": "#/$defs/AssessmentSummary"},
+        "history": {"type": "array", "items": {"$ref": "#/$defs/HistoryEntry"}},
+        "knowledge_cards": {"type": "array", "items": {"$ref": "#/$defs/KnowledgeCardBrief"}},
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rounds_remaining", "evaluations_remaining", "max_proposals_this_round"],
+          "properties": {
+            "rounds_remaining": {"type": "integer", "minimum": 0},
+            "evaluations_remaining": {"type": "integer", "minimum": 0},
+            "max_proposals_this_round": {"type": "integer", "minimum": 1, "maximum": 8}
+          }
+        },
+        "rules_for_the_proposer": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "response_format": {"type": "object"}
+      }
+    },
+    "Proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changes", "hypothesis"],
+      "properties": {
+        "changes": {"$ref": "#/$defs/Changes"},
+        "hypothesis": {"type": "string", "minLength": 5, "maxLength": 1200},
+        "rationale": {"type": "string", "maxLength": 2000},
+        "expected_effects": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rule_id", "direction"],
+            "properties": {
+              "rule_id": {"type": "string", "maxLength": 40},
+              "direction": {"enum": ["decrease", "increase", "unchanged", "unknown"]}
+            }
+          }
+        },
+        "cites": {"type": "array", "maxItems": 8, "items": {"type": "string", "maxLength": 40}},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "ProposalResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "request_id", "proposals"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "request_id": {"$ref": "#/$defs/Sha256"},
+        "proposals": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"$ref": "#/$defs/Proposal"}},
+        "notes": {"type": "string", "maxLength": 2000}
+      }
+    },
+    "ProposalRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "changes", "hypothesis", "in_domain", "domain_errors", "outcome", "gene", "gene_sha256", "assessment", "assessment_sha256", "improved"],
+      "properties": {
+        "index": {"type": "integer", "minimum": 0},
+        "changes": {"type": "object"},
+        "hypothesis": {"type": "string"},
+        "expected_effects": {"type": "array"},
+        "cites": {"type": "array"},
+        "in_domain": {"type": "boolean"},
+        "domain_errors": {"type": "array", "items": {"type": "string"}},
+        "outcome": {"enum": ["ASSESSED", "OUT_OF_DOMAIN", "DUPLICATE", "BUDGET_EXHAUSTED"]},
+        "gene": {"oneOf": [{"$ref": "#/$defs/Gene"}, {"type": "null"}]},
+        "gene_sha256": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]},
+        "assessment": {"oneOf": [{"$ref": "#/$defs/AssessmentSummary"}, {"type": "null"}]},
+        "assessment_sha256": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]},
+        "improved": {"type": "boolean"}
+      }
+    },
+    "RoundRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["round", "mode", "base_gene_sha256", "request_sha256", "adapter_status", "adapter_error", "response_sha256", "proposals", "elapsed_s"],
+      "properties": {
+        "round": {"type": "integer", "minimum": 1},
+        "mode": {"enum": ["REPAIR", "TRIM", "EXPLORE_L0"]},
+        "base_gene_sha256": {"$ref": "#/$defs/Sha256"},
+        "request_sha256": {"$ref": "#/$defs/Sha256"},
+        "adapter_status": {"enum": ["OK", "MALFORMED", "UNAVAILABLE", "TIMEOUT"]},
+        "adapter_error": {"type": ["string", "null"]},
+        "response_sha256": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]},
+        "raw_excerpt": {"type": "string", "maxLength": 600},
+        "proposals": {"type": "array", "items": {"$ref": "#/$defs/ProposalRecord"}},
+        "elapsed_s": {"type": "number", "minimum": 0}
+      }
+    },
+    "Preregistration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question", "family", "objective_key", "direction", "budget_rounds", "budget_evaluations",
+        "proposals_per_round", "improvement_min_rel", "success_criterion", "falsification_criterion",
+        "claim_gate_note", "seed", "adapter_id", "seed_gene_sha256", "seed_status", "seed_verifier_feasible",
+        "locked_before_round_1"
+      ],
+      "properties": {
+        "question": {"type": "string", "minLength": 10},
+        "family": {"type": "string"},
+        "objective_key": {"type": "string"},
+        "direction": {"enum": ["min", "max"]},
+        "budget_rounds": {"type": "integer", "minimum": 1, "maximum": 50},
+        "budget_evaluations": {"type": "integer", "minimum": 1, "maximum": 500},
+        "proposals_per_round": {"type": "integer", "minimum": 1, "maximum": 8},
+        "improvement_min_rel": {"type": "number", "minimum": 0, "maximum": 1},
+        "success_criterion": {"type": "string"},
+        "falsification_criterion": {"type": "string"},
+        "claim_gate_note": {"type": "string"},
+        "seed": {"type": "integer"},
+        "adapter_id": {"type": "string"},
+        "seed_gene_sha256": {"$ref": "#/$defs/Sha256"},
+        "seed_status": {"type": "string"},
+        "seed_verifier_feasible": {"type": ["boolean", "null"]},
+        "locked_before_round_1": {"const": true}
+      }
+    },
+    "ProposalSessionReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "basis_id", "session_id", "created_at_utc", "family", "grammar_version",
+        "study_level", "objective_available", "claim_ceiling", "verdict_authority", "feedback_authority",
+        "proposer_authority", "adapter", "preregistration", "preregistration_sha256", "seed_gene",
+        "seed_assessment", "rounds", "best", "evaluations_used", "assessed_count", "negative_results",
+        "duplicates", "out_of_domain", "termination_reason", "hypothesis_supported", "registry_sha256",
+        "source_digests"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "basis_id": {"type": "string"},
+        "session_id": {"type": "string", "pattern": "^[a-f0-9]{16}$"},
+        "created_at_utc": {"type": "string"},
+        "family": {"type": "string"},
+        "grammar_version": {"type": "string"},
+        "study_level": {"enum": ["L0_GEOMETRY", "L1_STRUCTURAL"]},
+        "objective_available": {"type": "boolean"},
+        "claim_ceiling": {"const": "SCREENED"},
+        "verdict_authority": {"type": "string"},
+        "feedback_authority": {"type": "string"},
+        "proposer_authority": {"const": "NONE"},
+        "adapter": {
+          "type": "object",
+          "required": ["kind", "adapter_id"],
+          "properties": {
+            "kind": {"enum": ["heuristic", "http", "cli"]},
+            "adapter_id": {"type": "string"},
+            "model": {"type": ["string", "null"]},
+            "endpoint_host": {"type": ["string", "null"]},
+            "provider": {"type": ["string", "null"]},
+            "api_key_env": {"type": ["string", "null"]},
+            "api_key_present": {"type": "boolean"},
+            "prompt_template_sha256": {"type": ["string", "null"]}
+          },
+          "not": {"anyOf": [{"required": ["api_key"]}, {"required": ["authorization"]}, {"required": ["token"]}]}
+        },
+        "preregistration": {"$ref": "#/$defs/Preregistration"},
+        "preregistration_sha256": {"$ref": "#/$defs/Sha256"},
+        "seed_gene": {"$ref": "#/$defs/Gene"},
+        "seed_assessment": {"$ref": "#/$defs/AssessmentSummary"},
+        "rounds": {"type": "array", "items": {"$ref": "#/$defs/RoundRecord"}},
+        "best": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["gene", "gene_sha256", "status", "claim_level", "verifier_feasible", "objective_value", "improvement_rel", "found_in_round"],
+              "properties": {
+                "gene": {"$ref": "#/$defs/Gene"},
+                "gene_sha256": {"$ref": "#/$defs/Sha256"},
+                "status": {"type": "string"},
+                "claim_level": {"enum": ["IDEA", "SCREENED"]},
+                "verifier_feasible": {"const": true},
+                "objective_value": {"type": ["number", "null"]},
+                "improvement_rel": {"type": ["number", "null"]},
+                "found_in_round": {"type": "integer", "minimum": 0}
+              }
+            }
+          ]
+        },
+        "evaluations_used": {"type": "integer", "minimum": 0},
+        "assessed_count": {"type": "integer", "minimum": 0},
+        "negative_results": {"type": "integer", "minimum": 0},
+        "duplicates": {"type": "integer", "minimum": 0},
+        "out_of_domain": {"type": "integer", "minimum": 0},
+        "termination_reason": {
+          "enum": [
+            "SUCCESS_CRITERION_MET", "BUDGET_ROUNDS_EXHAUSTED", "BUDGET_EVALUATIONS_EXHAUSTED",
+            "ADAPTER_FAILED_REPEATEDLY", "NO_NEW_PROPOSALS"
+          ]
+        },
+        "hypothesis_supported": {"type": ["boolean", "null"]},
+        "registry_sha256": {"type": ["string", "null"]},
+        "source_digests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {"path": {"type": "string"}, "sha256": {"$ref": "#/$defs/Sha256"}}
+          }
+        }
+      }
+    }
+  }
+}

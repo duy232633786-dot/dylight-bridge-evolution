@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "DESIGN-LOOP-0.2.0",
+  "algorithm_id": "COMPONENT_DESIGN_LOOP",
+  "algorithm_version": "design-loop/0.2.0",
+  "title": "Cơ sở thuật toán vòng lặp thiết kế cấu kiện (REPAIR → TRIM) trên grammar Super-T",
+  "claim_ceiling": "SCREENED",
+  "design_verdict_authority": "INDEPENDENT_VERIFIER",
+  "loop_authority": "NONE",
+  "allowed_grammars": [
+    "super_t_simple_v1",
+    "super_t_parametric_v2"
+  ],
+  "required_analysis": {
+    "fidelity": "L1_LINE_GIRDER",
+    "solver": "BUILTIN_L1"
+  },
+  "seed_contract": {
+    "allowlist": "Chỉ hai grammar Super-T trong runtime_scope của BRD-050 (production_line_girder_l1) được chạy; họ khác (I-girder, hộp, liên hợp) bị SEED_REJECTED trước khi mở solver — CX-050-04",
+    "analysis_settings": "Seed phải khai analysis.fidelity = L1_LINE_GIRDER và analysis.solver = BUILTIN_L1; seed L2/L3 (schema hợp lệ) bị SEED_REJECTED thay vì bị dựng lại lặng lẽ sang L1 — CX-050-01",
+    "rebuild_hash": "Sau khi lấy gene, state dựng lại từ gene phải có input_hash (lõi: bỏ provenance/case_id/status) ĐÚNG BẰNG seed đã nộp; khác ở bất kỳ trường nào (project_inputs, analysis, constraints, materials cố định) ⇒ SEED_REJECTED kèm danh sách trường lệch — CX-050-01"
+  },
+  "default_policy": {
+    "objective_key": "relative_cost",
+    "utilization_target": 1.0,
+    "move_policy": "knowledge_priority",
+    "trim_order": "cheapest_first",
+    "max_iterations": 50,
+    "trim_enabled": true,
+    "max_trim_probes": null,
+    "diagnose_top_k": 64
+  },
+  "utilization_rounding_tolerance": 0.002,
+  "progress_ladder": [
+    {
+      "stage": 0,
+      "label": "NOT_ANALYSABLE",
+      "meaning": "SCHEMA_INVALID hoặc SOLVER_FAILED — không có số liệu để tiến; SOLVER_FAILED không bao giờ được chấp nhận"
+    },
+    {
+      "stage": 1,
+      "label": "L0_INVALID",
+      "meaning": "GEOMETRY_INVALID: bố trí/chế tạo vi phạm, chưa mở solver; so trong stage bằng tổng margin HARD (cv)"
+    },
+    {
+      "stage": 2,
+      "label": "INFEASIBLE",
+      "meaning": "Solver chạy, independent verifier FAIL; so trong stage bằng cv"
+    },
+    {
+      "stage": 3,
+      "label": "FEASIBLE_OVER_TARGET",
+      "meaning": "Verifier PASS nhưng max_utilization > utilization_target; so trong stage bằng mức vượt"
+    },
+    {
+      "stage": 4,
+      "label": "ACCEPTABLE",
+      "meaning": "PASS và ≤ target — chuyển sang TRIM"
+    }
+  ],
+  "acceptance_rules": {
+    "REPAIR": "Chấp nhận nước đầu tiên có progress_key (stage, -mức) lớn hơn hiện tại theo thứ tự từ điển; không nước nào tiến lên ⇒ NO_IMPROVING_REPAIR, trừ khi có ứng viên solver NOT_CONVERGED chưa giải quyết ⇒ INCONCLUSIVE_SOLVER_FAILURES",
+    "TRIM": "Ứng viên = láng giềng ±1 bậc lưới có objective giải tích thấp hơn hiện tại, L0 sạch, chưa thăm; thử theo objective tăng dần; chấp nhận nước đầu tiên vẫn feasible và ≤ target; hết ứng viên và mọi láng giềng rẻ hơn đều có kết luận ⇒ CONVERGED (tối ưu cục bộ 1 bước); còn láng giềng NOT_CONVERGED (probe hoặc đã thăm mà hỏng) ⇒ INCONCLUSIVE_SOLVER_FAILURES; TRIM tắt theo policy ⇒ TRIM_DISABLED, không phải CONVERGED; trim_order=recent_reject_last chỉ đẩy nước (biến, giá trị) đã bị bác xuống cuối danh sách, không loại",
+    "visited": "Mọi input_hash đã đánh giá không bao giờ được đề xuất lại — vòng lặp không thể dao động và không mở solver hai lần cho cùng thiết kế; láng giềng đã thăm mà solver hỏng được đếm riêng (skipped_failed) vì nó chưa có kết luận",
+    "solver_failed": "NOT_CONVERGED ở seed ⇒ dừng SOLVER_FAILED; ở nước đi ⇒ phương án bị loại, ghi nhận, vòng lặp tiếp tục với ứng viên khác; nếu vòng cuối vẫn còn ứng viên hỏng chưa giải quyết thì kết luận là INCONCLUSIVE_SOLVER_FAILURES, không phải CONVERGED/NO_IMPROVING_REPAIR — CX-050-02"
+  },
+  "termination_reasons": [
+    "CONVERGED",
+    "BUDGET_EXHAUSTED",
+    "MAX_ITERATIONS",
+    "NO_IMPROVING_REPAIR",
+    "TRIM_PROBE_LIMIT",
+    "TRIM_DISABLED",
+    "INCONCLUSIVE_SOLVER_FAILURES",
+    "SEED_REJECTED",
+    "SOLVER_FAILED"
+  ],
+  "finite_termination_argument": "Tập trạng thái = tích các miền grammar (hữu hạn). Mỗi probe đánh giá một trạng thái chưa thăm và thêm nó vào visited; mỗi vòng hoặc chấp nhận một trạng thái mới hoặc dừng. Vì vậy số probe ≤ |grammar| và số vòng ≤ số probe; ngân sách solver và max_iterations chặn thêm phía trên.",
+  "rule_to_component_check": {
+    "STR-001": [
+      "LONGITUDINAL_GIRDER",
+      "FLEXURE_STRENGTH"
+    ],
+    "SERV-001": [
+      "LONGITUDINAL_GIRDER",
+      "SERVICE_STRESS"
+    ],
+    "SERV-002": [
+      "LONGITUDINAL_GIRDER",
+      "DEFLECTION"
+    ]
+  },
+  "touched_components_without_l1_evidence": [
+    ["S1", "DECK_SLAB"],
+    ["P1", "PRESTRESSING_SYSTEM"],
+    ["D1", "CROSS_BEAM_DIAPHRAGM"]
+  ],
+  "explicit_not_evaluated": {
+    "LONGITUDINAL_GIRDER/SHEAR_TORSION": "L1 chỉ có cắt đơn giản hoá (β=2, cốt đai giả định 4 nhánh D10@125), không có xoắn — STR-002 KHÔNG được nâng thành bằng chứng SHEAR_TORSION",
+    "LONGITUDINAL_GIRDER/FATIGUE": "không có trong runtime",
+    "LONGITUDINAL_GIRDER/STABILITY": "không có trong runtime",
+    "DECK_SLAB/*": "GEOM-003 chỉ là chiều dày tối thiểu cấu tạo, không phải kiểm uốn/chọc thủng/nứt/mỏi bản",
+    "PRESTRESSING_SYSTEM/*": "L1 dùng mất mát gộp trong catalog; không có ứng suất kích/truyền lực, mất mát theo giai đoạn, vùng neo",
+    "CROSS_BEAM_DIAPHRAGM/*": "diaphragm_layout_id bị REPAIR/TRIM thay đổi (CONS-001) nhưng L1 không kiểm uốn–cắt, liên kết hay mỏi dầm ngang/vách ngăn; khai component D1 với 0 check để audit sinh NOT_EVALUATED — CX-050-05"
+  },
+  "verification_records": "Report mang verification_records: mọi record đã mở solver (kể cả seed và phương án cuối) với responses đầy đủ, violations kèm message, objectives, provenance của evaluator, solver_name/solver_status. Evidence trong component audit trỏ tới report:/verification_records/<case_id> và sha256 là SHA-256 canonical của đúng payload đó — tự đối soát được không cần chạy lại — CX-050-03",
+  "pinned_sources": [
+    "bridge_evolution/design_loop.py",
+    "bridge_evolution/evaluate.py",
+    "bridge_evolution/analysis/diagnose.py",
+    "bridge_evolution/optimization/common.py",
+    "bridge_evolution/verifier/rules.py",
+    "bridge_evolution/fe_adapter/solver.py",
+    "bridge_evolution/fe_adapter/line_girder.py",
+    "bridge_evolution/geometry.py",
+    "bridge_evolution/objectives.py",
+    "bridge_evolution/state.py",
+    "bridge_evolution/catalogs.py",
+    "catalogs/catalogs.json",
+    "contracts/design_loop_report.schema.json",
+    "contracts/bridge_design_state.schema.json",
+    "contracts/evaluation_result.schema.json"
+  ],
+  "pinned_sources_note": "Cộng thêm bridge_grammar/<grammar_id>.json của run. Mọi authority định nghĩa hành vi (evaluator, chẩn đoán, ngân sách, verifier, solver adapter, hình học, objective, state, catalog bytes, contract) đều có SHA-256 trong report — CX-050-06",
+  "extra_repair_moves": {
+    "MODEL-001": [
+      [
+        "deck_slab_thickness_mm",
+        1
+      ],
+      [
+        "deck_concrete_id",
+        1
+      ],
+      [
+        "prestress_layout_id",
+        -1
+      ]
+    ]
+  },
+  "repair_move_sources": {
+    "diagnose": "bridge_evolution.analysis.diagnose.suggest_repairs — bậc thang _STEP_MOVES cho SERV-001/STR-001/STR-002/SERV-002, quét GEOM-001/002/003, CONS-001; mỗi nước đã kiểm 'không sinh vi phạm L0 HARD mới'; card_id não 2 chỉ để gắn nhãn nguồn gợi ý",
+    "loop_extra": "bảng extra_repair_moves ở trên, cùng kiểm L0 như diagnose",
+    "neighbor": "TRIM: láng giềng ±1 theo gene_order(grammar_id)"
+  },
+  "knowledge_cards_consulted_via_diagnose": [
+    "KC-001",
+    "KC-002",
+    "KC-003",
+    "KC-004",
+    "KC-005",
+    "KC-006",
+    "KC-007",
+    "KC-009",
+    "KC-020"
+  ],
+  "limits": [
+    "Tìm kiếm CỤC BỘ một bước: CONVERGED/NO_IMPROVING_REPAIR không chứng minh tối ưu toàn cục; đối chiếu với oracle vét cạn v1 hoặc NSGA-II theo docs/03_validation_protocol.md trước khi phát biểu",
+    "Chỉ áp dụng đúng một biến mỗi nước đi để lineage đọc được; các vi phạm cần đổi đồng thời hai biến (ví dụ KC-016 SERV-001 ↔ FAB-003 ở grammar v2) có thể dừng NO_IMPROVING_REPAIR",
+    "utilization_target chỉ siết (≤ 1.0); mọi verdict PASS/FAIL thuộc independent verifier",
+    "Objective từ catalog placeholder bậc độ lớn: chỉ xếp hạng trong cùng run",
+    "Trần claim SCREENED của toàn dự án; kết quả không thay L2/L3, thí nghiệm hay phê duyệt kỹ sư",
+    "Cổng applicability của design_study (APP-EVIDENCE-001, SITE-001) không nằm trong vòng lặp này: claim SCREENED của report là claim ở fidelity L1 theo verifier, chưa qua cổng site/evidence của assess_candidate"
+  ]
+}

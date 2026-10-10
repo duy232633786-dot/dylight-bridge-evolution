@@ -1,6 +1,6 @@
 # Ma trận Năng lực Runtime — DYLIGHT Bridge Evolution
 
-Phiên bản: `RCM-2.0.0` — cập nhật `2026-08-21` (BRD-001). Package: `0.8.0`.
+Phiên bản: `RCM-2.0.0` — cập nhật nội dung `2026-08-30` (BRD-034, engine độc lập chưa nối pipeline). Package: `0.8.0`.
 
 Tài liệu này ghi **runtime CÓ gì và KHÔNG có gì**, kèm bằng chứng là đường dẫn
 file và tên hàm. Trần claim hiện tại của toàn dự án là **`SCREENED`**
@@ -38,6 +38,9 @@ Ba trạng thái, hiểu theo nghĩa kiểm được:
 | `L1_LINE_GIRDER_SOLVER` | PRESENT | L1 — dầm đơn + hệ số phân bố ngang, hoạt tải HL-93/TCVN 11823 | `bridge_evolution/fe_adapter/line_girder.py::analyze`; `bridge_evolution/fe_adapter/solver.py::run_analysis` | Đàn hồi, tức thời. **Không** có mất mát DƯL theo giai đoạn, ứng suất lúc truyền lực, co ngót–từ biến, ổn định thành mỏng, xoắn. |
 | `INDEPENDENT_VERIFIER` | PRESENT | Verifier độc lập ra PASS/FAIL (`STR-001/002`, `SERV-001/002/003`, `MODEL-001`) | `bridge_evolution/verifier/rules.py::verify_candidate` | — |
 | `EVALUATION_CONTRACT` | PRESENT | Contract trung tâm + provenance SHA-256 tái lập | `bridge_evolution/evaluate.py::evaluate_candidate` | — |
+| `COMPONENT_AUDIT_ORCHESTRATION` | PARTIAL | Điều phối kiểm toán đa cấu kiện cầu và đề xuất tái phân tích | `bridge_evolution/evaluate.py::build_component_audit`; `contracts/evaluation_result.schema.json` | Chỉ chuẩn hóa `component_manifest` và evidence do caller cung cấp theo nguyên tắc fail-closed. **Không** tính demand/capacity, N-M, P-Delta, buckling, fatigue, địa kỹ thuật, thủy lực, giai đoạn thi công hay durability. `BLOCKED/REJECTED` của component audit không thay `status/feasible`; independent verifier vẫn là authority duy nhất của verdict hiện tại. |
+| `COLUMN_NM_SECOND_ORDER` | PARTIAL | F1 tương thích biến dạng N–M và khuếch đại mômen cho cột/trụ BTCT thẳng lăng trụ | `bridge_evolution/column_capacity/engine.py::interaction_diagram`; `bridge_evolution/column_capacity/engine.py::moment_magnification`; `tests/test_column_capacity.py` | Engine độc lập, chưa nối verifier/evaluate và chưa được khai trong danh sách package cài đặt. Chỉ uốn một phương, tiết diện đặc chữ nhật/tròn, cốt thép đối xứng. Basis bị khóa; `Pmax` tách khỏi `Po`; `k/Lu` và các đầu vào bậc hai cần `EvidenceRef` có SHA-256/case/clause nhưng lab chưa xác minh nội dung đó. `Cm` được tính, mode `delta_b/delta_s` không được trộn; `kLu/r >= 100` hoặc gần tải Euler bị chặn. Kết quả `SCREENED`, `design_verdict_authority=NONE`; đây **không** phải phân tích P–Delta phi tuyến. |
+| `ARCH_RIB_STABILITY` | ABSENT | Ổn định trong/ngoài mặt phẳng của vành vòm | `bridge_evolution/column_capacity/engine.py::require_straight_prismatic`; `tests/test_column_capacity.py::test_rejects_curved_member_and_bar_outside_section` | Engine cột chủ động từ chối `ARCH_RIB`. Chưa có đường áp lực, chiều dài quy đổi vòm, trị riêng hay phi tuyến hình học cho vành vòm. |
 | `OPTIMIZATION_BUILTIN` | PRESENT | Random Search + NSGA-II nội bộ, ngân sách solver công bằng | `bridge_evolution/optimization/nsga2.py::nsga2`; `bridge_evolution/optimization/common.py::BudgetedEvaluator` | — |
 | `OPTIMIZATION_PYMOO` | PARTIAL | Adapter pymoo (NSGA-II của thư viện ngoài) | `bridge_evolution/optimization/pymoo_adapter.py::run_pymoo_optimization` | Backend tùy chọn, cài qua extra `optimization`; `dev`/`all` có sẵn. NSGA-II vẫn là heuristic phụ thuộc seed/ngân sách và không tự nâng fidelity hay claim kết cấu. |
 | `SECTION_FEA_2D` | PARTIAL | Phân tích tiết diện 2D bằng `sectionproperties` | `bridge_evolution/geometry_parametric.py::compute_super_t_section_properties` | **Không nằm trong vòng tối ưu.** Đây là mô hình tiết diện **thứ hai**, bộ tham số khác grammar v2 (`bottom_thickness_m`…), chỉ chạy khi bật `section --fem`. Cài qua extra `section-fea`; lỗi backend fail-closed. Chưa có benchmark, mesh-convergence hay V&V để gọi là L2/L3. |
@@ -52,9 +55,10 @@ Ba trạng thái, hiểu theo nghĩa kiểm được:
 | `PHYSICAL_TEST_EVIDENCE` | ABSENT | Thí nghiệm vật lý / quan trắc hiện trường | `multiagent/lab.json`; `knowledge/audits/current.json` | Không có dữ liệu đo nào trong repo. Mọi "evidence" hiện có đều là kết quả mô phỏng `builtin-l1/0.2.0`. Trần claim dự án bị khoá ở `SCREENED`. |
 | `GRAMMAR_V2_ORACLE` | ABSENT | Oracle vét cạn cho grammar v2 | `knowledge/audits/current.json` | Miền v2 ~41,9 tỷ tổ hợp — không vét cạn được, và chưa có mẫu phân tầng thay thế. Vì vậy `KC-010…KC-020` **không có nguồn oracle**. |
 
-Grammar v1 hiện có **3 mã dầm Super-T định hình** dùng được (`ST-1650`, `ST-1750`,
-`ST-1850`); `ST-PARAM` chỉ là marker của grammar v2 và `ST-TEST-SINGULAR` là
-entry test-only cho đường `SOLVER_FAILED`.
+Catalog hiện có **6 mã tiết diện dầm production** theo bộ đếm runtime: ba mã
+Super-T định hình (`ST-1650`, `ST-1750`, `ST-1850`) và ba marker họ mới
+(`I-PARAM`, `BOX-PARAM`, `CI-PARAM`). `ST-PARAM` là marker grammar v2 bị loại
+khỏi bộ đếm; `ST-TEST-SINGULAR` là entry test-only cho đường `SOLVER_FAILED`.
 
 ---
 

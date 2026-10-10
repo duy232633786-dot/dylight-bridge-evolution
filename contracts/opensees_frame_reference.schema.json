@@ -1,0 +1,435 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opensees_frame_reference.schema.json",
+  "title": "BRD044OpenSeesFrameReferenceSuite",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "suite_id",
+    "suite_sha256",
+    "reference",
+    "claim_level",
+    "design_verdict_authority",
+    "technical_scope",
+    "status",
+    "basis_sha256",
+    "reference_source_sha256",
+    "reference_source_digests",
+    "backend_identity",
+    "comparison_tolerances",
+    "cases",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "suite_id": { "type": "string", "pattern": "^OSR-[0-9a-f]{16}$" },
+    "suite_sha256": { "$ref": "#/$defs/sha256" },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "OPENSEES_FRAME_2D_REFERENCE" },
+        "version": { "const": "opensees-frame-reference/0.1.0" }
+      }
+    },
+    "claim_level": { "const": "IDEA" },
+    "design_verdict_authority": { "const": "NONE" },
+    "technical_scope": {
+      "const": "CROSS_IMPLEMENTATION_LINEAR_2D_CODE_VERIFICATION_NO_L2_OR_DESIGN_VERDICT"
+    },
+    "status": {
+      "enum": [
+        "BENCHMARK_SUITE_COMPLETE",
+        "RECONCILIATION_REQUIRED"
+      ]
+    },
+    "basis_sha256": { "$ref": "#/$defs/sha256" },
+    "reference_source_sha256": { "$ref": "#/$defs/sha256" },
+    "reference_source_digests": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/source_digest" }
+    },
+    "backend_identity": { "$ref": "#/$defs/engine" },
+    "comparison_tolerances": { "$ref": "#/$defs/tolerances" },
+    "cases": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/case" }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nullable_sha256": {
+      "oneOf": [
+        { "$ref": "#/$defs/sha256" },
+        { "type": "null" }
+      ]
+    },
+    "source_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "enum": [
+            "experiments/validation/opensees_frame_reference.py",
+            "bridge_evolution/creative_shape.py",
+            "bridge_evolution/frame_f1.py",
+            "bridge_evolution/creative_frame_adapter.py",
+            "bridge_evolution/arch_action_f1.py",
+            "bridge_evolution/funicular_reference.py"
+          ]
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "engine_version",
+        "package_name",
+        "package_version",
+        "python_version",
+        "python_implementation",
+        "python_executable_sha256",
+        "binary_file_name",
+        "binary_sha256",
+        "worker_source_sha256"
+      ],
+      "properties": {
+        "name": { "const": "OpenSees" },
+        "engine_version": { "type": "string", "minLength": 1 },
+        "package_name": { "const": "openseespywin" },
+        "package_version": { "type": "string", "minLength": 1 },
+        "python_version": { "type": "string", "minLength": 1 },
+        "python_implementation": { "type": "string", "minLength": 1 },
+        "python_executable_sha256": { "$ref": "#/$defs/sha256" },
+        "binary_file_name": { "type": "string", "pattern": "^opensees\\.pyd$" },
+        "binary_sha256": { "$ref": "#/$defs/sha256" },
+        "worker_source_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "tolerances": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "displacement_absolute_m",
+        "displacement_relative",
+        "rotation_absolute_rad",
+        "rotation_relative",
+        "force_absolute_kN",
+        "force_relative",
+        "moment_absolute_kNm",
+        "moment_relative",
+        "equilibrium_force_absolute_kN",
+        "equilibrium_force_relative",
+        "equilibrium_moment_absolute_kNm",
+        "equilibrium_moment_relative"
+      ],
+      "properties": {
+        "displacement_absolute_m": { "type": "number", "exclusiveMinimum": 0 },
+        "displacement_relative": { "type": "number", "exclusiveMinimum": 0 },
+        "rotation_absolute_rad": { "type": "number", "exclusiveMinimum": 0 },
+        "rotation_relative": { "type": "number", "exclusiveMinimum": 0 },
+        "force_absolute_kN": { "type": "number", "exclusiveMinimum": 0 },
+        "force_relative": { "type": "number", "exclusiveMinimum": 0 },
+        "moment_absolute_kNm": { "type": "number", "exclusiveMinimum": 0 },
+        "moment_relative": { "type": "number", "exclusiveMinimum": 0 },
+        "equilibrium_force_absolute_kN": { "type": "number", "exclusiveMinimum": 0 },
+        "equilibrium_force_relative": { "type": "number", "exclusiveMinimum": 0 },
+        "equilibrium_moment_absolute_kNm": { "type": "number", "exclusiveMinimum": 0 },
+        "equilibrium_moment_relative": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benchmark_name",
+        "topology",
+        "candidate_sha256",
+        "analysis_sha256",
+        "arch_action_study_sha256",
+        "funicular_reference_sha256"
+      ],
+      "properties": {
+        "benchmark_name": {
+          "enum": ["AXIAL_BAR", "CANTILEVER", "SIMPLE_BEAM", "CREATIVE_ARCH_ACTION_MODEL"]
+        },
+        "topology": {
+          "type": ["string", "null"],
+          "enum": [null, "DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"]
+        },
+        "candidate_sha256": { "$ref": "#/$defs/nullable_sha256" },
+        "analysis_sha256": { "$ref": "#/$defs/nullable_sha256" },
+        "arch_action_study_sha256": { "$ref": "#/$defs/nullable_sha256" },
+        "funicular_reference_sha256": { "$ref": "#/$defs/nullable_sha256" }
+      }
+    },
+    "nodal_displacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "ux_m", "uy_m", "rz_rad"],
+      "properties": {
+        "node_id": { "type": "string", "minLength": 1 },
+        "ux_m": { "type": "number" },
+        "uy_m": { "type": "number" },
+        "rz_rad": { "type": "number" }
+      }
+    },
+    "reaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "fx_kN", "fy_kN", "mz_kNm"],
+      "properties": {
+        "node_id": { "type": "string", "minLength": 1 },
+        "fx_kN": { "type": "number" },
+        "fy_kN": { "type": "number" },
+        "mz_kNm": { "type": "number" }
+      }
+    },
+    "element_force": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "element_id",
+        "axial_i_kN",
+        "shear_i_kN",
+        "moment_i_kNm",
+        "axial_j_kN",
+        "shear_j_kN",
+        "moment_j_kNm"
+      ],
+      "properties": {
+        "element_id": { "type": "string", "minLength": 1 },
+        "axial_i_kN": { "type": "number" },
+        "shear_i_kN": { "type": "number" },
+        "moment_i_kNm": { "type": "number" },
+        "axial_j_kN": { "type": "number" },
+        "shear_j_kN": { "type": "number" },
+        "moment_j_kNm": { "type": "number" }
+      }
+    },
+    "raw_load_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "status",
+        "analyze_return_code",
+        "nodal_displacements",
+        "reactions",
+        "element_end_forces",
+        "max_translation_m",
+        "max_rotation_rad",
+        "issues"
+      ],
+      "properties": {
+        "load_case_id": { "type": "string", "minLength": 1 },
+        "status": { "const": "CONVERGED" },
+        "analyze_return_code": { "const": 0 },
+        "nodal_displacements": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/nodal_displacement" }
+        },
+        "reactions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/reaction" }
+        },
+        "element_end_forces": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/element_force" }
+        },
+        "max_translation_m": { "type": "number", "minimum": 0 },
+        "max_rotation_rad": { "type": "number", "minimum": 0 },
+        "issues": { "type": "array", "maxItems": 0 }
+      }
+    },
+    "raw_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "model_id",
+        "model_payload_sha256",
+        "engine",
+        "load_case_results",
+        "issues",
+        "raw_result_sha256"
+      ],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "status": { "const": "CONVERGED" },
+        "model_id": { "type": "string", "minLength": 1 },
+        "model_payload_sha256": { "$ref": "#/$defs/sha256" },
+        "engine": { "$ref": "#/$defs/engine" },
+        "load_case_results": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/raw_load_case" }
+        },
+        "issues": { "type": "array", "maxItems": 0 },
+        "raw_result_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "response_difference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "response_group",
+        "item_id",
+        "field",
+        "frame_f1_value",
+        "opensees_value",
+        "absolute_error",
+        "absolute_tolerance",
+        "relative_tolerance",
+        "normalized_error",
+        "comparison_state"
+      ],
+      "properties": {
+        "load_case_id": { "type": "string", "minLength": 1 },
+        "response_group": {
+          "enum": [
+            "NODAL_DISPLACEMENT",
+            "NODAL_ROTATION",
+            "SUPPORT_REACTION",
+            "SUPPORT_MOMENT",
+            "ELEMENT_END_FORCE",
+            "ELEMENT_END_MOMENT"
+          ]
+        },
+        "item_id": { "type": "string", "minLength": 1 },
+        "field": { "type": "string", "minLength": 1 },
+        "frame_f1_value": { "type": "number" },
+        "opensees_value": { "type": "number" },
+        "absolute_error": { "type": "number", "minimum": 0 },
+        "absolute_tolerance": { "type": "number", "exclusiveMinimum": 0 },
+        "relative_tolerance": { "type": "number", "exclusiveMinimum": 0 },
+        "normalized_error": { "type": "number", "minimum": 0 },
+        "comparison_state": { "enum": ["WITHIN_TOLERANCE", "OUTSIDE_TOLERANCE"] }
+      }
+    },
+    "equilibrium": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "load_case_id",
+        "fx_residual_kN",
+        "fy_residual_kN",
+        "mz_residual_kNm",
+        "force_scale_kN",
+        "moment_scale_kNm",
+        "fx_normalized",
+        "fy_normalized",
+        "mz_normalized",
+        "max_normalized"
+      ],
+      "properties": {
+        "load_case_id": { "type": "string", "minLength": 1 },
+        "fx_residual_kN": { "type": "number" },
+        "fy_residual_kN": { "type": "number" },
+        "mz_residual_kNm": { "type": "number" },
+        "force_scale_kN": { "type": "number", "minimum": 0 },
+        "moment_scale_kNm": { "type": "number", "minimum": 0 },
+        "fx_normalized": { "type": "number", "minimum": 0 },
+        "fy_normalized": { "type": "number", "minimum": 0 },
+        "mz_normalized": { "type": "number", "minimum": 0 },
+        "max_normalized": { "type": "number", "minimum": 0 }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "compared_value_count",
+        "outside_tolerance_count",
+        "max_normalized_error",
+        "worst_response",
+        "response_differences",
+        "equilibrium",
+        "reason_codes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "AGREEMENT_WITHIN_PREREGISTERED_TOLERANCE",
+            "DISCREPANCY_REQUIRES_RECONCILIATION"
+          ]
+        },
+        "compared_value_count": { "type": "integer", "minimum": 1 },
+        "outside_tolerance_count": { "type": "integer", "minimum": 0 },
+        "max_normalized_error": { "type": "number", "minimum": 0 },
+        "worst_response": { "$ref": "#/$defs/response_difference" },
+        "response_differences": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/response_difference" }
+        },
+        "equilibrium": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/equilibrium" }
+        },
+        "reason_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "RESPONSE_DIFFERENCE_OUTSIDE_PREREGISTERED_TOLERANCE",
+              "OPENSEES_GLOBAL_EQUILIBRIUM_RESIDUAL_OUTSIDE_TOLERANCE"
+            ]
+          }
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "case_sha256",
+        "case_kind",
+        "lineage",
+        "model",
+        "model_payload_sha256",
+        "frame_f1_result",
+        "opensees_result",
+        "comparison"
+      ],
+      "properties": {
+        "case_id": { "type": "string", "pattern": "^BRD044-[A-Z0-9_-]+$" },
+        "case_sha256": { "$ref": "#/$defs/sha256" },
+        "case_kind": { "enum": ["ANALYTICAL", "CREATIVE_PIPELINE"] },
+        "lineage": { "$ref": "#/$defs/lineage" },
+        "model": { "type": "object" },
+        "model_payload_sha256": { "$ref": "#/$defs/sha256" },
+        "frame_f1_result": { "type": "object" },
+        "opensees_result": { "$ref": "#/$defs/raw_result" },
+        "comparison": { "$ref": "#/$defs/comparison" }
+      }
+    }
+  }
+}

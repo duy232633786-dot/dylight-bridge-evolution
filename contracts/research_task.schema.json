@@ -47,6 +47,27 @@
         "PILOT_VALIDATED", "ENGINEERING_CANDIDATE"
       ]
     },
+    "runtime_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "structural_families", "runtime_domain"
+      ],
+      "properties": {
+        "structural_families": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,63}$"}
+        },
+        "runtime_domain": {
+          "enum": [
+            "production_line_girder_l1",
+            "production_l0_only",
+            "experimental_arch_frame",
+            "straight_prismatic_column"
+          ]
+        }
+      }
+    },
     "write_scope": {
       "type": "array", "minItems": 1, "uniqueItems": true,
       "items": {"type": "string", "minLength": 1}

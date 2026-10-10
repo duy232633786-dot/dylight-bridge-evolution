@@ -24,6 +24,7 @@ sàng lọc sơ bộ; hệ thống chưa thay thế kiểm chứng Midas và ph�
 | Knowledge graph / Obsidian 0.5 | Standard ↔ rule ↔ card ↔ variable, CSS và màu Graph View | ✅ Hoàn thành |
 | NotebookLM / Obsidian 0.6 | 32 notebook cầu/BIM, 218 nguồn khai báo, summary chỉ-đọc và provenance | ✅ Hoàn thành |
 | Physics/Reality Lab 0.8 | Intake → DAG → bounded agents → test/review → Obsidian | ✅ Digital auto có cổng dừng; runtime hiện chỉ `SCREENED` |
+| Kiểm toán đa cấu kiện | Dầm, bản, trụ/mố, móng/cọc, gối/khe, cáp-DƯL, vòm, giàn, liên kết và kết cấu tạm | ✅ Điều phối evidence fail-closed; **chưa có** physics oracle cho các check ngoài verifier L1 |
 | Chống lệch docs–runtime | `docs/runtime_capability_matrix.json` + `docs/check_runtime_drift.py` | ✅ Chạy được; **chưa** nối vào `pytest` (xem bên dưới) |
 
 ## Cài đặt
@@ -110,6 +111,38 @@ python experiments/run_multiseed.py --budget 600 --seeds 42,43,44 --algos rs,nsg
 python experiments/compare_to_oracle.py --oracle-dir experiments/results/exhaustive_<timestamp> --run-dir experiments/results/multiseed_b600_<timestamp>
 ```
 
+API có thể nhận thêm `component_manifest` để gom bằng chứng theo từng cấu kiện:
+
+```python
+from bridge_evolution.evaluate import evaluate_candidate
+
+component_manifest = {
+    "components": [{
+        "component_id": "G1",
+        "kind": "LONGITUDINAL_GIRDER",
+        "checks": [{
+            "check_id": "FLEXURE_STRENGTH",
+            "status": "PASS",
+            "severity": "HARD",
+            "evidence": {
+                "source_ref": "results/midas/G1-flexure.json",
+                "sha256": evidence_sha256,
+                "fidelity": "EXTERNAL_SOLVER",
+                "producer": "midas-export-adapter",
+            },
+            "message": "Kết quả do adapter bên ngoài cung cấp.",
+            "utilization": 0.82,
+        }],
+    }],
+}
+result = evaluate_candidate(state, component_manifest=component_manifest)
+```
+
+Ví dụ cố ý chỉ đưa một check nên audit sẽ `BLOCKED`: các hard check còn thiếu
+được sinh thành `NOT_EVALUATED`. Registry hiện bao phủ 20 họ cấu kiện nhưng chỉ
+**tổ chức bằng chứng**; nó không tự tạo nội lực/sức kháng. Proposal luôn là
+`UNVERIFIED_PROPOSAL`, bắt buộc phân tích lại và không thay `result.feasible`.
+
 `budget` chỉ tăng khi solver thật sự chạy (`solver.status != NOT_RUN`). Proposal,
 L0 reject và cache hit được đếm riêng. Hypervolume dùng reference point cố định,
 không suy hậu nghiệm từ kết quả thuật toán. Các báo cáo cũ trong
@@ -126,7 +159,8 @@ BridgeDesignState (JSON, schema-validated)
       │        (interface solver.py sẵn chỗ cho OpenSeesPy ở L2/L3)
       ├─ verifier.rules                     – PASS/FAIL độc lập với solver (STR/SERV/GEOM/CONS)
       ├─ objectives                         – chi phí tương đối, khối lượng, carbon
-      └─ evaluate.evaluate_candidate()      – contract trung tâm, có provenance + artifacts
+      ├─ evaluate.build_component_audit()   – envelope evidence đa cấu kiện, fail-closed
+      └─ evaluate.evaluate_candidate()      – contract trung tâm, provenance + artifacts + audit tùy chọn
                     │
         optimization/ (random_search, nsga2) → pareto.ParetoArchive → experiments/
 ```
@@ -147,6 +181,12 @@ Tóm tắt phần **KHÔNG có**: L2/L3 (`MIDAS_CIVIL`/`OPENSEESPY` chỉ ném
 hiệu ứng theo giai đoạn (ứng suất lúc truyền lực, mất mát DƯL, co ngót–từ biến),
 thí nghiệm/quan trắc thật, và phê duyệt kỹ sư (0/20 thẻ `ENGINEER_APPROVED`).
 Trần claim toàn dự án là `SCREENED`.
+
+`COMPONENT_AUDIT_ORCHESTRATION` là năng lực `PARTIAL`: runtime có thể phát hiện
+thiếu evidence, khóa hard check, kiểm lineage/hash và sinh đề xuất tái phân tích.
+Nó **không** phải solver cho N-M, P-Delta, ổn định, mỏi, địa kỹ thuật, thủy lực,
+giai đoạn thi công hay độ bền; các nội dung đó phải có bằng chứng từ công cụ phù
+hợp trước khi check được giữ ở trạng thái `PASS/FAIL`.
 
 Hai bộ kiểm giữ cho tài liệu không trôi khỏi runtime — chạy chúng sau mỗi thay
 đổi mã hoặc tài liệu:

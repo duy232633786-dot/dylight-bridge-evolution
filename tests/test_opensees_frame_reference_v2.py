@@ -1,0 +1,671 @@
+from __future__ import annotations
+
+import ast
+from copy import deepcopy
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import tempfile
+import threading
+
+import pytest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "experiments" / "validation" / "opensees_frame_reference_v2.py"
+SUITE_PATH = ROOT / "experiments" / "validation" / "opensees_brd045_benchmarks.json"
+NEGATIVE_PATH = ROOT / "experiments" / "validation" / "opensees_brd045_negative_result.json"
+
+_SPEC = importlib.util.spec_from_file_location("opensees_frame_reference_v2", MODULE_PATH)
+assert _SPEC is not None and _SPEC.loader is not None
+V2 = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(V2)
+
+EXPECTED_BRD044_HASHES = {
+    "experiments/validation/opensees_frame_reference.py": "fe65de3c259aafc027ae78ca58462cfa480116a6b77448c806b5739178d85915",
+    "experiments/validation/opensees_brd044_benchmarks.json": "d4031a4d704f6acbc7d3c3895fe62f977e4cbcf725c905858cca4db96bbc5ef2",
+    "contracts/opensees_frame_reference.schema.json": "f573c6471447c4ec45c1589bb0ee65af0a2e33b653a2919e4657ce5a7b7799d7",
+    "docs/design_basis/opensees_frame_reference_basis.json": "c90f857b0d81c8f1d2c210a4eaf192d6b033b3e72c4f1713daedeffe0c02c594",
+    "tests/test_opensees_frame_reference.py": "62c3446e63db82b905ddbdd56762749f1a1bee71b91ea9a4b5b1a4c81cd45193",
+}
+
+
+@pytest.fixture(scope="module")
+def suite() -> dict:
+    return json.loads(SUITE_PATH.read_text(encoding="utf-8"))
+
+
+@pytest.fixture(scope="module")
+def negative() -> dict:
+    return json.loads(NEGATIVE_PATH.read_text(encoding="utf-8"))
+
+
+def _case(suite: dict, case_id: str) -> dict:
+    matches = [item for item in suite["cases"] if item["case_id"] == case_id]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _by_id(items: list[dict], key: str) -> dict[str, dict]:
+    return {item[key]: item for item in items}
+
+
+def _reseal_case(suite: dict, case: dict) -> None:
+    envelope = {
+        "status": case["opensees_result"]["status"],
+        "failure_status": case["worker_failure_status"],
+        "raw_result": case["opensees_result"],
+        "hardening_audit": case["hardening_audit"],
+        "worker_envelope_sha256": "0" * 64,
+    }
+    case["worker_envelope_sha256"] = V2._envelope_hash(envelope)
+    case["case_sha256"] = V2._case_hash(case)
+    suite["suite_id"] = "OSR2-" + V2.sha256_json({
+        "basis": suite["basis_sha256"],
+        "source": suite["reference_source_sha256"],
+        "cases": [item["case_sha256"] for item in suite["cases"]],
+    })[:16]
+    suite["suite_sha256"] = V2._suite_hash(suite)
+
+
+def _reseal_negative(record: dict) -> None:
+    record["record_sha256"] = V2._record_hash(record, "record_sha256")
+
+
+def _backend_or_skip() -> tuple[Path, Path]:
+    python = os.environ.get("DYLIGHT_OPENSEES_PYTHON")
+    site = os.environ.get("DYLIGHT_OPENSEES_SITE_PACKAGES")
+    if not python or not site:
+        pytest.skip("Backend nghiệm thu cần DYLIGHT_OPENSEES_PYTHON/SITE_PACKAGES")
+    python_path, site_path = Path(python), Path(site)
+    if not python_path.is_file() or not site_path.is_dir():
+        pytest.skip("Backend nghiệm thu không tồn tại trên host")
+    return python_path, site_path
+
+
+def _walk_keys(value: object):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from _walk_keys(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _walk_keys(item)
+
+
+def test_canonical_suite_and_negative_are_semantically_valid(suite, negative):
+    V2.validate_benchmark_suite(suite)
+    V2.validate_negative_result(negative)
+
+
+def test_brd044_artifacts_are_immutable_and_five_way_anchored(suite, negative):
+    observed = {
+        item["path"]: item["sha256"] for item in V2.upstream_brd044_digests()
+    }
+    assert observed == EXPECTED_BRD044_HASHES
+    assert suite["upstream_brd044_artifacts"] == V2.upstream_brd044_digests()
+    assert negative["upstream_brd044_artifacts"] == V2.upstream_brd044_digests()
+
+
+def test_source_seal_covers_v2_base_and_brd039_through_brd043(suite):
+    assert suite["reference_source_digests"] == V2.source_digests()
+    assert {item["path"] for item in suite["reference_source_digests"]} == set(V2.SOURCE_FILES)
+    assert suite["reference_source_sha256"] == V2.sha256_json(V2.source_digests())
+
+
+def test_schema_and_tests_are_anchored_in_basis_and_artifacts(suite, negative):
+    expected = V2.task_artifact_digests()
+    assert V2.load_basis()["task_artifact_digests"] == expected
+    assert suite["task_artifact_digests"] == expected
+    assert negative["task_artifact_digests"] == expected
+    assert {item["path"] for item in expected} == set(V2.TASK_SEALED_FILES)
+
+
+def test_schema_uses_external_f1_and_brd044_contract_refs():
+    schema = json.loads(V2.SCHEMA_PATH.read_text(encoding="utf-8"))
+    text = json.dumps(schema, sort_keys=True)
+    assert "frame_f1_model.schema.json" in text
+    assert "frame_f1_result.schema.json" in text
+    assert "opensees_frame_reference.schema.json#/$defs/raw_result" in text
+    assert "opensees_frame_reference.schema.json#/$defs/comparison" in text
+
+
+def test_every_task_owned_object_schema_is_closed():
+    schema = json.loads(V2.SCHEMA_PATH.read_text(encoding="utf-8"))
+    missing = []
+
+    def walk(value: object, path: str = "$") -> None:
+        if isinstance(value, dict):
+            if value.get("type") == "object" and value.get("additionalProperties") is not False:
+                missing.append(path)
+            for key, item in value.items():
+                walk(item, f"{path}/{key}")
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                walk(item, f"{path}/{index}")
+
+    walk(schema)
+    assert missing == []
+
+
+def test_backend_identity_is_preregistered_in_basis_and_enforced(suite):
+    basis = V2.load_basis()
+    assert suite["expected_backend_identity"] == basis["expected_backend_identity"]
+    assert suite["backend_identity"] == basis["expected_backend_identity"]
+    assert suite["backend_identity"]["binary_owner_module"] == "openseespywin.opensees"
+    assert suite["backend_identity"]["binary_sha256"] == "25ba42e1672526137d765d9c3631d1403e091f54f5afcdb9242f9243c63c3a96"
+    assert suite["backend_identity"]["shim_module"] == "openseespy.opensees"
+    assert suite["backend_identity"]["shim_sha256"] == "8bd3a626052bb33e372dc9c38844098efd25cdb9d1548533ff2cb7b0abc9868d"
+    assert [item["name"] for item in suite["backend_identity"]["callable_bindings"]] == list(
+        V2.REQUIRED_OPENSEES_CALLABLES
+    )
+    assert {item["module"] for item in suite["backend_identity"]["callable_bindings"]} == {
+        "openseespywin.opensees"
+    }
+
+
+def test_every_case_proves_worker_runtime_isolation_and_binary_owner(suite):
+    worker_hash = hashlib.sha256(MODULE_PATH.read_bytes()).hexdigest()
+    base_hash = hashlib.sha256(V2.BASE_MODULE_PATH.read_bytes()).hexdigest()
+    for case in suite["cases"]:
+        audit = case["hardening_audit"]
+        assert audit["origin"] == "WORKER"
+        assert audit["worker_attestation_verified"] is True
+        assert audit["worker_isolation_verified"] is True
+        assert audit["loaded_forbidden_modules"] == []
+        assert audit["loaded_forbidden_origins"] == []
+        assert audit["site_packages_policy"] == "APPEND_AFTER_EXISTING_PATHS"
+        assert audit["engine_module_contract"]["binary_owner_module"] == "openseespywin.opensees"
+        assert audit["engine_module_contract"]["shim_module"] == "openseespy.opensees"
+        assert audit["worker_v2_source_sha256"] == worker_hash
+        assert audit["base_worker_source_sha256"] == base_hash
+        assert case["opensees_result"]["engine"]["worker_source_sha256"] == worker_hash
+        path_audit = audit["runtime_path_audit"]
+        assert path_audit["site_packages_index"] == len(path_audit["sys_path"]) - 1
+        assert path_audit["sys_path"][path_audit["site_packages_index"]] == path_audit["site_packages_path"]
+        assert path_audit["shim_under_site_packages"] is True
+        assert path_audit["binary_under_site_packages"] is True
+        assert case["worker_failure_status"] is None
+
+
+def test_worker_top_level_imports_are_stdlib_only_and_path_policy_appends():
+    source = MODULE_PATH.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    imported = []
+    for node in tree.body:
+        if isinstance(node, ast.Import):
+            imported.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            imported.append(node.module or "")
+    assert not any(name.startswith("bridge_evolution") for name in imported)
+    assert "sys.path.append(path)" in source
+    assert "sys.path.insert(0, path)" not in source
+    assert 'command = [str(executable), "-P"' in source
+    assert "PYTHONSAFEPATH" in source
+
+
+def test_four_analytical_expectation_sets_live_in_hashed_basis(suite):
+    basis = V2.load_basis()
+    analytical = {
+        item["case_id"]: item for item in suite["cases"]
+        if item["case_kind"] == "ANALYTICAL"
+    }
+    assert set(analytical) == set(basis["analytical_expectations"])
+    for case_id, case in analytical.items():
+        expected = V2.evaluate_closed_form(case_id, case["opensees_result"], basis)
+        assert case["analytical_check"] == expected
+        assert expected["status"] == "CLOSED_FORM_WITHIN_PREREGISTERED_TOLERANCE"
+        assert max(item["normalized_error"] for item in expected["checks"]) <= 1.0
+
+
+def test_inclined_two_bar_truss_distinguishes_local_from_global_force(suite):
+    case = _case(suite, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    raw = case["opensees_result"]["load_case_results"][0]
+    nodes = _by_id(case["model"]["nodes"], "id")
+    forces = _by_id(raw["element_end_forces"], "element_id")
+    assert nodes["N3"] == {"id": "N3", "x_m": 3.0, "y_m": 4.0}
+    for element_id in ("E1", "E2"):
+        force = forces[element_id]
+        assert force["axial_i_kN"] == pytest.approx(50.0, abs=1e-10)
+        assert force["axial_j_kN"] == pytest.approx(-50.0, abs=1e-10)
+        assert force["shear_i_kN"] == force["shear_j_kN"] == 0.0
+        assert force["moment_i_kNm"] == force["moment_j_kNm"] == 0.0
+
+
+def test_inclined_truss_audits_hidden_rotation_reaction(suite):
+    case = _case(suite, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    audits = case["hardening_audit"]["artificial_rotation_audits"]
+    assert len(audits) == 1
+    audit = audits[0]
+    assert audit["load_case_id"] == "LC1"
+    assert audit["audit_status"] == "COMPLETE"
+    assert audit["issues"] == []
+    assert audit["artificial_rotation_reactions"] == [{"node_id": "N3", "mz_kNm": 0.0}]
+    assert audit["artificial_rotation_constraints"] == [{
+        "node_id": "N3",
+        "node_tag": 3,
+        "x_m": 3.0,
+        "y_m": 4.0,
+        "fixed_dofs": [3],
+    }]
+    binding = _by_id(audit["domain_fingerprint"]["node_bindings"], "node_id")["N3"]
+    assert binding["node_tag"] == 3
+    assert binding["x_m"] == 3.0 and binding["y_m"] == 4.0
+    assert binding["fixed_dofs"] == [3]
+    control = audit["artificial_rotation_positive_control"]
+    assert control["applied_mz_kNm"] == 1.0
+    assert abs(control["observed_reaction_mz_kNm"]) > 0.5
+    assert control["equilibrium_residual_kNm"] == pytest.approx(0.0, abs=1e-10)
+    assert control["control_outcome"] == "EXPECTED_NONZERO_REACTION_OBSERVED"
+
+
+def test_raw_truss_local_force_vectors_are_preserved(suite):
+    case = _case(suite, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    audit = case["hardening_audit"]["artificial_rotation_audits"][0]
+    vectors = _by_id(audit["truss_local_force_responses"], "element_id")
+    assert set(vectors) == {"E1", "E2"}
+    for item in vectors.values():
+        assert item["component_count"] == 6
+        assert item["raw_local_force"] == pytest.approx(
+            [50.0, 0.0, 0.0, -50.0, 0.0, 0.0], abs=1e-10
+        )
+
+
+def test_every_truss_response_has_zero_shear_moment_and_opposite_axial(suite):
+    for case in suite["cases"]:
+        model = case["model"]
+        truss = {item["id"] for item in model["elements"] if item["kind"] == "TRUSS_2D"}
+        for load_case in case["opensees_result"]["load_case_results"]:
+            forces = _by_id(load_case["element_end_forces"], "element_id")
+            for element_id in truss:
+                item = forces[element_id]
+                assert item["shear_i_kN"] == item["shear_j_kN"] == 0.0
+                assert item["moment_i_kNm"] == item["moment_j_kNm"] == 0.0
+                assert item["axial_i_kN"] == pytest.approx(-item["axial_j_kN"], abs=1e-10)
+
+
+def test_three_creative_topologies_retain_complete_lineage(suite):
+    creative = [item for item in suite["cases"] if item["case_kind"] == "CREATIVE_PIPELINE"]
+    assert {item["lineage"]["topology"] for item in creative} == {
+        "DECK_ARCH", "THROUGH_ARCH", "NETWORK_ARCH"
+    }
+    for case in creative:
+        assert all(case["lineage"][key] is not None for key in (
+            "candidate_sha256", "analysis_sha256", "arch_action_study_sha256", "funicular_reference_sha256"
+        ))
+        assert case["analytical_check"] is None
+
+
+def test_negative_result_persists_real_solver_failure_and_original_issue(negative):
+    assert negative["status"] == "NEGATIVE_RESULT_RECORDED"
+    assert negative["failure_status"] == "SOLVER_FAILED"
+    raw = negative["worker_envelope"]["raw_result"]
+    assert raw["status"] == "SOLVER_FAILED"
+    assert raw["load_case_results"][0]["analyze_return_code"] == -3
+    assert negative["issues"] == raw["issues"]
+    assert "OpenSees analyze" in negative["issues"][0]
+    assert negative["input_capture"]["capture_kind"] == "CANONICAL_JSON"
+
+
+def test_negative_solver_failure_keeps_backend_provenance_when_available(negative):
+    raw = negative["worker_envelope"]["raw_result"]
+    audit = negative["worker_envelope"]["hardening_audit"]
+    assert raw["engine"] is not None
+    assert V2._engine_contract_view(raw, audit) == V2.load_basis()["expected_backend_identity"]
+    assert audit["origin"] == "WORKER"
+    assert audit["worker_attestation_verified"] is True
+    assert audit["worker_isolation_verified"] is True
+
+
+def test_backend_unavailable_can_be_serialized_as_negative_result(suite):
+    model = deepcopy(suite["cases"][0]["model"])
+    envelope = V2.run_opensees_model(model, python_executable=ROOT / "missing-python.exe")
+    assert envelope["status"] == "BACKEND_UNAVAILABLE"
+    record = V2.build_negative_result(model, envelope)
+    V2.validate_negative_result(record)
+    assert record["failure_status"] == "BACKEND_UNAVAILABLE"
+    audit = record["worker_envelope"]["hardening_audit"]
+    assert audit["origin"] == "HOST"
+    assert audit["worker_attestation_verified"] is False
+    assert audit["worker_isolation_verified"] is None
+    assert audit["loaded_forbidden_modules"] is None
+    assert audit["loaded_forbidden_origins"] is None
+
+
+def test_schema_invalid_input_can_be_serialized_without_pretending_it_is_a_model():
+    invalid = {"model_id": "F1M-invalid"}
+    envelope = V2.run_opensees_model(
+        invalid, python_executable=ROOT / "worker-is-never-started-for-invalid-input.exe"
+    )
+    assert envelope["status"] == "SOLVER_FAILED"
+    assert envelope["failure_status"] == "HOST_VALIDATION_FAILED"
+    record = V2.build_negative_result(invalid, envelope)
+    V2.validate_negative_result(record)
+    assert record["model"] is None
+    assert record["input_capture"]["capture_kind"] == "CANONICAL_JSON"
+    assert "HOST_VALIDATION" in record["issues"][0]
+
+
+def test_id_permutation_does_not_change_comparison(suite):
+    case = deepcopy(_case(suite, "BRD044-ANALYTICAL-SIMPLE-BEAM"))
+    raw = case["opensees_result"]
+    raw["load_case_results"][0]["nodal_displacements"].reverse()
+    raw["load_case_results"][0]["reactions"].reverse()
+    raw["load_case_results"][0]["element_end_forces"].reverse()
+    raw["raw_result_sha256"] = V2._raw_hash(raw)
+    _, comparison = V2._base().compare_to_frame_f1(case["model"], raw)
+    assert comparison == case["comparison"]
+
+
+def test_backend_identity_tamper_is_rejected_even_when_resealed(suite):
+    mutated = deepcopy(suite)
+    mutated["expected_backend_identity"]["engine_version"] = "9.9.9"
+    mutated["suite_sha256"] = V2._suite_hash(mutated)
+    with pytest.raises(V2.HardenedReferenceError, match="Expected backend identity"):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_binary_owner_module_tamper_is_rejected_even_when_resealed(suite):
+    mutated = deepcopy(suite)
+    case = mutated["cases"][0]
+    case["hardening_audit"]["engine_module_contract"]["binary_owner_module"] = "openseespy.fake"
+    _reseal_case(mutated, case)
+    with pytest.raises(V2.HardenedReferenceError):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_shim_or_callable_binding_tamper_is_rejected_even_when_resealed(suite):
+    for mutate in (
+        lambda contract: contract.__setitem__("shim_sha256", "0" * 64),
+        lambda contract: contract["callable_bindings"][0].__setitem__(
+            "module", "openseespy.fake"
+        ),
+    ):
+        mutated = deepcopy(suite)
+        case = mutated["cases"][0]
+        mutate(case["hardening_audit"]["engine_module_contract"])
+        _reseal_case(mutated, case)
+        with pytest.raises(V2.HardenedReferenceError):
+            V2.validate_benchmark_suite(mutated)
+
+
+def test_worker_and_base_source_hash_tamper_is_rejected(suite):
+    for field in ("worker_v2_source_sha256", "base_worker_source_sha256"):
+        mutated = deepcopy(suite)
+        case = mutated["cases"][0]
+        case["hardening_audit"][field] = "0" * 64
+        _reseal_case(mutated, case)
+        with pytest.raises(V2.HardenedReferenceError):
+            V2.validate_benchmark_suite(mutated)
+
+
+def test_source_digest_tamper_is_rejected_even_with_suite_reseal(suite):
+    mutated = deepcopy(suite)
+    mutated["reference_source_digests"][0]["sha256"] = "0" * 64
+    mutated["reference_source_sha256"] = V2.sha256_json(mutated["reference_source_digests"])
+    mutated["suite_sha256"] = V2._suite_hash(mutated)
+    with pytest.raises(V2.HardenedReferenceError, match="source digests"):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_task_artifact_digest_tamper_is_rejected_even_with_suite_reseal(suite):
+    mutated = deepcopy(suite)
+    mutated["task_artifact_digests"][0]["sha256"] = "0" * 64
+    mutated["suite_sha256"] = V2._suite_hash(mutated)
+    with pytest.raises(V2.HardenedReferenceError, match="schema/test BRD-045"):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_closed_form_artifact_tamper_is_rejected_after_reseal(suite):
+    mutated = deepcopy(suite)
+    case = _case(mutated, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    case["analytical_check"]["checks"][0]["observed_value"] = 123.0
+    _reseal_case(mutated, case)
+    with pytest.raises(V2.HardenedReferenceError, match="closed-form check drift"):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_missing_artificial_rotation_reaction_is_rejected_after_reseal(suite):
+    mutated = deepcopy(suite)
+    case = _case(mutated, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    case["hardening_audit"]["artificial_rotation_audits"][0]["artificial_rotation_reactions"] = []
+    _reseal_case(mutated, case)
+    with pytest.raises(V2.HardenedReferenceError, match="Artificial-rz node set"):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_nonzero_primary_rz_reaction_is_rejected_but_positive_control_is_observable(suite):
+    mutated = deepcopy(suite)
+    case = _case(mutated, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    audit = case["hardening_audit"]["artificial_rotation_audits"][0]
+    control_value = audit["artificial_rotation_positive_control"][
+        "observed_reaction_mz_kNm"
+    ]
+    assert abs(control_value) > 0.5
+    audit["artificial_rotation_reactions"][0]["mz_kNm"] = control_value
+    _reseal_case(mutated, case)
+    with pytest.raises(V2.HardenedReferenceError, match="vượt tolerance"):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_domain_tag_coordinate_or_fixity_tamper_is_rejected(suite):
+    for field, value in (("node_tag", 99), ("x_m", 99.0), ("fixed_dofs", [])):
+        mutated = deepcopy(suite)
+        case = _case(mutated, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+        fingerprint = case["hardening_audit"]["artificial_rotation_audits"][0][
+            "domain_fingerprint"
+        ]
+        binding = _by_id(fingerprint["node_bindings"], "node_id")["N3"]
+        binding[field] = value
+        payload = deepcopy(fingerprint)
+        payload.pop("fingerprint_sha256")
+        fingerprint["fingerprint_sha256"] = V2.sha256_json(payload)
+        _reseal_case(mutated, case)
+        with pytest.raises(V2.HardenedReferenceError):
+            V2.validate_benchmark_suite(mutated)
+
+
+def test_origin_guard_detects_file_alias_even_without_bridge_evolution_module_name():
+    guard = V2._RuntimeOriginGuard()
+    guard.start()
+    try:
+        code = compile(
+            "def brd045_alias_probe():\n    return 1\nbrd045_alias_probe()",
+            str(ROOT / "bridge_evolution" / "frame_f1.py"),
+            "exec",
+        )
+        exec(code, {"__name__": "innocent_alias"})
+    finally:
+        guard.stop()
+    assert any(
+        item["module_name"] == "innocent_alias"
+        and item["origin"] == "bridge_evolution/frame_f1.py"
+        and item["origin_state"] == "PRESENT"
+        and item["sha256"] == hashlib.sha256(
+            (ROOT / "bridge_evolution" / "frame_f1.py").read_bytes()
+        ).hexdigest()
+        for item in guard.records
+    )
+
+
+def test_origin_guard_covers_child_threads_and_missing_forbidden_paths():
+    guard = V2._RuntimeOriginGuard()
+    guard.start()
+    try:
+        code = compile(
+            "def brd045_thread_probe():\n    return 1\nbrd045_thread_probe()",
+            str(ROOT / "bridge_evolution" / "deleted-after-load.py"),
+            "exec",
+        )
+        thread = threading.Thread(
+            target=lambda: exec(code, {"__name__": "thread_alias"})
+        )
+        thread.start()
+        thread.join(timeout=5.0)
+        assert not thread.is_alive()
+    finally:
+        guard.stop()
+    assert any(
+        item["module_name"] == "thread_alias"
+        and item["origin"] == "bridge_evolution/deleted-after-load.py"
+        and item["origin_state"] == "MISSING_AT_AUDIT"
+        and item["sha256"] is None
+        for item in guard.records
+    )
+
+
+def test_isolation_breach_with_converged_load_case_is_persistable(suite):
+    case = deepcopy(suite["cases"][0])
+    raw = case["opensees_result"]
+    raw["status"] = "SOLVER_FAILED"
+    raw["issues"] = ["Worker đã thực thi code dưới bridge_evolution"]
+    raw["raw_result_sha256"] = V2._raw_hash(raw)
+    origin = V2._origin_record(
+        "innocent_alias", ROOT / "bridge_evolution" / "frame_f1.py"
+    )
+    assert origin is not None
+    audit = case["hardening_audit"]
+    audit["worker_isolation_verified"] = False
+    audit["loaded_forbidden_modules"] = ["innocent_alias"]
+    audit["loaded_forbidden_origins"] = [origin]
+    envelope = {
+        "status": "SOLVER_FAILED",
+        "failure_status": "ISOLATION_BREACH",
+        "raw_result": raw,
+        "hardening_audit": audit,
+    }
+    envelope["worker_envelope_sha256"] = V2._envelope_hash(envelope)
+    record = V2.build_negative_result(case["model"], envelope)
+    V2.validate_negative_result(record)
+    assert record["failure_status"] == "ISOLATION_BREACH"
+    assert record["worker_envelope"]["raw_result"]["load_case_results"][0][
+        "status"
+    ] == "CONVERGED"
+
+
+def test_actual_worker_isolation_breach_is_written_before_generate_stops():
+    python, site = _backend_or_skip()
+    scratch = ROOT / "multiagent" / "scratch"
+    scratch.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="brd045-breach-", dir=scratch) as folder:
+        output = Path(folder) / "negative-isolation-breach.json"
+        with pytest.raises(V2.NegativeEvidencePersistedError) as captured:
+            V2.generate_benchmark_suite(
+                python_executable=python,
+                site_packages=site,
+                negative_output=output,
+                _test_isolation_probe=True,
+            )
+        assert captured.value.output_path == output.resolve()
+        assert output.is_file()
+        record = json.loads(output.read_text(encoding="utf-8"))
+        V2.validate_negative_result(record)
+        assert record["failure_status"] == "ISOLATION_BREACH"
+        envelope = record["worker_envelope"]
+        assert envelope["raw_result"]["load_case_results"][0]["status"] == "CONVERGED"
+        origins = envelope["hardening_audit"]["loaded_forbidden_origins"]
+        assert any(
+            item["origin"] == "bridge_evolution/__init__.py"
+            and item["origin_state"] == "PRESENT"
+            and item["sha256"] == hashlib.sha256(
+                (ROOT / "bridge_evolution" / "__init__.py").read_bytes()
+            ).hexdigest()
+            for item in origins
+        )
+
+
+def test_external_contract_refs_reject_unknown_keys(suite):
+    for branch in ("model", "frame_f1_result", "opensees_result", "comparison"):
+        mutated = deepcopy(suite)
+        mutated["cases"][0][branch]["brd045_unknown_key"] = 1
+        with pytest.raises(V2.HardenedReferenceError, match="Artifact sai schema"):
+            V2.schema_validate(mutated)
+
+
+def test_closed_form_tolerances_have_hard_schema_ceilings(suite):
+    mutated = deepcopy(suite)
+    check = _case(mutated, "BRD044-ANALYTICAL-AXIAL")["analytical_check"]["checks"][0]
+    check["absolute_tolerance"] = 1.0
+    check["relative_tolerance"] = 1.0
+    with pytest.raises(V2.HardenedReferenceError, match="Artifact sai schema"):
+        V2.schema_validate(mutated)
+
+
+def test_host_envelope_cannot_claim_worker_isolation(suite):
+    model = deepcopy(suite["cases"][0]["model"])
+    envelope = V2.run_opensees_model(model, python_executable=ROOT / "missing.exe")
+    envelope["hardening_audit"]["worker_isolation_verified"] = True
+    envelope["hardening_audit"]["loaded_forbidden_modules"] = []
+    envelope["hardening_audit"]["loaded_forbidden_origins"] = []
+    envelope["worker_envelope_sha256"] = V2._envelope_hash(envelope)
+    with pytest.raises(V2.HardenedReferenceError, match="HOST không được khai"):
+        V2.validate_worker_envelope(
+            envelope, model=model, require_converged=False
+        )
+
+
+def test_validator_requires_every_analytical_case_in_basis(suite, monkeypatch):
+    basis = deepcopy(V2.load_basis())
+    basis["analytical_expectations"].pop("BRD045-ANALYTICAL-INCLINED-TRUSS")
+    monkeypatch.setattr(V2, "load_basis", lambda: deepcopy(basis))
+    with pytest.raises(V2.HardenedReferenceError, match="ANALYTICAL thiếu expectation"):
+        V2.validate_benchmark_suite(deepcopy(suite))
+
+
+def test_nonzero_truss_shear_is_rejected_after_all_inner_hashes_are_resealed(suite):
+    mutated = deepcopy(suite)
+    case = _case(mutated, "BRD045-ANALYTICAL-INCLINED-TRUSS")
+    raw = case["opensees_result"]
+    raw["load_case_results"][0]["element_end_forces"][0]["shear_i_kN"] = 1.0
+    raw["raw_result_sha256"] = V2._raw_hash(raw)
+    _reseal_case(mutated, case)
+    with pytest.raises(V2.HardenedReferenceError):
+        V2.validate_benchmark_suite(mutated)
+
+
+def test_negative_issue_tamper_is_rejected_after_outer_reseal(negative):
+    mutated = deepcopy(negative)
+    mutated["issues"] = ["friendly replacement"]
+    _reseal_negative(mutated)
+    with pytest.raises(V2.HardenedReferenceError, match="issues gốc"):
+        V2.validate_negative_result(mutated)
+
+
+def test_negative_input_capture_tamper_is_rejected_after_outer_reseal(negative):
+    mutated = deepcopy(negative)
+    mutated["input_capture"]["payload_text"] += " "
+    _reseal_negative(mutated)
+    with pytest.raises(V2.HardenedReferenceError, match="input capture hash"):
+        V2.validate_negative_result(mutated)
+
+
+@pytest.mark.parametrize("forbidden", sorted(V2.FORBIDDEN_VERDICT_KEYS))
+def test_schema_and_runtime_reject_forbidden_design_verdict_backdoors(suite, forbidden):
+    root = deepcopy(suite)
+    root[forbidden] = True
+    with pytest.raises(V2.HardenedReferenceError):
+        V2.schema_validate(root)
+    nested = deepcopy(suite)
+    nested["cases"][0]["hardening_audit"][forbidden] = 1
+    with pytest.raises(V2.HardenedReferenceError):
+        V2.schema_validate(nested)
+
+
+def test_artifacts_contain_no_forbidden_verdict_keys(suite, negative):
+    assert not (set(_walk_keys(suite)) & V2.FORBIDDEN_VERDICT_KEYS)
+    assert not (set(_walk_keys(negative)) & V2.FORBIDDEN_VERDICT_KEYS)
+    assert suite["claim_level"] == negative["claim_level"] == "IDEA"
+    assert suite["design_verdict_authority"] == negative["design_verdict_authority"] == "NONE"
+    assert suite["gates_completed"] == negative["gates_completed"] == []
+
+
+def test_actual_backend_reruns_suite_and_negative_deterministically(suite, negative):
+    python, site = _backend_or_skip()
+    V2.validate_benchmark_suite(
+        suite, rerun_backend=True, python_executable=python, site_packages=site
+    )
+    V2.validate_negative_result(
+        negative, rerun_backend=True, python_executable=python, site_packages=site
+    )

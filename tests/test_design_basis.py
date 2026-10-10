@@ -19,6 +19,11 @@ import jsonschema
 import pytest
 
 from bridge_evolution import CATALOGS_DIR, CONTRACTS_DIR, GRAMMAR_DIR
+from bridge_evolution.evaluate import (
+    COMPONENT_AUDIT_REGISTRY,
+    build_component_audit,
+    evaluate_candidate,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DESIGN_BASIS_DIR = REPO_ROOT / "docs" / "design_basis"
@@ -611,3 +616,194 @@ def test_schema_rejects_g0_passed_with_blocking_items():
     assert _errors(schema, site), (
         "Không được tuyên bố G0 PASSED trong khi vẫn còn blocking_items"
     )
+
+
+# ---------------------------------------------------------------------------
+# Component audit đa cấu kiện — chỉ điều phối evidence, không thay verifier
+# ---------------------------------------------------------------------------
+
+
+_AUDIT_CASE_ID = "BT-0123456789abcdef"
+
+
+def _audit_evidence(tag: str = "sample") -> dict:
+    return {
+        "source_ref": f"tests/synthetic-component-evidence/{tag}.json",
+        "sha256": "a" * 64,
+        "fidelity": "ENGINEER_REVIEW",
+        "producer": "pytest-fixture",
+    }
+
+
+def _complete_component(kind: str, component_id: str = "C1",
+                        *, fail_check: str | None = None,
+                        include_advisory: bool = True) -> dict:
+    checks = []
+    for check_id, severity in COMPONENT_AUDIT_REGISTRY[kind]["required_checks"].items():
+        if severity == "SOFT" and not include_advisory:
+            continue
+        checks.append({
+            "check_id": check_id,
+            "status": "FAIL" if check_id == fail_check else "PASS",
+            "severity": severity,
+            "evidence": _audit_evidence(f"{kind}-{check_id}"),
+            "message": "Synthetic envelope test; không phải bằng chứng thiết kế.",
+            "utilization": 1.05 if check_id == fail_check else 0.75,
+        })
+    return {"component_id": component_id, "kind": kind, "checks": checks}
+
+
+def _build_audit(manifest: dict, state: dict | None = None) -> dict:
+    state = {} if state is None else state
+    result = {
+        "case_id": _AUDIT_CASE_ID,
+        "provenance": {"input_hash": "b" * 64},
+    }
+    return build_component_audit(state, result, manifest)
+
+
+def test_component_registry_covers_whole_bridge_system():
+    required_families = {
+        "DECK_SLAB", "LONGITUDINAL_GIRDER", "CROSS_BEAM_DIAPHRAGM",
+        "PIER_COLUMN", "PIER_CAP", "ABUTMENT", "RETAINING_WING_WALL",
+        "FOUNDATION_FOOTING", "FOUNDATION_PILE", "BEARING",
+        "EXPANSION_JOINT", "PRESTRESSING_SYSTEM", "CABLE_SYSTEM",
+        "ARCH_RIB", "TRUSS_MEMBER", "CONNECTION", "APPROACH_SLAB",
+        "PARAPET_BARRIER", "WATERPROOFING_DRAINAGE", "TEMPORARY_WORKS",
+    }
+    assert required_families <= set(COMPONENT_AUDIT_REGISTRY)
+
+
+def test_every_registered_component_can_enter_audit_envelope():
+    components = [
+        _complete_component(kind, f"C{index:02d}")
+        for index, kind in enumerate(sorted(COMPONENT_AUDIT_REGISTRY), start=1)
+    ]
+    audit = _build_audit({"candidate_id": _AUDIT_CASE_ID, "components": components})
+    assert audit["status"] == "SCREENED"
+    assert audit["blocking_reasons"] == []
+    assert {item["kind"] for item in audit["components"]} == set(COMPONENT_AUDIT_REGISTRY)
+
+
+def test_hard_fail_rejects_component_audit_and_creates_unverified_repair():
+    hard_check = next(
+        check_id for check_id, severity
+        in COMPONENT_AUDIT_REGISTRY["CONNECTION"]["required_checks"].items()
+        if severity == "HARD"
+    )
+    audit = _build_audit({
+        "components": [_complete_component("CONNECTION", "CONN-1",
+                                           fail_check=hard_check)],
+    })
+    assert audit["status"] == "REJECTED"
+    repair = next(p for p in audit["proposals"] if p["check_id"] == hard_check)
+    assert repair["kind"] == "REPAIR"
+    assert repair["requires_reanalysis"] is True
+    assert repair["claim"] == "UNVERIFIED_PROPOSAL"
+    assert "feasible" not in repair
+
+
+def test_missing_or_unproven_hard_checks_fail_closed():
+    audit = _build_audit({
+        "components": [{
+            "component_id": "BRG-1",
+            "kind": "BEARING",
+            "checks": [{
+                "check_id": "REACTION_CAPACITY",
+                "status": "PASS",
+                "severity": "HARD",
+                "message": "Caller nói đạt nhưng không đưa evidence.",
+            }],
+        }],
+    })
+    assert audit["status"] == "BLOCKED"
+    by_id = {check["check_id"]: check for check in audit["components"][0]["checks"]}
+    assert by_id["REACTION_CAPACITY"]["status"] == "NOT_EVALUATED"
+    codes = {reason["code"] for reason in audit["blocking_reasons"]}
+    assert "INVALID_HARD_CHECK_EVIDENCE" in codes
+    assert "MISSING_HARD_CHECK_EVIDENCE" in codes
+
+
+def test_unknown_component_kind_is_visible_and_blocked():
+    audit = _build_audit({
+        "components": [{"component_id": "X-1", "kind": "ALIEN_PART", "checks": []}],
+    })
+    assert audit["status"] == "BLOCKED"
+    assert audit["components"][0]["registry_supported"] is False
+    assert audit["components"][0]["checks"][0]["status"] == "NOT_EVALUATED"
+    assert any(r["code"] == "UNKNOWN_COMPONENT_KIND"
+               for r in audit["blocking_reasons"])
+
+
+def test_component_audit_lineage_and_hash_are_deterministic():
+    state = {"provenance": {"parent_candidate_id": "BT-parent-001"}}
+    component_a = _complete_component("DECK_SLAB", "DECK-1")
+    component_b = _complete_component("PIER_COLUMN", "PIER-1")
+    manifest = {
+        "candidate_id": _AUDIT_CASE_ID,
+        "parent_candidate_id": "BT-parent-001",
+        "components": [component_a, component_b],
+    }
+    first = _build_audit(copy.deepcopy(manifest), state)
+    reordered = copy.deepcopy(manifest)
+    reordered["components"].reverse()
+    second = _build_audit(reordered, state)
+    assert first["parent_candidate_id"] == "BT-parent-001"
+    assert first["audit_hash"] == second["audit_hash"]
+    assert len(first["audit_hash"]) == 64
+
+    mismatched = copy.deepcopy(manifest)
+    mismatched["parent_candidate_id"] = "BT-other-parent"
+    mismatch_audit = _build_audit(mismatched, state)
+    assert mismatch_audit["status"] == "BLOCKED"
+    assert any(r["code"] == "PARENT_LINEAGE_MISMATCH"
+               for r in mismatch_audit["blocking_reasons"])
+
+
+def test_durability_stays_advisory_when_hard_checks_have_evidence():
+    audit = _build_audit({
+        "components": [_complete_component(
+            "DECK_SLAB", "DECK-1", include_advisory=False,
+        )],
+    })
+    assert audit["status"] == "SCREENED"
+    durability = next(
+        check for check in audit["components"][0]["checks"]
+        if check["check_id"] == "DURABILITY"
+    )
+    assert durability["severity"] == "SOFT"
+    assert durability["status"] == "NOT_EVALUATED"
+
+
+def test_component_audit_validates_against_evaluation_result_schema():
+    audit = _build_audit({
+        "components": [_complete_component("FOUNDATION_PILE", "PILE-1")],
+    })
+    result = {
+        "case_id": _AUDIT_CASE_ID,
+        "status": "SUCCESS",
+        "feasible": False,
+        "solver": {"status": "NOT_RUN", "name": "BUILTIN_L1"},
+        "violations": [],
+        "provenance": {
+            "input_hash": "b" * 64,
+            "ruleset_version": "test-rules",
+            "solver_version": "test-solver",
+            "catalogs_version": "test-catalogs",
+        },
+        "component_audit": audit,
+    }
+    assert _errors(_load_schema("evaluation_result.schema.json"), result) == []
+
+
+def test_component_audit_never_changes_existing_evaluation_verdict():
+    state = _load_json(REPO_ROOT / "gold_cases" / "cases" / "GC-01_standard_pass.json")
+    baseline = evaluate_candidate(copy.deepcopy(state))
+    audited = evaluate_candidate(copy.deepcopy(state), component_manifest={
+        "components": [{"component_id": "X-1", "kind": "UNKNOWN_PART", "checks": []}],
+    })
+    assert audited["status"] == baseline["status"]
+    assert audited["feasible"] == baseline["feasible"]
+    assert audited["component_audit"]["status"] == "BLOCKED"
+    assert audited["component_audit"]["alters_evaluation_verdict"] is False
+    assert "component_audit" not in baseline

@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "ARCH-ACTION-F1-1.0.0",
+  "study_version": "arch-action-f1/0.1.0",
+  "upstream_versions": {
+    "creative_frame_adapter": "creative-frame-adapter/0.1.0",
+    "creative_generator": "creative-shape/0.3.0",
+    "frame_solver": "frame-f1/0.3.0"
+  },
+  "study_source_files": [
+    "bridge_evolution/arch_action_f1.py",
+    "bridge_evolution/creative_frame_adapter.py",
+    "bridge_evolution/creative_shape.py",
+    "bridge_evolution/frame_f1.py"
+  ],
+  "study_source_sha256": "0cf71ff05c0ca3ac3ea14fa10e9967f4225f7e7d39e5942f1fc22420457c4131",
+  "claim_ceiling": "IDEA",
+  "design_verdict_authority": "NONE",
+  "support_policy_by_topology": {
+    "DECK_ARCH": {
+      "id": "DECK_ARCH_BOTH_FEET_PINNED_TRANSLATION",
+      "left": { "ux": true, "uy": true, "rz": false },
+      "right": { "ux": true, "uy": true, "rz": false }
+    },
+    "THROUGH_ARCH": {
+      "id": "TIED_ARCH_LEFT_PIN_RIGHT_VERTICAL_ROLLER",
+      "left": { "ux": true, "uy": true, "rz": false },
+      "right": { "ux": false, "uy": true, "rz": false }
+    },
+    "NETWORK_ARCH": {
+      "id": "TIED_ARCH_LEFT_PIN_RIGHT_VERTICAL_ROLLER",
+      "left": { "ux": true, "uy": true, "rz": false },
+      "right": { "ux": false, "uy": true, "rz": false }
+    }
+  },
+  "expected_action_by_topology": {
+    "DECK_ARCH": "FOUNDATION_THRUST",
+    "THROUGH_ARCH": "INTERNAL_TIE_ACTION",
+    "NETWORK_ARCH": "INTERNAL_TIE_ACTION"
+  },
+  "diagnostic_tolerances": {
+    "action_force_relative": 1e-9,
+    "equilibrium_relative": 1e-8,
+    "element_end_antisymmetry_relative": 1e-8
+  },
+  "explicit_assumptions": [
+    "DECK_ARCH is represented with both arch feet restrained in ux and uy and free in rz to expose a two-hinged-arch-like foundation-thrust path in the 2D F1 idealisation",
+    "THROUGH_ARCH and NETWORK_ARCH retain a left pin and right vertical roller because the DECK frame is the internal tie path",
+    "Signed axial diagnostic is (axial_j - axial_i) / 2, with positive tension and negative compression under the F1 local-force convention",
+    "A force is numerically detected only when its magnitude exceeds action_force_relative times the total applied force scale",
+    "A detected load path requires every ARCH_RIB element to remain in compression; a tied-arch path also requires every DECK element between the feet to remain in tension",
+    "For DECK_ARCH, the left horizontal support reaction must point right and the right reaction must point left"
+  ],
+  "explicit_limitations": [
+    "This study diagnoses an F1 linear load path; it performs no resistance, utilization, serviceability or code-compliance check",
+    "Both restrained DECK_ARCH feet are an idealised boundary condition and do not model abutment, bearing, foundation or soil stiffness",
+    "FRAME_2D joints remain rigid idealisations and TRUSS_2D hangers remain axial-only",
+    "No self-weight is generated; the parent user-supplied deck line load controls the study",
+    "No prestress, P-Delta, eigenvalue buckling, material nonlinearity, dynamic, wind, seismic, fatigue, connection or construction-stage analysis",
+    "FOUNDATION_THRUST_DETECTED and INTERNAL_TIE_ACTION_DETECTED mean only that the expected force path is numerically visible, not that any member or foundation is adequate",
+    "A source_ref, hash and clause_id establish provenance only; they do not prove engineering applicability"
+  ],
+  "promotion_requirements": [
+    "Independent review of support idealisation, reaction signs and element local-force convention",
+    "Cross-check foundation thrust and tie force against closed-form arch equilibrium and a separate trusted solver",
+    "Introduce bearing, abutment and soil/foundation stiffness with project-specific evidence",
+    "Add project load combinations, geometric nonlinearity, stability and section/foundation resistance checks before design use"
+  ]
+}

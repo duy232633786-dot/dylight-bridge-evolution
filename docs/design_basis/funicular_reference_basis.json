@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "FUNICULAR-REFERENCE-1.0.0",
+  "reference_version": "funicular-reference/0.1.0",
+  "upstream_version": "arch-action-f1/0.1.0",
+  "reference_source_files": [
+    "bridge_evolution/funicular_reference.py",
+    "bridge_evolution/arch_action_f1.py"
+  ],
+  "reference_source_sha256": "529db0faa3c1d1e87b716cc54a962bae57150db91a0003e8152eacde27881a7c",
+  "claim_ceiling": "IDEA",
+  "design_verdict_authority": "NONE",
+  "applicable_topologies": [
+    "DECK_ARCH",
+    "THROUGH_ARCH",
+    "NETWORK_ARCH"
+  ],
+  "load_domain": {
+    "load_case_count": 1,
+    "direction": "GLOBAL_NEGATIVE_Y",
+    "distribution": "UNIFORM_OVER_HORIZONTAL_SPAN_FROM_TRIBUTARY_LENGTHS",
+    "support_elevation": "EQUAL",
+    "arch_axis_x": "STRICTLY_INCREASING"
+  },
+  "formulae": {
+    "equivalent_uniform_load": "w=W/L",
+    "horizontal_thrust": "H_ref=w*L^2/(8*f)",
+    "funicular_axis": "y_ref=4*f*x*(L-x)/L^2",
+    "reference_shear": "V_ref=w*(L/2-x)",
+    "reference_compression": "C_ref=sqrt(H_ref^2+V_ref^2)",
+    "bending_proxy": "M_proxy=w*x*(L-x)/2-H_ref*y_actual"
+  },
+  "numerical_tolerances": {
+    "geometry_relative": 1e-12,
+    "load_relative": 1e-12,
+    "canonical_funicular_relative": 1e-12
+  },
+  "order_of_magnitude_band": {
+    "minimum_ratio": 0.2,
+    "maximum_ratio": 5.0,
+    "interpretation": "HEURISTIC_MODEL_ERROR_DETECTION_NOT_CODE_LIMIT"
+  },
+  "explicit_assumptions": [
+    "The reference is the equilibrium funicular for a two-hinged parabolic arch under a vertical load uniformly distributed over the horizontal span",
+    "The parent deck tributary loads are reduced to the same total vertical load W over the horizontal span L; no stiffness quantity enters the reference equations",
+    "Axis ordinate is measured from the straight line joining two equal-elevation arch feet, and rise f is the maximum positive ordinate",
+    "For DECK_ARCH the measured quantity is the BRD-042 foundation-thrust magnitude; for tied arches it is the positive DECK tie-force envelope",
+    "The reciprocal factor-five order band is a model-error alarm only and is not a code acceptance limit"
+  ],
+  "explicit_limitations": [
+    "This is a statics-only funicular reference and geometry diagnostic; it is not a second frame solver and does not satisfy project gate G4 by itself",
+    "The bending proxy is M0-H_ref*y_actual for the idealised uniform vertical load; it is not the F1 element moment and not a design action",
+    "The foundation-thrust or tie-force comparison checks sign and order of magnitude only; it does not establish accuracy, resistance, utilization or adequacy",
+    "Load redistribution by deck stiffness, spandrels, hangers, end posts and polygonal rib discretisation is absent from the reference model",
+    "No bearing, abutment, foundation or soil stiffness is represented, so H_ref is not a foundation design load",
+    "No self-weight generation, prestress, P-Delta, buckling, material nonlinearity, dynamics, wind, seismic, fatigue, construction stage or code combination",
+    "A source_ref, hash and clause_id establish provenance only; they do not prove engineering applicability",
+    "Any technical use still requires an independent solver benchmark and responsible engineer review"
+  ],
+  "promotion_requirements": [
+    "Review the funicular equations, sign convention, load-domain checks and normalization independently",
+    "Benchmark reaction, tie force and bending distribution against a separate trusted solver on canonical and asymmetric arches",
+    "Add non-uniform and moving-load thrust-line envelopes before using the metric to rank design alternatives",
+    "Introduce project-specific bearings, abutments, foundations, soil interaction, load combinations, stability and resistance before design use"
+  ]
+}

@@ -15,7 +15,7 @@
     "MODEL-001",
     "SCHEMA-001", "SCHEMA-002",
     "SERV-001", "SERV-002", "SERV-003",
-    "SOLVER-001",
+    "SOLVER-001", "SITE-001",
     "STR-001", "STR-002"
   ],
   "capabilities": [
@@ -117,6 +117,49 @@
       "limits": "",
       "probes": [
         { "kind": "module_attr", "module": "bridge_evolution.evaluate", "attr": "evaluate_candidate", "callable": true }
+      ]
+    },
+    {
+      "id": "COMPONENT_AUDIT_ORCHESTRATION",
+      "title": "Điều phối kiểm toán đa cấu kiện cầu và đề xuất tái phân tích",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/evaluate.py::build_component_audit",
+        "contracts/evaluation_result.schema.json"
+      ],
+      "limits": "Chỉ chuẩn hóa component_manifest và evidence do caller cung cấp theo nguyên tắc fail-closed. Không tính demand/capacity, N-M, P-Delta, buckling, fatigue, địa kỹ thuật, thủy lực, giai đoạn thi công hay durability. BLOCKED/REJECTED của component audit không thay status/feasible; independent verifier vẫn là authority duy nhất của verdict hiện tại.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.evaluate", "attr": "build_component_audit", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.evaluate", "attr": "COMPONENT_AUDIT_REGISTRY" },
+        { "kind": "file_exists", "path": "contracts/evaluation_result.schema.json" }
+      ]
+    },
+    {
+      "id": "COLUMN_NM_SECOND_ORDER",
+      "title": "F1 — tương thích biến dạng N–M và khuếch đại mômen cho cột/trụ BTCT thẳng lăng trụ",
+      "state": "PARTIAL",
+      "evidence": [
+        "bridge_evolution/column_capacity/engine.py::interaction_diagram",
+        "bridge_evolution/column_capacity/engine.py::moment_magnification",
+        "tests/test_column_capacity.py"
+      ],
+      "limits": "Engine độc lập, chưa nối verifier/evaluate và chưa được khai trong danh sách package cài đặt. Chỉ uốn một phương cho tiết diện đặc chữ nhật/tròn và bố trí cốt thép đối xứng; basis DYLIGHT-FHWA-AASHTO-LRFD-SCREENING-v1 bị khóa, có beta1 giảm theo f'c, As/Ag <= 0.08, giới hạn Pmax tách khỏi Po và phi biến thiên. k/Lu và toàn bộ r, EI nứt, phi_k, tải, moment phải có EvidenceRef với model SHA-256/case/clause; lab chưa xác minh nội dung provenance đó. delta_b tự tính Cm từ M1/M2/tải ngang; delta_s dùng tổng cấp hệ và không được trộn mode; kLu/r >= 100 hoặc Pu/(phi_k*Pc) >= 0.95 fail-closed. Kết quả SCREENED, design_verdict_authority=NONE. Không có uốn hai phương, tiết diện rỗng/thay đổi, dự ứng lực, tải tổ hợp, cắt, mỏi hay P–Delta phi tuyến.",
+      "probes": [
+        { "kind": "module_attr", "module": "bridge_evolution.column_capacity", "attr": "interaction_diagram", "callable": true },
+        { "kind": "module_attr", "module": "bridge_evolution.column_capacity", "attr": "moment_magnification", "callable": true }
+      ]
+    },
+    {
+      "id": "ARCH_RIB_STABILITY",
+      "title": "Ổn định trong/ngoài mặt phẳng của vành vòm",
+      "state": "ABSENT",
+      "evidence": [
+        "bridge_evolution/column_capacity/engine.py::require_straight_prismatic",
+        "tests/test_column_capacity.py::test_rejects_curved_member_and_bar_outside_section"
+      ],
+      "limits": "Engine cột chủ động từ chối ARCH_RIB. Runtime chưa có đường áp lực, chiều dài quy đổi vòm, trị riêng hoặc phân tích phi tuyến hình học cho vành vòm.",
+      "probes": [
+        { "kind": "raises", "module": "bridge_evolution.column_capacity", "attr": "require_straight_prismatic", "args": ["ARCH_RIB"], "exception": "UnsupportedMemberGeometry" }
       ]
     },
     {
@@ -333,10 +376,10 @@
     },
     {
       "id": "production_girder_sections",
-      "description": "Số mã tiết diện Super-T định hình dùng được trong catalog (bỏ marker ST-PARAM và entry test-only).",
+      "description": "Số mã tiết diện dầm production theo bộ đếm runtime (bỏ marker ST-PARAM và entry test-only).",
       "source": "production_girder_sections",
       "doc_claims": [
-        { "file": "docs/runtime_capability_matrix.md", "pattern": "(\\d+) mã dầm Super-T định hình" }
+        { "file": "docs/runtime_capability_matrix.md", "pattern": "(\\d+) mã tiết diện dầm production" }
       ]
     },
     {

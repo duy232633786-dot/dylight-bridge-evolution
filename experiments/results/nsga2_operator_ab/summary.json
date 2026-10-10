@@ -1,0 +1,157 @@
+{
+  "cells": {
+    "super_t_parametric_v2|150": {
+      "arms": {
+        "legacy": {
+          "mean_best_cost": 2193.0463157894737,
+          "median_best_cost": 2166.37,
+          "median_cache_hit_ratio": 0.11172341360228293,
+          "median_feasible_count": 96.0,
+          "runs_without_feasible": 1,
+          "seeds_hitting_v1_oracle": null,
+          "worst_best_cost": 2491.02
+        },
+        "repaired": {
+          "mean_best_cost": 2159.037,
+          "median_best_cost": 2157.025,
+          "median_cache_hit_ratio": 0.0,
+          "median_feasible_count": 62.0,
+          "runs_without_feasible": 0,
+          "seeds_hitting_v1_oracle": null,
+          "worst_best_cost": 2229.38
+        }
+      },
+      "paired_losses_repaired": 8,
+      "paired_ties": 0,
+      "paired_wins_repaired": 12,
+      "sign_test_p_one_sided": 0.2517223358154297,
+      "verdict": "NO_SUPPORTED_DIFFERENCE"
+    },
+    "super_t_parametric_v2|600": {
+      "arms": {
+        "legacy": {
+          "mean_best_cost": 2063.53,
+          "median_best_cost": 2049.77,
+          "median_cache_hit_ratio": 0.3942267140291914,
+          "median_feasible_count": 401.5,
+          "runs_without_feasible": 1,
+          "seeds_hitting_v1_oracle": null,
+          "worst_best_cost": 2390.51
+        },
+        "repaired": {
+          "mean_best_cost": 2055.1475,
+          "median_best_cost": 2047.9699999999998,
+          "median_cache_hit_ratio": 0.0010796594431340327,
+          "median_feasible_count": 423.0,
+          "runs_without_feasible": 0,
+          "seeds_hitting_v1_oracle": null,
+          "worst_best_cost": 2109.81
+        }
+      },
+      "paired_losses_repaired": 12,
+      "paired_ties": 0,
+      "paired_wins_repaired": 8,
+      "sign_test_p_one_sided": 0.8684120178222656,
+      "verdict": "NO_SUPPORTED_DIFFERENCE"
+    },
+    "super_t_simple_v1|150": {
+      "arms": {
+        "legacy": {
+          "mean_best_cost": 2104.551,
+          "median_best_cost": 2101.895,
+          "median_cache_hit_ratio": 0.2118784655940369,
+          "median_feasible_count": 101.0,
+          "runs_without_feasible": 0,
+          "seeds_hitting_v1_oracle": 0,
+          "worst_best_cost": 2143.72
+        },
+        "repaired": {
+          "mean_best_cost": 2116.962,
+          "median_best_cost": 2114.1400000000003,
+          "median_cache_hit_ratio": 0.0,
+          "median_feasible_count": 95.0,
+          "runs_without_feasible": 0,
+          "seeds_hitting_v1_oracle": 0,
+          "worst_best_cost": 2153.66
+        }
+      },
+      "paired_losses_repaired": 15,
+      "paired_ties": 1,
+      "paired_wins_repaired": 4,
+      "sign_test_p_one_sided": 0.9977874755859375,
+      "verdict": "REPAIRED_WORSE"
+    },
+    "super_t_simple_v1|600": {
+      "arms": {
+        "legacy": {
+          "mean_best_cost": 2072.94,
+          "median_best_cost": 2072.94,
+          "median_cache_hit_ratio": 0.76353811994944,
+          "median_feasible_count": 340.0,
+          "runs_without_feasible": 0,
+          "seeds_hitting_v1_oracle": 20,
+          "worst_best_cost": 2072.94
+        },
+        "repaired": {
+          "mean_best_cost": 2074.478,
+          "median_best_cost": 2072.94,
+          "median_cache_hit_ratio": 0.12448411677954879,
+          "median_feasible_count": 368.0,
+          "runs_without_feasible": 0,
+          "seeds_hitting_v1_oracle": 15,
+          "worst_best_cost": 2089.48
+        }
+      },
+      "paired_losses_repaired": 5,
+      "paired_ties": 15,
+      "paired_wins_repaired": 0,
+      "sign_test_p_one_sided": 1.0,
+      "verdict": "NO_SUPPORTED_DIFFERENCE"
+    }
+  },
+  "claim_ceiling": "SCREENED",
+  "created_at_utc": "2026-09-25T06:36:47.332845+00:00",
+  "experiment": "BRD-059 nsga2 operator A/B",
+  "preregistration": {
+    "arms": [
+      "legacy",
+      "repaired"
+    ],
+    "budgets": [
+      150,
+      600
+    ],
+    "decision_rule": "repaired tốt hơn ở ô (grammar, budget) chỉ khi thắng theo cặp ở >= 14/20 seed và trung vị best_cost không tệ hơn",
+    "grammars": [
+      "super_t_simple_v1",
+      "super_t_parametric_v2"
+    ],
+    "primary_metric": "best_relative_cost",
+    "seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119
+    ],
+    "tie_tolerance": 1e-09,
+    "v1_exhaustive_oracle_best_cost": 2072.94,
+    "win_threshold": 14
+  },
+  "software_version": "0.8.0"
+}

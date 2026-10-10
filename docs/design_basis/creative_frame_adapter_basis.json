@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "basis_id": "CREATIVE-FRAME-ADAPTER-1.0.0",
+  "adapter_version": "creative-frame-adapter/0.1.0",
+  "creative_generator_version": "creative-shape/0.3.0",
+  "frame_solver_version": "frame-f1/0.3.0",
+  "adapter_source_files": [
+    "bridge_evolution/creative_frame_adapter.py",
+    "bridge_evolution/creative_shape.py",
+    "bridge_evolution/frame_f1.py"
+  ],
+  "adapter_source_sha256": "a2308d3c8c04ce438bd70d89f922da29a0f04c84cc6ca122ee82c9d886478c18",
+  "claim_ceiling": "IDEA",
+  "design_verdict_authority": "NONE",
+  "edge_kind_mapping": {
+    "ARCH_RIB": "FRAME_2D",
+    "DECK": "FRAME_2D",
+    "SPANDREL": "FRAME_2D",
+    "END_POST": "FRAME_2D",
+    "HANGER": "TRUSS_2D",
+    "NETWORK_HANGER": "TRUSS_2D"
+  },
+  "support_policy": {
+    "id": "LEFT_PIN_RIGHT_VERTICAL_ROLLER",
+    "left": { "ux": true, "uy": true, "rz": false },
+    "right": { "ux": false, "uy": true, "rz": false }
+  },
+  "minimum_element_length_m": 1e-9,
+  "load_transfer": {
+    "method": "HALF_ADJACENT_DECK_EDGE_LENGTH_TO_EACH_END_NODE",
+    "direction": "GLOBAL_NEGATIVE_Y",
+    "relative_tolerance": 1e-12
+  },
+  "explicit_assumptions": [
+    "Mỗi ARCH_RIB, DECK, SPANDREL và END_POST được lý tưởng hóa thành FRAME_2D có liên kết cứng tại nút",
+    "Mỗi HANGER và NETWORK_HANGER được lý tưởng hóa thành TRUSS_2D chỉ chịu lực dọc trục",
+    "Policy khớp trái và con lăn đứng phải chỉ là điều kiện biên sàng F1 cố định; không đại diện mặc nhiên cho cấu tạo gối, mố hoặc truyền lực xô của cầu thật",
+    "Tải đường đều do người gọi cấp được quy đổi thành tải nút theo nửa chiều dài hai đoạn DECK kề nút"
+  ],
+  "explicit_limitations": [
+    "FRAME_2D joints are rigid idealisations; TRUSS_2D hangers carry axial force only",
+    "No self-weight is generated; user-supplied deck line load must explicitly include every intended gravity component",
+    "No prestress, P-Delta, eigenvalue buckling, material nonlinearity, dynamic, wind, seismic, fatigue, connection, foundation or construction-stage analysis",
+    "No bridge-code load combination, resistance factor, capacity or serviceability check is performed",
+    "For DECK_ARCH, the right vertical roller releases horizontal reaction and therefore does not represent a conventional two-hinged arch foundation-thrust model",
+    "A source_ref, hash and clause_id establish provenance only; they do not prove applicability",
+    "CONVERGED means only that the F1 linear system converged within its declared applicability guards; it is not a design verdict"
+  ],
+  "promotion_requirements": [
+    "Independent review of geometry, member idealisation, support policy and tributary load conversion",
+    "Cross-check representative models against an independent trusted finite-element solver",
+    "Project-specific section properties, load cases, combinations and capacity checks tied to cited bridge-code clauses",
+    "Geometric/material nonlinearity, stability, connection, bearing, foundation and staged-construction verification before design use"
+  ]
+}

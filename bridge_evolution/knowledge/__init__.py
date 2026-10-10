@@ -9,6 +9,11 @@ from .obsidian import (discover_obsidian_vaults, export_obsidian_vault,
 from .reference_docs import import_tcvn_collection
 from .local_library import import_local_library, plan_import
 from .notebooklm import import_notebooklm_snapshot, load_notebooklm_snapshot
+from .notebooklm_sync import (
+    enqueue_codex_message, export_sync_dashboard, ingest_notebooklm_capture,
+    load_messages as load_notebooklm_sync_messages, sync_status as notebooklm_sync_status,
+    update_message_status as update_notebooklm_sync_status,
+)
 from .theme import configure_obsidian_colors
 
 __all__ = [
@@ -21,6 +26,12 @@ __all__ = [
     "load_card_audit",
     "load_cards",
     "load_notebooklm_snapshot",
+    "enqueue_codex_message",
+    "export_sync_dashboard",
+    "ingest_notebooklm_capture",
+    "load_notebooklm_sync_messages",
+    "notebooklm_sync_status",
+    "update_notebooklm_sync_status",
     "plan_import",
     "query_knowledge",
     "resolve_obsidian_vault",

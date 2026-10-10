@@ -1,0 +1,304 @@
+/* DYLIGHT Lab — shell phòng lab hướng 1. Chỉ gọi API cục bộ của scripts/serve_lab.py;
+   mọi số kỹ thuật đến từ evaluate_candidate / design_loop / check_geometry / MAP-Elites. */
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const nf = (v, d) => (v == null || !isFinite(v)) ? '–' : Number(v).toLocaleString('vi-VN', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const kv = (rows) => '<table class="kv">' + rows.filter(Boolean).map(([k, v]) => '<tr><td>' + k + '</td><td>' + v + '</td></tr>').join('') + '</table>';
+  const pill = (text, cls) => '<span class="pill ' + cls + '">' + esc(text) + '</span>';
+  const statusPill = (s) => pill(s, { PRESENT: 'pass', PARTIAL: 'warn', ABSENT: 'na', PASSED: 'pass', AVAILABLE: 'pass', BLOCKED: 'fail', ACCEPTED: 'pass', REVIEW: 'warn', ACTIVE: 'info', READY: 'na', BACKLOG: 'na', REJECTED: 'fail', APPROVE: 'pass', REVISE: 'warn', REJECT: 'fail', DRAFT: 'na', ENGINEER_APPROVED: 'pass', SCREENED: 'pass', IDEA: 'na', PASS: 'pass', FAIL: 'fail', NOT_EVALUATED: 'na', UNKNOWN: 'na' }[s] || 'na');
+  const VAR_LABELS = { girder_catalog_id: 'Tiết diện', girder_count: 'Số dầm', girder_spacing_mm: 'Khoảng cách dầm', deck_slab_thickness_mm: 'Dày bản', girder_concrete_id: 'Bê tông dầm', deck_concrete_id: 'Bê tông bản', diaphragm_layout_id: 'Dầm ngang', prestress_layout_id: 'Cáp DƯL', girder_depth_mm: 'Chiều cao dầm H', top_flange_width_mm: 'Rộng cánh trên b_f', top_flange_thickness_mm: 'Dày cánh trên t_f', web_thickness_mm: 'Dày sườn t_w', bottom_bulb_width_mm: 'Rộng bầu b_b', bottom_bulb_height_mm: 'Cao bầu h_b' };
+  const RULE_LABELS = { 'STR-001': 'Uốn CĐ-I', 'STR-002': 'Cắt CĐ-I', 'SERV-001': 'Kéo thớ dưới SD-III', 'SERV-002': 'Võng hoạt tải', 'SERV-003': 'Tần số', 'MODEL-001': 'Khối ứng suất trong bản', 'GEOM-001': 'Cánh hẫng', 'GEOM-002': 'Khe cánh dầm', 'GEOM-003': 'Dày bản tối thiểu', 'CONS-001': 'Dầm ngang', 'CONS-002': 'Lưới grammar', 'FAB-000': 'Tiết diện phi vật lý', 'FAB-001': 'Sườn tối thiểu', 'FAB-002': 'Cánh trên tối thiểu', 'FAB-003': 'Chỗ xếp cáp', 'FAB-004': 'Năng lực cẩu', 'FAB-005': 'Tĩnh không vận chuyển', 'FAB-006': 'Độ vát ván khuôn', 'FAB-007': 'Tỷ lệ nhịp/chiều cao' };
+
+  const state = { overview: null, catalog: null, cards: [], knowledgeLoaded: false, obsidian: null, live: null, report: null, reportLabel: '', studioGene: null, creative: null, taskFilter: 'ALL' };
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._h); toast._h = setTimeout(() => t.classList.remove('on'), 3000); }
+  async function api(path, body) {
+    const res = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
+    const data = await res.json().catch(() => ({ error: 'phản hồi không phải JSON' }));
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  }
+
+  // ---------------------------------------------------------------- điều hướng
+  document.querySelectorAll('.nav').forEach((b) => b.addEventListener('click', () => showView(b.dataset.view)));
+  function showView(name) {
+    document.querySelectorAll('.nav').forEach((b) => b.classList.toggle('on', b.dataset.view === name));
+    document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === 'view-' + name));
+    if (name === 'evidence') renderEvidence();
+    if (name === 'creative') ensureSecFrame();
+    if (name === 'process' && !state.live) loadProcess();
+    if (name === 'knowledge') { if (state.knowledgeLoaded) renderCards(state.cards); else loadKnowledge(); }
+  }
+
+  // ---------------------------------------------------------------- bàn sáng tạo mặt cắt: ba tab
+  function ensureSecFrame() { const f = $('midas-frame'); if ($('sec-psc').classList.contains('on') && !f.getAttribute('src')) f.src = f.dataset.src; }
+  function activateSec(sec) { document.querySelectorAll('#sec-tabs .btn').forEach((b) => b.classList.toggle('active', b.dataset.sec === sec)); document.querySelectorAll('.sec-pane').forEach((pane) => pane.classList.toggle('on', pane.id === 'sec-' + sec)); if (sec === 'psc') ensureSecFrame(); }
+  document.querySelectorAll('#sec-tabs .btn').forEach((b) => b.addEventListener('click', () => activateSec(b.dataset.sec)));
+
+  // ---------------------------------------------------------------- tổng quan
+  async function loadOverview() {
+    try {
+      const ov = await api('/api/lab/overview'); state.overview = ov;
+      $('server-chip').innerHTML = '<span class="dot" style="background:var(--pass)"></span>server ' + esc(ov.lab_version) + ' · pkg ' + esc(ov.software_version);
+      $('claim-banner').innerHTML = pill(ov.claim_ceiling, ov.claim_ceiling === 'SCREENED' ? 'warn' : 'na') + '<span>' + esc(ov.claim_note) + '</span>';
+      $('ov-gates').querySelector('.body').innerHTML = ov.gates.map((g) => '<div class="gate"><span class="g">' + g.gate + '</span><span>' + esc(g.label) + '<div class="d">' + esc(g.detail) + '</div></span>' + statusPill(g.status) + '</div>').join('');
+      const caps = ov.capabilities.map((c) => '<span class="cap" title="' + esc(c.limit || c.title) + '"><span class="dot" style="background:var(--' + ({ PRESENT: 'pass', PARTIAL: 'warn', ABSENT: 'na' }[c.state] || 'na') + ')"></span>' + esc(c.id) + '</span>').join('');
+      const counts = ov.capabilities.reduce((a, c) => { a[c.state] = (a[c.state] || 0) + 1; return a; }, {});
+      $('ov-caps').querySelector('.body').innerHTML = '<div class="note">' + Object.entries(counts).map(([k, v]) => k + ' ' + v).join(' · ') + ' · rule runtime: ' + ov.rule_inventory.length + '</div><div class="caps">' + caps + '</div>';
+      $('ov-basis').querySelector('.body').innerHTML = kv([
+        ['Design basis', esc(ov.design_basis.project_id || '–')], ['Tiêu chuẩn', esc((ov.design_basis.standard || '') + ' ' + (ov.design_basis.standard_version || ''))],
+        ['Tuổi thọ thiết kế', statusPill(ov.design_basis.design_life || 'UNKNOWN')], ['Cấp phơi nhiễm', statusPill(ov.design_basis.exposure_class || 'UNKNOWN')],
+        ['Site profile', esc(ov.site.profile) + ' · ' + esc(ov.site.status || '')], ['G0', statusPill(ov.site.g0 || 'UNKNOWN')], ['Trường UNKNOWN', ov.site.unknown_fields.length],
+      ]) + '<div class="note">Đây là lý do mọi số vẫn ở mức mô hình nghiên cứu: chưa có vị trí, gió, động đất, thủy văn, địa chất, ăn mòn thật.</div>';
+      const ls = ov.lab_status || {};
+      $('ov-lab').querySelector('.body').innerHTML = kv([
+        ['Lab hợp lệ', ls.valid === true ? pill('valid', 'pass') : ls.valid === false ? pill('invalid', 'fail') : '–'],
+        ['Task', ls.tasks ? Object.entries(ls.tasks).map(([k, v]) => k + ' ' + v).join(' · ') : '–'],
+        ['CLI', ls.cli_available ? Object.entries(ls.cli_available).map(([k, v]) => k + (v ? ' ✓' : ' ✗')).join(' · ') : '–'],
+        ['Tác tử', (ov.agents || []).map((a) => esc(a.agent_id)).join(', ')],
+      ]) + '<div class="note">Đề tài mới đi qua lab orchestrate; mọi phát minh nộp handoff có hash; proposer không tự review.</div>';
+      const o = ov.oracle_v1;
+      $('ov-knowledge').querySelector('.body').innerHTML = kv([
+        ['Thẻ tri thức', ov.knowledge.cards + ' · ' + Object.entries(ov.knowledge.by_status).map(([k, v]) => k + ' ' + v).join(', ')],
+        ['Thẻ kỹ sư duyệt', (ov.knowledge.by_status.ENGINEER_APPROVED || 0)],
+        o ? ['Oracle vét cạn v1', nf(o.domain_size, 0) + ' tổ hợp · ' + nf(o.l0_valid, 0) + ' L0 · ' + nf(o.feasible, 0) + ' khả thi'] : null,
+        o && o.best_cost != null ? ['Chi phí tối ưu toàn cục v1', nf(o.best_cost, 2)] : null,
+      ]) + '<div class="note">Mọi vòng lặp cục bộ phải đối chiếu với oracle này trước khi phát biểu "tốt".</div>';
+      $('ov-honest').querySelector('.body').innerHTML = '<ul class="note" style="margin:0;padding-left:16px;color:var(--ink-2)">'
+        + '<li>Được: sàng lọc L0/L1 tái lập được, lineage có hash, chẩn đoán vi phạm và nước sửa, danh mục hình thái F0.</li>'
+        + '<li>Không được: kết luận đạt tiêu chuẩn, trích chi phí/carbon như dự toán, tối ưu cốt thép thường (chưa có biến), nói về gió/động đất/xói/độ bền.</li>'
+        + '<li>Muốn nâng: G0 site thật → L2 qua midas-mcp → grammar cốt thép → L3 giai đoạn → kỹ sư duyệt.</li></ul>';
+    } catch (err) { $('server-chip').innerHTML = '<span class="dot" style="background:var(--fail)"></span>' + esc(err.message); }
+  }
+
+  // ---------------------------------------------------------------- bàn cấu kiện
+  const inspector = $('inspector');
+  function sendInspector(msg) { try { inspector.contentWindow.postMessage(msg, '*'); } catch (err) { /* chưa sẵn sàng */ } }
+  window.addEventListener('message', (e) => {
+    const d = e.data; if (!d || typeof d !== 'object') return;
+    if (d.type === 'dylight:loaded') { if (d.report) { state.report = d.report; state.reportLabel = d.label || ''; } renderEvidence(); }
+  });
+  async function loadCatalog() {
+    const cat = await api('/api/catalog'); state.catalog = cat;
+    const sel = $('seed-select'); sel.innerHTML = '';
+    for (const gc of cat.gold_cases) { const o = document.createElement('option'); o.value = 'gold:' + gc.file; o.textContent = gc.file.replace('.json', '') + ' — ' + (gc.description || ''); sel.appendChild(o); }
+    for (const [fam, gene] of Object.entries(cat.anchor_genes || {})) { if (!cat.grammars[fam]) continue; const o = document.createElement('option'); o.value = 'anchor:' + fam; o.textContent = 'anchor ' + fam; sel.appendChild(o); }
+    const custom = document.createElement('option'); custom.value = 'studio'; custom.textContent = 'gene từ Studio tiết diện'; sel.appendChild(custom);
+    if (cat.gold_cases.find((g) => g.file.startsWith('GC-06'))) sel.value = 'gold:' + cat.gold_cases.find((g) => g.file.startsWith('GC-06')).file;
+    initStudio();
+  }
+  function seedPayload() {
+    const v = $('seed-select').value;
+    if (v.startsWith('gold:')) return { seed_file: v.slice(5) };
+    if (v.startsWith('anchor:')) { const fam = v.slice(7); return { gene: state.catalog.anchor_genes[fam], grammar_id: fam }; }
+    if (v === 'studio') { if (!state.studioGene) throw new Error('Chưa có gene từ Studio'); return { gene: state.studioGene, grammar_id: 'super_t_parametric_v2' }; }
+    throw new Error('Seed không hợp lệ');
+  }
+  $('btn-run').addEventListener('click', async () => {
+    const btn = $('btn-run'); btn.disabled = true; $('run-status').textContent = 'Đang chạy… mỗi lần solver ~20 ms, chẩn đoán ~10 ms.';
+    try {
+      const payload = Object.assign(seedPayload(), {
+        budget: +$('in-budget').value,
+        policy: { objective_key: $('in-objective').value, utilization_target: +$('in-target').value, move_policy: $('in-policy').value, trim_order: $('in-trim').value, trim_enabled: $('in-trim-on').value === '1' },
+      });
+      const res = await api('/api/design-loop', payload);
+      state.report = res.report; state.reportLabel = res.saved_as;
+      sendInspector({ type: 'dylight:load', payload: res.report, label: res.saved_as });
+      const f = res.report.final || {};
+      $('run-status').innerHTML = 'Xong: ' + statusPill(res.report.termination.reason) + ' · ' + (f.feasible ? pill('khả thi', 'pass') : pill('chưa khả thi', 'fail')) + ' · D/C ' + nf(f.max_utilization, 3) + ' · chi phí ' + nf((f.objectives || {}).relative_cost, 2) + ' · ' + res.report.counters.evaluator.solver_calls + ' solver · lưu <span style="font-family:var(--font-mono)">' + esc(res.saved_as) + '</span>';
+      loadRuns(); renderEvidence();
+    } catch (err) { $('run-status').innerHTML = '<span style="color:var(--fail)">' + esc(err.message) + '</span>'; }
+    btn.disabled = false;
+  });
+  async function loadRuns() {
+    try {
+      const res = await api('/api/design-loop/runs'); const box = $('runs-list'); box.innerHTML = '';
+      if (!res.runs.length) { box.innerHTML = '<div class="note">Chưa có run nào.</div>'; return; }
+      for (const r of res.runs.slice(0, 30)) {
+        const d = document.createElement('div'); d.className = 'run';
+        d.innerHTML = '<div class="t">' + esc(r.created_utc) + '</div><div>' + esc(r.seed_case_id) + ' → ' + esc(r.final_case_id || '–') + '</div><div class="m">' + (r.final_feasible ? pill('đạt', 'pass') : pill('chưa', 'fail')) + '<span>' + nf(r.final_cost, 0) + '</span><span>D/C ' + nf(r.final_max_utilization, 3) + '</span><span>' + esc(r.termination) + '</span></div>';
+        d.addEventListener('click', async () => { try { const one = await api('/api/design-loop/runs/' + encodeURIComponent(r.name)); state.report = one.report; state.reportLabel = r.name; sendInspector({ type: 'dylight:load', payload: one.report, label: r.name }); renderEvidence(); toast('Đã nạp ' + r.name); } catch (err) { toast(err.message); } });
+        box.appendChild(d);
+      }
+    } catch (err) { $('runs-list').innerHTML = '<div class="note">' + esc(err.message) + '</div>'; }
+  }
+
+  // ---------------------------------------------------------------- studio tiết diện v2
+  const STUDIO_KEYS = ['girder_depth_mm', 'top_flange_width_mm', 'top_flange_thickness_mm', 'web_thickness_mm', 'bottom_bulb_width_mm', 'bottom_bulb_height_mm', 'girder_count', 'girder_spacing_mm', 'deck_slab_thickness_mm', 'prestress_layout_id', 'girder_concrete_id', 'deck_concrete_id', 'diaphragm_layout_id'];
+  function initStudio() {
+    const g = state.catalog.grammars.super_t_parametric_v2; if (!g) return;
+    state.studioGene = Object.assign({}, state.catalog.anchor_genes.super_t_parametric_v2);
+    const box = $('studio-sliders'); box.innerHTML = '';
+    for (const key of STUDIO_KEYS) {
+      const dom = g.domains[key]; const lab = document.createElement('label');
+      const numeric = typeof dom[0] === 'number';
+      if (numeric) lab.innerHTML = '<span>' + esc(VAR_LABELS[key] || key) + '</span><input type="range" min="0" max="' + (dom.length - 1) + '" step="1" data-key="' + key + '" value="' + dom.indexOf(state.studioGene[key]) + '"><input type="number" class="val-in" id="sv-' + key + '" data-key="' + key + '" value="' + state.studioGene[key] + '" min="' + dom[0] + '" max="' + dom[dom.length - 1] + '" step="' + (dom.length > 1 ? dom[1] - dom[0] : 1) + '" title="gõ số, tự bắt vào lưới grammar">';
+      else lab.innerHTML = '<span>' + esc(VAR_LABELS[key] || key) + '</span><select data-key="' + key + '">' + dom.map((v) => '<option value="' + esc(v) + '"' + (v === state.studioGene[key] ? ' selected' : '') + '>' + esc(v) + '</option>').join('') + '</select><span class="val"></span>';
+      box.appendChild(lab);
+    }
+    box.querySelectorAll('input[type=range]').forEach((r) => r.addEventListener('input', () => { const key = r.dataset.key; state.studioGene[key] = g.domains[key][+r.value]; $('sv-' + key).value = state.studioGene[key]; scheduleStudio(); }));
+    box.querySelectorAll('input.val-in').forEach((n) => n.addEventListener('change', () => { const key = n.dataset.key; const dom = g.domains[key]; const v = +n.value; let best = dom[0]; for (const c of dom) if (Math.abs(c - v) < Math.abs(best - v)) best = c; state.studioGene[key] = best; n.value = best; const r = box.querySelector('input[type=range][data-key="' + key + '"]'); if (r) r.value = dom.indexOf(best); if (best !== v) toast(esc(VAR_LABELS[key] || key) + ' bắt vào lưới: ' + best); scheduleStudio(); }));
+    box.querySelectorAll('select').forEach((s) => s.addEventListener('change', () => { state.studioGene[s.dataset.key] = s.value; scheduleStudio(); }));
+    scheduleStudio();
+  }
+  let studioTimer = null;
+  function scheduleStudio() { clearTimeout(studioTimer); studioTimer = setTimeout(runStudio, 120); }
+  async function runStudio() {
+    try {
+      const res = await api('/api/section', { grammar_id: 'super_t_parametric_v2', gene: state.studioGene });
+      drawSection(res); const s = res.section, o = res.objectives, geo = res.geometry || {};
+      $('studio-props').innerHTML = s ? 'A ' + nf(s.area_m2, 4) + ' m² · I ' + nf(s.I_m4, 4) + ' m⁴ · y_b ' + nf(s.y_bottom_m * 1000, 0) + ' mm · S_b ' + nf(s.I_m4 / s.y_bottom_m, 4) + ' m³ · cánh hẫng ' + nf(geo.overhang_m * 1000, 0) + ' mm · khe cánh ' + nf(geo.flange_gap_m * 1000, 0) + ' mm' + (o ? ' · chi phí ' + nf(o.relative_cost, 2) + ' · ' + nf(o.material_mass_t, 1) + ' t' : ' · <span style="color:var(--fail)">L0 chặn, không tính objective</span>') : 'Không dựng được tiết diện.';
+      const hard = res.violations.filter((v) => v.severity === 'HARD'), soft = res.violations.filter((v) => v.severity !== 'HARD');
+      $('studio-violations').innerHTML = (res.schema_errors.length ? res.schema_errors.map((e) => '<div class="viol">' + esc(e) + '</div>').join('') : '')
+        + hard.map((v) => '<div class="viol"><span class="rid">' + esc(v.rule_id) + '</span> ' + esc(RULE_LABELS[v.rule_id] || '') + ' · ' + esc(v.message) + '</div>').join('')
+        + soft.map((v) => '<div class="viol soft"><span class="rid">' + esc(v.rule_id) + '</span> ' + esc(v.message) + '</div>').join('')
+        + (!hard.length && !res.schema_errors.length ? '<div class="note">L0 sạch: bố trí và chế tạo qua; chưa nói gì về chịu lực cho tới khi chạy vòng lặp.</div>' : '');
+    } catch (err) { $('studio-props').textContent = err.message; }
+  }
+  function drawSection(res) {
+    const svg = $('studio-svg'); const ring = res.polygon; if (!ring || !ring.length) { svg.innerHTML = '<text x="10" y="20" fill="currentColor" font-size="12">' + esc(res.polygon_error || 'không có biên') + '</text>'; return; }
+    const xs = ring.map((p) => p[0]), ys = ring.map((p) => p[1]); const bf = Math.max(...xs) - Math.min(...xs), H = Math.max(...ys);
+    const W = 420, Hh = 340, pad = 30; const sc = Math.min((W - 2 * pad) / bf, (Hh - 2 * pad - 20) / H);
+    const X = (x) => W / 2 + x * sc, Y = (y) => Hh - pad - y * sc;
+    const path = ring.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join(' ') + ' Z';
+    const s = res.section || {}; const yb = s.y_bottom_m;
+    svg.innerHTML = '<path d="' + path + '" fill="rgba(128,128,128,.22)" stroke="currentColor" stroke-width="1.2"/>'
+      + (yb != null ? '<line x1="' + X(-bf / 2) + '" x2="' + X(bf / 2) + '" y1="' + Y(yb) + '" y2="' + Y(yb) + '" stroke="var(--accent)" stroke-dasharray="4 3"/>' : '')
+      + '<text x="' + (X(-bf / 2) - 4) + '" y="' + (Y(H / 2)) + '" font-size="11" fill="var(--accent)" text-anchor="end" font-family="IBM Plex Mono">H ' + Math.round(H * 1000) + '</text>'
+      + '<text x="' + X(0) + '" y="' + (Y(H) - 8) + '" font-size="11" fill="var(--accent)" text-anchor="middle" font-family="IBM Plex Mono">b_f ' + Math.round(bf * 1000) + '</text>'
+      + '<text x="10" y="16" font-size="11" fill="var(--muted)">grammar v2 · ' + esc(res.geometry ? res.geometry.section_source : '') + '</text>';
+  }
+  $('btn-studio-anchor').addEventListener('click', initStudio);
+  $('btn-studio-seed').addEventListener('click', () => { $('seed-select').value = 'studio'; showView('bench'); toast('Seed = gene Studio; bấm Chạy vòng lặp'); });
+  // Bắt tay với iframe MIDAS: gene chỉ gửi khi iframe đã báo 'dylight:midas-ready' (tránh mất message trước khi listener cài xong).
+  state.midasReady = false; state.midasQueue = [];
+  function midasSend(msg) { const f = $('midas-frame'); if (state.midasReady) { try { f.contentWindow.postMessage(msg, '*'); } catch (err) { toast(err.message); } } else { state.midasQueue.push(msg); if (!f.getAttribute('src')) f.src = f.dataset.src; } }
+  window.addEventListener('message', (e) => {
+    const d = e.data; if (!d || typeof d !== 'object') return;
+    if (d.type === 'dylight:midas-ready') { state.midasReady = true; const q = state.midasQueue.splice(0); q.forEach(midasSend); }
+    if (d.type === 'dylight:supert-ack') toast('MIDAS đã nhận gene: ' + (d.vertices || '?') + ' đỉnh');
+  });
+  $('btn-studio-midas').addEventListener('click', () => {
+    showView('creative'); activateSec('psc');
+    midasSend({ type: 'dylight:supert-gene', gene: state.studioGene, grammar_id: 'super_t_parametric_v2' });
+    toast('Gene Studio → PSC-Value MIDAS');
+  });
+
+  // ---------------------------------------------------------------- danh mục hình thái
+  $('btn-creative').addEventListener('click', async () => {
+    const btn = $('btn-creative'); btn.disabled = true; $('cs-status').textContent = 'Đang chạy MAP-Elites…';
+    try {
+      const res = await api('/api/creative-search', { seed: +$('cs-seed').value, iterations: +$('cs-iter').value }); state.creative = res;
+      $('cs-status').innerHTML = res.archive_size + ' hình thái trong archive · ' + res.rejected + ' bị loại · ' + res.unknown + ' chưa xác định · claim ' + pill(res.claim_level, 'na') + '<div class="note">Profile: ' + esc(res.profile.source_ref) + ' sha ' + esc(res.profile.sha256.slice(0, 12)) + ' — ' + esc(res.profile.note) + '</div>';
+      const grid = $('cs-grid'); grid.innerHTML = '';
+      res.candidates.forEach((c, i) => {
+        const d = document.createElement('div'); d.className = 'cs-card';
+        d.innerHTML = graphSvg(c.graph, c.axis_points) + '<div class="t"><span>' + esc((c.genome.topology || '').replace('_ARCH', '')) + ' ' + nf(c.genome.span_m, 0) + 'm</span><span>' + (c.all_known_pass ? pill(c.screening_status, 'pass') : pill(c.screening_status, 'warn')) + '</span></div>';
+        d.addEventListener('click', () => { grid.querySelectorAll('.cs-card').forEach((x) => x.classList.remove('on')); d.classList.add('on'); renderCreativeDetail(c); });
+        grid.appendChild(d);
+      });
+    } catch (err) { $('cs-status').innerHTML = '<span style="color:var(--fail)">' + esc(err.message) + '</span>'; }
+    btn.disabled = false;
+  });
+  function graphSvg(graph, axis) {
+    const nodes = graph.nodes || []; if (!nodes.length) return '<svg viewBox="0 0 100 40"></svg>';
+    const xs = nodes.map((n) => n.x_m), ys = nodes.map((n) => n.y_m); const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
+    const W = 200, H = 90, pad = 6; const sc = Math.min((W - 2 * pad) / Math.max(1e-6, maxx - minx), (H - 2 * pad) / Math.max(1e-6, maxy - miny));
+    const X = (x) => pad + (x - minx) * sc, Y = (y) => H - pad - (y - miny) * sc; const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+    const col = { ARCH_RIB: 'var(--accent)', DECK: 'var(--ink)', SPANDREL: 'var(--muted)', HANGER: 'var(--muted)', NETWORK_HANGER: 'var(--muted)', END_POST: 'var(--warn)' };
+    const lines = (graph.edges || []).map((e) => { const a = byId[e.from], b = byId[e.to]; if (!a || !b) return ''; return '<line x1="' + X(a.x_m).toFixed(1) + '" y1="' + Y(a.y_m).toFixed(1) + '" x2="' + X(b.x_m).toFixed(1) + '" y2="' + Y(b.y_m).toFixed(1) + '" stroke="' + (col[e.kind] || 'var(--muted)') + '" stroke-width="' + (e.kind === 'ARCH_RIB' ? 2 : e.kind === 'DECK' ? 1.6 : 0.8) + '"/>'; }).join('');
+    const axisPath = axis && axis.length ? '<path d="' + axis.map((p, i) => (i ? 'L' : 'M') + X(p.x_m).toFixed(1) + ' ' + Y(p.y_m).toFixed(1)).join(' ') + '" fill="none" stroke="var(--select)" stroke-width="0.8" stroke-dasharray="2 2"/>' : '';
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '">' + axisPath + lines + '</svg>';
+  }
+  function renderCreativeDetail(c) {
+    const g = c.genome, d = c.descriptors || {};
+    $('cs-detail').innerHTML = '<h3 style="margin-top:10px">' + esc(c.candidate_id) + ' · ' + pill(c.claim_level, 'na') + '</h3>' + graphSvg(c.graph, c.axis_points).replace('<svg', '<svg style="width:100%;height:160px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px"')
+      + kv([['Topology', esc(g.topology)], ['Nhịp', nf(g.span_m, 1) + ' m'], ['Tỷ số vồng f/L', nf(g.rise_ratio, 3)], ['Số khoang', g.panel_count], ['Số sườn vòm', g.rib_count], ['Chiều cao sườn', nf(g.rib_depth_m, 2) + ' m'], ['Tĩnh không mặt cầu', nf(g.deck_clearance_m, 2) + ' m'], ['Hệ số hình dạng', (g.shape_coefficients || []).map((v) => nf(v, 3)).join(', ')]]
+        .concat(Object.entries(d).filter(([k, v]) => typeof v === 'number').map(([k, v]) => [esc(k), nf(v, 4)])))
+      + '<h3 style="margin-top:10px">Kiểm F0</h3>' + '<table class="grid"><thead><tr><th>check</th><th>mô hình</th><th>trạng thái</th></tr></thead><tbody>' + c.checks.map((k) => '<tr><td>' + esc(k.check_id) + '</td><td class="note">' + esc(k.model_kind || k.clause_id || '') + '</td><td>' + statusPill(k.status) + '</td></tr>').join('') + '</tbody></table>'
+      + (c.limitations && c.limitations.length ? '<div class="note">Giới hạn: ' + c.limitations.map(esc).join('; ') + '</div>' : '')
+      + '<div class="note">Bước kế tiếp theo repo: creative_frame_adapter → frame F1 → arch action → funicular reference (creative_portfolio). Vẫn là IDEA cho tới khi có profile có nguồn.</div>';
+  }
+
+  // ---------------------------------------------------------------- bằng chứng
+  const CHECK_LABELS = { FLEXURE_STRENGTH: 'Sức kháng uốn', SHEAR_TORSION: 'Cắt – xoắn', SERVICE_STRESS: 'Ứng suất sử dụng', DEFLECTION: 'Võng', FATIGUE: 'Mỏi', STABILITY: 'Ổn định', DURABILITY: 'Độ bền lâu', SHEAR_PUNCHING: 'Chọc thủng', SERVICE_CRACKING: 'Nứt', JACKING_STRESS: 'Ứng suất kích', TRANSFER_STRESS: 'Ứng suất truyền lực', LOSSES: 'Mất mát DƯL', ULTIMATE_STRENGTH: 'Cường độ cực hạn', ANCHORAGE_ZONE: 'Vùng neo', GROUTING_DURABILITY: 'Bơm vữa' };
+  function bar(label, u) { const pct = Math.min(100, u * 100 / 1.25); const cls = u > 1 + 1e-9 ? 'fail' : u > 0.9 ? 'warn' : ''; return '<div class="bar"><span>' + label + '</span><div class="track"><div class="fill ' + cls + '" style="width:' + pct.toFixed(1) + '%"></div><div class="lim" style="left:80%"></div></div><span class="v">' + nf(u, 3) + '</span></div>'; }
+  async function renderEvidence() {
+    const r = state.report; if (!r) return;
+    const f = r.final || {};
+    $('ev-current').querySelector('.body').innerHTML = kv([['Report', esc(state.reportLabel)], ['Seed → cuối', esc(r.seed.case_id) + ' → ' + esc(f.case_id || '–')], ['Claim', statusPill(r.claim_level) + ' (trần ' + esc(r.claim_ceiling) + ')'], ['Verdict authority', esc(r.design_verdict_authority) + ' · loop ' + esc(r.loop_authority)], ['Kết thúc', esc(r.termination.reason)], ['Khả thi (verifier L1)', f.feasible ? pill('FEASIBLE', 'pass') : pill('INFEASIBLE', 'fail')], ['Đạt mục tiêu D/C', f.meets_target ? pill('đạt', 'pass') : pill('chưa', 'warn')], ['Ngân sách', r.counters.evaluator.solver_calls + ' / ' + r.budget_solver_calls + ' solver']])
+      + (f.rule_utilizations ? '<h3 style="margin-top:10px">D/C theo rule · fidelity L1</h3>' + Object.entries(f.rule_utilizations).map(([k, u]) => bar(esc(k) + ' <span class="note">' + esc(RULE_LABELS[k] || '') + '</span>', u)).join('') : '');
+    const ov = state.overview; const gates = ov ? ov.gates.map((g) => Object.assign({}, g)) : [];
+    for (const g of gates) {
+      if (g.gate === 'G1') { const l0 = (r.seed.status !== 'GEOMETRY_INVALID' || f.status === 'SUCCESS'); g.status = f.status === 'SUCCESS' ? 'PASSED' : 'BLOCKED'; g.detail = 'Phương án cuối ' + (f.status === 'SUCCESS' ? 'qua L0 (bố trí + chế tạo)' : 'chưa qua L0: ' + f.status); }
+      if (g.gate === 'G2') { g.status = f.solver_status === 'CONVERGED' ? 'PASSED' : 'BLOCKED'; g.detail = 'Solver ' + esc(f.solver_status || '–') + ' · ' + esc(r.solver_version) + ' · verifier ' + esc(r.ruleset_version); }
+    }
+    $('ev-gates').querySelector('.body').innerHTML = gates.map((g) => '<div class="gate"><span class="g">' + g.gate + '</span><span>' + esc(g.label) + '<div class="d">' + esc(g.detail) + '</div></span>' + statusPill(g.status) + '</div>').join('') + '<div class="note">G1, G2 là của phương án này; G0 và G3–G7 là của toàn dự án và đang chặn.</div>';
+    const a = r.component_audit;
+    $('ev-audit').querySelector('.body').innerHTML = a ? '<div class="note">Trạng thái ' + statusPill(a.status) + ' · không đổi verdict evaluator</div>' + a.components.map((c) => '<div style="font-weight:600;margin-top:6px">' + esc(c.component_id) + ' · ' + esc(c.kind) + '</div><table class="grid">' + c.checks.map((k) => '<tr><td>' + esc(CHECK_LABELS[k.check_id] || k.check_id) + '</td><td class="num">' + (k.utilization != null ? nf(k.utilization, 3) : '') + '</td><td>' + statusPill(k.status) + (k.evidence ? ' <span class="note">' + esc(k.evidence.fidelity) + '</span>' : '') + '</td></tr>').join('') + '</table>').join('') + '<div class="note">' + a.proposals.length + ' đề xuất EVIDENCE_REQUEST — việc còn lại trước khi gọi là thiết kế.</div>' : '<div class="note">Phương án cuối chưa qua solver nên không có audit.</div>';
+    const used = new Map();
+    for (const it of r.iterations || []) for (const p of it.probes || []) if (p.outcome === 'ACCEPTED' && p.move && p.move.card_id) used.set(p.move.card_id, (used.get(p.move.card_id) || 0) + 1);
+    if (!state.cards.length) { try { state.cards = (await api('/api/knowledge/cards')).cards; } catch (err) { /* bỏ qua */ } }
+    $('ev-cards').querySelector('.body').innerHTML = used.size ? [...used.entries()].map(([id, n]) => { const c = state.cards.find((x) => x.card_id === id); return '<div class="hand"><div class="h"><span>' + esc(id) + ' × ' + n + '</span>' + (c ? statusPill(c.status) : '') + '</div><div class="s">' + esc(c ? c.title : '') + '</div></div>'; }).join('') + '<div class="note">Thẻ chỉ gợi ý thứ tự nước sửa; PASS/FAIL luôn của verifier. Thẻ DRAFT chưa được kỹ sư duyệt.</div>' : '<div class="note">Không có nước sửa nào gắn thẻ tri thức trong report này.</div>';
+    $('ev-prov').querySelector('.body').innerHTML = kv([['report_sha256', '<span style="font-size:11px">' + esc(r.report_sha256) + '</span>'], ['basis', esc(r.basis.basis_id) + ' · ' + esc(r.basis.sha256.slice(0, 16))], ['nguồn', r.source_digests.map((s) => esc(s.path) + ' ' + esc(s.sha256.slice(0, 12))).join('<br>')], ['catalog / grammar', esc(r.catalogs_version) + ' / ' + esc(r.grammar_id) + ' ' + esc(r.grammar_version)], ['solver / ruleset', esc(r.solver_version) + ' / ' + esc(r.ruleset_version)], ['policy', esc(JSON.stringify(r.policy))]]);
+  }
+
+  // ---------------------------------------------------------------- quy trình lab
+  async function loadProcess() {
+    try {
+      const [live, status] = await Promise.all([api('/api/live-data'), api('/api/lab-status')]); state.live = live;
+      $('lab-valid').innerHTML = (status.valid ? '<span class="dot" style="background:var(--pass)"></span>lab valid' : '<span class="dot" style="background:var(--fail)"></span>lab invalid') + ' · trần ' + esc(status.current_project_claim_ceiling || '');
+      const filters = ['ALL', 'BRD', 'RND']; $('task-filters').innerHTML = filters.map((f) => '<button class="btn' + (f === state.taskFilter ? ' active' : '') + '" data-f="' + f + '">' + f + '</button>').join('');
+      $('task-filters').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { state.taskFilter = b.dataset.f; loadProcess(); }));
+      renderBoard();
+      const hb = $('pr-handoffs').querySelector('.body'); hb.innerHTML = live.handoffs.slice(-25).reverse().map((h) => '<div class="hand"><div class="h"><span>' + esc(h.task_id) + ' · ' + esc(h.agent_id) + ' · ' + esc(h.role) + '</span><span>' + statusPill(h.claim_level) + ' ' + esc((h.gates_completed || []).join(' ')) + '</span></div><div class="s">' + esc(String(h.summary || '').slice(0, 260)) + (String(h.summary || '').length > 260 ? '…' : '') + '</div><div class="h"><span>' + (h.artifacts || []).length + ' artifact có SHA-256</span><span>' + esc(h.filename) + '</span></div></div>').join('');
+      const rb = $('pr-reviews').querySelector('.body'); rb.innerHTML = live.reviews.slice(-25).reverse().map((v) => '<div class="hand"><div class="h"><span>' + esc(v.task_id) + ' · ' + esc(v.reviewer_id) + '</span><span>' + statusPill(v.decision) + '</span></div><div class="s">' + (v.gate_findings || []).map((g) => esc(g.gate) + ' ' + esc(g.status)).join(' · ') + '</div><div class="s note">' + esc(String(v.notes || '').slice(0, 220)) + '</div></div>').join('');
+    } catch (err) { $('board').innerHTML = '<div class="note">' + esc(err.message) + '</div>'; }
+  }
+  function renderBoard() {
+    const q = ($('task-search').value || '').toLowerCase(); const cols = ['READY', 'ACTIVE', 'REVIEW', 'ACCEPTED', 'BLOCKED', 'REJECTED', 'BACKLOG'];
+    const tasks = Object.values(state.live.tasks).filter((t) => (state.taskFilter === 'ALL' || t.task_id.startsWith(state.taskFilter)) && (!q || JSON.stringify(t).toLowerCase().includes(q)));
+    $('board').innerHTML = cols.map((c) => { const items = tasks.filter((t) => t.status === c); return '<div class="col"><h4><span>' + c + '</span><span>' + items.length + '</span></h4>' + items.map((t) => '<div class="task ' + esc(t.priority) + '" data-id="' + esc(t.task_id) + '"><div class="id"><span>' + esc(t.task_id) + '</span><span>' + esc(t.owner || '') + '</span></div><div class="ttl">' + esc(t.title) + '</div></div>').join('') + '</div>'; }).join('');
+    $('board').querySelectorAll('.task').forEach((d) => d.addEventListener('click', () => showTask(state.live.tasks[d.dataset.id])));
+  }
+  $('task-search').addEventListener('input', () => { if (state.live) renderBoard(); });
+  function showTask(t) {
+    $('task-modal-body').innerHTML = '<h3>' + esc(t.task_id) + ' · ' + statusPill(t.status) + '</h3><div style="font-weight:600;margin:6px 0">' + esc(t.title) + '</div><div class="note">' + esc(t.research_question) + '</div>'
+      + kv([['Owner / reviewer', esc(t.owner || '–') + ' / ' + esc(t.reviewer || '–')], ['Claim ceiling', esc(t.claim_ceiling)], ['Gates', esc((t.required_gates || []).join(', '))], ['Runtime scope', t.runtime_scope ? esc(t.runtime_scope.runtime_domain) + ' · ' + esc((t.runtime_scope.structural_families || []).join(', ')) : '–'], ['Write scope', (t.write_scope || []).map(esc).join('<br>')]])
+      + '<h3 style="margin-top:10px">Tiêu chí nghiệm thu</h3><ul class="note" style="color:var(--ink-2)">' + (t.acceptance_criteria || []).map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>'
+      + '<h3>An toàn</h3><ul class="note" style="color:var(--ink-2)">' + (t.safety_notes || []).map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>'
+      + (t.review_notes && t.review_notes.length ? '<h3>Review</h3>' + t.review_notes.map((x) => '<div class="note" style="color:var(--ink-2)">' + esc(x) + '</div>').join('') : '')
+      + '<div class="row-btns"><button class="btn primary" id="task-close">Đóng</button></div>';
+    $('task-modal').classList.add('on'); $('task-close').addEventListener('click', () => $('task-modal').classList.remove('on'));
+  }
+  $('task-modal').addEventListener('click', (e) => { if (e.target === $('task-modal')) $('task-modal').classList.remove('on'); });
+
+  // ---------------------------------------------------------------- não 2
+  async function loadKnowledge() {
+    try {
+      const [cards, ob] = await Promise.all([api('/api/knowledge/cards'), api('/api/obsidian')]); state.cards = cards.cards; state.obsidian = ob; state.knowledgeLoaded = true;
+      $('obsidian-chip').innerHTML = ob.available ? '<span class="dot" style="background:var(--pass)"></span>Obsidian: ' + esc(ob.vault_name) : '<span class="dot" style="background:var(--na)"></span>Obsidian chưa cấu hình';
+      renderCards(state.cards);
+    } catch (err) { $('kc-list').innerHTML = '<div class="note">' + esc(err.message) + '</div>'; }
+  }
+  function renderCards(cards) {
+    const list = $('kc-list'); list.innerHTML = '';
+    for (const c of cards) {
+      const d = document.createElement('div'); d.className = 'kc';
+      d.innerHTML = '<div class="id"><span>' + esc(c.card_id) + ' · ' + esc(c.type) + '</span>' + statusPill(c.status) + '</div><div>' + esc(c.title) + '</div><div class="note">' + esc((c.applies_to.rules || []).join(', ')) + ' · ' + esc((c.applies_to.variables || []).join(', ')) + '</div>';
+      d.addEventListener('click', () => { list.querySelectorAll('.kc').forEach((x) => x.classList.remove('on')); d.classList.add('on'); renderCard(c); });
+      list.appendChild(d);
+    }
+  }
+  function renderCard(c) {
+    const ob = state.obsidian; const link = ob && ob.available ? '<a href="obsidian://open?vault=' + encodeURIComponent(ob.vault_name) + '&file=' + encodeURIComponent(ob.managed_folder + '/Cards/' + c.card_id) + '">mở trong Obsidian</a>' : '';
+    $('kc-detail').innerHTML = '<h3>' + esc(c.card_id) + ' · ' + statusPill(c.status) + '</h3><div style="font-weight:600;margin:6px 0">' + esc(c.title) + '</div>' + kv([['Loại', esc(c.type)], ['Họ', esc(c.applies_to.family || '')], ['Rule', esc((c.applies_to.rules || []).join(', '))], ['Biến', esc((c.applies_to.variables || []).join(', '))], ['Nguồn', esc(c.source ? (c.source.kind || '') + ' ' + (c.source.ref || c.source.reference || '') : '')], link ? ['Obsidian', link] : null])
+      + '<h3 style="margin-top:10px">Hướng dẫn</h3><div class="note" style="color:var(--ink-2)">' + esc(c.guidance) + '</div><h3>Bằng chứng</h3><div class="note" style="color:var(--ink-2)">' + esc(c.evidence || '') + '</div><div class="note">Thẻ chỉ gợi ý; muốn thành rule phải dẫn điều khoản, thêm test và kỹ sư duyệt.</div>';
+  }
+  let kcTimer = null;
+  $('kc-search').addEventListener('input', () => { clearTimeout(kcTimer); kcTimer = setTimeout(async () => { const q = $('kc-search').value.trim(); if (!q) return renderCards(state.cards); const rules = q.match(/[A-Z]{3,6}-[0-9]{3}/g) || []; try { const res = await api('/api/knowledge/query?rules=' + encodeURIComponent(rules.join(',')) + '&text=' + encodeURIComponent(q)); renderCards(res.hits.map((h) => h.card)); } catch (err) { toast(err.message); } }, 200); });
+
+  // ---------------------------------------------------------------- khởi động
+  loadOverview(); loadCatalog().then(loadRuns).catch((err) => toast(err.message));
+})();

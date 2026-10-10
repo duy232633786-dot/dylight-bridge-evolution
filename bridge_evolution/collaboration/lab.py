@@ -17,6 +17,7 @@ import re
 import tempfile
 from typing import Callable, Iterable
 import uuid
+import warnings
 
 from jsonschema import Draft202012Validator
 
@@ -53,6 +54,7 @@ TASK_AMENDABLE_FIELDS = {
     "acceptance_criteria",
     "safety_notes",
     "human_gate",
+    "runtime_scope",
     "status",
 }
 TASK_AMENDMENT_TRANSITIONS = {
@@ -65,6 +67,101 @@ TASK_AMENDMENT_TRANSITIONS = {
 TASK_LIFECYCLE_FIELDS = {
     "status", "owner", "reviewer", "review_notes", "preferred_provider"
 }
+RUNTIME_CAPABILITY_MATRIX_PATH = REPO_ROOT / "docs" / "runtime_capability_matrix.json"
+# Frozen migration boundary for task contracts that existed before BRD-037
+# introduced ``runtime_scope``.  The exemption is deliberately based on IDs
+# that were already allocated, not on a caller-controlled schema flag.  A new
+# task therefore cannot omit its structural scope simply by declaring itself
+# "legacy".  Reusing an exempt ID would collide with an existing task file.
+LEGACY_RUNTIME_SCOPE_TASK_IDS = frozenset({
+    *(f"BRD-{number:03d}" for number in range(1, 46)),
+    "RND-647720ea-01", "RND-647720ea-02", "RND-647720ea-03",
+    "RND-647720ea-04", "RND-647720ea-05",
+    "RND-76fa444f-01", "RND-76fa444f-02", "RND-76fa444f-03",
+    "RND-76fa444f-04", "RND-76fa444f-05",
+    "RND-b471879e-01", "RND-b471879e-02", "RND-b471879e-03",
+    "RND-b471879e-04", "RND-b471879e-05",
+    "RND-cc3d03b6-01", "RND-cc3d03b6-02", "RND-cc3d03b6-03",
+    "RND-cc3d03b6-04",
+    "RND-d88a2a60-01", "RND-d88a2a60-02", "RND-d88a2a60-03",
+    "RND-d88a2a60-04",
+    "RND-dc6374c9-01", "RND-dc6374c9-02", "RND-dc6374c9-03",
+    "RND-dc6374c9-04", "RND-dc6374c9-05",
+    "RND-e03038f3-01", "RND-e03038f3-02", "RND-e03038f3-03",
+    "RND-e03038f3-04", "RND-e03038f3-05",
+    "RND-f5b697be-01", "RND-f5b697be-02", "RND-f5b697be-03",
+    "RND-f5b697be-04",
+})
+RUNTIME_SCOPE_POLICIES = {
+    "production_line_girder_l1": {
+        "families": frozenset({
+            "super_t_simple_v1",
+            "super_t_parametric_v2",
+            "i_girder_parametric_v1",
+        }),
+        "gates": {
+            "G1": (("ALL", ("L0_LAYOUT_RULES",)),),
+            "G2": (("ALL", (
+                "L1_LINE_GIRDER_SOLVER",
+                "INDEPENDENT_VERIFIER",
+                "EVALUATION_CONTRACT",
+            )),),
+        },
+    },
+    "production_l0_only": {
+        "families": frozenset({
+            "box_girder_parametric_v1",
+            "composite_i_girder_parametric_v1",
+        }),
+        "gates": {
+            "G1": (("ALL", ("L0_LAYOUT_RULES",)),),
+            "G2": (("ANY", (
+                "SOLVER_MIDAS_CIVIL",
+                "SOLVER_OPENSEESPY",
+                "GRILLAGE_3D",
+            )),),
+        },
+    },
+    "experimental_arch_frame": {
+        "families": frozenset({"arch_deck_v1", "network_arch", "through_arch"}),
+        "gates": {
+            # Chưa có capability hình học-vòm chuyên biệt ở matrix. Dùng đúng
+            # các capability đã khai và yêu cầu cả layout lẫn fabrication;
+            # L0_FABRICATION_RULES đang PARTIAL nên nhánh này fail-closed.
+            "G1": (("ALL", ("L0_LAYOUT_RULES", "L0_FABRICATION_RULES")),),
+            "G2": (("ANY", ("SOLVER_MIDAS_CIVIL", "SOLVER_OPENSEESPY")),),
+        },
+    },
+    "straight_prismatic_column": {
+        "families": frozenset({"rc_column", "rc_pier"}),
+        "gates": {
+            # COLUMN_NM_SECOND_ORDER là PARTIAL cho tới khi engine được nối
+            # pipeline và có basis/verification đầy đủ; vì vậy G1/G2 đều chưa
+            # thể được claim cho task mới.
+            "G1": (("ALL", ("L0_LAYOUT_RULES", "COLUMN_NM_SECOND_ORDER")),),
+            "G2": (("ALL", ("COLUMN_NM_SECOND_ORDER",)),),
+        },
+    },
+}
+
+
+def _is_legacy_runtime_scope_task(task_id: str) -> bool:
+    return task_id in LEGACY_RUNTIME_SCOPE_TASK_IDS
+
+
+def _machine_gates_for_task(task: dict) -> list[str]:
+    """Machine gates implied by both contract and maximum permitted claim.
+
+    ``required_gates`` is caller-authored task data.  It therefore cannot be
+    the sole reachability source: otherwise a new task can set it to ``[]``,
+    keep ``claim_ceiling=SCREENED`` and later self-report G0/G1/G2 at submit.
+    The union closes that bypass while IDEA-only governance tasks remain free
+    of structural runtime requirements.
+    """
+    declared = set(task.get("required_gates", []))
+    ceiling = task.get("claim_ceiling")
+    implied = set(CLAIM_GATES.get(ceiling, set()))
+    return sorted((declared | implied) - {"G0", "G7"})
 
 
 def _lab_dir(lab_dir: str | Path | None = None) -> Path:
@@ -78,6 +175,133 @@ def _schema(name: str) -> dict:
 
 def _load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _task_reachability(task: dict) -> tuple[list[str], list[str]]:
+    """Check a declared structural scope against an immutable gate policy.
+
+    Legacy tasks intentionally remain claimable: inferring a structural family or
+    solver from prose would create an unverifiable policy. A scoped task cannot
+    choose a convenient capability: the domain policy fixes both admissible
+    families and required capability groups, while the runtime matrix supplies
+    their observed state. Only ``PRESENT`` satisfies a claim-time requirement.
+    """
+    scope = task.get("runtime_scope")
+    if scope is None:
+        machine_gates = _machine_gates_for_task(task)
+        if machine_gates and not _is_legacy_runtime_scope_task(task["task_id"]):
+            return [
+                f"{task['task_id']} là task mới đòi machine gate "
+                f"{','.join(machine_gates)} nhưng không khai runtime_scope; "
+                "từ BRD-046 trở đi task đòi machine gate phải khai "
+                "structural_families và runtime_domain trước claim"
+            ], []
+        if not machine_gates:
+            return [], []
+        advisory = (
+            f"{task['task_id']} là task legacy không khai runtime_scope; lab không thể kiểm tra "
+            "khả năng đạt gate theo capability matrix trước claim"
+        )
+        return [], [advisory]
+
+    domain = scope.get("runtime_domain")
+    policy = RUNTIME_SCOPE_POLICIES.get(domain)
+    if policy is None:
+        return [f"{task['task_id']} runtime_domain không được hỗ trợ: {domain}"], []
+    families = set(scope.get("structural_families", []))
+    unsupported_families = sorted(families - policy["families"])
+    if unsupported_families:
+        return [
+            f"{task['task_id']} runtime_domain={domain} không áp dụng cho family "
+            + ", ".join(unsupported_families)
+        ], []
+
+    machine_gates = _machine_gates_for_task(task)
+    missing_policy = [gate for gate in machine_gates if gate not in policy["gates"]]
+    if missing_policy:
+        return [
+            f"{task['task_id']} runtime_domain={domain} không có capability policy "
+            f"cho gate {', '.join(missing_policy)}"
+        ], []
+    requirements = [
+        (gate, mode, capability_ids)
+        for gate in machine_gates
+        for mode, capability_ids in policy["gates"][gate]
+    ]
+    if not requirements:
+        return [], []
+
+    try:
+        matrix = _load_json(RUNTIME_CAPABILITY_MATRIX_PATH)
+        matrix_schema = _schema("runtime_capability_matrix.schema.json")
+    except (OSError, ValueError, TypeError) as exc:
+        return [
+            f"{task['task_id']} không đọc được runtime capability matrix/schema "
+            f"{RUNTIME_CAPABILITY_MATRIX_PATH}: {exc}"
+        ], []
+
+    matrix_schema_errors = list(Draft202012Validator(
+        matrix_schema
+    ).iter_errors(matrix))
+    if matrix_schema_errors:
+        details = "; ".join(
+            f"{error.json_path}: {error.message}"
+            for error in matrix_schema_errors[:5]
+        )
+        if len(matrix_schema_errors) > 5:
+            details += f"; ... và {len(matrix_schema_errors) - 5} lỗi khác"
+        return [
+            f"{task['task_id']} runtime capability matrix không đúng schema: {details}"
+        ], []
+
+    entries = matrix.get("capabilities")
+    if not isinstance(entries, list):
+        return [
+            f"{task['task_id']} runtime capability matrix thiếu mảng capabilities"
+        ], []
+
+    states: dict[str, str] = {}
+    duplicates: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        capability_id = entry.get("id")
+        state = entry.get("state")
+        if not isinstance(capability_id, str) or not isinstance(state, str):
+            continue
+        if capability_id in states:
+            duplicates.add(capability_id)
+        states[capability_id] = state
+    if duplicates:
+        return [
+            f"{task['task_id']} runtime capability matrix trùng id: "
+            + ", ".join(sorted(duplicates))
+        ], []
+
+    errors: list[str] = []
+    family_label = ",".join(sorted(families))
+    for gate, mode, capability_ids in requirements:
+        observed = {
+            capability_id: states.get(capability_id, "UNDECLARED")
+            for capability_id in capability_ids
+        }
+        matches = {
+            capability_id: state == "PRESENT"
+            for capability_id, state in observed.items()
+        }
+        reachable = any(matches.values()) if mode == "ANY" else all(matches.values())
+        if reachable:
+            continue
+        observations = ", ".join(
+            f"{capability_id}={observed[capability_id]}"
+            for capability_id in capability_ids
+        )
+        errors.append(
+            f"{task['task_id']} gate {gate} không thể đạt cho runtime_domain={domain} "
+            f"families={family_label}: cần {mode} trong [{', '.join(capability_ids)}] "
+            f"ở trạng thái PRESENT, quan sát {observations}"
+        )
+    return errors, []
 
 
 def _sha256(path: Path) -> str:
@@ -1595,11 +1819,27 @@ def claim_task(task_id: str, agent_id: str, lab_dir: str | Path | None = None) -
     with _task_lock(root, task_id, agent_id):
         tasks = _all_tasks(root)
         task = _load_json(_task_path(root, task_id))
+        task_schema_errors = list(Draft202012Validator(
+            _schema("research_task.schema.json")
+        ).iter_errors(task))
+        if task_schema_errors:
+            raise ValueError(
+                f"Task {task_id} không đúng schema: "
+                + "; ".join(
+                    f"{error.json_path}: {error.message}"
+                    for error in task_schema_errors
+                )
+            )
         if task["status"] != "READY" or task.get("owner") is not None:
             raise ValueError(f"{task_id} không ở trạng thái READY chưa có owner")
         blocked = [dep for dep in task["dependencies"] if tasks[dep]["status"] != "ACCEPTED"]
         if blocked:
             raise ValueError(f"{task_id} còn dependency chưa ACCEPTED: {blocked}")
+        reachability_errors, reachability_advisories = _task_reachability(task)
+        if reachability_errors:
+            raise ValueError("; ".join(reachability_errors))
+        for advisory in reachability_advisories:
+            warnings.warn(advisory, RuntimeWarning, stacklevel=2)
         task["owner"] = agent_id
         task["status"] = "ACTIVE"
         _atomic_json(_task_path(root, task_id), task)
