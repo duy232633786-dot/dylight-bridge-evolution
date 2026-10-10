@@ -44,3 +44,6 @@ multiagent/scratch/*
 !multiagent/scratch/.gitkeep
 
 CLAUDE.local.md
+
+# Thư mục scratch của các phiên lab (không phải artifact có hash)
+.tmp/
