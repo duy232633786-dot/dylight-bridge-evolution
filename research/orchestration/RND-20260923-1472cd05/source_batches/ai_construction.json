@@ -1,0 +1,916 @@
+{
+  "sources": [
+    {
+      "id": "AI-001",
+      "title": "Illuminating search spaces by mapping elites",
+      "authors": [
+        "Jean-Baptiste Mouret",
+        "Jeff Clune"
+      ],
+      "year": 2015,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "quality-diversity",
+        "MAP-Elites",
+        "design-space-exploration"
+      ],
+      "countries": [
+        "France",
+        "United States"
+      ],
+      "url": "https://arxiv.org/abs/1504.04909",
+      "doi": "10.48550/arXiv.1504.04909",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF pp. 1–3: Author's Note; Section 2 Optimization vs. Illumination Algorithms; Section 3 Details of the MAP-Elites algorithm; Figure 2 pseudocode.",
+      "summary_vi": "Bài báo giới thiệu MAP-Elites để lưu phương án tốt theo từng ô đặc trưng do người dùng chọn. Thuật toán lấy mẫu ban đầu, biến dị các cá thể đã lưu và thay đại diện khi chất lượng tăng. Giá trị nghiên cứu là khám phá nhiều hình thái, thay vì chỉ một nghiệm. Tác giả ghi rõ đây là bản thảo sơ bộ, với kết quả thực nghiệm còn có thể thay đổi.",
+      "key_points_vi": [
+        "Tách không gian thiết kế khỏi không gian đặc trưng.",
+        "Mỗi ô lưu đại diện có chất lượng tốt nhất đã gặp."
+      ],
+      "limitations_vi": [
+        "Bản preprint sơ bộ; chưa tái lập kết quả trong dự án.",
+        "Độ phủ phụ thuộc đặc trưng và cách chia ô, không chứng minh tính mới toàn cầu."
+      ],
+      "project_use_vi": "Làm nguồn nền tảng để đánh giá kho phương án đa dạng, không dùng làm chứng nhận kết cấu.",
+      "pdf_url": "https://arxiv.org/pdf/1504.04909",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-002",
+      "title": "Using Centroidal Voronoi Tessellations to Scale Up the Multi-dimensional Archive of Phenotypic Elites Algorithm",
+      "authors": [
+        "Vassilis Vassiliades",
+        "Konstantinos Chatzilygeroudis",
+        "Jean-Baptiste Mouret"
+      ],
+      "year": 2016,
+      "publisher": "arXiv — preprint, revised 2017",
+      "source_type": "research_paper",
+      "topics": [
+        "quality-diversity",
+        "CVT-MAP-Elites",
+        "high-dimensional-descriptors"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/1610.05729",
+      "doi": "10.48550/arXiv.1610.05729",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract and submission history, v2 revised 29 July 2017.",
+      "summary_vi": "Nghiên cứu xử lý việc số ô MAP-Elites tăng quá nhanh khi bổ sung chiều đặc trưng. CVT chia không gian thành số vùng định trước, rồi gán phương án vào tâm gần nhất và thay đại diện kém hơn. Tác giả so sánh trên dẫn đường trong mê cung và vận động robot sáu chân. Nguồn giúp phân biệt độ đa dạng được quản lý với việc liệt kê mọi tổ hợp.",
+      "key_points_vi": [
+        "Số vùng lưu trữ được cố định trước.",
+        "Phân vùng Voronoi thay lưới chia đều từng chiều."
+      ],
+      "limitations_vi": [
+        "Đọc abstract của bản arXiv; chưa kiểm tra toàn văn hay tái lập.",
+        "Thực nghiệm robot không xác nhận hiệu quả cho cấu kiện cầu."
+      ],
+      "project_use_vi": "Tham khảo khi lựa chọn cách mô tả đa dạng hình học với nhiều thuộc tính.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-003",
+      "title": "A fast and elitist multiobjective genetic algorithm: NSGA-II",
+      "authors": [
+        "Kalyanmoy Deb",
+        "Amrit Pratap",
+        "Sameer Agarwal",
+        "T. Meyarivan"
+      ],
+      "year": 2002,
+      "publisher": "IEEE Transactions on Evolutionary Computation — journal article",
+      "source_type": "research_paper",
+      "topics": [
+        "multiobjective-optimization",
+        "constraint-handling",
+        "Pareto-search"
+      ],
+      "countries": [],
+      "url": "https://doi.org/10.1109/4235.996017",
+      "doi": "10.1109/4235.996017",
+      "access_status": "BLOCKED",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Publisher abstract retrieved through indexed IEEE result; direct open encountered JavaScript verification. Publication: volume 6 issue 2, pp. 182–197.",
+      "summary_vi": "NSGA-II đề xuất sắp hạng không trội nhanh và chọn lọc bảo tồn cá thể từ quần thể cha cùng con. Phương pháp tìm nhiều đánh đổi giữa các mục tiêu, đồng thời sửa định nghĩa trội để xử lý ràng buộc. Abstract báo cáo thử nghiệm trên các bài toán tối ưu kiểm chuẩn. Đây là nguồn gốc phù hợp để hiểu tìm kiếm Pareto trước khi so sánh thuật toán mới.",
+      "key_points_vi": [
+        "Giữ cả chất lượng và độ phân bố nghiệm.",
+        "Có biến thể xử lý bài toán đa mục tiêu có ràng buộc."
+      ],
+      "limitations_vi": [
+        "Trang đầy đủ bị chặn; chỉ đọc abstract do chỉ mục của nhà xuất bản cung cấp.",
+        "Kết quả benchmark không bảo đảm tối ưu toàn cục hoặc tuân thủ tiêu chuẩn cầu."
+      ],
+      "project_use_vi": "Dùng làm nền tảng đối chứng đa mục tiêu và diễn giải tập đánh đổi.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-004",
+      "title": "Bayesian Optimization with Unknown Constraints",
+      "authors": [
+        "Michael A. Gelbart",
+        "Jasper Snoek",
+        "Ryan P. Adams"
+      ],
+      "year": 2014,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "Bayesian-optimization",
+        "unknown-constraints",
+        "uncertainty",
+        "active-learning"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/1403.5607",
+      "doi": "10.48550/arXiv.1403.5607",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract; version submitted 22 March 2014.",
+      "summary_vi": "Bài báo xét tối ưu hộp đen khi tính khả thi chưa biết trước và phép đo ràng buộc có thể nhiễu. Mục tiêu và ràng buộc được phép đánh giá độc lập, phù hợp tình huống các phép kiểm có chi phí khác nhau. Khung xác suất giúp quyết định nơi lấy mẫu tiếp theo. Ý nghĩa cho kỹ thuật là quản lý ngân sách tính toán, không thay thế phép kiểm vật lý.",
+      "key_points_vi": [
+        "Tách mô hình mục tiêu và các ràng buộc chưa biết.",
+        "Cho phép đánh giá các hàm không đồng thời."
+      ],
+      "limitations_vi": [
+        "Đọc abstract; chưa xác minh chi tiết các giả thiết toàn văn.",
+        "Xác suất khả thi từ mô hình không phải kết luận an toàn thiết kế."
+      ],
+      "project_use_vi": "Tham khảo lựa chọn phương án cần tính thật khi mỗi lượt phân tích có chi phí cao.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-005",
+      "title": "Safe Exploration for Optimization with Gaussian Processes",
+      "authors": [
+        "Yanan Sui",
+        "Alkis Gotovos",
+        "Joel Burdick",
+        "Andreas Krause"
+      ],
+      "year": 2015,
+      "publisher": "PMLR 37, ICML — conference paper",
+      "source_type": "research_paper",
+      "topics": [
+        "safe-optimization",
+        "Gaussian-process",
+        "uncertainty",
+        "active-learning"
+      ],
+      "countries": [],
+      "url": "https://proceedings.mlr.press/v37/sui15.html",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF pp. 2–3: Section 2 Problem Statement, Regularity assumptions; p. 6: Guaranteeing safety via GP confidence bounds.",
+      "summary_vi": "SAFEOPT dùng khoảng tin cậy của Gaussian process để mở rộng vùng được xem là an toàn và tìm nghiệm tốt trong vùng có thể tiếp cận. Bài toán cần điểm khởi đầu an toàn cùng các giả thiết về độ trơn của hàm. Bảo đảm của nghiên cứu gắn chặt với mô hình toán đó. Không thể chuyển nguyên lời bảo đảm sang cầu thực tế nếu chưa kiểm tra các giả thiết.",
+      "key_points_vi": [
+        "Cần tập khởi đầu chứa ít nhất một quyết định an toàn.",
+        "Phân biệt nghiệm tối ưu toàn miền với nghiệm có thể tiếp cận an toàn."
+      ],
+      "limitations_vi": [
+        "Bảo đảm phụ thuộc điều kiện RKHS, Lipschitz và độ tin cậy.",
+        "Không phải quy trình thẩm tra kết cấu theo tiêu chuẩn."
+      ],
+      "project_use_vi": "Làm tài liệu về bất định và điều kiện áp dụng của các bộ chọn mẫu được gọi là an toàn.",
+      "pdf_url": "https://proceedings.mlr.press/v37/sui15.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-006",
+      "title": "Data-Efficient Design Exploration through Surrogate-Assisted Illumination",
+      "authors": [
+        "Adam Gaier",
+        "Alexander Asteroth",
+        "Jean-Baptiste Mouret"
+      ],
+      "year": 2018,
+      "publisher": "Evolutionary Computation — journal article; author manuscript on arXiv",
+      "source_type": "research_paper",
+      "topics": [
+        "quality-diversity",
+        "SAIL",
+        "surrogate-model",
+        "active-learning",
+        "design-exploration"
+      ],
+      "countries": [
+        "France",
+        "Germany"
+      ],
+      "url": "https://arxiv.org/abs/1806.05865",
+      "doi": "10.1162/evco_a_00231",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF pp. 8–9: Section 3 Surrogate-Assisted Illumination, Algorithm 2; p. 3: Figure 1 and explanation; pp. 26–27: limitations on nonconvergent simulations.",
+      "summary_vi": "SAIL kết hợp Gaussian process với MAP-Elites để chọn mẫu có ích trước khi đánh giá bằng mô phỏng tốn kém. Tác giả phân biệt bản đồ phục vụ lấy mẫu với bản đồ dự đoán chất lượng sau cùng. Bài báo báo cáo hiệu quả trên thiết kế khí động học hai và ba chiều. Đây là ví dụ trực tiếp về dùng nhiều dự đoán rẻ để giảm số lượt mô phỏng thật.",
+      "key_points_vi": [
+        "Bản đồ acquisition cân bằng khám phá và khai thác.",
+        "Bản đồ prediction chỉ chứa dự đoán, cần đối chiếu bằng đánh giá thật."
+      ],
+      "limitations_vi": [
+        "Kết quả khí động học chưa được tái lập cho dự án cầu.",
+        "Mô phỏng không hội tụ trong nghiên cứu được loại; cần quản lý riêng nguyên nhân thất bại."
+      ],
+      "project_use_vi": "Cung cấp cơ sở nghiên cứu giảm ngân sách tính toán nhưng vẫn ghi rõ nguồn kết quả thật và dự đoán.",
+      "pdf_url": "https://arxiv.org/pdf/1806.05865",
+      "related_urls": [
+        "https://doi.org/10.1162/evco_a_00231"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-007",
+      "title": "TopologyGAN: Topology Optimization Using Generative Adversarial Networks Based on Physical Fields Over the Initial Domain",
+      "authors": [
+        "Zhenguo Nie",
+        "Tong Lin",
+        "Haoliang Jiang",
+        "Levent Burak Kara"
+      ],
+      "year": 2020,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "topology-optimization",
+        "conditional-GAN",
+        "physical-fields"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/2003.04685",
+      "doi": "10.48550/arXiv.2003.04685",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract, v2 revised 11 March 2020.",
+      "summary_vi": "TopologyGAN sử dụng các trường vật lý tính trên miền vật liệu ban đầu làm đầu vào cho mạng sinh có điều kiện. Cách mã hóa này nhằm cung cấp thông tin phong phú hơn biểu diễn tải và điều kiện biên thưa. Tác giả báo cáo giảm sai số ảnh dự đoán trên bài kiểm tra điều kiện biên chưa gặp. Nguồn cho thấy dữ liệu vật lý có vai trò quan trọng trong bộ sinh hình.",
+      "key_points_vi": [
+        "Kết hợp thông tin vật lý và mạng sinh.",
+        "So sánh với cGAN nền trên điều kiện biên chưa gặp."
+      ],
+      "limitations_vi": [
+        "Đọc abstract bản preprint; chưa tái lập các mức cải thiện.",
+        "Sai số hình ảnh thấp không tự chứng minh độ bền, ổn định hoặc khả năng chế tạo."
+      ],
+      "project_use_vi": "Tham khảo cách mô tả đầu bài vật lý cho dữ liệu hình học sinh.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-008",
+      "title": "GM-TOuNN: Graded Multiscale Topology Optimization using Neural Networks",
+      "authors": [
+        "Aaditya Chandrasekhar",
+        "Saketh Sridhara",
+        "Krishnan Suresh"
+      ],
+      "year": 2022,
+      "publisher": "arXiv — preprint submitted to Structural and Multidisciplinary Optimization",
+      "source_type": "research_paper",
+      "topics": [
+        "multiscale-topology",
+        "microstructures",
+        "neural-representation",
+        "automatic-differentiation"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/2204.06682",
+      "doi": "10.48550/arXiv.2204.06682",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract and Comments field: submitted to Structural and Multidisciplinary Optimization.",
+      "summary_vi": "Nghiên cứu dùng mạng nơ-ron để chọn và phân bố các vi cấu trúc đã định nghĩa trước trong tối ưu đa tỷ lệ. Phương pháp hướng đến chuyển đổi liên tục giữa các mẫu, thỏa điều kiện tổng tỷ phần và giảm sự trộn mẫu ở kết quả cuối. Abstract trình bày các ví dụ minh họa. Nguồn gần với ý tưởng phối hợp thư viện mảnh ghép nhưng ở cấp cấu trúc vật liệu.",
+      "key_points_vi": [
+        "Thư viện vi cấu trúc là đầu vào được chọn trước.",
+        "Vi phân tự động hỗ trợ tối ưu phân bố đa tỷ lệ."
+      ],
+      "limitations_vi": [
+        "Bản arXiv ghi đang gửi tạp chí; chưa xác minh bản xuất bản cuối.",
+        "Không mặc nhiên áp dụng được cho bê tông cốt thép hoặc liên kết cầu."
+      ],
+      "project_use_vi": "Lưu làm nghiên cứu tham chiếu về tổ hợp vật liệu và hình học ở nhiều cấp tỷ lệ.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-009",
+      "title": "DMF-TONN: Direct Mesh-free Topology Optimization using Neural Networks",
+      "authors": [
+        "Aditya Joglekar",
+        "Hongrui Chen",
+        "Levent Burak Kara"
+      ],
+      "year": 2024,
+      "publisher": "Springer Nature, Engineering with Computers — journal article; online 2023",
+      "source_type": "research_paper",
+      "topics": [
+        "topology-optimization",
+        "physics-informed-neural-network",
+        "implicit-geometry",
+        "mesh-free"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://link.springer.com/article/10.1007/s00366-023-01904-w",
+      "doi": "10.1007/s00366-023-01904-w",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Sections 3.1 Density neural network; 3.2 Displacement neural network; 3.2.1 Displacement constraints; 3.2.2 Minimum potential energy loss function; 3.3 integration.",
+      "summary_vi": "DMF-TONN biểu diễn trường mật độ và chuyển vị bằng hai mạng liên kết, rồi tối ưu độ mềm cùng ràng buộc thể tích. Mạng chuyển vị dùng nguyên lý thế năng cực tiểu cho đàn hồi tuyến tính. Bài báo mô tả điều kiện biên chuyển vị cưỡng bức và quan hệ giữa độ phân giải hai mạng. Đây là nguồn chi tiết về hình học ngầm liên tục và sai hỏng do biểu diễn không tương thích.",
+      "key_points_vi": [
+        "Fourier features điều khiển khả năng biểu diễn chi tiết.",
+        "Tác giả nêu nguy cơ đứt liên kết khi mạng chuyển vị không theo kịp chi tiết mật độ."
+      ],
+      "limitations_vi": [
+        "Kết quả bài báo chưa được tái lập tại dự án.",
+        "PINN trong nghiên cứu không thay thế mặc định bộ kiểm chứng kết cấu độc lập."
+      ],
+      "project_use_vi": "Dùng để nghiên cứu giới hạn của biểu diễn mật độ liên tục và kiểm tra hình học sau tối ưu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-010",
+      "title": "Neural networks for topology optimization",
+      "authors": [
+        "Ivan Sosnovik",
+        "Ivan Oseledets"
+      ],
+      "year": 2017,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "topology-optimization",
+        "encoder-decoder",
+        "image-segmentation"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/1709.09578",
+      "doi": "10.48550/arXiv.1709.09578",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract and submission metadata.",
+      "summary_vi": "Nguồn này diễn giải dự đoán topology như bài toán phân đoạn ảnh và sử dụng mạng tích chập encoder–decoder để tăng tốc quá trình tối ưu. Tác giả trình bày khả năng khái quát hóa trong các bài thử cùng những nhược điểm của cách tiếp cận. Ý nghĩa phương pháp là chuyển trường vật liệu thành dữ liệu học máy, đồng thời phải phân biệt dự đoán hình dạng với lời giải vật lý.",
+      "key_points_vi": [
+        "Biểu diễn layout dưới dạng nhãn theo điểm ảnh.",
+        "Mạng học hỗ trợ tăng tốc quá trình tối ưu."
+      ],
+      "limitations_vi": [
+        "Đọc abstract của bản arXiv, chưa tái lập.",
+        "Không cung cấp bằng chứng đạt mọi điều kiện thiết kế cầu."
+      ],
+      "project_use_vi": "Làm nguồn nền về mối liên hệ giữa biểu diễn voxel/pixel và tối ưu vật liệu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-011",
+      "title": "RoboGrammar: Graph Grammar for Terrain-Optimized Robot Design",
+      "authors": [
+        "Allan Zhao",
+        "Jie Xu",
+        "Mina Konaković Luković",
+        "Josephine Hughes",
+        "Andrew Spielberg",
+        "Daniela Rus",
+        "Wojciech Matusik"
+      ],
+      "year": 2020,
+      "publisher": "ACM Transactions on Graphics 39(6), SIGGRAPH Asia — journal article; author project page",
+      "source_type": "research_paper",
+      "topics": [
+        "graph-grammar",
+        "combinatorial-design",
+        "graph-neural-network",
+        "physical-simulation"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://people.csail.mit.edu/jiex/papers/robogrammar/index.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Author project page: Abstract; Paper bibliographic block; linked code README observed.",
+      "summary_vi": "RoboGrammar biểu diễn thiết kế robot bằng đồ thị và chuỗi quy tắc sinh, giới hạn cách lắp ráp trong một thư viện bộ phận. Graph Heuristic Search học đánh giá các nhánh thiết kế chưa hoàn chỉnh để ưu tiên tìm kiếm. Mô phỏng chuyển động đánh giá tổ hợp cấu trúc và bộ điều khiển. Nguồn hữu ích về ngữ pháp có thể thực thi, dù đối tượng nghiên cứu là robot.",
+      "key_points_vi": [
+        "Quy tắc đồ thị mã hóa cách ghép thành phần.",
+        "Tìm kiếm được đối chiếu với ngẫu nhiên và Monte Carlo tree search."
+      ],
+      "limitations_vi": [
+        "Đã đọc abstract trên trang nhóm tác giả; PDF liên kết lỗi khi mở.",
+        "Khả năng chế tạo trong ngữ pháp robot không chuyển trực tiếp sang tiêu chuẩn cầu."
+      ],
+      "project_use_vi": "Tham khảo biểu diễn mảnh ghép có cổng nối và quy tắc hợp lệ.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://github.com/allanzhao/RoboGrammar"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-012",
+      "title": "Automated generative design and prefabrication of precast buildings using integrated BIM and graph convolutional neural network",
+      "authors": [
+        "Kexin Li",
+        "Vincent J. L. Gan",
+        "Mingkai Li",
+        "Maggie Y. Gao",
+        "Robert L. K. Tiong",
+        "Yaowen Yang"
+      ],
+      "year": 2024,
+      "publisher": "Elsevier, Developments in the Built Environment 18, 100418 — journal article",
+      "source_type": "research_paper",
+      "topics": [
+        "BIM",
+        "graph-convolution",
+        "generative-design",
+        "precast",
+        "prefabrication",
+        "IFC"
+      ],
+      "countries": [
+        "Singapore"
+      ],
+      "url": "https://doi.org/10.1016/j.dibe.2024.100418",
+      "doi": "10.1016/j.dibe.2024.100418",
+      "access_status": "BLOCKED",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Indexed primary publisher text: Sections 3 Methodology, 3.2 Graph-constrained precast layout generation, 5 Conclusions, Data availability; direct page open returned 403.",
+      "summary_vi": "Bài báo kết hợp BIM, biểu diễn đồ thị và mạng tích chập đồ thị để tạo phương án bố trí nhà lắp ghép. Thông tin hình học và quan hệ giữa các môđun được đưa vào bộ đánh giá; dữ liệu IFC được làm giàu để chuyển sang PXML phục vụ chế tạo. Đây là ví dụ xây dựng cụ thể nối sinh phương án với dữ liệu sản xuất, khác với chỉ sinh ảnh.",
+      "key_points_vi": [
+        "Đồ thị gồm đặc trưng hình học và ma trận liên kết.",
+        "Chuyển dữ liệu thiết kế sang lược đồ chế tạo PXML."
+      ],
+      "limitations_vi": [
+        "Trang trực tiếp bị chặn; các mục được đọc qua bản chỉ mục của chính nhà xuất bản.",
+        "Dữ liệu nghiên cứu cung cấp theo yêu cầu, chưa tải hay tái lập; bài toán bố trí nhà không phải sức chịu tải cấu kiện cầu."
+      ],
+      "project_use_vi": "Lưu làm trường hợp tham chiếu BIM–AI–chế tạo và xác định dữ liệu cần chuẩn hóa.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-013",
+      "title": "IFCNet: A Benchmark Dataset for IFC Entity Classification",
+      "authors": [
+        "Christoph Emunds",
+        "Nicolas Pauen",
+        "Veronika Richter",
+        "Jérôme Frisch",
+        "Christoph van Treeck"
+      ],
+      "year": 2021,
+      "publisher": "arXiv — preprint, marked for EG-ICE 2021",
+      "source_type": "dataset",
+      "topics": [
+        "BIM-semantics",
+        "IFC",
+        "dataset",
+        "entity-classification"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/2106.09712",
+      "doi": "10.48550/arXiv.2106.09712",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv Abstract and Comments field.",
+      "summary_vi": "IFCNet cung cấp các tệp IFC theo từng đối tượng, chứa cả hình học lẫn thông tin ngữ nghĩa thuộc nhiều lớp cấu kiện. Tác giả đánh giá ba mô hình học sâu sử dụng riêng hình học để phân loại đối tượng. Nguồn giải quyết một khó khăn nền tảng của thư viện BIM: hình học thu thập được có thể thiếu hoặc sai nhãn, cần cơ sở dữ liệu và phép đánh giá rõ ràng.",
+      "key_points_vi": [
+        "Dữ liệu lưu theo thực thể IFC đơn lẻ.",
+        "Phân biệt nhãn ngữ nghĩa với biểu diễn hình học."
+      ],
+      "limitations_vi": [
+        "Đọc abstract bản preprint; chưa tải tập dữ liệu hoặc xác minh giấy phép tài sản.",
+        "Nhãn lớp IFC không chứng minh chức năng chịu lực hoặc thiết kế đạt chuẩn."
+      ],
+      "project_use_vi": "Tham khảo chuẩn hóa và đánh giá phân loại Family sau trích xuất hình học.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-014",
+      "title": "BIM-Edit: Benchmarking Large Language Models for IFC-Based Building Information Modeling",
+      "authors": [
+        "Bharathi Kannan Nithyanantham",
+        "Clemens Kujat",
+        "Tobias Sesterhenn",
+        "Stefan Telgmann",
+        "Ashwin Nedungadi",
+        "Jörn Plönnigs",
+        "Christian Bartelt",
+        "Stefan Lüdtke"
+      ],
+      "year": 2026,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "BIM",
+        "LLM-evaluation",
+        "IFC-editing",
+        "semantics",
+        "topology"
+      ],
+      "countries": [
+        "Germany"
+      ],
+      "url": "https://arxiv.org/abs/2606.20146",
+      "doi": "10.48550/arXiv.2606.20146",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "HTML v1: Section 3.1 Benchmark construction (reference/scene complexity); Section 3.2 Evaluation Metrics; Geometry Score; document table of contents.",
+      "summary_vi": "BIM-Edit đánh giá việc sửa IFC bằng ngôn ngữ tự nhiên trên ba trục hình học, ngữ nghĩa và quan hệ topology. Chấm điểm tập trung vào phần đồ thị thay đổi, tránh để phần mô hình giữ nguyên che khuất lỗi. Nguồn đưa ra ví dụ hình đúng nhưng lớp đối tượng hoặc quan hệ chủ–phụ sai. Đây là nghiên cứu mới hữu ích cho kiểm tra thao tác AI trên BIM.",
+      "key_points_vi": [
+        "Tách ba loại đúng đắn thay vì chỉ so bề mặt.",
+        "Đánh giá phần thay đổi của đồ thị IFC."
+      ],
+      "limitations_vi": [
+        "Preprint 2026; không phải bằng chứng hệ dự án đã được kiểm chứng.",
+        "Độ đúng IFC không tương đương kiểm tra khả năng chịu lực hoặc quy chuẩn."
+      ],
+      "project_use_vi": "Lưu bộ tiêu chí đánh giá chỉnh sửa BIM để tham khảo cho khâu kiểm dữ liệu.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://arxiv.org/html/2606.20146v1"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-015",
+      "title": "MCP4IFC: IFC-Based Building Design Using Large Language Models",
+      "authors": [
+        "Bharathi Kannan Nithyanantham",
+        "Tobias Sesterhenn",
+        "Ashwin Nedungadi",
+        "Sergio Peral Garijo",
+        "Janis Zenkner",
+        "Christian Bartelt",
+        "Stefan Lüdtke"
+      ],
+      "year": 2025,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "BIM",
+        "LLM-tools",
+        "MCP",
+        "IfcOpenShell",
+        "RAG"
+      ],
+      "countries": [
+        "Germany"
+      ],
+      "url": "https://arxiv.org/abs/2511.05533",
+      "doi": "10.48550/arXiv.2511.05533",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "HTML v1: Section 3 Methodology; 3.1 System Architecture and Workflow; 3.2 Toolset Implementation; 3.2.1 Scene Query and Context Tools.",
+      "summary_vi": "MCP4IFC kết nối mô hình ngôn ngữ với các thao tác đọc, tạo và sửa IFC qua công cụ có cấu trúc. Kiến trúc gồm phía AI, máy chủ Python và phần bổ sung Blender dùng IfcOpenShell/Bonsai. Công cụ trả ngữ cảnh gọn, kiểm yêu cầu rồi báo kết quả để AI quyết định bước tiếp theo. Nguồn mô tả rõ giao diện công cụ, không phải bộ giải kết cấu.",
+      "key_points_vi": [
+        "Công cụ có tên, tham số và lược đồ kết quả.",
+        "RAG và ví dụ hỗ trợ tạo mã cho thao tác ngoài bộ công cụ cố định."
+      ],
+      "limitations_vi": [
+        "Preprint; kết quả minh họa chưa được tái lập trong dự án.",
+        "Môi trường nghiên cứu là IFC/Blender, không phải tích hợp Dynamo/Revit đã xác nhận."
+      ],
+      "project_use_vi": "Tham khảo giao tiếp AI với công cụ BIM có kiểm tra đầu vào và phản hồi lỗi.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://arxiv.org/html/2511.05533v1",
+        "https://show2instruct.github.io/mcp4ifc/"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-016",
+      "title": "Z24 Bridge benchmark",
+      "authors": [
+        "KU Leuven, Structural Mechanics Section"
+      ],
+      "year": null,
+      "publisher": "KU Leuven — official benchmark page",
+      "source_type": "dataset",
+      "topics": [
+        "bridge-SHM",
+        "environmental-variability",
+        "progressive-damage",
+        "open-data"
+      ],
+      "countries": [
+        "Belgium",
+        "Switzerland"
+      ],
+      "url": "https://bwk.kuleuven.be/bwm/z24",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Sections Brite-EuRam project SIMCES; Description of the Z24-bridge; Long-term continuous monitoring test; Short-term progressive damage test. Dataset campaign dated 1998; webpage year not established.",
+      "summary_vi": "Z24 là cầu dầm hộp bê tông dự ứng lực tại Thụy Sĩ được theo dõi dài hạn và gây hư hỏng tiến triển trước tháo dỡ. Trang chính thức mô tả cảm biến môi trường, gia tốc, nhiệt độ cùng các thí nghiệm dao động. Dữ liệu cho phép nghiên cứu cách tách biến thiên môi trường khỏi dấu hiệu hư hỏng, một vấn đề dễ bị bỏ qua khi huấn luyện AI.",
+      "key_points_vi": [
+        "Có trạng thái thực nghiệm với hư hỏng tiến triển.",
+        "Trang ghi nhận cả trôi và hỏng cảm biến."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc mô tả chính thức, chưa tải dữ liệu hay chạy phân tích.",
+        "Một cầu và một chiến dịch không đại diện mọi điều kiện cầu."
+      ],
+      "project_use_vi": "Tham khảo dữ liệu thất bại, nhiễu môi trường và đánh giá chẩn đoán.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-017",
+      "title": "Monitoring data for railway bridge KW51 in Leuven, Belgium, before, during, and after retrofitting",
+      "authors": [
+        "Kristof Maes",
+        "Geert Lombaert"
+      ],
+      "year": 2020,
+      "publisher": "Zenodo / KU Leuven — dataset version 1.0",
+      "source_type": "dataset",
+      "topics": [
+        "bridge-SHM",
+        "retrofitting",
+        "strain",
+        "vibration",
+        "open-data"
+      ],
+      "countries": [
+        "Belgium"
+      ],
+      "url": "https://zenodo.org/records/3745914",
+      "doi": "10.5281/zenodo.3745914",
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Zenodo version 1.0: Description, Files, DOI and publisher metadata; KU Leuven KW51 benchmark page.",
+      "summary_vi": "Bộ dữ liệu theo dõi mười lăm tháng trên cầu đường sắt vòm thép KW51 bao trùm giai đoạn trước, trong và sau gia cường liên kết. Các kênh gồm gia tốc, biến dạng, chuyển vị gối, nhiệt độ và độ ẩm, kèm đặc trưng dao động. Nguồn rất phù hợp nghiên cứu phản hồi sau can thiệp, vì thay đổi thực tế của công trình được ghi theo thời gian.",
+      "key_points_vi": [
+        "Có đo đạc trước–trong–sau gia cường.",
+        "Bao gồm dao động môi trường và tàu chạy hàng ngày."
+      ],
+      "limitations_vi": [
+        "Chưa tải khối dữ liệu 45,6 GB hoặc xác nhận xử lý tín hiệu.",
+        "Dữ liệu gia cường cầu hiện hữu không tự tạo nhãn tối ưu cho cấu kiện mới."
+      ],
+      "project_use_vi": "Lưu nguồn để nghiên cứu chuỗi can thiệp–kết quả và kiểm tra khả năng khái quát.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://bwk.kuleuven.be/bwm/kw51"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-018",
+      "title": "IFC4.3.2.0 Documentation",
+      "authors": [
+        "buildingSMART International"
+      ],
+      "year": null,
+      "publisher": "buildingSMART International — official release documentation",
+      "source_type": "manual",
+      "topics": [
+        "BIM-semantics",
+        "IFC4.3",
+        "bridge-information-model",
+        "interoperability"
+      ],
+      "countries": [
+        "International"
+      ],
+      "url": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Official release index IFC4X3_ADD2; entity page 5.4.3.7 IfcBridge. Development mirror was inspected separately and is explicitly a working draft.",
+      "summary_vi": "Tài liệu chính thức IFC 4.3.2.0 tổ chức lược đồ dữ liệu lõi, đối tượng dùng chung, miền chuyên ngành và tài nguyên hình học. Nhánh cầu có định nghĩa IfcBridge để trao đổi thông tin theo ngữ nghĩa thống nhất. Nguồn này giúp xác định cấu kiện nằm ở đâu trong mô hình và quan hệ dữ liệu cần giữ khi chuyển giữa phần mềm, thay vì chỉ mang theo bề mặt.",
+      "key_points_vi": [
+        "Đã phân biệt đường dẫn RELEASE chính thức với DEV đang phát triển.",
+        "Có trang định nghĩa thực thể IfcBridge."
+      ],
+      "limitations_vi": [
+        "Chưa đọc toàn bộ lược đồ hoặc chứng nhận tương thích phần mềm.",
+        "IFC là tiêu chuẩn dữ liệu, không phải bộ tiêu chuẩn sức chịu tải."
+      ],
+      "project_use_vi": "Dùng làm đầu mối chuẩn hóa ngữ nghĩa thư viện BIM và liên kết dữ liệu cầu.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcBridge.htm"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-019",
+      "title": "Information Delivery Specification standard",
+      "authors": [
+        "buildingSMART International"
+      ],
+      "year": null,
+      "publisher": "buildingSMART International — official repository",
+      "source_type": "tool_documentation",
+      "topics": [
+        "BIM-requirements",
+        "IDS",
+        "machine-readable-constraints",
+        "IFC"
+      ],
+      "countries": [
+        "International"
+      ],
+      "url": "https://github.com/buildingSMART/IDS",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Official README: Information Delivery Specification standard; links to Schema/ids.xsd, Documentation/User manual and ImplementersDocumentation.",
+      "summary_vi": "IDS là đặc tả XML mà máy tính có thể đọc để mô tả yêu cầu giao nộp thông tin IFC. Kho chính thức cung cấp lược đồ, ví dụ và hướng dẫn cho người dùng lẫn bên triển khai. Vai trò phù hợp là biểu diễn dữ liệu nào phải có trước khi sử dụng mô hình. Việc kiểm đủ thông tin cần tách khỏi phép tính và kết luận thiết kế.",
+      "key_points_vi": [
+        "Yêu cầu thông tin được biểu diễn bằng XML.",
+        "Kho có lược đồ XSD và tài liệu triển khai."
+      ],
+      "limitations_vi": [
+        "Đọc README; chưa chạy bộ kiểm IDS hoặc kiểm từng yêu cầu.",
+        "IDS không tự đánh giá đầy đủ hình học và cơ học kết cấu."
+      ],
+      "project_use_vi": "Tham khảo lớp kiểm đầy đủ và đúng loại dữ liệu trước xử lý bằng AI.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-020",
+      "title": "Damage identification for bridges using machine learning: Development and application to KW51 bridge",
+      "authors": [
+        "Yuqing Qiu",
+        "Bilal Ahmed",
+        "Diab W. Abueidda",
+        "Waleed El-Sekelly",
+        "Borja Garcia de Soto",
+        "Tarek Abdoun",
+        "Hongli Ji",
+        "Jinhao Qiu",
+        "Mostafa E. Mobasher"
+      ],
+      "year": 2024,
+      "publisher": "arXiv — preprint",
+      "source_type": "research_paper",
+      "topics": [
+        "bridge-SHM",
+        "damage-identification",
+        "machine-learning",
+        "synthetic-data",
+        "finite-element-model"
+      ],
+      "countries": [
+        "Belgium"
+      ],
+      "url": "https://arxiv.org/abs/2408.03002",
+      "doi": "10.48550/arXiv.2408.03002",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract, v2 revised 25 September 2024.",
+      "summary_vi": "Nghiên cứu kết hợp phân tích dao động, xử lý tín hiệu và nhiều mô hình học máy để nhận biết tồn tại, vị trí và mức độ hư hỏng cầu KW51. Dữ liệu huấn luyện được lấy từ đo đạc cùng mô hình phần tử hữu hạn tạo các trường hợp hư hỏng. Nguồn cung cấp một ví dụ cầu thực về trộn dữ liệu thực nghiệm và mô phỏng có đối chiếu.",
+      "key_points_vi": [
+        "Dùng kNN, GRU và CNN cho các nhiệm vụ chẩn đoán khác nhau.",
+        "Mô hình FE tạo tổ hợp vị trí và mức hư hỏng."
+      ],
+      "limitations_vi": [
+        "Đọc abstract bản preprint; mức chính xác tác giả báo cáo chưa được tái lập.",
+        "Cần kiểm tra chênh lệch dữ liệu mô phỏng–thực và rò rỉ theo thời gian."
+      ],
+      "project_use_vi": "Tham khảo cách gắn dữ liệu thất bại với mô hình vật lý và đo đạc.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-021",
+      "title": "DeepCAD: A Deep Generative Network for Computer-Aided Design Models",
+      "authors": [
+        "Rundi Wu",
+        "Chang Xiao",
+        "Changxi Zheng"
+      ],
+      "year": 2021,
+      "publisher": "IEEE/CVF ICCV — conference paper; arXiv author version",
+      "source_type": "research_paper",
+      "topics": [
+        "CAD-generation",
+        "parametric-geometry",
+        "Transformer",
+        "CAD-sequence",
+        "dataset"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://arxiv.org/abs/2105.09492",
+      "doi": null,
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract and indexed CVF conference record, ICCV 2021 pp. 6772–6782.",
+      "summary_vi": "DeepCAD sinh chuỗi thao tác CAD thay vì chỉ tạo đám mây điểm hoặc lưới bề mặt. Mạng Transformer xử lý cấu trúc tuần tự và tham số của thao tác dựng hình; nhóm tác giả công bố tập dữ liệu gồm 178.238 mô hình cùng chuỗi tạo chúng. Nguồn gần với nhu cầu đầu ra chỉnh sửa được, nhưng quan hệ giữa thao tác CAD và ý nghĩa cấu kiện vẫn phải xây riêng.",
+      "key_points_vi": [
+        "Biểu diễn hình bằng lịch sử thao tác dựng CAD.",
+        "Có dữ liệu chuỗi thao tác phục vụ học và đánh giá."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc abstract và metadata; chưa tải dữ liệu hoặc chạy mô hình.",
+        "Không phải tập Family Revit hay bộ dữ liệu cấu kiện cầu đã kiểm toán."
+      ],
+      "project_use_vi": "Tham khảo biểu diễn hình học có tham số và khả năng chỉnh sửa sau khi sinh.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://openaccess.thecvf.com/content/ICCV2021/html/Wu_DeepCAD_A_Deep_Generative_Network_for_Computer-Aided_Design_Models_ICCV_2021_paper.html",
+        "https://github.com/rundiwu/DeepCAD"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "AI-022",
+      "title": "ABC: A Big CAD Model Dataset For Geometric Deep Learning",
+      "authors": [
+        "Sebastian Koch",
+        "Albert Matveev",
+        "Zhongshi Jiang",
+        "Francis Williams",
+        "Alexey Artemov",
+        "Evgeny Burnaev",
+        "Marc Alexa",
+        "Denis Zorin",
+        "Daniele Panozzo"
+      ],
+      "year": 2019,
+      "publisher": "IEEE/CVF CVPR — conference paper and dataset; arXiv author version",
+      "source_type": "dataset",
+      "topics": [
+        "CAD-dataset",
+        "B-Rep",
+        "geometry-processing",
+        "mesh-validation",
+        "ground-truth"
+      ],
+      "countries": [
+        "Germany",
+        "Russia",
+        "United States"
+      ],
+      "url": "https://arxiv.org/abs/1812.06216",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF pp. 3–4: Section 3 Dataset; 3.1 CAD Models and Boundary Representations; 3.2 Processing Pipeline; p. 5 Section 4 Supported Applications.",
+      "summary_vi": "ABC tập hợp hơn một triệu mô hình CAD với đường cong và mặt tham số, cho phép lấy mẫu hình học có dữ liệu đối chiếu chính xác. Quy trình chuyển B-Rep sang lưới giữ liên hệ giữa mặt, cạnh và nhãn. Tác giả nêu rõ dữ liệu công khai ban đầu có mô hình lỗi và trùng lặp, rồi áp dụng tiêu chí lọc. Đây là bài học trực tiếp cho thu thập thư viện Family.",
+      "key_points_vi": [
+        "Giữ tương ứng giữa hình học liên tục và dữ liệu lưới.",
+        "Kiểm chất lượng dữ liệu trước khi dùng để học."
+      ],
+      "limitations_vi": [
+        "Đã đọc chọn lọc; chưa tải tập dữ liệu.",
+        "Chủ yếu chi tiết cơ khí, thiếu ngữ nghĩa thiết kế cầu và nhãn an toàn."
+      ],
+      "project_use_vi": "Tham khảo cách tổ chức, lọc lỗi và đo chất lượng dữ liệu hình học đầu vào.",
+      "pdf_url": "https://arxiv.org/pdf/1812.06216",
+      "related_urls": [
+        "https://openaccess.thecvf.com/content_CVPR_2019/html/Koch_ABC_A_Big_CAD_Model_Dataset_for_Geometric_Deep_Learning_CVPR_2019_paper.html"
+      ],
+      "accessed_on": "2026-09-23"
+    }
+  ],
+  "synthesis_vi": [
+    "Đây là tập nghiên cứu nguồn gốc, không phải báo cáo đã triển khai hoặc tái lập thuật toán trong dự án. Các mức đọc được ghi riêng cho abstract, phần toàn văn và trang dữ liệu.",
+    "Biểu diễn hình học có ít nhất ba hướng bổ sung nhau: trường mật độ liên tục (AI-007–010), đồ thị/quy tắc tổ hợp (AI-011–012), và chuỗi thao tác CAD có tham số (AI-021–022). Chưa có bằng chứng một dạng biểu diễn duy nhất bao trùm mọi cấu kiện cầu.",
+    "Quality-diversity nhấn mạnh nhiều phương án tốt khác nhau (AI-001–002); Pareto search nhấn mạnh đánh đổi mục tiêu (AI-003). Hai khái niệm không thể dùng thay thế mà không định nghĩa rõ phép đo.",
+    "SAIL, constrained BO và SAFEOPT (AI-004–006) giải quyết lựa chọn mẫu có ích dưới ngân sách. Dự đoán, khoảng tin cậy và bảo đảm toán học phải gắn với giả thiết; chúng không là kết luận kiểm toán kết cấu.",
+    "Nghiên cứu BIM cụ thể cho thấy cần giữ hình học, ngữ nghĩa và quan hệ đồng thời (AI-012–015). Hình nhìn đúng chưa bảo đảm sửa đúng IFC, càng chưa chứng minh thiết kế chịu lực.",
+    "Z24 và KW51 (AI-016–017, AI-020) cung cấp đối chứng đo đạc và biến đổi theo thời gian. Chúng phù hợp nghiên cứu chẩn đoán, môi trường và phản hồi sau can thiệp; không phải dữ liệu trực tiếp chứng minh cấu kiện mới tối ưu.",
+    "Quốc gia trong hồ sơ chỉ phản ánh địa điểm nghiên cứu/công trình hoặc cơ quan tác giả được xác minh; mảng rỗng nghĩa chưa kiểm tra, không suy đoán quốc tịch.",
+    "URL tài liệu IFC phát triển chuyển tới bản Working Draft build 20260918. Hồ sơ AI-018 sử dụng riêng đường dẫn RELEASE chính thức, tránh nhầm tài liệu đang phát triển với bản phát hành."
+  ],
+  "gaps_vi": [
+    "Chưa có tập dữ liệu Family Revit cầu được xác minh về quyền sử dụng, nguồn thiết kế, phiên bản, tải trọng và phạm vi được duyệt.",
+    "Chưa tái lập bất kỳ kết quả AI, topology optimization, BIM agent hay phân tích SHM nào từ các nguồn này.",
+    "Chưa đọc toàn văn mọi nguồn; các nguồn nhà xuất bản bị chặn đã ghi rõ chỉ đọc abstract hoặc các mục trích xuất từ chỉ mục chính chủ.",
+    "Thiếu các thử nghiệm cầu nhiều vật liệu, phi tuyến, ổn định, mỏi, liên kết, giai đoạn thi công và dung sai chế tạo để chuyển kết quả nghiên cứu sang phạm vi thiết kế thực.",
+    "Cần kiểm tra giấy phép ở cấp dữ liệu/tài sản trước khi tải và sử dụng; việc bài báo mở không đồng nghĩa mọi mô hình CAD đi kèm dùng được cho mọi mục đích.",
+    "Cần thiết kế phép chia dữ liệu theo dự án/họ hình học/thời gian để tránh rò rỉ do các biến thể gần trùng; dữ liệu hư hỏng mô phỏng cần đối chiếu với đo đạc.",
+    "Tính mới chỉ đánh giá được so với corpus đã tra cứu; không nguồn nào ở đây chứng minh một kết quả tương lai là phát minh chưa từng tồn tại trên thế giới."
+  ]
+}

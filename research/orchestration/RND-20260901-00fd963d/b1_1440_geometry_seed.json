@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "concept_id": "HGB-B1-1440-F0",
+  "title": "Hybrid Grand Bridge B1 - canonical 1440 m concept geometry seed",
+  "fidelity": "F0",
+  "claim_level": "IDEA",
+  "gates": {
+    "G0": "FAIL_INHERITED_STOP_FOR_ENGINEERING_CLAIMS",
+    "G1": "NOT_CLAIMED",
+    "G2": "NOT_CLAIMED"
+  },
+  "user_decisions": {
+    "span_chain": {
+      "value_m": [145.0, 250.0, 650.0, 250.0, 145.0],
+      "total_m": 1440.0,
+      "provenance": "USER_CONFIRMED",
+      "evidence": "Chốt B1 - 1.440 m"
+    },
+    "mechanism": {
+      "value": "B1_VERTICAL_ARCH_DECK_INTERFACE",
+      "provenance": "USER_CONFIRMED",
+      "constraint": "psi_a=UNKNOWN_UNTIL_STAGED_NONLINEAR_SOLVER"
+    }
+  },
+  "coordinate_system": {
+    "x": "longitudinal from left abutment, metres",
+    "y": "transverse, positive to viewer right along increasing x, metres",
+    "z": "local render datum with deck grade line z=0; not a survey elevation",
+    "vertical_datum_status": "RESEARCH_PLACEHOLDER_FOR_RENDER_ONLY",
+    "symmetry_plane_x_m": 720.0
+  },
+  "span_chain": [
+    {"id": "AP-L", "x0_m": 0.0, "x1_m": 145.0, "length_m": 145.0},
+    {"id": "SIDE-L", "x0_m": 145.0, "x1_m": 395.0, "length_m": 250.0},
+    {"id": "MAIN", "x0_m": 395.0, "x1_m": 1045.0, "length_m": 650.0},
+    {"id": "SIDE-R", "x0_m": 1045.0, "x1_m": 1295.0, "length_m": 250.0},
+    {"id": "AP-R", "x0_m": 1295.0, "x1_m": 1440.0, "length_m": 145.0}
+  ],
+  "landmarks": [
+    {"id": "B.AB.L", "x_m": 0.0, "role": "abutment"},
+    {"id": "B.CATB.L", "x_m": 145.0, "role": "combined cable anchor, transition support and side half-arch springing"},
+    {"id": "B.TN.L", "x_m": 395.0, "role": "tower foot and central/side arch springing"},
+    {"id": "B.SAD.L", "x_m": 395.0, "role": "main-cable saddle; longitudinally aligned with tower foot in this F0 seed"},
+    {"id": "B.TN.R", "x_m": 1045.0, "role": "tower foot and central/side arch springing"},
+    {"id": "B.SAD.R", "x_m": 1045.0, "role": "main-cable saddle; longitudinally aligned with tower foot in this F0 seed"},
+    {"id": "B.CATB.R", "x_m": 1295.0, "role": "combined cable anchor, transition support and side half-arch springing"},
+    {"id": "B.AB.R", "x_m": 1440.0, "role": "abutment"}
+  ],
+  "topology": {
+    "main_cable_path": ["B.CATB.L", "B.BS.L.*", "B.SAD.L", "B.MS.*", "B.SAD.R", "B.BS.R.*", "B.CATB.R"],
+    "landward_stays": "separate fans; deck anchors must satisfy x<x_SAD,L or x>x_SAD,R",
+    "central_arch": "one continuous rib B.TN.L--B.AC.*--B.TN.R with vertical deck interface",
+    "side_half_arches": ["B.CATB.L--B.AH.L.*--B.TN.L", "B.TN.R--B.AH.R.*--B.CATB.R"],
+    "land_supports": "one transition support/CATB on each bank plus two abutments",
+    "control_HGB_D_edges": [
+      "D.AN.L--D.BS.L.*--D.SAD.L--D.MS.*--D.SAD.R--D.BS.R.*--D.AN.R",
+      "D.DK.MAIN.*--D.HG.*--D.MS.*",
+      "D.SAD.L--D.PY.L--D.TN.L--D.GND.TN.L",
+      "D.SAD.R--D.PY.R--D.TN.R--D.GND.TN.R",
+      "D.DK.LAND.L.*--D.BRG.L.*--D.AB_OR_PIER.L.*--D.GND.L.*",
+      "D.DK.LAND.R.*--D.BRG.R.*--D.AB_OR_PIER.R.*--D.GND.R.*"
+    ]
+  },
+  "render_seed": {
+    "provenance": "RESEARCH_PLACEHOLDER_FOR_RENDER_ONLY",
+    "deck_z_local_m": 0.0,
+    "deck_width_m": 32.0,
+    "steel_box_top_width_m": 18.0,
+    "steel_box_bottom_width_m": 14.0,
+    "steel_box_depth_m": 4.5,
+    "tower_saddle_z_local_m": 155.0,
+    "tower_foot_z_local_m": -55.0,
+    "main_cable_sag_m": 65.0,
+    "main_cable_panel_m": 25.0,
+    "approach_panel_count": 5,
+    "side_panel_count": 10,
+    "cable_plane_half_spacing_m": 13.0,
+    "central_arch_crown_z_local_m": -24.0,
+    "side_arch_catb_z_local_m": -30.0,
+    "side_arch_tangent_dz_du_catb_m": 80.0,
+    "side_arch_tangent_dz_du_tower_m": -110.0,
+    "stay_count_per_side": 9,
+    "stay_anchor_first_offset_m": 25.0,
+    "stay_anchor_spacing_m": 25.0,
+    "uhpc_deck_cassette_thickness_m": 0.25,
+    "cfrp_role": "fire-protected fatigue strengthening strips and replaceable lightweight panels only; not primary compression"
+  },
+  "navigation": {
+    "status": "BLOCKED_MISSING_INPUT",
+    "concept_image_seed_only": {"width_m": 250.0, "height_m": 60.0},
+    "provenance": "CONCEPT_IMAGE_UNVERIFIED",
+    "required_inputs": ["approved channel station limits", "MNTK datum", "deck absolute profile", "deflection", "temperature movement", "construction tolerance", "inspection equipment envelope"],
+    "warning": "An under-deck arch can intrude into the navigation prism; no clearance claim is allowed from this local render."
+  },
+  "solver_locked_unknowns": {
+    "psi_a": "UNKNOWN_UNTIL_STAGED_NONLINEAR_SOLVER",
+    "tower_longitudinal_balance": "NOT_RUN_SOLVER_REQUIRED",
+    "CATB_residual_thrust": "NOT_RUN_SOLVER_REQUIRED",
+    "aerodynamic_stability": "NOT_RUN_WIND_STUDY_REQUIRED",
+    "construction_sequence": "NOT_RUN_STAGED_ANALYSIS_REQUIRED"
+  },
+  "forbidden_claims": ["safe", "balanced", "navigation-clear", "wind-stable", "constructible", "optimal", "world-first", "engineering-ready"]
+}

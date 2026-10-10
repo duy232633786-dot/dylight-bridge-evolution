@@ -1,0 +1,26 @@
+{
+  "case_id": "BT-a2b7bb69a653c723",
+  "status": "SOLVER_FAILED",
+  "feasible": false,
+  "solver": {
+    "status": "NOT_CONVERGED",
+    "name": "BUILTIN_L1"
+  },
+  "violations": [
+    {
+      "rule_id": "SOLVER-001",
+      "severity": "HARD",
+      "message": "Tiết diện/vật liệu suy biến (I≤0 hoặc A≤0 hoặc E≤0) — độ cứng kỳ dị",
+      "margin": 1.0
+    }
+  ],
+  "provenance": {
+    "input_hash": "a2b7bb69a653c7232de4681d3b0aa2a17d53c2b7302b14d3f269cc819526c1b3",
+    "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+    "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+    "catalogs_version": "1.1.0",
+    "grammar_version": "1.0.0",
+    "random_seed": 42,
+    "timestamp_utc": "2026-09-22T17:17:38+00:00"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "checks": [
+    {
+      "evidence": "sum=1440.000000 m; target=1440.000000 m; contiguous=True",
+      "id": "F0-SPAN-CLOSURE",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "mirror plane x=720 m; all AB/CATB/TN/SAD pairs checked",
+      "id": "F0-LANDMARK-SYMMETRY",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "27 nodes independently recomputed against parabolic render law",
+      "id": "F0-MAIN-CABLE-LAW",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "undirected CATB-L--BS--SAD--MS--SAD--BS--CATB-R path; terminal degree=1, internal degree=2",
+      "id": "F0-CABLE-PATH-CLOSURE",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "27 nodes; endpoints close at TN-L/TN-R",
+      "id": "F0-CENTRAL-ARCH-LAW-CLOSURE",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "both cubic-Hermite half-arches independently checked and close at CATB/TN",
+      "id": "F0-SIDE-ARCH-LAW-CLOSURE",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "18 stay edges checked against x_SAD,L=395 and x_SAD,R=1045",
+      "id": "F0-NO-INWARD-STAYS",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "252 member endpoint pairs resolve to canonical nodes",
+      "id": "F0-GRAPH-ENDPOINTS",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "AB/CATB/TN support nodes each have an explicit FND edge to a distinct GND terminal",
+      "id": "F0-SUPPORT-GROUND-CLOSURE",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "csv_rows=161; json_nodes=161",
+      "id": "F0-CSV-JSON-AGREEMENT",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "minimum local seed gap from box soffit to arch centreline=12.210000 m; not a fabrication clearance",
+      "id": "F0-LOCAL-RENDER-ARCH-GAP",
+      "status": "SATISFIED_RENDER_GEOMETRY_ONLY"
+    },
+    {
+      "evidence": "fresh temporary replay compared byte-for-byte for geometry JSON and node CSV",
+      "id": "F0-DETERMINISTIC-REPLAY",
+      "status": "SATISFIED_F0_GEOMETRY"
+    },
+    {
+      "evidence": "site survey, approved navigation datum/envelope, geotechnics, loads, materials and service life remain incomplete",
+      "id": "G0-DESIGN-BASIS",
+      "status": "FAIL_INHERITED_STOP_FOR_ENGINEERING_CLAIMS"
+    },
+    {
+      "evidence": "local z=0 render cannot be intersected with an approved absolute navigation prism",
+      "id": "G1-NAVIGATION-EXCLUSION",
+      "status": "BLOCKED_MISSING_INPUT"
+    },
+    {
+      "evidence": "B1 interface exists, but vertical load share psi_a is not assigned",
+      "id": "G2-PSI-A",
+      "status": "NOT_RUN_SOLVER_REQUIRED"
+    },
+    {
+      "evidence": "main cable, backstay and separate landward stay vectors require staged nonlinear analysis",
+      "id": "G2-TOWER-BALANCE",
+      "status": "NOT_RUN_SOLVER_REQUIRED"
+    },
+    {
+      "evidence": "section is a render seed; no CFD or wind-tunnel evidence",
+      "id": "G3-AERODYNAMIC-STABILITY",
+      "status": "NOT_RUN_WIND_STUDY_REQUIRED"
+    }
+  ],
+  "claim_level": "IDEA",
+  "concept_id": "HGB-B1-1440-F0",
+  "counts": {
+    "members": 252,
+    "nodes": 161
+  },
+  "engineering_release": "PROHIBITED",
+  "geometry_sha256": "0e501ec09b14c75b8952120b26141d818cc2096f9f8e951669a9e592257710f0",
+  "nodes_csv_sha256": "81d1b3a89f05e59e785b227614cc54416a0f5bbe1ce977b8243db63851a39061",
+  "schema_version": "1.0",
+  "verification_outcome": "F0_GEOMETRY_CHECKS_PASSED_WITH_ENGINEERING_GATES_BLOCKED"
+}

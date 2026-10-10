@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "task_id": "BRD-055",
+  "reviewer": "codex_research_reviewer",
+  "reviewer_kind": "independent_same_platform_agent",
+  "reviewed_on": "2026-09-23",
+  "scope": "Read-only audit of ai_construction.json, bridges_materials.json, geometry.json; final combined corpus and vault publication not yet reviewed.",
+  "verdict": "PASS_FOR_ADDITIVE_PUBLICATION",
+  "author_record_count": 70,
+  "reading_level_counts": {
+    "SELECTED_SECTIONS_READ": 25,
+    "ABSTRACT_READ": 19,
+    "OFFICIAL_PAGE_READ": 25,
+    "METADATA_ONLY": 1
+  },
+  "method": [
+    "Read titles, source URLs, declared reading levels and all Vietnamese summaries/limitations for 70 author records.",
+    "Checked exact URL and DOI duplicates across the 70 records: none found.",
+    "Computed whitespace word counts over summary, key points, limitations and project-use prose: maximum 160 words (AI-012).",
+    "Independently opened a risk-weighted sample of 22 source URLs, including 2026 preprint metadata, publisher-indexed sections, source PDF metadata and official API documentation.",
+    "Audit confirms plausibility of selected-section claims using the cited sections; it does not certify that all source text was read, all findings reproduced, or every source remains accessible."
+  ],
+  "sampled_source_ids": [
+    "AI-006",
+    "AI-008",
+    "AI-009",
+    "AI-012",
+    "AI-014",
+    "AI-015",
+    "BM-001",
+    "BM-004",
+    "BM-009",
+    "BM-011",
+    "BM-015",
+    "BM-017",
+    "BM-018",
+    "BM-020",
+    "GE-002",
+    "GE-006",
+    "GE-007",
+    "GE-019",
+    "GE-020",
+    "GE-022"
+  ],
+  "findings": [
+    {
+      "id": "REV-001",
+      "priority": "P2",
+      "status": "FIX_VERIFIED_IN_FINAL_STAGE",
+      "source_id": "BM-020",
+      "field": "limitations_vi[0]",
+      "issue_vi": "Câu 'quản lý vòng đời còn được điều tra ở phần tiếp theo' có thể được hiểu là điều tra còn dang dở tại ngày truy cập 2026. Phần 2 thực tế đã xuất bản ngày 20-03-2024.",
+      "evidence_url": "https://nsia.no/Road/Published-reports/2024-03",
+      "evidence_locator": "Published 20.03.2024; report title Sub-report 2 on the collapse of Tretten bridge on 15 August 2022.",
+      "suggested_replacement_vi": "Bản ghi này chỉ bao phủ phần 1 (2023); phần 2 về quản lý vòng đời đã xuất bản ngày 20-03-2024 và cần đọc riêng.",
+      "suggested_related_url": "https://nsia.no/Road/Published-reports/2024-03"
+    },
+    {
+      "id": "REV-002",
+      "priority": "P3",
+      "status": "ENRICHMENT_VERIFIED_IN_FINAL_STAGE",
+      "source_id": "GE-020",
+      "field": "limitations_vi",
+      "issue_vi": "Với mục tiêu hình hữu cơ có lỗ/rỗng, nên giữ hai giới hạn cụ thể của TessellatedShapeBuilder ngay trong hồ sơ nguồn.",
+      "evidence_url": "https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/a144b0e3-c997-eac1-5c00-51c56d9e66f2.htm",
+      "evidence_locator": "Remarks, Limitations in the current implementation.",
+      "suggested_replacement_vi": "Tài liệu nêu không hỗ trợ định nghĩa void bằng face-set đảo hướng và không tự kiểm tra giao nhau giữa nhiều connected face sets; cần kiểm tra riêng."
+    }
+  ],
+  "confirmed_strengths": [
+    "AI-012 honestly separates direct HTTP 403 from publisher-indexed selected-section reading; independent indexed search exposed methodology 3, 3.2 and 3.3, supporting the stated synthesis.",
+    "AI-014 BIM-Edit arXiv 2606.20146 is a genuine June 2026 preprint; section 3.2 and edit-graph discussion support geometry/semantics/topology synthesis. It is not a future-dated invented citation.",
+    "AI-009 uses 2024 journal volume year consistently with Springer metadata; online publication was October 2023.",
+    "BM-015 correctly records report year 2019 despite FHWA-HIF-18-041 identifier.",
+    "BM-018 metadata confirms December 2024 and named authors; treatment as a non-regulatory research/manual reference is appropriate.",
+    "BM-001 avoids stale world-ranking claim; BM-009 separates designer account from independent failure investigation; BM-011 explicitly refuses a suspect 3.5 km source figure.",
+    "GE-002 preserves same-direction-load and compression-only assumptions; GE-020 avoids equating DirectShape with parametric Family.",
+    "GE-006 accurately reflects abstract scope and does not invent a member-buckling validation.",
+    "All sampled source/title/DOI pairs matched; no invented reference or engineering approval claim found in the sampled set."
+  ],
+  "second_pass_pending": [
+    "Verify additive vault publication after copy.",
+    "Canonical lab handoff review remains separate and has not been executed by this reviewer."
+  ],
+  "limitations": [
+    "Independent external verification sampled sources rather than opening all 70 URLs.",
+    "Geographic breadth is not equivalent to global exhaustiveness.",
+    "Legacy corpus and all standards editions not audited in this pass.",
+    "No runtime, solver, Family import, engineering design, experiment reproduction or invention work assessed."
+  ],
+  "standards_draft_review": {
+    "records_read": 31,
+    "source_ids_verified": [
+      "ST-002",
+      "ST-003",
+      "ST-005",
+      "ST-011",
+      "ST-017",
+      "ST-018"
+    ],
+    "verified_claims": [
+      "MLIT R7 new-design effective date 2026-04-01",
+      "Eurocode staged transition with national annexes",
+      "WSDOT M 23-50.24 June 2025",
+      "JTG D60-2015 registry marked current",
+      "ASTM C39/C39M-26 active, updated 2026-04-02",
+      "NEXCO partial technical-standard revision dated 2026-07-01"
+    ],
+    "editorial_fix": "ST-009 and ST-010 contain a copy-pasted limitation about PDF Part 2 instead of their own Part 3 and Part 6.",
+    "identity_note": "The 12 TCVN parts share a catalogue URL; deduplicate by standard number/local PDF identity, not shared registry URL."
+  },
+  "final_stage_review": {
+    "reviewed_on": "2026-09-23",
+    "corpus_sha256": "cb341a398cb56f917704292656623a8526190e64dc6dd790977084e21da9cd31",
+    "source_records": 104,
+    "source_notes": 104,
+    "distinct_document_keys": 103,
+    "wikilinks_checked": 404,
+    "missing_wikilinks": 0,
+    "attachment_hashes_checked": 27,
+    "attachment_hashes_passed": 27,
+    "frontmatter_check": "All staged frontmatter passed conservative lexical checks of the simple scalar/list format; full YAML parser unavailable.",
+    "data_corpus_matches_canonical": true,
+    "claim_ceiling_IDEA": 104,
+    "reading_counts": {
+      "SELECTED_SECTIONS_READ": 42,
+      "ABSTRACT_READ": 21,
+      "OFFICIAL_PAGE_READ": 36,
+      "METADATA_ONLY": 5
+    },
+    "fixes_verified": [
+      "BM-020 temporal wording corrected and 2024 part 2 linked",
+      "GE-020 includes face-set intersection and void limitations",
+      "ST-009 and ST-010 no longer mention Part 2 download failure",
+      "TCVN records kept distinct using individual document keys and local PDF paths"
+    ],
+    "new_sources_checked": [
+      "BM-027 SMEC technical page",
+      "BM-028 official MOP indexed history and library page; direct page failed during reviewer re-open",
+      "BM-029 arXiv author/title/abstract match"
+    ],
+    "usability_note": "README staged Open link is now angle-bracket wrapped; fix verified. All publication wiki links resolve.",
+    "content_boundary": "Dashboard correctly says 2360 stored PDF pages are not pages read, and 12 TCVN records only read scope clauses. No engineering approval, invention, solver verification, full-global coverage or global-new-document claim found.",
+    "publication_readiness": "READY for additive copy into the stated new vault subfolder, contingent on root no-overwrite/hash publication checks."
+  }
+}

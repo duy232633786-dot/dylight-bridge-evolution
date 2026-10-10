@@ -1,0 +1,3086 @@
+{
+  "claim_level": "IDEA",
+  "concept_id": "HGB-B1-1440-F0",
+  "coordinate_notice": {
+    "symmetry_plane_x_m": 720.0,
+    "vertical_datum_status": "RESEARCH_PLACEHOLDER_FOR_RENDER_ONLY",
+    "x": "longitudinal from left abutment, metres",
+    "y": "transverse, positive to viewer right along increasing x, metres",
+    "z": "local render datum with deck grade line z=0; not a survey elevation"
+  },
+  "fidelity": "F0",
+  "forbidden_claims": [
+    "safe",
+    "balanced",
+    "navigation-clear",
+    "wind-stable",
+    "constructible",
+    "optimal",
+    "world-first",
+    "engineering-ready"
+  ],
+  "members": [
+    {
+      "end": "B.AC.000",
+      "family": "AC",
+      "id": "B.AC.JOINT.L",
+      "role": "central-arch closure at left tower foot",
+      "start": "B.TN.L"
+    },
+    {
+      "end": "B.TN.R",
+      "family": "AC",
+      "id": "B.AC.JOINT.R",
+      "role": "central-arch closure at right tower foot",
+      "start": "B.AC.026"
+    },
+    {
+      "end": "B.AC.001",
+      "family": "AC",
+      "id": "B.AC.M.001",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.000"
+    },
+    {
+      "end": "B.AC.002",
+      "family": "AC",
+      "id": "B.AC.M.002",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.001"
+    },
+    {
+      "end": "B.AC.003",
+      "family": "AC",
+      "id": "B.AC.M.003",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.002"
+    },
+    {
+      "end": "B.AC.004",
+      "family": "AC",
+      "id": "B.AC.M.004",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.003"
+    },
+    {
+      "end": "B.AC.005",
+      "family": "AC",
+      "id": "B.AC.M.005",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.004"
+    },
+    {
+      "end": "B.AC.006",
+      "family": "AC",
+      "id": "B.AC.M.006",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.005"
+    },
+    {
+      "end": "B.AC.007",
+      "family": "AC",
+      "id": "B.AC.M.007",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.006"
+    },
+    {
+      "end": "B.AC.008",
+      "family": "AC",
+      "id": "B.AC.M.008",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.007"
+    },
+    {
+      "end": "B.AC.009",
+      "family": "AC",
+      "id": "B.AC.M.009",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.008"
+    },
+    {
+      "end": "B.AC.010",
+      "family": "AC",
+      "id": "B.AC.M.010",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.009"
+    },
+    {
+      "end": "B.AC.011",
+      "family": "AC",
+      "id": "B.AC.M.011",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.010"
+    },
+    {
+      "end": "B.AC.012",
+      "family": "AC",
+      "id": "B.AC.M.012",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.011"
+    },
+    {
+      "end": "B.AC.013",
+      "family": "AC",
+      "id": "B.AC.M.013",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.012"
+    },
+    {
+      "end": "B.AC.014",
+      "family": "AC",
+      "id": "B.AC.M.014",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.013"
+    },
+    {
+      "end": "B.AC.015",
+      "family": "AC",
+      "id": "B.AC.M.015",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.014"
+    },
+    {
+      "end": "B.AC.016",
+      "family": "AC",
+      "id": "B.AC.M.016",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.015"
+    },
+    {
+      "end": "B.AC.017",
+      "family": "AC",
+      "id": "B.AC.M.017",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.016"
+    },
+    {
+      "end": "B.AC.018",
+      "family": "AC",
+      "id": "B.AC.M.018",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.017"
+    },
+    {
+      "end": "B.AC.019",
+      "family": "AC",
+      "id": "B.AC.M.019",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.018"
+    },
+    {
+      "end": "B.AC.020",
+      "family": "AC",
+      "id": "B.AC.M.020",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.019"
+    },
+    {
+      "end": "B.AC.021",
+      "family": "AC",
+      "id": "B.AC.M.021",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.020"
+    },
+    {
+      "end": "B.AC.022",
+      "family": "AC",
+      "id": "B.AC.M.022",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.021"
+    },
+    {
+      "end": "B.AC.023",
+      "family": "AC",
+      "id": "B.AC.M.023",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.022"
+    },
+    {
+      "end": "B.AC.024",
+      "family": "AC",
+      "id": "B.AC.M.024",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.023"
+    },
+    {
+      "end": "B.AC.025",
+      "family": "AC",
+      "id": "B.AC.M.025",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.024"
+    },
+    {
+      "end": "B.AC.026",
+      "family": "AC",
+      "id": "B.AC.M.026",
+      "role": "single continuous CFST-UHPC concept rib",
+      "start": "B.AC.025"
+    },
+    {
+      "end": "B.AH.L.01",
+      "family": "AH",
+      "id": "B.AH.M.L.01",
+      "role": "side half-arch concept rib",
+      "start": "B.CATB.L"
+    },
+    {
+      "end": "B.AH.L.02",
+      "family": "AH",
+      "id": "B.AH.M.L.02",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.01"
+    },
+    {
+      "end": "B.AH.L.03",
+      "family": "AH",
+      "id": "B.AH.M.L.03",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.02"
+    },
+    {
+      "end": "B.AH.L.04",
+      "family": "AH",
+      "id": "B.AH.M.L.04",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.03"
+    },
+    {
+      "end": "B.AH.L.05",
+      "family": "AH",
+      "id": "B.AH.M.L.05",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.04"
+    },
+    {
+      "end": "B.AH.L.06",
+      "family": "AH",
+      "id": "B.AH.M.L.06",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.05"
+    },
+    {
+      "end": "B.AH.L.07",
+      "family": "AH",
+      "id": "B.AH.M.L.07",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.06"
+    },
+    {
+      "end": "B.AH.L.08",
+      "family": "AH",
+      "id": "B.AH.M.L.08",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.07"
+    },
+    {
+      "end": "B.AH.L.09",
+      "family": "AH",
+      "id": "B.AH.M.L.09",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.L.08"
+    },
+    {
+      "end": "B.TN.L",
+      "family": "AH",
+      "id": "B.AH.M.L.END",
+      "role": "side half-arch endpoint closure",
+      "start": "B.AH.L.09"
+    },
+    {
+      "end": "B.AH.R.01",
+      "family": "AH",
+      "id": "B.AH.M.R.01",
+      "role": "side half-arch concept rib",
+      "start": "B.CATB.R"
+    },
+    {
+      "end": "B.AH.R.02",
+      "family": "AH",
+      "id": "B.AH.M.R.02",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.01"
+    },
+    {
+      "end": "B.AH.R.03",
+      "family": "AH",
+      "id": "B.AH.M.R.03",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.02"
+    },
+    {
+      "end": "B.AH.R.04",
+      "family": "AH",
+      "id": "B.AH.M.R.04",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.03"
+    },
+    {
+      "end": "B.AH.R.05",
+      "family": "AH",
+      "id": "B.AH.M.R.05",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.04"
+    },
+    {
+      "end": "B.AH.R.06",
+      "family": "AH",
+      "id": "B.AH.M.R.06",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.05"
+    },
+    {
+      "end": "B.AH.R.07",
+      "family": "AH",
+      "id": "B.AH.M.R.07",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.06"
+    },
+    {
+      "end": "B.AH.R.08",
+      "family": "AH",
+      "id": "B.AH.M.R.08",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.07"
+    },
+    {
+      "end": "B.AH.R.09",
+      "family": "AH",
+      "id": "B.AH.M.R.09",
+      "role": "side half-arch concept rib",
+      "start": "B.AH.R.08"
+    },
+    {
+      "end": "B.TN.R",
+      "family": "AH",
+      "id": "B.AH.M.R.END",
+      "role": "side half-arch endpoint closure",
+      "start": "B.AH.R.09"
+    },
+    {
+      "end": "B.AB.L",
+      "family": "BRG",
+      "id": "B.BRG.AB.L",
+      "role": "deck-to-abutment support path",
+      "start": "B.DK.000"
+    },
+    {
+      "end": "B.AB.R",
+      "family": "BRG",
+      "id": "B.BRG.AB.R",
+      "role": "deck-to-abutment support path",
+      "start": "B.DK.056"
+    },
+    {
+      "end": "B.CATB.L",
+      "family": "BRG",
+      "id": "B.BRG.CATB.L",
+      "role": "deck-to-transition-support path",
+      "start": "B.DK.005"
+    },
+    {
+      "end": "B.CATB.R",
+      "family": "BRG",
+      "id": "B.BRG.CATB.R",
+      "role": "deck-to-transition-support path",
+      "start": "B.DK.051"
+    },
+    {
+      "end": "B.TN.L",
+      "family": "BRG",
+      "id": "B.BRG.TN.L",
+      "role": "deck-to-tower-foot support/interface path",
+      "start": "B.DK.015"
+    },
+    {
+      "end": "B.TN.R",
+      "family": "BRG",
+      "id": "B.BRG.TN.R",
+      "role": "deck-to-tower-foot support/interface path",
+      "start": "B.DK.041"
+    },
+    {
+      "end": "B.BS.L.01",
+      "family": "BS",
+      "id": "B.BS.M.L.01",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.CATB.L"
+    },
+    {
+      "end": "B.BS.L.02",
+      "family": "BS",
+      "id": "B.BS.M.L.02",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.01"
+    },
+    {
+      "end": "B.BS.L.03",
+      "family": "BS",
+      "id": "B.BS.M.L.03",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.02"
+    },
+    {
+      "end": "B.BS.L.04",
+      "family": "BS",
+      "id": "B.BS.M.L.04",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.03"
+    },
+    {
+      "end": "B.BS.L.05",
+      "family": "BS",
+      "id": "B.BS.M.L.05",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.04"
+    },
+    {
+      "end": "B.BS.L.06",
+      "family": "BS",
+      "id": "B.BS.M.L.06",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.05"
+    },
+    {
+      "end": "B.BS.L.07",
+      "family": "BS",
+      "id": "B.BS.M.L.07",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.06"
+    },
+    {
+      "end": "B.BS.L.08",
+      "family": "BS",
+      "id": "B.BS.M.L.08",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.07"
+    },
+    {
+      "end": "B.BS.L.09",
+      "family": "BS",
+      "id": "B.BS.M.L.09",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.08"
+    },
+    {
+      "end": "B.SAD.L",
+      "family": "BS",
+      "id": "B.BS.M.L.END",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.L.09"
+    },
+    {
+      "end": "B.BS.R.01",
+      "family": "BS",
+      "id": "B.BS.M.R.01",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.CATB.R"
+    },
+    {
+      "end": "B.BS.R.02",
+      "family": "BS",
+      "id": "B.BS.M.R.02",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.01"
+    },
+    {
+      "end": "B.BS.R.03",
+      "family": "BS",
+      "id": "B.BS.M.R.03",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.02"
+    },
+    {
+      "end": "B.BS.R.04",
+      "family": "BS",
+      "id": "B.BS.M.R.04",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.03"
+    },
+    {
+      "end": "B.BS.R.05",
+      "family": "BS",
+      "id": "B.BS.M.R.05",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.04"
+    },
+    {
+      "end": "B.BS.R.06",
+      "family": "BS",
+      "id": "B.BS.M.R.06",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.05"
+    },
+    {
+      "end": "B.BS.R.07",
+      "family": "BS",
+      "id": "B.BS.M.R.07",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.06"
+    },
+    {
+      "end": "B.BS.R.08",
+      "family": "BS",
+      "id": "B.BS.M.R.08",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.07"
+    },
+    {
+      "end": "B.BS.R.09",
+      "family": "BS",
+      "id": "B.BS.M.R.09",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.08"
+    },
+    {
+      "end": "B.SAD.R",
+      "family": "BS",
+      "id": "B.BS.M.R.END",
+      "role": "continuous ground-anchored backstay segment",
+      "start": "B.BS.R.09"
+    },
+    {
+      "end": "B.DK.001",
+      "family": "DK",
+      "id": "B.DK.M.001",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.000"
+    },
+    {
+      "end": "B.DK.002",
+      "family": "DK",
+      "id": "B.DK.M.002",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.001"
+    },
+    {
+      "end": "B.DK.003",
+      "family": "DK",
+      "id": "B.DK.M.003",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.002"
+    },
+    {
+      "end": "B.DK.004",
+      "family": "DK",
+      "id": "B.DK.M.004",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.003"
+    },
+    {
+      "end": "B.DK.005",
+      "family": "DK",
+      "id": "B.DK.M.005",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.004"
+    },
+    {
+      "end": "B.DK.006",
+      "family": "DK",
+      "id": "B.DK.M.006",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.005"
+    },
+    {
+      "end": "B.DK.007",
+      "family": "DK",
+      "id": "B.DK.M.007",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.006"
+    },
+    {
+      "end": "B.DK.008",
+      "family": "DK",
+      "id": "B.DK.M.008",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.007"
+    },
+    {
+      "end": "B.DK.009",
+      "family": "DK",
+      "id": "B.DK.M.009",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.008"
+    },
+    {
+      "end": "B.DK.010",
+      "family": "DK",
+      "id": "B.DK.M.010",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.009"
+    },
+    {
+      "end": "B.DK.011",
+      "family": "DK",
+      "id": "B.DK.M.011",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.010"
+    },
+    {
+      "end": "B.DK.012",
+      "family": "DK",
+      "id": "B.DK.M.012",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.011"
+    },
+    {
+      "end": "B.DK.013",
+      "family": "DK",
+      "id": "B.DK.M.013",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.012"
+    },
+    {
+      "end": "B.DK.014",
+      "family": "DK",
+      "id": "B.DK.M.014",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.013"
+    },
+    {
+      "end": "B.DK.015",
+      "family": "DK",
+      "id": "B.DK.M.015",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.014"
+    },
+    {
+      "end": "B.DK.016",
+      "family": "DK",
+      "id": "B.DK.M.016",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.015"
+    },
+    {
+      "end": "B.DK.017",
+      "family": "DK",
+      "id": "B.DK.M.017",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.016"
+    },
+    {
+      "end": "B.DK.018",
+      "family": "DK",
+      "id": "B.DK.M.018",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.017"
+    },
+    {
+      "end": "B.DK.019",
+      "family": "DK",
+      "id": "B.DK.M.019",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.018"
+    },
+    {
+      "end": "B.DK.020",
+      "family": "DK",
+      "id": "B.DK.M.020",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.019"
+    },
+    {
+      "end": "B.DK.021",
+      "family": "DK",
+      "id": "B.DK.M.021",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.020"
+    },
+    {
+      "end": "B.DK.022",
+      "family": "DK",
+      "id": "B.DK.M.022",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.021"
+    },
+    {
+      "end": "B.DK.023",
+      "family": "DK",
+      "id": "B.DK.M.023",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.022"
+    },
+    {
+      "end": "B.DK.024",
+      "family": "DK",
+      "id": "B.DK.M.024",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.023"
+    },
+    {
+      "end": "B.DK.025",
+      "family": "DK",
+      "id": "B.DK.M.025",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.024"
+    },
+    {
+      "end": "B.DK.026",
+      "family": "DK",
+      "id": "B.DK.M.026",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.025"
+    },
+    {
+      "end": "B.DK.027",
+      "family": "DK",
+      "id": "B.DK.M.027",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.026"
+    },
+    {
+      "end": "B.DK.028",
+      "family": "DK",
+      "id": "B.DK.M.028",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.027"
+    },
+    {
+      "end": "B.DK.029",
+      "family": "DK",
+      "id": "B.DK.M.029",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.028"
+    },
+    {
+      "end": "B.DK.030",
+      "family": "DK",
+      "id": "B.DK.M.030",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.029"
+    },
+    {
+      "end": "B.DK.031",
+      "family": "DK",
+      "id": "B.DK.M.031",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.030"
+    },
+    {
+      "end": "B.DK.032",
+      "family": "DK",
+      "id": "B.DK.M.032",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.031"
+    },
+    {
+      "end": "B.DK.033",
+      "family": "DK",
+      "id": "B.DK.M.033",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.032"
+    },
+    {
+      "end": "B.DK.034",
+      "family": "DK",
+      "id": "B.DK.M.034",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.033"
+    },
+    {
+      "end": "B.DK.035",
+      "family": "DK",
+      "id": "B.DK.M.035",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.034"
+    },
+    {
+      "end": "B.DK.036",
+      "family": "DK",
+      "id": "B.DK.M.036",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.035"
+    },
+    {
+      "end": "B.DK.037",
+      "family": "DK",
+      "id": "B.DK.M.037",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.036"
+    },
+    {
+      "end": "B.DK.038",
+      "family": "DK",
+      "id": "B.DK.M.038",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.037"
+    },
+    {
+      "end": "B.DK.039",
+      "family": "DK",
+      "id": "B.DK.M.039",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.038"
+    },
+    {
+      "end": "B.DK.040",
+      "family": "DK",
+      "id": "B.DK.M.040",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.039"
+    },
+    {
+      "end": "B.DK.041",
+      "family": "DK",
+      "id": "B.DK.M.041",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.040"
+    },
+    {
+      "end": "B.DK.042",
+      "family": "DK",
+      "id": "B.DK.M.042",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.041"
+    },
+    {
+      "end": "B.DK.043",
+      "family": "DK",
+      "id": "B.DK.M.043",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.042"
+    },
+    {
+      "end": "B.DK.044",
+      "family": "DK",
+      "id": "B.DK.M.044",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.043"
+    },
+    {
+      "end": "B.DK.045",
+      "family": "DK",
+      "id": "B.DK.M.045",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.044"
+    },
+    {
+      "end": "B.DK.046",
+      "family": "DK",
+      "id": "B.DK.M.046",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.045"
+    },
+    {
+      "end": "B.DK.047",
+      "family": "DK",
+      "id": "B.DK.M.047",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.046"
+    },
+    {
+      "end": "B.DK.048",
+      "family": "DK",
+      "id": "B.DK.M.048",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.047"
+    },
+    {
+      "end": "B.DK.049",
+      "family": "DK",
+      "id": "B.DK.M.049",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.048"
+    },
+    {
+      "end": "B.DK.050",
+      "family": "DK",
+      "id": "B.DK.M.050",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.049"
+    },
+    {
+      "end": "B.DK.051",
+      "family": "DK",
+      "id": "B.DK.M.051",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.050"
+    },
+    {
+      "end": "B.DK.052",
+      "family": "DK",
+      "id": "B.DK.M.052",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.051"
+    },
+    {
+      "end": "B.DK.053",
+      "family": "DK",
+      "id": "B.DK.M.053",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.052"
+    },
+    {
+      "end": "B.DK.054",
+      "family": "DK",
+      "id": "B.DK.M.054",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.053"
+    },
+    {
+      "end": "B.DK.055",
+      "family": "DK",
+      "id": "B.DK.M.055",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.054"
+    },
+    {
+      "end": "B.DK.056",
+      "family": "DK",
+      "id": "B.DK.M.056",
+      "role": "continuous aerodynamic steel-box deck line",
+      "start": "B.DK.055"
+    },
+    {
+      "end": "B.GND.AB.L",
+      "family": "FND",
+      "id": "B.FND.L.AB",
+      "role": "explicit support-to-ground topology; foundation not sized",
+      "start": "B.AB.L"
+    },
+    {
+      "end": "B.GND.CATB.L",
+      "family": "FND",
+      "id": "B.FND.L.CATB",
+      "role": "explicit support-to-ground topology; foundation not sized",
+      "start": "B.CATB.L"
+    },
+    {
+      "end": "B.GND.TN.L",
+      "family": "FND",
+      "id": "B.FND.L.TN",
+      "role": "explicit support-to-ground topology; foundation not sized",
+      "start": "B.TN.L"
+    },
+    {
+      "end": "B.GND.AB.R",
+      "family": "FND",
+      "id": "B.FND.R.AB",
+      "role": "explicit support-to-ground topology; foundation not sized",
+      "start": "B.AB.R"
+    },
+    {
+      "end": "B.GND.CATB.R",
+      "family": "FND",
+      "id": "B.FND.R.CATB",
+      "role": "explicit support-to-ground topology; foundation not sized",
+      "start": "B.CATB.R"
+    },
+    {
+      "end": "B.GND.TN.R",
+      "family": "FND",
+      "id": "B.FND.R.TN",
+      "role": "explicit support-to-ground topology; foundation not sized",
+      "start": "B.TN.R"
+    },
+    {
+      "end": "B.DK.016",
+      "family": "HG",
+      "id": "B.HG.001",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.001"
+    },
+    {
+      "end": "B.DK.017",
+      "family": "HG",
+      "id": "B.HG.002",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.002"
+    },
+    {
+      "end": "B.DK.018",
+      "family": "HG",
+      "id": "B.HG.003",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.003"
+    },
+    {
+      "end": "B.DK.019",
+      "family": "HG",
+      "id": "B.HG.004",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.004"
+    },
+    {
+      "end": "B.DK.020",
+      "family": "HG",
+      "id": "B.HG.005",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.005"
+    },
+    {
+      "end": "B.DK.021",
+      "family": "HG",
+      "id": "B.HG.006",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.006"
+    },
+    {
+      "end": "B.DK.022",
+      "family": "HG",
+      "id": "B.HG.007",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.007"
+    },
+    {
+      "end": "B.DK.023",
+      "family": "HG",
+      "id": "B.HG.008",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.008"
+    },
+    {
+      "end": "B.DK.024",
+      "family": "HG",
+      "id": "B.HG.009",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.009"
+    },
+    {
+      "end": "B.DK.025",
+      "family": "HG",
+      "id": "B.HG.010",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.010"
+    },
+    {
+      "end": "B.DK.026",
+      "family": "HG",
+      "id": "B.HG.011",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.011"
+    },
+    {
+      "end": "B.DK.027",
+      "family": "HG",
+      "id": "B.HG.012",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.012"
+    },
+    {
+      "end": "B.DK.028",
+      "family": "HG",
+      "id": "B.HG.013",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.013"
+    },
+    {
+      "end": "B.DK.029",
+      "family": "HG",
+      "id": "B.HG.014",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.014"
+    },
+    {
+      "end": "B.DK.030",
+      "family": "HG",
+      "id": "B.HG.015",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.015"
+    },
+    {
+      "end": "B.DK.031",
+      "family": "HG",
+      "id": "B.HG.016",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.016"
+    },
+    {
+      "end": "B.DK.032",
+      "family": "HG",
+      "id": "B.HG.017",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.017"
+    },
+    {
+      "end": "B.DK.033",
+      "family": "HG",
+      "id": "B.HG.018",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.018"
+    },
+    {
+      "end": "B.DK.034",
+      "family": "HG",
+      "id": "B.HG.019",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.019"
+    },
+    {
+      "end": "B.DK.035",
+      "family": "HG",
+      "id": "B.HG.020",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.020"
+    },
+    {
+      "end": "B.DK.036",
+      "family": "HG",
+      "id": "B.HG.021",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.021"
+    },
+    {
+      "end": "B.DK.037",
+      "family": "HG",
+      "id": "B.HG.022",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.022"
+    },
+    {
+      "end": "B.DK.038",
+      "family": "HG",
+      "id": "B.HG.023",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.023"
+    },
+    {
+      "end": "B.DK.039",
+      "family": "HG",
+      "id": "B.HG.024",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.024"
+    },
+    {
+      "end": "B.DK.040",
+      "family": "HG",
+      "id": "B.HG.025",
+      "role": "vertical hanger; force unknown until solver",
+      "start": "B.MS.025"
+    },
+    {
+      "end": "B.MS.000",
+      "family": "MS",
+      "id": "B.MS.JOINT.L",
+      "role": "main-cable continuity through left saddle",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.SAD.R",
+      "family": "MS",
+      "id": "B.MS.JOINT.R",
+      "role": "main-cable continuity through right saddle",
+      "start": "B.MS.026"
+    },
+    {
+      "end": "B.MS.001",
+      "family": "MS",
+      "id": "B.MS.M.001",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.000"
+    },
+    {
+      "end": "B.MS.002",
+      "family": "MS",
+      "id": "B.MS.M.002",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.001"
+    },
+    {
+      "end": "B.MS.003",
+      "family": "MS",
+      "id": "B.MS.M.003",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.002"
+    },
+    {
+      "end": "B.MS.004",
+      "family": "MS",
+      "id": "B.MS.M.004",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.003"
+    },
+    {
+      "end": "B.MS.005",
+      "family": "MS",
+      "id": "B.MS.M.005",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.004"
+    },
+    {
+      "end": "B.MS.006",
+      "family": "MS",
+      "id": "B.MS.M.006",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.005"
+    },
+    {
+      "end": "B.MS.007",
+      "family": "MS",
+      "id": "B.MS.M.007",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.006"
+    },
+    {
+      "end": "B.MS.008",
+      "family": "MS",
+      "id": "B.MS.M.008",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.007"
+    },
+    {
+      "end": "B.MS.009",
+      "family": "MS",
+      "id": "B.MS.M.009",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.008"
+    },
+    {
+      "end": "B.MS.010",
+      "family": "MS",
+      "id": "B.MS.M.010",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.009"
+    },
+    {
+      "end": "B.MS.011",
+      "family": "MS",
+      "id": "B.MS.M.011",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.010"
+    },
+    {
+      "end": "B.MS.012",
+      "family": "MS",
+      "id": "B.MS.M.012",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.011"
+    },
+    {
+      "end": "B.MS.013",
+      "family": "MS",
+      "id": "B.MS.M.013",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.012"
+    },
+    {
+      "end": "B.MS.014",
+      "family": "MS",
+      "id": "B.MS.M.014",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.013"
+    },
+    {
+      "end": "B.MS.015",
+      "family": "MS",
+      "id": "B.MS.M.015",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.014"
+    },
+    {
+      "end": "B.MS.016",
+      "family": "MS",
+      "id": "B.MS.M.016",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.015"
+    },
+    {
+      "end": "B.MS.017",
+      "family": "MS",
+      "id": "B.MS.M.017",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.016"
+    },
+    {
+      "end": "B.MS.018",
+      "family": "MS",
+      "id": "B.MS.M.018",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.017"
+    },
+    {
+      "end": "B.MS.019",
+      "family": "MS",
+      "id": "B.MS.M.019",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.018"
+    },
+    {
+      "end": "B.MS.020",
+      "family": "MS",
+      "id": "B.MS.M.020",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.019"
+    },
+    {
+      "end": "B.MS.021",
+      "family": "MS",
+      "id": "B.MS.M.021",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.020"
+    },
+    {
+      "end": "B.MS.022",
+      "family": "MS",
+      "id": "B.MS.M.022",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.021"
+    },
+    {
+      "end": "B.MS.023",
+      "family": "MS",
+      "id": "B.MS.M.023",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.022"
+    },
+    {
+      "end": "B.MS.024",
+      "family": "MS",
+      "id": "B.MS.M.024",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.023"
+    },
+    {
+      "end": "B.MS.025",
+      "family": "MS",
+      "id": "B.MS.M.025",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.024"
+    },
+    {
+      "end": "B.MS.026",
+      "family": "MS",
+      "id": "B.MS.M.026",
+      "role": "main suspension cable geometry",
+      "start": "B.MS.025"
+    },
+    {
+      "end": "B.SAD.L",
+      "family": "PY",
+      "id": "B.PY.L",
+      "role": "tower compression/flexure path; not solver-sized",
+      "start": "B.TN.L"
+    },
+    {
+      "end": "B.SAD.R",
+      "family": "PY",
+      "id": "B.PY.R",
+      "role": "tower compression/flexure path; not solver-sized",
+      "start": "B.TN.R"
+    },
+    {
+      "end": "B.DK.016",
+      "family": "SP-AC",
+      "id": "B.SP.AC.001",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.001"
+    },
+    {
+      "end": "B.DK.017",
+      "family": "SP-AC",
+      "id": "B.SP.AC.002",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.002"
+    },
+    {
+      "end": "B.DK.018",
+      "family": "SP-AC",
+      "id": "B.SP.AC.003",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.003"
+    },
+    {
+      "end": "B.DK.019",
+      "family": "SP-AC",
+      "id": "B.SP.AC.004",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.004"
+    },
+    {
+      "end": "B.DK.020",
+      "family": "SP-AC",
+      "id": "B.SP.AC.005",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.005"
+    },
+    {
+      "end": "B.DK.021",
+      "family": "SP-AC",
+      "id": "B.SP.AC.006",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.006"
+    },
+    {
+      "end": "B.DK.022",
+      "family": "SP-AC",
+      "id": "B.SP.AC.007",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.007"
+    },
+    {
+      "end": "B.DK.023",
+      "family": "SP-AC",
+      "id": "B.SP.AC.008",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.008"
+    },
+    {
+      "end": "B.DK.024",
+      "family": "SP-AC",
+      "id": "B.SP.AC.009",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.009"
+    },
+    {
+      "end": "B.DK.025",
+      "family": "SP-AC",
+      "id": "B.SP.AC.010",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.010"
+    },
+    {
+      "end": "B.DK.026",
+      "family": "SP-AC",
+      "id": "B.SP.AC.011",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.011"
+    },
+    {
+      "end": "B.DK.027",
+      "family": "SP-AC",
+      "id": "B.SP.AC.012",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.012"
+    },
+    {
+      "end": "B.DK.028",
+      "family": "SP-AC",
+      "id": "B.SP.AC.013",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.013"
+    },
+    {
+      "end": "B.DK.029",
+      "family": "SP-AC",
+      "id": "B.SP.AC.014",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.014"
+    },
+    {
+      "end": "B.DK.030",
+      "family": "SP-AC",
+      "id": "B.SP.AC.015",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.015"
+    },
+    {
+      "end": "B.DK.031",
+      "family": "SP-AC",
+      "id": "B.SP.AC.016",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.016"
+    },
+    {
+      "end": "B.DK.032",
+      "family": "SP-AC",
+      "id": "B.SP.AC.017",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.017"
+    },
+    {
+      "end": "B.DK.033",
+      "family": "SP-AC",
+      "id": "B.SP.AC.018",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.018"
+    },
+    {
+      "end": "B.DK.034",
+      "family": "SP-AC",
+      "id": "B.SP.AC.019",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.019"
+    },
+    {
+      "end": "B.DK.035",
+      "family": "SP-AC",
+      "id": "B.SP.AC.020",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.020"
+    },
+    {
+      "end": "B.DK.036",
+      "family": "SP-AC",
+      "id": "B.SP.AC.021",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.021"
+    },
+    {
+      "end": "B.DK.037",
+      "family": "SP-AC",
+      "id": "B.SP.AC.022",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.022"
+    },
+    {
+      "end": "B.DK.038",
+      "family": "SP-AC",
+      "id": "B.SP.AC.023",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.023"
+    },
+    {
+      "end": "B.DK.039",
+      "family": "SP-AC",
+      "id": "B.SP.AC.024",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.024"
+    },
+    {
+      "end": "B.DK.040",
+      "family": "SP-AC",
+      "id": "B.SP.AC.025",
+      "role": "B1 vertical interface; force share is solver-locked",
+      "start": "B.AC.025"
+    },
+    {
+      "end": "B.DK.006",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.01",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.01"
+    },
+    {
+      "end": "B.DK.007",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.02",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.02"
+    },
+    {
+      "end": "B.DK.008",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.03",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.03"
+    },
+    {
+      "end": "B.DK.009",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.04",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.04"
+    },
+    {
+      "end": "B.DK.010",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.05",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.05"
+    },
+    {
+      "end": "B.DK.011",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.06",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.06"
+    },
+    {
+      "end": "B.DK.012",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.07",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.07"
+    },
+    {
+      "end": "B.DK.013",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.08",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.08"
+    },
+    {
+      "end": "B.DK.014",
+      "family": "SP-AH",
+      "id": "B.SP.AH.L.09",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.L.09"
+    },
+    {
+      "end": "B.DK.050",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.01",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.01"
+    },
+    {
+      "end": "B.DK.049",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.02",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.02"
+    },
+    {
+      "end": "B.DK.048",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.03",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.03"
+    },
+    {
+      "end": "B.DK.047",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.04",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.04"
+    },
+    {
+      "end": "B.DK.046",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.05",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.05"
+    },
+    {
+      "end": "B.DK.045",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.06",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.06"
+    },
+    {
+      "end": "B.DK.044",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.07",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.07"
+    },
+    {
+      "end": "B.DK.043",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.08",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.08"
+    },
+    {
+      "end": "B.DK.042",
+      "family": "SP-AH",
+      "id": "B.SP.AH.R.09",
+      "role": "side-span spandrel; force unknown until solver",
+      "start": "B.AH.R.09"
+    },
+    {
+      "end": "B.DK.006",
+      "family": "ST",
+      "id": "B.ST.L.01",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.007",
+      "family": "ST",
+      "id": "B.ST.L.02",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.008",
+      "family": "ST",
+      "id": "B.ST.L.03",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.009",
+      "family": "ST",
+      "id": "B.ST.L.04",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.010",
+      "family": "ST",
+      "id": "B.ST.L.05",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.011",
+      "family": "ST",
+      "id": "B.ST.L.06",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.012",
+      "family": "ST",
+      "id": "B.ST.L.07",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.013",
+      "family": "ST",
+      "id": "B.ST.L.08",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.014",
+      "family": "ST",
+      "id": "B.ST.L.09",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.L"
+    },
+    {
+      "end": "B.DK.050",
+      "family": "ST",
+      "id": "B.ST.R.01",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.049",
+      "family": "ST",
+      "id": "B.ST.R.02",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.048",
+      "family": "ST",
+      "id": "B.ST.R.03",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.047",
+      "family": "ST",
+      "id": "B.ST.R.04",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.046",
+      "family": "ST",
+      "id": "B.ST.R.05",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.045",
+      "family": "ST",
+      "id": "B.ST.R.06",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.044",
+      "family": "ST",
+      "id": "B.ST.R.07",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.043",
+      "family": "ST",
+      "id": "B.ST.R.08",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    },
+    {
+      "end": "B.DK.042",
+      "family": "ST",
+      "id": "B.ST.R.09",
+      "role": "landward-only stay; separate from main cable",
+      "start": "B.SAD.R"
+    }
+  ],
+  "nodes": [
+    {
+      "family": "AB",
+      "id": "B.AB.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 0.0,
+      "y_m": 0.0,
+      "z_local_m": -55.0
+    },
+    {
+      "family": "AB",
+      "id": "B.AB.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1440.0,
+      "y_m": 0.0,
+      "z_local_m": -55.0
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.000",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 395.0,
+      "y_m": 0.0,
+      "z_local_m": -55.0
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.001",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 420.0,
+      "y_m": 0.0,
+      "z_local_m": -50.414201
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.002",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 445.0,
+      "y_m": 0.0,
+      "z_local_m": -46.195266
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.003",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 470.0,
+      "y_m": 0.0,
+      "z_local_m": -42.343195
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.004",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 495.0,
+      "y_m": 0.0,
+      "z_local_m": -38.857988
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.005",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 520.0,
+      "y_m": 0.0,
+      "z_local_m": -35.739645
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.006",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 545.0,
+      "y_m": 0.0,
+      "z_local_m": -32.988166
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.007",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 570.0,
+      "y_m": 0.0,
+      "z_local_m": -30.60355
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.008",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 595.0,
+      "y_m": 0.0,
+      "z_local_m": -28.585799
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.009",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 620.0,
+      "y_m": 0.0,
+      "z_local_m": -26.934911
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.010",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 645.0,
+      "y_m": 0.0,
+      "z_local_m": -25.650888
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.011",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 670.0,
+      "y_m": 0.0,
+      "z_local_m": -24.733728
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.012",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 695.0,
+      "y_m": 0.0,
+      "z_local_m": -24.183432
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.013",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 720.0,
+      "y_m": 0.0,
+      "z_local_m": -24.0
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.014",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 745.0,
+      "y_m": 0.0,
+      "z_local_m": -24.183432
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.015",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 770.0,
+      "y_m": 0.0,
+      "z_local_m": -24.733728
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.016",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 795.0,
+      "y_m": 0.0,
+      "z_local_m": -25.650888
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.017",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 820.0,
+      "y_m": 0.0,
+      "z_local_m": -26.934911
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.018",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 845.0,
+      "y_m": 0.0,
+      "z_local_m": -28.585799
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.019",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 870.0,
+      "y_m": 0.0,
+      "z_local_m": -30.60355
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.020",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 895.0,
+      "y_m": 0.0,
+      "z_local_m": -32.988166
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.021",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 920.0,
+      "y_m": 0.0,
+      "z_local_m": -35.739645
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.022",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 945.0,
+      "y_m": 0.0,
+      "z_local_m": -38.857988
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.023",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 970.0,
+      "y_m": 0.0,
+      "z_local_m": -42.343195
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.024",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 995.0,
+      "y_m": 0.0,
+      "z_local_m": -46.195266
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.025",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1020.0,
+      "y_m": 0.0,
+      "z_local_m": -50.414201
+    },
+    {
+      "family": "AC",
+      "id": "B.AC.026",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1045.0,
+      "y_m": 0.0,
+      "z_local_m": -55.0
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.01",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 170.0,
+      "y_m": 0.0,
+      "z_local_m": -23.23
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.02",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 195.0,
+      "y_m": 0.0,
+      "z_local_m": -18.84
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.03",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 220.0,
+      "y_m": 0.0,
+      "z_local_m": -16.71
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.04",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 245.0,
+      "y_m": 0.0,
+      "z_local_m": -16.72
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.05",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 270.0,
+      "y_m": 0.0,
+      "z_local_m": -18.75
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.06",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 295.0,
+      "y_m": 0.0,
+      "z_local_m": -22.68
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.07",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 320.0,
+      "y_m": 0.0,
+      "z_local_m": -28.39
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.08",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 345.0,
+      "y_m": 0.0,
+      "z_local_m": -35.76
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.L.09",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 370.0,
+      "y_m": 0.0,
+      "z_local_m": -44.67
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.01",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1270.0,
+      "y_m": 0.0,
+      "z_local_m": -23.23
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.02",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1245.0,
+      "y_m": 0.0,
+      "z_local_m": -18.84
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.03",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1220.0,
+      "y_m": 0.0,
+      "z_local_m": -16.71
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.04",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1195.0,
+      "y_m": 0.0,
+      "z_local_m": -16.72
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.05",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1170.0,
+      "y_m": 0.0,
+      "z_local_m": -18.75
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.06",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1145.0,
+      "y_m": 0.0,
+      "z_local_m": -22.68
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.07",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1120.0,
+      "y_m": 0.0,
+      "z_local_m": -28.39
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.08",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1095.0,
+      "y_m": 0.0,
+      "z_local_m": -35.76
+    },
+    {
+      "family": "AH",
+      "id": "B.AH.R.09",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1070.0,
+      "y_m": 0.0,
+      "z_local_m": -44.67
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.01",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 170.0,
+      "y_m": 0.0,
+      "z_local_m": -11.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.02",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 195.0,
+      "y_m": 0.0,
+      "z_local_m": 7.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.03",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 220.0,
+      "y_m": 0.0,
+      "z_local_m": 25.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.04",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 245.0,
+      "y_m": 0.0,
+      "z_local_m": 44.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.05",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 270.0,
+      "y_m": 0.0,
+      "z_local_m": 62.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.06",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 295.0,
+      "y_m": 0.0,
+      "z_local_m": 81.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.07",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 320.0,
+      "y_m": 0.0,
+      "z_local_m": 99.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.08",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 345.0,
+      "y_m": 0.0,
+      "z_local_m": 118.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.L.09",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 370.0,
+      "y_m": 0.0,
+      "z_local_m": 136.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.01",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1270.0,
+      "y_m": 0.0,
+      "z_local_m": -11.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.02",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1245.0,
+      "y_m": 0.0,
+      "z_local_m": 7.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.03",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1220.0,
+      "y_m": 0.0,
+      "z_local_m": 25.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.04",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1195.0,
+      "y_m": 0.0,
+      "z_local_m": 44.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.05",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1170.0,
+      "y_m": 0.0,
+      "z_local_m": 62.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.06",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1145.0,
+      "y_m": 0.0,
+      "z_local_m": 81.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.07",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1120.0,
+      "y_m": 0.0,
+      "z_local_m": 99.5
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.08",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1095.0,
+      "y_m": 0.0,
+      "z_local_m": 118.0
+    },
+    {
+      "family": "BS",
+      "id": "B.BS.R.09",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1070.0,
+      "y_m": 0.0,
+      "z_local_m": 136.5
+    },
+    {
+      "family": "CATB",
+      "id": "B.CATB.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 145.0,
+      "y_m": 0.0,
+      "z_local_m": -30.0
+    },
+    {
+      "family": "CATB",
+      "id": "B.CATB.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1295.0,
+      "y_m": 0.0,
+      "z_local_m": -30.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.000",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 0.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.001",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 29.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.002",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 58.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.003",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 87.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.004",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 116.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.005",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 145.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.006",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 170.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.007",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 195.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.008",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 220.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.009",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 245.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.010",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 270.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.011",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 295.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.012",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 320.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.013",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 345.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.014",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 370.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.015",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 395.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.016",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 420.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.017",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 445.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.018",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 470.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.019",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 495.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.020",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 520.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.021",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 545.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.022",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 570.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.023",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 595.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.024",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 620.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.025",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 645.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.026",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 670.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.027",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 695.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.028",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 720.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.029",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 745.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.030",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 770.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.031",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 795.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.032",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 820.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.033",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 845.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.034",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 870.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.035",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 895.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.036",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 920.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.037",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 945.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.038",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 970.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.039",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 995.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.040",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1020.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.041",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1045.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.042",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1070.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.043",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1095.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.044",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1120.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.045",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1145.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.046",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1170.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.047",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1195.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.048",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1220.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.049",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1245.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.050",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1270.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.051",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1295.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.052",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1324.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.053",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1353.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.054",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1382.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.055",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1411.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "DK",
+      "id": "B.DK.056",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1440.0,
+      "y_m": 0.0,
+      "z_local_m": 0.0
+    },
+    {
+      "family": "GND",
+      "id": "B.GND.AB.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 0.0,
+      "y_m": 0.0,
+      "z_local_m": -70.0
+    },
+    {
+      "family": "GND",
+      "id": "B.GND.AB.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1440.0,
+      "y_m": 0.0,
+      "z_local_m": -70.0
+    },
+    {
+      "family": "GND",
+      "id": "B.GND.CATB.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 145.0,
+      "y_m": 0.0,
+      "z_local_m": -70.0
+    },
+    {
+      "family": "GND",
+      "id": "B.GND.CATB.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1295.0,
+      "y_m": 0.0,
+      "z_local_m": -70.0
+    },
+    {
+      "family": "GND",
+      "id": "B.GND.TN.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 395.0,
+      "y_m": 0.0,
+      "z_local_m": -70.0
+    },
+    {
+      "family": "GND",
+      "id": "B.GND.TN.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1045.0,
+      "y_m": 0.0,
+      "z_local_m": -70.0
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.000",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 395.0,
+      "y_m": 0.0,
+      "z_local_m": 155.0
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.001",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 420.0,
+      "y_m": 0.0,
+      "z_local_m": 145.384615
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.002",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 445.0,
+      "y_m": 0.0,
+      "z_local_m": 136.538462
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.003",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 470.0,
+      "y_m": 0.0,
+      "z_local_m": 128.461538
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.004",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 495.0,
+      "y_m": 0.0,
+      "z_local_m": 121.153846
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.005",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 520.0,
+      "y_m": 0.0,
+      "z_local_m": 114.615385
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.006",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 545.0,
+      "y_m": 0.0,
+      "z_local_m": 108.846154
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.007",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 570.0,
+      "y_m": 0.0,
+      "z_local_m": 103.846154
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.008",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 595.0,
+      "y_m": 0.0,
+      "z_local_m": 99.615385
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.009",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 620.0,
+      "y_m": 0.0,
+      "z_local_m": 96.153846
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.010",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 645.0,
+      "y_m": 0.0,
+      "z_local_m": 93.461538
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.011",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 670.0,
+      "y_m": 0.0,
+      "z_local_m": 91.538462
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.012",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 695.0,
+      "y_m": 0.0,
+      "z_local_m": 90.384615
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.013",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 720.0,
+      "y_m": 0.0,
+      "z_local_m": 90.0
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.014",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 745.0,
+      "y_m": 0.0,
+      "z_local_m": 90.384615
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.015",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 770.0,
+      "y_m": 0.0,
+      "z_local_m": 91.538462
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.016",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 795.0,
+      "y_m": 0.0,
+      "z_local_m": 93.461538
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.017",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 820.0,
+      "y_m": 0.0,
+      "z_local_m": 96.153846
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.018",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 845.0,
+      "y_m": 0.0,
+      "z_local_m": 99.615385
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.019",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 870.0,
+      "y_m": 0.0,
+      "z_local_m": 103.846154
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.020",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 895.0,
+      "y_m": 0.0,
+      "z_local_m": 108.846154
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.021",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 920.0,
+      "y_m": 0.0,
+      "z_local_m": 114.615385
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.022",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 945.0,
+      "y_m": 0.0,
+      "z_local_m": 121.153846
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.023",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 970.0,
+      "y_m": 0.0,
+      "z_local_m": 128.461538
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.024",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 995.0,
+      "y_m": 0.0,
+      "z_local_m": 136.538462
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.025",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1020.0,
+      "y_m": 0.0,
+      "z_local_m": 145.384615
+    },
+    {
+      "family": "MS",
+      "id": "B.MS.026",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1045.0,
+      "y_m": 0.0,
+      "z_local_m": 155.0
+    },
+    {
+      "family": "SAD",
+      "id": "B.SAD.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 395.0,
+      "y_m": 0.0,
+      "z_local_m": 155.0
+    },
+    {
+      "family": "SAD",
+      "id": "B.SAD.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1045.0,
+      "y_m": 0.0,
+      "z_local_m": 155.0
+    },
+    {
+      "family": "TN",
+      "id": "B.TN.L",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 395.0,
+      "y_m": 0.0,
+      "z_local_m": -55.0
+    },
+    {
+      "family": "TN",
+      "id": "B.TN.R",
+      "provenance": "DERIVED_FROM_CANONICAL_SEED",
+      "x_m": 1045.0,
+      "y_m": 0.0,
+      "z_local_m": -55.0
+    }
+  ],
+  "schema_version": "1.0",
+  "solver_locked_unknowns": {
+    "CATB_residual_thrust": "NOT_RUN_SOLVER_REQUIRED",
+    "aerodynamic_stability": "NOT_RUN_WIND_STUDY_REQUIRED",
+    "construction_sequence": "NOT_RUN_STAGED_ANALYSIS_REQUIRED",
+    "psi_a": "UNKNOWN_UNTIL_STAGED_NONLINEAR_SOLVER",
+    "tower_longitudinal_balance": "NOT_RUN_SOLVER_REQUIRED"
+  }
+}

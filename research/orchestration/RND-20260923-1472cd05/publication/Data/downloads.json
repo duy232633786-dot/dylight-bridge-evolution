@@ -1,0 +1,137 @@
+[
+  {
+    "id": "AI-001",
+    "url": "https://arxiv.org/pdf/1504.04909",
+    "file": "Attachments/AI-001.pdf",
+    "sha256": "df7344343b14893a1d79a5459c1f56db50562e246d132cd0269f5201d1455872",
+    "bytes": 3221283,
+    "page_count": 15,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "AI-005",
+    "url": "https://proceedings.mlr.press/v37/sui15.pdf",
+    "file": "Attachments/AI-005.pdf",
+    "sha256": "2ce477c022c19edc608b3c6c99c9cabf326fa970393d177e7bb1f1d93a39228f",
+    "bytes": 369748,
+    "page_count": 9,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "AI-006",
+    "url": "https://arxiv.org/pdf/1806.05865",
+    "file": "Attachments/AI-006.pdf",
+    "sha256": "85ecbc13345539cd4b1ef7322499b70108b8f38b603a532509b08b37ea589d19",
+    "bytes": 7186848,
+    "page_count": 30,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "AI-022",
+    "url": "https://arxiv.org/pdf/1812.06216",
+    "file": "Attachments/AI-022.pdf",
+    "sha256": "535f9252d9dcd6fcf99b41db4e3c015c1b8be1dd741d7fec569074a449f0cda5",
+    "bytes": 5596607,
+    "page_count": 15,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "BM-013",
+    "url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/hpc/13060/13060.pdf",
+    "file": "Attachments/BM-013.pdf",
+    "sha256": "3b0faa46cd1b4c6e3e0f89396f665e369c32ccf7e0ed3829a7de6edfda880c32",
+    "bytes": 2148984,
+    "page_count": 176,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "BM-019",
+    "url": "https://www.fhwa.dot.gov/bridge/lrfd/fhwanhi04043.pdf",
+    "file": "Attachments/BM-019.pdf",
+    "sha256": "8ab43798dd71a94f4f3dbd74f2db15b833f79d632cc78462b60906a224f95fe7",
+    "bytes": 3930767,
+    "page_count": 383,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "BM-020",
+    "url": "https://nsia.no/Road/Published-reports/2023-03?attach=1&pid=SHT-Report-ReportFile",
+    "file": "Attachments/BM-020.pdf",
+    "sha256": "3d3baf8ea000887c9df9ffc2063ac5f3b178921051537465297cc6df76b46377",
+    "bytes": 3829359,
+    "page_count": 30,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "GE-002",
+    "url": "https://www.block.arch.ethz.ch/brg/files/block_ochs_IASS_2007.pdf",
+    "file": "Attachments/GE-002.pdf",
+    "sha256": "b4e48994affa3a297cc3086924beeacf819eec127c496ac5fe1e7ad1d0a1520b",
+    "bytes": 2293761,
+    "page_count": 8,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "GE-003",
+    "url": "https://www.topopt.mek.dtu.dk/-/media/subsites/topopt/apps/dokumenter-og-filer-til-apps/topopt88.pdf?hash=E80FAB2808804A29FFB181CA05D2EEFECAA86686&la=da",
+    "file": "Attachments/GE-003.pdf",
+    "sha256": "21f2f864bd0e53791fdef7c996ba9b8846e6ef59b555c5dbcd8ae087956181d9",
+    "bytes": 253088,
+    "page_count": 15,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "GE-004",
+    "url": "https://www.cmap.polytechnique.fr/~allaire/ajt-jcp.pdf",
+    "file": "Attachments/GE-004.pdf",
+    "sha256": "a5f863f677fe80c4535d93d94cd1b419b5d271b5d37162a5ec4850de26441a0c",
+    "bytes": 845605,
+    "page_count": 31,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "GE-007",
+    "url": "https://graphics.stanford.edu/courses/cs348a-21-winter/Papers/Marching_Cubes.pdf",
+    "file": "Attachments/GE-007.pdf",
+    "sha256": "dd085331924836b731bac1569c641f5fc02cd9ba9468bfa36b9816fe73887791",
+    "bytes": 1266670,
+    "page_count": 7,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "GE-008",
+    "url": "https://www.microsoft.com/en-us/research/wp-content/uploads/1982/07/p235-blinn.pdf",
+    "file": "Attachments/GE-008.pdf",
+    "sha256": "5b7c153d0802bf067ecf41db5a24fabeaace56572fac370eb4c6616f1f0fcd93",
+    "bytes": 1284713,
+    "page_count": 22,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "ST-002",
+    "url": "https://www.mlit.go.jp/road/sign/kijyun/pdf/20260325hashikouka.pdf",
+    "file": "Attachments/ST-002.pdf",
+    "sha256": "253fa78368ab8550968528a6d26fdbb55139f9117e32f9a3cd35f65d4162c0c3",
+    "bytes": 17128877,
+    "page_count": 841,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "ST-004",
+    "url": "https://publications.jrc.ec.europa.eu/repository/bitstream/JRC68415/reqno_jrc68415_bridge_design_to_eurocodes_-_worked_examples_-_lbna25193enn%5b1%5d.pdf",
+    "file": "Attachments/ST-004.pdf",
+    "sha256": "d67fe931d53c0af90c40381066c9b0294b977e5eca702c6906b9f59ffc963b37",
+    "bytes": 25940768,
+    "page_count": 438,
+    "status": "DOWNLOADED_AND_PARSED"
+  },
+  {
+    "id": "ST-006",
+    "url": "https://www.fhwa.dot.gov/engineering/hydraulics/pubs/hif12003.pdf",
+    "file": "Attachments/ST-006.pdf",
+    "sha256": "223462a63ee80af78ba7dd0b389550d0600000e9a201fcc786c6fe8ca990e040",
+    "bytes": 7025730,
+    "page_count": 340,
+    "status": "DOWNLOADED_AND_PARSED"
+  }
+]

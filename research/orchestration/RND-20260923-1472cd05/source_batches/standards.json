@@ -1,0 +1,1099 @@
+{
+  "sources": [
+    {
+      "id": "ST-001",
+      "title": "AASHTO LRFD Bridge Design Specifications, 10th Edition",
+      "authors": [],
+      "year": 2024,
+      "publisher": "AASHTO",
+      "source_type": "standard",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://store.transportation.org/Item/PublicationDetail?ID=5377",
+      "doi": null,
+      "access_status": "CATALOG_ONLY",
+      "reading_level": "METADATA_ONLY",
+      "read_locator": "Catalogue chính thức được tìm kiếm; giao diện mở có trường dữ liệu động.",
+      "summary_vi": "Hồ sơ thư mục để nhận diện bộ tiêu chuẩn LRFD của Hoa Kỳ. Đợt này chỉ xác minh thông tin xuất bản; chưa đọc nội dung quy định và chưa thu nạp toàn văn. Bản đầy đủ được phân phối có điều kiện sử dụng riêng.",
+      "key_points_vi": [
+        "Ấn bản thứ 10; cần quản lý kèm bản đính chính."
+      ],
+      "limitations_vi": [
+        "Trang mở trực tiếp hiển thị một số trường động; thông tin ấn bản được đối chiếu kết quả chỉ mục chính thức.",
+        "AASHTO công bố hạn chế sử dụng nội dung với AI; chỉ lưu thư mục và liên kết, không đưa toàn văn vào tập huấn luyện."
+      ],
+      "project_use_vi": "Làm đầu mục cần có bản quyền và đối chiếu khi xác lập cơ sở thiết kế.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "ingestion_policy": "METADATA_ONLY_NO_FULL_TEXT"
+    },
+    {
+      "id": "ST-002",
+      "title": "道路橋示方書 — 橋、高架の道路等の技術基準（令和7年改定、R8.3.25更新）",
+      "authors": [],
+      "year": 2025,
+      "publisher": "国土交通省 MLIT",
+      "source_type": "standard",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "url": "https://www.mlit.go.jp/road/sign/kijyun/bunya04.html",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF trang 1–4; phần I mục 1.1–1.2; thông báo MLIT 22/08/2025.",
+      "summary_vi": "Bản công bố của MLIT chia nội dung thành phần chung, cấu kiện thép, cấu kiện bê tông, kết cấu dưới và liên kết trên–dưới. Phần đầu phân biệt khả năng chịu tải, độ bền lâu và chức năng. Thông báo sửa đổi quy định áp dụng cho thiết kế khởi đầu từ tháng 4/2026.",
+      "key_points_vi": [
+        "Đã đọc phạm vi và định nghĩa ở PDF trang 1–4.",
+        "Phần V là 上下部接続部; không dùng lại tên phần của bản 2017."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc các phần đầu, chưa kiểm tra toàn bộ điều khoản hoặc errata.",
+        "Tập quy định công khai không đồng nhất với sách bình giải thương mại JRA."
+      ],
+      "project_use_vi": "Tạo cấu trúc phân loại yêu cầu theo chức năng và phiên bản Nhật.",
+      "pdf_url": "https://www.mlit.go.jp/road/sign/kijyun/pdf/20260325hashikouka.pdf",
+      "related_urls": [
+        "https://www.mlit.go.jp/report/press/road01_hh_001980.html"
+      ],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "edition_status": "Công bố 2025; tệp trên trang MLIT cập nhật 25/03/2026; áp dụng thiết kế mới từ 01/04/2026 theo thông báo."
+    },
+    {
+      "id": "ST-003",
+      "title": "Second Generation of the Eurocodes",
+      "authors": [],
+      "year": null,
+      "publisher": "European Commission JRC",
+      "source_type": "official_guidance",
+      "topics": [
+        "standards",
+        "edition-control"
+      ],
+      "countries": [
+        "European Union"
+      ],
+      "url": "https://eurocodes.jrc.ec.europa.eu/second-generation-eurocodes",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Trang chính thức: mô tả, phạm vi và thông tin phiên bản.",
+      "summary_vi": "JRC giải thích lộ trình phát hành Eurocodes thế hệ hai. Mốc phát hành văn bản cho cơ quan tiêu chuẩn quốc gia khác với thời hạn đưa vào hệ thống quốc gia và rút bản xung đột. Cần thêm phụ lục quốc gia và kế hoạch chuyển tiếp trước khi xác lập tiêu chuẩn áp dụng.",
+      "key_points_vi": [
+        "DAV 30/03/2026; DoP 30/09/2027; DoW 30/03/2028 theo lộ trình công bố."
+      ],
+      "limitations_vi": [
+        "Lộ trình không xác nhận mọi quốc gia đã sử dụng bản mới."
+      ],
+      "project_use_vi": "Ghi riêng phiên bản EN, phụ lục quốc gia và ngày áp dụng trong hồ sơ nguồn.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-004",
+      "title": "Bridge Design to Eurocodes — Worked examples",
+      "authors": [],
+      "year": 2012,
+      "publisher": "European Commission JRC",
+      "source_type": "manual",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "European Union"
+      ],
+      "url": "https://publications.jrc.ec.europa.eu/repository/handle/JRC68415",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF trang 18–21 (giới thiệu/phạm vi ví dụ), 101–103 (mục 4.1–4.3: mô hình dầm liên hợp, shear lag, creep).",
+      "summary_vi": "Ví dụ cầu liên hợp tách mô hình toàn cục và phân tích mặt cắt, xét bề rộng hữu hiệu, từ biến, nứt và giai đoạn thi công. Phần giới thiệu ghi rõ giả thiết không có tải thủy lực, bỏ tuyết và dùng giá trị tham số quốc gia khuyến nghị. Đây là ví dụ học phương pháp, không phải lời giải tối ưu.",
+      "key_points_vi": [
+        "Hình học mô hình phân tích có thể khác bề rộng hình học thực.",
+        "Điều kiện biên và trình tự thi công là dữ liệu thiết yếu."
+      ],
+      "limitations_vi": [
+        "Ví dụ Eurocodes thế hệ cũ; không đại diện tự động cho thế hệ hai.",
+        "Chưa tái lập phép tính; các phương trình trích tự động có thể lỗi ký hiệu."
+      ],
+      "project_use_vi": "Danh mục bài toán mẫu cần tái lập về sau.",
+      "pdf_url": "https://publications.jrc.ec.europa.eu/repository/bitstream/JRC68415/reqno_jrc68415_bridge_design_to_eurocodes_-_worked_examples_-_lbna25193enn%5b1%5d.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-005",
+      "title": "Bridge Design Manual, M 23-50.24",
+      "authors": [],
+      "year": 2025,
+      "publisher": "Washington State Department of Transportation",
+      "source_type": "manual",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://apps.wsdot.wa.gov/engineering-standards/all-manuals-and-standards/manuals/bridge-design-manual",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Trang quản lý: Publication Version, mô tả, Bridge Design Manual Memorandums, Revision History.",
+      "summary_vi": "Sổ tay WSDOT tổ chức tiêu chí thiết kế, phương pháp phân tích và cấu tạo để lập hồ sơ cầu đường bộ. Trang quản lý nhấn mạnh các bản ghi nhớ đang hiệu lực có thể thay thế nội dung sổ tay. Vì vậy chỉ lưu một PDF là chưa đủ quản lý phiên bản thiết kế.",
+      "key_points_vi": [
+        "Trang quản lý ghi phiên bản M 23-50.24 và lịch sử tháng 6/2025."
+      ],
+      "limitations_vi": [
+        "Chưa đọc kỹ từng chương và các memorandum đang hiệu lực."
+      ],
+      "project_use_vi": "Bổ sung mô hình quản lý sổ tay kèm cập nhật của cơ quan chủ quản.",
+      "pdf_url": "https://www.wsdot.wa.gov/publications/manuals/fulltext/m23-50/bdm.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-006",
+      "title": "Evaluating Scour at Bridges, Fifth Edition — HEC-18 / FHWA-HIF-12-003",
+      "authors": [
+        "L. A. Arneson",
+        "L. W. Zevenbergen",
+        "P. F. Lagasse",
+        "P. E. Clopper"
+      ],
+      "year": 2012,
+      "publisher": "Federal Highway Administration",
+      "source_type": "manual",
+      "topics": [
+        "hydraulics",
+        "scour",
+        "foundations"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/engineering/hydraulics/pubs/hif12003.pdf",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Mục 2.4.6 PDF trang 67; mục 3.2 PDF trang 72; trụ phức tạp PDF trang 177.",
+      "summary_vi": "HEC-18 phân biệt hạ thấp đáy dài hạn, xói co hẹp và xói cục bộ, đồng thời xét dịch chuyển lòng dẫn. Phần đánh giá tổng xói yêu cầu kiểm tra giả thiết và tính hợp lý của kết quả. Trụ có hình thức bất thường có thể cần mô hình vật lý và đánh giá sâu hơn.",
+      "key_points_vi": [
+        "Hình dạng móng và trụ chịu ràng buộc thủy lực, không chỉ sức chịu tải.",
+        "Chương 7 nêu giới hạn khi áp công thức cho nhóm cọc phức tạp."
+      ],
+      "limitations_vi": [
+        "Không suy rộng trực tiếp phương pháp từ trụ thông thường sang mọi hình sinh tự động."
+      ],
+      "project_use_vi": "Gắn dữ liệu hình dạng trụ với cơ chế xói và điều kiện khảo sát.",
+      "pdf_url": "https://www.fhwa.dot.gov/engineering/hydraulics/pubs/hif12003.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-007",
+      "title": "Bridge manual — third edition, amendment 4; register of later technical updates",
+      "authors": [],
+      "year": 2022,
+      "publisher": "NZ Transport Agency Waka Kotahi",
+      "source_type": "manual",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "New Zealand"
+      ],
+      "url": "https://www.nzta.govt.nz/resources/bridge-manual/bridge-manual",
+      "doi": null,
+      "access_status": "BLOCKED",
+      "reading_level": "METADATA_ONLY",
+      "read_locator": "Chỉ mục trang NZTA qua tìm kiếm; mở trực tiếp 403.",
+      "summary_vi": "Sổ tay bao quát cầu, cống, nền đường và tường chắn; tách tải trọng, phân tích, chống động đất và đánh giá cầu hiện hữu. Chỉ mục chính thức còn liệt kê các cập nhật tải xe và động đất trong năm 2026, cần đi kèm bản nền tháng 5/2022.",
+      "key_points_vi": [
+        "Có cập nhật riêng ngày 28/01/2026 và 24/04/2026 trên chỉ mục."
+      ],
+      "limitations_vi": [
+        "Mở trực tiếp bị 403; thông tin đọc từ chỉ mục tìm kiếm chính thức.",
+        "Chưa đọc các cập nhật hoặc xác nhận một bộ PDF hợp nhất."
+      ],
+      "project_use_vi": "So sánh cấu trúc dữ liệu tải trọng và chống động đất tại New Zealand.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://www.nzta.govt.nz/assets/resources/bridge-manual/docs-3rd-edition/Bridge-manual-pdf-section-3-v3.4.pdf",
+        "https://www.nzta.govt.nz/assets/resources/bridge-manual/docs-3rd-edition/Bridge-manual-pdf-section-4-v3.4.pdf"
+      ],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-008",
+      "title": "Guide to Bridge Technology Part 2: Materials",
+      "authors": [],
+      "year": 2018,
+      "publisher": "Austroads",
+      "source_type": "manual",
+      "topics": [
+        "materials",
+        "standards"
+      ],
+      "countries": [
+        "Australia",
+        "New Zealand"
+      ],
+      "url": "https://austroads.gov.au/publications/bridges/agbt02",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Overview and Abstract; Change log; Table of Contents.",
+      "summary_vi": "Phần vật liệu tổ chức đặc tính, độ bền lâu, vấn đề thi công và bảo vệ của bê tông, kim loại, gỗ và vật liệu phi kim. Danh mục mục lục có UHPC, geopolymer, FRP và vật liệu gối. Đợt này đọc mô tả và mục lục, chưa trích thông số thiết kế.",
+      "key_points_vi": [
+        "Ấn bản 2, công bố 19/02/2018."
+      ],
+      "limitations_vi": [
+        "Đã đọc trang giới thiệu/mục lục; chưa đọc toàn văn hướng dẫn.",
+        "Tải PDF phần 2 gặp 403; không ghi nhận là đã tải."
+      ],
+      "project_use_vi": "Khung phân loại vật liệu và quy trình chế tạo.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-009",
+      "title": "Guide to Bridge Technology Part 3: Typical Superstructures, Substructures and Components",
+      "authors": [],
+      "year": 2018,
+      "publisher": "Austroads",
+      "source_type": "manual",
+      "topics": [
+        "bridge-forms",
+        "standards"
+      ],
+      "countries": [
+        "Australia",
+        "New Zealand"
+      ],
+      "url": "https://austroads.gov.au/publications/bridges/agbt03",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Overview and Abstract; Change log; Table of Contents.",
+      "summary_vi": "Tài liệu phân loại cầu theo vật liệu, hệ chịu lực, gối đỡ và chức năng, rồi đi đến cấu kiện mặt cầu, mố trụ, móng, gối và khe. Cách tổ chức giúp tránh biểu diễn một kiểu cầu chỉ bằng hình dáng bên ngoài.",
+      "key_points_vi": [
+        "Ấn bản 2, công bố 19/02/2018."
+      ],
+      "limitations_vi": [
+        "Đã đọc trang giới thiệu và mục lục; chưa đọc toàn văn hướng dẫn."
+      ],
+      "project_use_vi": "Tạo từ điển hệ cầu–cấu kiện–liên kết.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-010",
+      "title": "Guide to Bridge Technology Part 6: Bridge Construction",
+      "authors": [],
+      "year": 2018,
+      "publisher": "Austroads",
+      "source_type": "manual",
+      "topics": [
+        "construction",
+        "standards"
+      ],
+      "countries": [
+        "Australia",
+        "New Zealand"
+      ],
+      "url": "https://austroads.gov.au/publications/bridges/agbt06",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Overview and Abstract; Change log; Table of Contents.",
+      "summary_vi": "Hướng dẫn xem thi công là chuỗi hoạt động có yêu cầu hình học, công trình tạm, kiểm soát chất lượng và nghiệm thu. Mô tả cập nhật đề cập match-cast, hàn, bu lông và truy xuất vật liệu. Những dữ liệu này cần đi cùng hình học cấu kiện.",
+      "key_points_vi": [
+        "Ấn bản 2, công bố 19/02/2018."
+      ],
+      "limitations_vi": [
+        "Đã đọc trang giới thiệu và mục lục; chưa đọc toàn văn hướng dẫn."
+      ],
+      "project_use_vi": "Khung thu thập phương pháp lắp dựng, dung sai và kiểm tra tại xưởng.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-011",
+      "title": "公路桥涵设计通用规范 — JTG D60-2015",
+      "authors": [],
+      "year": 2015,
+      "publisher": "Ministry of Transport of the People’s Republic of China",
+      "source_type": "standard",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "China"
+      ],
+      "url": "https://jtst.mot.gov.cn/hb/search/stdHBDetailed?id=0bba71b2a8599df1427e457629b89187",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Trang chính thức: mô tả, phạm vi và thông tin phiên bản.",
+      "summary_vi": "Cơ sở dữ liệu của Bộ Giao thông Trung Quốc xác nhận số hiệu, ngày ban hành và ngày áp dụng bộ quy định thiết kế cầu cống đường bộ. Trang ghi trạng thái hiện hành và liên kết các tiêu chuẩn thi công, nền móng, chống gió và động đất liên quan.",
+      "key_points_vi": [
+        "Ban hành 09/09/2015, có hiệu lực 01/12/2015; thay JTG D60-2004."
+      ],
+      "limitations_vi": [
+        "Chưa đọc các tổ hợp tải và hệ số trong toàn văn.",
+        "Trạng thái hiện hành là quan sát ngày 23/09/2026 trên registry."
+      ],
+      "project_use_vi": "Đầu mối nghiên cứu hệ tiêu chuẩn Trung Quốc, giữ riêng với LRFD/Eurocodes.",
+      "pdf_url": "https://xxgk.mot.gov.cn/jigou/glj/202006/P020240327350422059754.pdf",
+      "related_urls": [
+        "https://xxgk.mot.gov.cn/jigou/glj/202006/t20200623_3312312.html"
+      ],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-012",
+      "title": "CD 350 — The design of highway structures, Revision 0 (SUPERSEDED)",
+      "authors": [],
+      "year": 2020,
+      "publisher": "Highways England / DMRB",
+      "source_type": "standard",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "United Kingdom"
+      ],
+      "url": "https://www.standardsforhighways.co.uk/tses/attachments/19858eae-6dd2-4669-90a7-38aa8c85a1dd?inline=true",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Trang in 8, 10, 13–14; PDF trang 9, 11, 14–15.",
+      "summary_vi": "Bản lịch sử này mô tả quan hệ giữa Eurocodes, phụ lục quốc gia, hồ sơ chấp thuận và yêu cầu thi công. Văn bản yêu cầu ghi cơ sở khi cấu kiện hoặc vật liệu ngoài phạm vi quy tắc thông thường. PDF được đánh dấu đã thay thế nên chỉ dùng nghiên cứu lịch sử quy trình.",
+      "key_points_vi": [
+        "Đọc mục 1, 3, 5 và 6.",
+        "Watermark SUPERSEDED hiện trên tài liệu."
+      ],
+      "limitations_vi": [
+        "Không dùng làm bộ quy định hiện hành; cần lấy phiên bản thay thế chính thức."
+      ],
+      "project_use_vi": "Nghiên cứu cách quản lý giải pháp mới ngoài phạm vi quy định thông thường.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "edition_status": "SUPERSEDED — historical reference only"
+    },
+    {
+      "id": "ST-013",
+      "title": "Climate Change Provisions for CSA S6:25 Canadian Highway Bridge Design Code: Findings and Recommendations",
+      "authors": [
+        "Don Kennedy",
+        "Han-Ping Hong",
+        "Jeremy Fyke",
+        "Darrel Gagnon"
+      ],
+      "year": 2022,
+      "publisher": "CSA Group",
+      "source_type": "research_report",
+      "topics": [
+        "climate",
+        "reliability",
+        "durability"
+      ],
+      "countries": [
+        "Canada"
+      ],
+      "url": "https://www.csagroup.org/wp-content/uploads/CSA-Group-Research-Climate-Change-Provisions-for-CSA-S6-25-Canadian-Highway-Bridge-Design-Code.pdf",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Executive Summary, PDF trang 5–7; mục tiêu báo cáo trang 8–9.",
+      "summary_vi": "Báo cáo nghiên cứu ảnh hưởng khí hậu không dừng lên tải trọng, tuổi thọ và độ tin cậy cầu. Tác giả xem xét gió, nhiệt độ, thủy văn và vùng băng vĩnh cửu, rồi đề xuất nội dung cho S6:25. Đây là nghiên cứu phục vụ xây dựng tiêu chuẩn, không phải toàn văn tiêu chuẩn đã thông qua.",
+      "key_points_vi": [
+        "Năm báo cáo là 2022 dù tên chứa S6:25.",
+        "Phân biệt bất định dự báo khí hậu và bất định thiết kế."
+      ],
+      "limitations_vi": [
+        "Khuyến nghị trong báo cáo không tự động là điều khoản chính thức S6:25."
+      ],
+      "project_use_vi": "Bổ sung biến môi trường và độ bền lâu vào hồ sơ vật liệu/cấu kiện.",
+      "pdf_url": "https://www.csagroup.org/wp-content/uploads/CSA-Group-Research-Climate-Change-Provisions-for-CSA-S6-25-Canadian-Highway-Bridge-Design-Code.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-014",
+      "title": "fib Model Code for Concrete Structures (2020)",
+      "authors": [],
+      "year": 2023,
+      "publisher": "International Federation for Structural Concrete (fib)",
+      "source_type": "model_code",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "International"
+      ],
+      "url": "https://shop.fib-international.org/publications/model-code-supporting-documents/984-fib-model-code-for-concrete-structures-2020",
+      "doi": null,
+      "access_status": "CATALOG_ONLY",
+      "reading_level": "METADATA_ONLY",
+      "read_locator": "Trang sản phẩm; mục lục công khai và trang bản quyền.",
+      "summary_vi": "Hồ sơ xuất bản và mục lục công khai cho thấy Model Code tổ chức kiến thức theo tính năng, quản lý vòng đời, chất lượng, thông tin, thi công và bảo tồn. Đợt này ghi nhận cấu trúc tham khảo; chưa đọc phần tính toán của sách có bản quyền.",
+      "key_points_vi": [
+        "Tên Model Code 2020 khác năm bản quyền 2023; trang bản quyền được xem ghi Version 1.2 [2024]."
+      ],
+      "limitations_vi": [
+        "Model Code không tự động là quy chuẩn áp dụng tại một quốc gia.",
+        "Chỉ đọc thư mục và mục lục công khai."
+      ],
+      "project_use_vi": "Danh mục cần đọc sâu về bê tông và vòng đời.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://fib-international.org/images/abstracts/table_contents/fib_model_code2020_contents.pdf",
+        "https://fib-international.org/images/abstracts/copyrights/fib_model_code2020_copyrights.pdf"
+      ],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-015",
+      "title": "The second-generation Eurocodes: key changes and benefits through design examples",
+      "authors": [],
+      "year": 2025,
+      "publisher": "Publications Office of the European Union / JRC",
+      "source_type": "research_report",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "European Union"
+      ],
+      "url": "https://publications.jrc.ec.europa.eu/repository/handle/JRC144386",
+      "doi": "10.2760/3056713",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Tóm tắt và metadata JRC144386.",
+      "summary_vi": "Báo cáo tổng hợp đóng góp kỹ thuật từ hội thảo JRC tháng 6/2025, trình bày thay đổi của Eurocodes thế hệ hai qua ví dụ thiết kế. Đây là nguồn học chuyển tiếp đáng ưu tiên để đối chiếu các ví dụ năm 2012 với cấu trúc và quy tắc mới.",
+      "key_points_vi": [
+        "Trang chính thức ghi xuất bản 14/11/2025 và DOI."
+      ],
+      "limitations_vi": [
+        "Đợt này chỉ đọc tóm tắt và metadata; chưa kiểm tra ví dụ hay phụ lục quốc gia."
+      ],
+      "project_use_vi": "Ưu tiên đọc sâu khi xây bộ đối chiếu thế hệ Eurocodes.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-016",
+      "title": "ASTM E8/E8M-25 — Standard Test Methods for Tension Testing of Metallic Materials",
+      "authors": [],
+      "year": 2025,
+      "publisher": "ASTM International",
+      "source_type": "standard",
+      "topics": [
+        "material-testing",
+        "steel"
+      ],
+      "countries": [
+        "United States",
+        "International"
+      ],
+      "url": "https://store.astm.org/e0008_e0008m-25.html",
+      "doi": "10.1520/E0008_E0008M-25",
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Scope 1.1–1.5; Significance and Use 4.1–4.3.",
+      "summary_vi": "Phạm vi công khai xác định các đại lượng thí nghiệm kéo kim loại như giới hạn chảy, bền kéo và độ dẻo. ASTM lưu ý mẫu gia công từ một vị trí không nhất thiết đại diện cho toàn bộ sản phẩm hay hành vi trong môi trường khai thác.",
+      "key_points_vi": [
+        "Không trộn quy ước SI và inch-pound của hai hệ phép thử."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc Scope và Significance and Use công khai; chưa có toàn văn."
+      ],
+      "project_use_vi": "Ghi nguồn và điều kiện thí nghiệm cho thuộc tính vật liệu kim loại.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-017",
+      "title": "ASTM C39/C39M-26 — Standard Test Method for Compressive Strength of Cylindrical Concrete Specimens",
+      "authors": [],
+      "year": 2026,
+      "publisher": "ASTM International",
+      "source_type": "standard",
+      "topics": [
+        "material-testing",
+        "concrete"
+      ],
+      "countries": [
+        "United States",
+        "International"
+      ],
+      "url": "https://store.astm.org/c0039_c0039m-26.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Scope 1.1–1.2; Significance and Use 5.1–5.3.",
+      "summary_vi": "Phép thử nén mẫu trụ bê tông được giới thiệu cùng những yếu tố ảnh hưởng kết quả: hình dạng, kích thước, chế tạo, tuổi và dưỡng hộ. Do vậy giá trị cường độ trong dữ liệu vật liệu phải có ngữ cảnh thử, không chỉ một con số MPa.",
+      "key_points_vi": [
+        "Trang chính thức ghi C39/C39M-26 Active."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc phạm vi và ý nghĩa công khai; chưa đọc toàn văn thao tác thử."
+      ],
+      "project_use_vi": "Xác định trường dữ liệu cho mẫu thử và điều kiện dưỡng hộ.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-018",
+      "title": "技術基準類の改定について — NEXCO東日本",
+      "authors": [],
+      "year": 2026,
+      "publisher": "East Nippon Expressway Company",
+      "source_type": "official_notice",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "url": "https://www.e-nexco.co.jp/bids/tech_info/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Trang chính thức: mô tả, phạm vi và thông tin phiên bản.",
+      "summary_vi": "Trang NEXCO thông báo một số tiêu chuẩn kỹ thuật được ban hành hoặc sửa đổi ngày 01/07/2026 và dẫn tới các nhóm thiết kế, quản lý thi công, phương pháp thử và bản vẽ tiêu chuẩn. Thông báo chỉ là điểm kiểm tra cập nhật, chưa xác định nội dung từng tập.",
+      "key_points_vi": [
+        "Cần theo dõi 設計要領 và 施工管理要領 theo tập, tháng phát hành."
+      ],
+      "limitations_vi": [
+        "Không suy ra toàn bộ 設計要領第二集 đã đổi chỉ từ thông báo chung."
+      ],
+      "project_use_vi": "Đầu mối thu thập yêu cầu riêng của chủ quản cao tốc Nhật.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://shop.ri-nexco.co.jp/"
+      ],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-019",
+      "title": "Amendment/Errata to IRC Publications — official notification register",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Indian Roads Congress",
+      "source_type": "official_notice",
+      "topics": [
+        "standards",
+        "design-basis"
+      ],
+      "countries": [
+        "India"
+      ],
+      "url": "https://www.irc.nic.in/WriteReadData/LINKS/Amendment%20List%20from%202018%281%2986dbb0a7-2f29-4d69-a45f-bb3390cfa2f7.pdf",
+      "doi": null,
+      "access_status": "BLOCKED",
+      "reading_level": "METADATA_ONLY",
+      "read_locator": "Chỉ mục tìm kiếm nguồn IRC chính thức; mở PDF trực tiếp lỗi.",
+      "summary_vi": "Danh mục chính thức ghi các thông báo sửa đổi và đính chính, gồm tải trọng cầu IRC:6-2017 và các nội dung liên quan IRC:112-2020. Hồ sơ này giúp tránh xem năm trên tên bộ tiêu chuẩn là bằng chứng rằng không có thay đổi sau đó.",
+      "key_points_vi": [
+        "Chỉ mục tìm kiếm ghi Amendment No.9 của IRC:6-2017 trong Indian Highways tháng 3/2026."
+      ],
+      "limitations_vi": [
+        "Tải trực tiếp bị lỗi; chưa đọc nội dung sửa đổi hoặc bộ tiêu chuẩn đầy đủ."
+      ],
+      "project_use_vi": "Đầu mối truy tìm phiên bản và bổ sung tiêu chuẩn Ấn Độ.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE"
+    },
+    {
+      "id": "ST-101",
+      "title": "TCVN 11823-1:2017 — Thiết kế cầu đường bộ — Yêu cầu chung",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 4 (1-based).",
+      "summary_vi": "Phần chung xác lập phương pháp LRFD và phạm vi cầu đường bộ, bao gồm thiết kế, đánh giá và khôi phục. Điều 1 không mặc nhiên bao phủ cầu chỉ dành cho đường sắt. Các nội dung tính dẻo, tính dư, xói và va chạm cần xem trong cơ sở thiết kế.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm yêu cầu chung.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-1-2017.pdf",
+      "page_count": 10,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-110",
+      "title": "TCVN 11823-10:2017 — Thiết kế cầu đường bộ — Nền móng",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 10 (1-based).",
+      "summary_vi": "Điều 1 xác định các loại móng được đề cập: móng nông, cọc đóng, cọc khoan nhồi và cọc siêu nhỏ. Kho dữ liệu cấu kiện móng cần giữ loại móng, điều kiện địa chất và phương pháp thi công riêng biệt.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm nền móng.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-10-2017.pdf",
+      "page_count": 150,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-111",
+      "title": "TCVN 11823-11:2017 — Thiết kế cầu đường bộ — Mố, trụ và tường chắn",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 7 (1-based).",
+      "summary_vi": "Phạm vi gồm mố, trụ và tường chắn; phân biệt tường thông thường, có neo, đất có cốt và chế tạo sẵn theo mô đun. Tên hình học giống nhau không thay cho việc xác định cơ chế làm việc với đất.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm mố, trụ và tường chắn.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-11-2017.pdf",
+      "page_count": 71,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-112",
+      "title": "TCVN 11823-12:2017 — Thiết kế cầu đường bộ — Kết cấu vùi và áo hầm",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 7 (1-based).",
+      "summary_vi": "Phạm vi liệt kê kết cấu vùi bằng kim loại, bê tông, nhựa và tấm áo hầm thép uốn nguội. Các họ hình gồm ống, hộp, vòm và elíp; cần xét tương tác với đất cùng hình dạng cấu kiện.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm kết cấu vùi và áo hầm.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-12-2017.pdf",
+      "page_count": 83,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-113",
+      "title": "TCVN 11823-13:2017 — Thiết kế cầu đường bộ — Lan can",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 5 (1-based).",
+      "summary_vi": "Điều 1 áp dụng cho lan can cầu đường bộ xây mới và thay thế khi cải tạo. Đây là nhóm cấu kiện có chức năng riêng cần gắn tiêu chí sử dụng, vị trí và bài toán va chạm, thay vì chỉ mô tả hình khối.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm lan can.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-13-2017.pdf",
+      "page_count": 28,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-114",
+      "title": "TCVN 11823-14:2017 — Thiết kế cầu đường bộ — Khe co giãn và gối cầu",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 7 (1-based).",
+      "summary_vi": "Phạm vi hướng tới thiết kế, lựa chọn gối cầu và kết cấu khe co giãn mặt cầu. Đây là đầu mối phân loại bộ phận truyền lực và cho phép chuyển vị; phải giữ quan hệ với hệ kết cấu và điều kiện làm việc.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm khe co giãn và gối cầu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-14-2017.pdf",
+      "page_count": 64,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-102",
+      "title": "TCVN 11823-2:2017 — Thiết kế cầu đường bộ — Tổng thể và đặc điểm vị trí",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 5 (1-based).",
+      "summary_vi": "Phạm vi kết nối bố trí tổng thể với tĩnh không, môi trường, mỹ quan, địa chất và kinh tế. Mục tiêu còn bao gồm khả năng chịu lực khi thi công, tiếp cận kiểm tra và bảo trì. Dữ liệu hình dạng cần gắn với vị trí cầu.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm tổng thể và đặc điểm vị trí.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-2-2017.pdf",
+      "page_count": 26,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-103",
+      "title": "TCVN 11823-3:2017 — Thiết kế cầu đường bộ — Tải trọng và hệ số tải trọng",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 8 (1-based).",
+      "summary_vi": "Phạm vi bao gồm tải trọng, lực, hệ số và tổ hợp cho cầu mới, đồng thời dùng tải trọng để đánh giá cầu đang khai thác. Phần này cũng nêu tải trong thi công và ngoại lệ đối với hệ số thi công phân đoạn cầu bê tông.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm tải trọng và hệ số tải trọng.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-3-2017.pdf",
+      "page_count": 97,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-104",
+      "title": "TCVN 11823-4:2017 — Thiết kế cầu đường bộ — Phân tích và đánh giá kết cấu",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 8 (1-based).",
+      "summary_vi": "Phạm vi tập trung vào mô hình kết cấu và hiệu ứng lực. Phân tích đàn hồi là cơ sở chung, với điều kiện riêng cho phân tích không đàn hồi. Phương pháp khác cần thỏa cân bằng, tương hợp và các tính chất vật liệu quy định.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm phân tích và đánh giá kết cấu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-4-2017.pdf",
+      "page_count": 79,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-105",
+      "title": "TCVN 11823-5:2017 — Thiết kế cầu đường bộ — Kết cấu bê tông",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 14 (1-based).",
+      "summary_vi": "Phần bê tông bao quát BTCT, dự ứng lực và dự ứng lực một phần. Phạm vi cơ bản nêu bê tông 16–70 MPa cùng trường hợp cường độ lớn hơn được chấp nhận. Không thể mặc định mọi vật liệu UHPC mới đã nằm trong mô hình thông thường.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm kết cấu bê tông.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-5-2017.pdf",
+      "page_count": 192,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-106",
+      "title": "TCVN 11823-6:2017 — Thiết kế cầu đường bộ — Kết cấu thép",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 15 (1-based).",
+      "summary_vi": "Phần thép bao quát cấu kiện, mối nối và liên kết trong dầm, khung, giàn, vòm và hệ dây. Phạm vi ghi điều kiện riêng đối với dầm cong mặt cắt I/hộp đơn; hình dạng ngoài phạm vi cần đánh giá chi tiết theo cơ học.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm kết cấu thép.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-6-2017.pdf",
+      "page_count": 243,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    },
+    {
+      "id": "ST-109",
+      "title": "TCVN 11823-9:2017 — Thiết kế cầu đường bộ — Mặt cầu và hệ mặt cầu",
+      "authors": [],
+      "year": 2017,
+      "publisher": "Bộ Khoa học và Công nghệ; Bộ Giao thông vận tải biên soạn",
+      "source_type": "standard",
+      "topics": [
+        "TCVN11823",
+        "standards"
+      ],
+      "countries": [
+        "Vietnam"
+      ],
+      "url": "https://tieuchuan.vsqi.gov.vn/tim-kiem?si=TCVN+11823",
+      "doi": null,
+      "access_status": "LOCAL_EXISTING_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Điều 1 — Phạm vi áp dụng; PDF trang 6 (1-based).",
+      "summary_vi": "Phạm vi gồm phân tích, thiết kế mặt cầu bê tông, kim loại và tổ hợp chịu trọng lực. Thiết kế mặt cầu bê tông theo kinh nghiệm chỉ dành cho trường hợp thỏa điều kiện riêng, không áp dụng mặc định cho mặt cầu hình học mới.",
+      "key_points_vi": [
+        "Đã đọc điều 1 của bản PDF có sẵn trong vault."
+      ],
+      "limitations_vi": [
+        "Mức đọc chỉ là phạm vi, không phải toàn bộ công thức/điều khoản.",
+        "Bản địa phương cần đối chiếu bản có thẩm quyền trước khi dùng thiết kế."
+      ],
+      "project_use_vi": "Lập bản đồ yêu cầu cho nhóm mặt cầu và hệ mặt cầu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23",
+      "evidence_status": "UNVERIFIED_REFERENCE",
+      "local_existing_path": "D:\\Obsidian Vault\\DYLIGHT Bridge Evolution\\Standards\\TCVN 11823-2017\\PDF\\TCVN 11823-9-2017.pdf",
+      "page_count": 29,
+      "edition_status": "Bản lưu 2017; chưa kiểm tra tình trạng hiệu lực riêng từng phần."
+    }
+  ],
+  "synthesis_vi": [
+    "Quản lý tiêu chuẩn theo quốc gia, phạm vi, phiên bản, cập nhật và ngày áp dụng.",
+    "Tách bài báo/khuyến nghị phát triển tiêu chuẩn khỏi điều khoản đã ban hành.",
+    "Tách đặc tính vật liệu đo được, mô hình tính toán và giá trị thiết kế."
+  ],
+  "gaps_vi": [
+    "Chưa có toàn văn được cấp phép AASHTO, CSA S6:25, AS 5100, fib Model Code và các tập NEXCO.",
+    "Cần lấy CD350 phiên bản hiện hành; bản 2020 đọc trong đợt này đã bị thay thế.",
+    "Cần nghiên cứu sâu hơn tiêu chuẩn Hàn Quốc, Nam Mỹ và châu Phi.",
+    "Chưa trích công thức thành bộ quy tắc tính toán và chưa thực hiện kiểm chứng kỹ thuật."
+  ]
+}

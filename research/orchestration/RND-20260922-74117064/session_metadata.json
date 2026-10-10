@@ -1,0 +1,33 @@
+{
+  "git_head": "5e3b214ae6b6bca46a499f62bb25eaf83d90ace5",
+  "utc": "2026-09-22T17:23:35.992993+00:00",
+  "python": "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+  "python_version": "3.12.14",
+  "existing_tracked_diff_preserved": true,
+  "source_docx_search": {
+    "SAGE_QD": "SOURCE_UNAVAILABLE",
+    "SAGE_EvoBridge": "SOURCE_UNAVAILABLE",
+    "_de_bai.docx": "READ_UNRELATED_EXCLUDED"
+  },
+  "code_sha256": "5ac2c9e59ef1a60c7aff40b6ee5dd0a1d0b34f7a41f9662079d6dce2a1abf8da",
+  "automation_id": "l-u-ti-n-sage-evobridge",
+  "obsidian_external_vault": "NOT_SYNCED_WORKSPACE_SCOPE_ONLY",
+  "final_regression": {
+    "passed": 1943,
+    "skipped": 6,
+    "exit_code": 0,
+    "elapsed_s": 732.78,
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "pytest",
+      "tests",
+      "-o",
+      "addopts=",
+      "-q",
+      "--basetemp",
+      "../tmp/b054_regression_20260923"
+    ]
+  },
+  "finalized_at_utc": "2026-09-22T17:35:51.006292+00:00"
+}

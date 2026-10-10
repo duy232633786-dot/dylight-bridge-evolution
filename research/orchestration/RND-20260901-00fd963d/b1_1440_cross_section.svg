@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650">
+<style>
+ .bg{fill:#f7f8fb} .steel{fill:#d0d5dd;stroke:#1d2939;stroke-width:4} .uhpc{fill:#e4e7ec;stroke:#344054;stroke-width:3}
+ .rib{stroke:#344054;stroke-width:9} .cable{stroke:#315efb;stroke-width:8} .cfrp{stroke:#12b76a;stroke-width:10;stroke-dasharray:14 8}
+ .dim{stroke:#667085;stroke-width:1.5;fill:none} .t1{font:700 26px 'Segoe UI',sans-serif;fill:#102a56}
+ .t2{font:600 16px 'Segoe UI',sans-serif;fill:#344054} .txt{font:14px 'Segoe UI',sans-serif;fill:#344054}
+ .small{font:12px 'Segoe UI',sans-serif;fill:#475467} .warn{font:700 13px 'Segoe UI',sans-serif;fill:#b42318}
+</style><rect class="bg" width="100%" height="100%"/>
+<text x="55" y="45" class="t1">MẶT CẮT NGANG CONCEPT B1</text>
+<text x="55" y="72" class="t2">B = 32 m là seed hình ảnh; hộp thép khí động + cassette UHPC + sườn xiên thép</text>
+<rect class="uhpc" x="166.0" y="208.0" width="768.0" height="24" rx="5"/>
+<path class="steel" d="M 334.0,232.0 L 766.0,232.0 L 718.0,328.0 L 382.0,328.0 Z"/>
+<line class="rib" x1="382.0" y1="328.0" x2="184.0" y2="232.0"/>
+<line class="rib" x1="718.0" y1="328.0" x2="916.0" y2="232.0"/>
+<line class="cable" x1="238.0" y1="135.0" x2="238.0" y2="208.0"/>
+<line class="cable" x1="862.0" y1="135.0" x2="862.0" y2="208.0"/>
+<line class="cfrp" x1="400.0" y1="315.0" x2="700.0" y2="315.0"/>
+<line class="dim" x1="166.0" y1="500" x2="934.0" y2="500"/>
+<line class="dim" x1="166.0" y1="490" x2="166.0" y2="510"/><line class="dim" x1="934.0" y1="490" x2="934.0" y2="510"/>
+<text x="550" y="490" text-anchor="middle" class="txt">32,0 m — CONCEPT_IMAGE / chưa khóa G0</text>
+<text x="550" y="290.0" text-anchor="middle" class="txt">Hộp thép kín khí động</text>
+<text x="550" y="366.0" text-anchor="middle" class="txt">Dải CFRP bảo vệ cháy: gia cường mỏi cục bộ, không phải cấu kiện nén chính</text>
+<text x="85" y="325.0" class="txt">Sườn xiên thép vĩnh cửu</text><text x="830" y="325.0" class="txt">Sườn xiên thép vĩnh cửu</text>
+<text x="238.0" y="115" text-anchor="middle" class="small">mặt phẳng cáp L</text><text x="862.0" y="115" text-anchor="middle" class="small">mặt phẳng cáp R</text>
+<text x="550" y="590" text-anchor="middle" class="warn">KÍCH THƯỚC MẶT CẮT CHỈ ĐỂ NGHIÊN CỨU HÌNH THÁI · CHƯA KIỂM TRA GIÓ/MỎI/CHÁY</text>
+</svg>

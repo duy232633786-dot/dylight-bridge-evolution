@@ -1,0 +1,93 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--contract",
+      "docs/sage_evobridge/beam_contract.json",
+      "--initial-height",
+      ".5",
+      "--heights",
+      ".4",
+      ".8",
+      "--out",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\success"
+    ],
+    "exit_code": 0,
+    "elapsed_s": 0.6438956999991206,
+    "utc": "2026-09-22T17:20:30.474169+00:00"
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--contract",
+      "docs/sage_evobridge/budget_contract.json",
+      "--initial-height",
+      ".5",
+      "--heights",
+      ".4",
+      ".8",
+      "--out",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\budget_exhausted"
+    ],
+    "exit_code": 2,
+    "elapsed_s": 0.5538919999999052,
+    "utc": "2026-09-22T17:20:31.028159+00:00"
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--contract",
+      "docs/sage_evobridge/collateral_contract.json",
+      "--initial-height",
+      ".5",
+      "--heights",
+      ".8",
+      "--out",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\collateral"
+    ],
+    "exit_code": 2,
+    "elapsed_s": 0.5731708999992406,
+    "utc": "2026-09-22T17:20:31.601040+00:00"
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--contract",
+      "docs/sage_evobridge/unsupported_contract.json",
+      "--initial-height",
+      ".5",
+      "--heights",
+      "--out",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\unsupported"
+    ],
+    "exit_code": 2,
+    "elapsed_s": 0.4122786999978416,
+    "utc": "2026-09-22T17:20:32.012971+00:00"
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--contract",
+      "docs/sage_evobridge/beam_contract.json",
+      "--initial-height",
+      ".5",
+      "--heights",
+      "1.5",
+      "--out",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\inconclusive_probe"
+    ],
+    "exit_code": 2,
+    "elapsed_s": 0.5102111999985937,
+    "utc": "2026-09-22T17:20:32.523899+00:00"
+  }
+]

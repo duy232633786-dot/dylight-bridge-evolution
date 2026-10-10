@@ -1,0 +1,2832 @@
+{
+  "schema_version": "1.0",
+  "algorithm_id": "COMPONENT_DESIGN_LOOP",
+  "algorithm_version": "design-loop/0.2.0",
+  "software_version": "0.8.0",
+  "grammar_id": "super_t_simple_v1",
+  "grammar_version": "1.0.0",
+  "catalogs_version": "1.1.0",
+  "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+  "solver_version": "builtin-l1/0.2.0",
+  "claim_ceiling": "SCREENED",
+  "claim_level": "SCREENED",
+  "design_verdict_authority": "INDEPENDENT_VERIFIER",
+  "loop_authority": "NONE",
+  "policy": {
+    "objective_key": "relative_cost",
+    "utilization_target": 1.0,
+    "move_policy": "knowledge_priority",
+    "trim_order": "cheapest_first",
+    "max_iterations": 50,
+    "trim_enabled": true,
+    "max_trim_probes": null,
+    "diagnose_top_k": 64
+  },
+  "budget_solver_calls": 12,
+  "budget_definition": "solver.status != NOT_RUN",
+  "seed": {
+    "case_id": "BT-7b8e109e20a6c66c",
+    "input_hash": "7b8e109e20a6c66c46a2dc7662ce6a77f7d0dc3ce5333d6faade4645b82f1d8d",
+    "gene": {
+      "girder_catalog_id": "ST-1750",
+      "girder_count": 5,
+      "girder_spacing_mm": 2800,
+      "deck_slab_thickness_mm": 195,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C30",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-38"
+    },
+    "status": "SUCCESS",
+    "solver_status": "CONVERGED",
+    "solver_call_index": 1,
+    "feasible": false,
+    "cv": 1.3113,
+    "max_utilization": 2.3113,
+    "objectives": {
+      "relative_cost": 2050.78,
+      "material_mass_t": 565.04,
+      "embodied_carbon_kgCO2e": 91134.8
+    },
+    "violations": [
+      {
+        "rule_id": "SERV-001",
+        "severity": "HARD",
+        "margin": 1.3113
+      }
+    ],
+    "stage": 2,
+    "stage_label": "INFEASIBLE"
+  },
+  "final": {
+    "case_id": "BT-ca416c8a213d3c77",
+    "input_hash": "ca416c8a213d3c7798fb89cf700efa4caf21b2c36b03a136c326f7bf18650061",
+    "gene": {
+      "girder_catalog_id": "ST-1750",
+      "girder_count": 5,
+      "girder_spacing_mm": 2700,
+      "deck_slab_thickness_mm": 190,
+      "girder_concrete_id": "C40",
+      "deck_concrete_id": "C30",
+      "diaphragm_layout_id": "DG-5",
+      "prestress_layout_id": "PT-46"
+    },
+    "status": "SUCCESS",
+    "solver_status": "CONVERGED",
+    "solver_call_index": 11,
+    "feasible": true,
+    "cv": 0.0,
+    "max_utilization": 0.9729,
+    "objectives": {
+      "relative_cost": 2138.25,
+      "material_mass_t": 559.8,
+      "embodied_carbon_kgCO2e": 94109.6
+    },
+    "violations": [],
+    "stage": 4,
+    "stage_label": "ACCEPTABLE",
+    "meets_target": true,
+    "rule_utilizations": {
+      "STR-001": 0.771913,
+      "STR-002": 0.972867,
+      "SERV-001": 0.572106,
+      "SERV-002": 0.307291
+    },
+    "design_state": {
+      "family": "super_t_simple_v1",
+      "status": "CANDIDATE",
+      "project_inputs": {
+        "span_length_m": 38.3,
+        "deck_width_m": 12.0,
+        "alignment_type": "STRAIGHT",
+        "skew_deg": 0
+      },
+      "design_variables": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2700,
+        "deck_slab_thickness_mm": 190,
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "materials": {
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "prestressing_steel_id": "PS-15.2-1860"
+      },
+      "analysis": {
+        "fidelity": "L1_LINE_GIRDER",
+        "solver": "BUILTIN_L1",
+        "load_profile_id": "LOAD-PROFILE-01"
+      },
+      "constraints": {
+        "rule_profile_id": "BRIDGE-RULESET-V1"
+      },
+      "provenance": {
+        "random_seed": 42,
+        "parent_candidate_id": "BT-bcc6c25c208996be",
+        "generation_action": "DESIGN_LOOP_TRIM"
+      },
+      "case_id": "BT-ca416c8a213d3c77"
+    }
+  },
+  "lineage": [
+    "BT-7b8e109e20a6c66c",
+    "BT-38b9d77d2cf4ad4d",
+    "BT-65c165a753de8b16",
+    "BT-2eae035ffa973315",
+    "BT-bcc6c25c208996be",
+    "BT-ca416c8a213d3c77"
+  ],
+  "iterations": [
+    {
+      "iteration": 1,
+      "phase": "REPAIR",
+      "from_case_id": "BT-7b8e109e20a6c66c",
+      "from_stage": "INFEASIBLE",
+      "candidates": [
+        {
+          "variable": "prestress_layout_id",
+          "current": "PT-38",
+          "proposed": "PT-42",
+          "rule_id": "SERV-001",
+          "rationale": "Vi phạm SERV-001: tăng một bậc cáp DƯL để tăng lực nén trước, bù ứng suất kéo thớ dưới (PT-38 → PT-42).",
+          "card_id": "KC-001",
+          "source": "diagnose",
+          "cheap_objective": 2098.42
+        },
+        {
+          "variable": "girder_catalog_id",
+          "current": "ST-1750",
+          "proposed": "ST-1850",
+          "rule_id": "SERV-001",
+          "rationale": "Vi phạm SERV-001: dùng tiết diện dầm cao hơn để tăng mô đun chống uốn (ST-1750 → ST-1850).",
+          "card_id": "KC-020",
+          "source": "diagnose",
+          "cheap_objective": 2074.32
+        },
+        {
+          "variable": "girder_concrete_id",
+          "current": "C40",
+          "proposed": "C45",
+          "rule_id": "SERV-001",
+          "rationale": "Vi phạm SERV-001: nâng grade bê tông dầm để tăng giới hạn kéo cho phép (đòn bẩy cuối) (C40 → C45).",
+          "card_id": "KC-009",
+          "source": "diagnose",
+          "cheap_objective": 2088.06
+        }
+      ],
+      "probes": [
+        {
+          "case_id": "BT-38b9d77d2cf4ad4d",
+          "input_hash": "38b9d77d2cf4ad4d7c881484a7359dc414232db09ad13088fd786b68e2243b99",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2800,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-42"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 2,
+          "feasible": false,
+          "cv": 0.5375,
+          "max_utilization": 1.5375,
+          "objectives": {
+            "relative_cost": 2098.42,
+            "material_mass_t": 565.91,
+            "embodied_carbon_kgCO2e": 93040.4
+          },
+          "violations": [
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.5375
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "prestress_layout_id",
+            "current": "PT-38",
+            "proposed": "PT-42",
+            "rule_id": "SERV-001",
+            "rationale": "Vi phạm SERV-001: tăng một bậc cáp DƯL để tăng lực nén trước, bù ứng suất kéo thớ dưới (PT-38 → PT-42).",
+            "card_id": "KC-001",
+            "source": "diagnose",
+            "cheap_objective": 2098.42
+          },
+          "outcome": "ACCEPTED"
+        }
+      ],
+      "accepted_case_id": "BT-38b9d77d2cf4ad4d",
+      "unprobed_candidates": 2,
+      "unresolved_solver_failures": 0
+    },
+    {
+      "iteration": 2,
+      "phase": "REPAIR",
+      "from_case_id": "BT-38b9d77d2cf4ad4d",
+      "from_stage": "INFEASIBLE",
+      "candidates": [
+        {
+          "variable": "prestress_layout_id",
+          "current": "PT-42",
+          "proposed": "PT-46",
+          "rule_id": "SERV-001",
+          "rationale": "Vi phạm SERV-001: tăng một bậc cáp DƯL để tăng lực nén trước, bù ứng suất kéo thớ dưới (PT-42 → PT-46).",
+          "card_id": "KC-001",
+          "source": "diagnose",
+          "cheap_objective": 2146.06
+        },
+        {
+          "variable": "girder_catalog_id",
+          "current": "ST-1750",
+          "proposed": "ST-1850",
+          "rule_id": "SERV-001",
+          "rationale": "Vi phạm SERV-001: dùng tiết diện dầm cao hơn để tăng mô đun chống uốn (ST-1750 → ST-1850).",
+          "card_id": "KC-020",
+          "source": "diagnose",
+          "cheap_objective": 2121.96
+        },
+        {
+          "variable": "girder_concrete_id",
+          "current": "C40",
+          "proposed": "C45",
+          "rule_id": "SERV-001",
+          "rationale": "Vi phạm SERV-001: nâng grade bê tông dầm để tăng giới hạn kéo cho phép (đòn bẩy cuối) (C40 → C45).",
+          "card_id": "KC-009",
+          "source": "diagnose",
+          "cheap_objective": 2135.7
+        }
+      ],
+      "probes": [
+        {
+          "case_id": "BT-65c165a753de8b16",
+          "input_hash": "65c165a753de8b161b224f9859e1f4a1d7fbb4f0f991964e508ceb60e1b29dfb",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2800,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 3,
+          "feasible": true,
+          "cv": 0.0,
+          "max_utilization": 0.9938,
+          "objectives": {
+            "relative_cost": 2146.06,
+            "material_mass_t": 566.77,
+            "embodied_carbon_kgCO2e": 94946.0
+          },
+          "violations": [],
+          "stage": 4,
+          "stage_label": "ACCEPTABLE",
+          "move": {
+            "variable": "prestress_layout_id",
+            "current": "PT-42",
+            "proposed": "PT-46",
+            "rule_id": "SERV-001",
+            "rationale": "Vi phạm SERV-001: tăng một bậc cáp DƯL để tăng lực nén trước, bù ứng suất kéo thớ dưới (PT-42 → PT-46).",
+            "card_id": "KC-001",
+            "source": "diagnose",
+            "cheap_objective": 2146.06
+          },
+          "outcome": "ACCEPTED"
+        }
+      ],
+      "accepted_case_id": "BT-65c165a753de8b16",
+      "unprobed_candidates": 2,
+      "unresolved_solver_failures": 0
+    },
+    {
+      "iteration": 3,
+      "phase": "TRIM",
+      "from_case_id": "BT-65c165a753de8b16",
+      "from_stage": "ACCEPTABLE",
+      "candidates": [
+        {
+          "variable": "girder_catalog_id",
+          "current": "ST-1750",
+          "proposed": "ST-1650",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2146.06 → 2122.51)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2122.51
+        },
+        {
+          "variable": "girder_spacing_mm",
+          "current": 2800,
+          "proposed": 2750,
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_spacing_mm 2800 → 2750 (relative_cost 2146.06 → 2145.37)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2145.37
+        }
+      ],
+      "probes": [
+        {
+          "case_id": "BT-f57c0466607d18d3",
+          "input_hash": "f57c0466607d18d303864f221ec51a72bca4fb8f915a811734ca1853eee139b7",
+          "gene": {
+            "girder_catalog_id": "ST-1650",
+            "girder_count": 5,
+            "girder_spacing_mm": 2800,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 4,
+          "feasible": false,
+          "cv": 0.2378,
+          "max_utilization": 1.1986,
+          "objectives": {
+            "relative_cost": 2122.51,
+            "material_mass_t": 549.24,
+            "embodied_carbon_kgCO2e": 92515.9
+          },
+          "violations": [
+            {
+              "rule_id": "STR-002",
+              "severity": "HARD",
+              "margin": 0.0392
+            },
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.1986
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "girder_catalog_id",
+            "current": "ST-1750",
+            "proposed": "ST-1650",
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2146.06 → 2122.51)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2122.51
+          },
+          "outcome": "REJECTED_INFEASIBLE"
+        },
+        {
+          "case_id": "BT-2eae035ffa973315",
+          "input_hash": "2eae035ffa973315affc3ea4995c8e0c503deb4c040ce2a50a68941dd59a56b5",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2750,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 5,
+          "feasible": true,
+          "cv": 0.0,
+          "max_utilization": 0.9841,
+          "objectives": {
+            "relative_cost": 2145.37,
+            "material_mass_t": 566.16,
+            "embodied_carbon_kgCO2e": 94872.5
+          },
+          "violations": [],
+          "stage": 4,
+          "stage_label": "ACCEPTABLE",
+          "move": {
+            "variable": "girder_spacing_mm",
+            "current": 2800,
+            "proposed": 2750,
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: girder_spacing_mm 2800 → 2750 (relative_cost 2146.06 → 2145.37)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2145.37
+          },
+          "outcome": "ACCEPTED"
+        }
+      ],
+      "accepted_case_id": "BT-2eae035ffa973315",
+      "unprobed_candidates": 0,
+      "unresolved_solver_failures": 0
+    },
+    {
+      "iteration": 4,
+      "phase": "TRIM",
+      "from_case_id": "BT-2eae035ffa973315",
+      "from_stage": "ACCEPTABLE",
+      "candidates": [
+        {
+          "variable": "prestress_layout_id",
+          "current": "PT-46",
+          "proposed": "PT-42",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: prestress_layout_id PT-46 → PT-42 (relative_cost 2145.37 → 2097.73)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2097.73
+        },
+        {
+          "variable": "girder_catalog_id",
+          "current": "ST-1750",
+          "proposed": "ST-1650",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2145.37 → 2121.86)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2121.86
+        },
+        {
+          "variable": "girder_spacing_mm",
+          "current": 2750,
+          "proposed": 2700,
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_spacing_mm 2750 → 2700 (relative_cost 2145.37 → 2144.68)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2144.68
+        }
+      ],
+      "probes": [
+        {
+          "case_id": "BT-a9f0126568d06a79",
+          "input_hash": "a9f0126568d06a790816c746b9d60f74c456b160076a428e676fc1af60177b31",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2750,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-42"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 6,
+          "feasible": false,
+          "cv": 0.4595,
+          "max_utilization": 1.4595,
+          "objectives": {
+            "relative_cost": 2097.73,
+            "material_mass_t": 565.3,
+            "embodied_carbon_kgCO2e": 92966.9
+          },
+          "violations": [
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.4595
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "prestress_layout_id",
+            "current": "PT-46",
+            "proposed": "PT-42",
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: prestress_layout_id PT-46 → PT-42 (relative_cost 2145.37 → 2097.73)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2097.73
+          },
+          "outcome": "REJECTED_INFEASIBLE"
+        },
+        {
+          "case_id": "BT-4d7d99e501c53dc7",
+          "input_hash": "4d7d99e501c53dc72daa71f5e9aa9cfa65e037b2f6cc1c942febc8557186a858",
+          "gene": {
+            "girder_catalog_id": "ST-1650",
+            "girder_count": 5,
+            "girder_spacing_mm": 2750,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 7,
+          "feasible": false,
+          "cv": 0.1406,
+          "max_utilization": 1.1116,
+          "objectives": {
+            "relative_cost": 2121.86,
+            "material_mass_t": 548.66,
+            "embodied_carbon_kgCO2e": 92446.6
+          },
+          "violations": [
+            {
+              "rule_id": "STR-002",
+              "severity": "HARD",
+              "margin": 0.029
+            },
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.1116
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "girder_catalog_id",
+            "current": "ST-1750",
+            "proposed": "ST-1650",
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2145.37 → 2121.86)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2121.86
+          },
+          "outcome": "REJECTED_INFEASIBLE"
+        },
+        {
+          "case_id": "BT-bcc6c25c208996be",
+          "input_hash": "bcc6c25c208996be9d9bf354d31a275474d663fbd234eea51ea4a8411c35c76c",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2700,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 8,
+          "feasible": true,
+          "cv": 0.0,
+          "max_utilization": 0.9744,
+          "objectives": {
+            "relative_cost": 2144.68,
+            "material_mass_t": 565.55,
+            "embodied_carbon_kgCO2e": 94799.0
+          },
+          "violations": [],
+          "stage": 4,
+          "stage_label": "ACCEPTABLE",
+          "move": {
+            "variable": "girder_spacing_mm",
+            "current": 2750,
+            "proposed": 2700,
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: girder_spacing_mm 2750 → 2700 (relative_cost 2145.37 → 2144.68)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2144.68
+          },
+          "outcome": "ACCEPTED"
+        }
+      ],
+      "accepted_case_id": "BT-bcc6c25c208996be",
+      "unprobed_candidates": 0,
+      "unresolved_solver_failures": 0
+    },
+    {
+      "iteration": 5,
+      "phase": "TRIM",
+      "from_case_id": "BT-bcc6c25c208996be",
+      "from_stage": "ACCEPTABLE",
+      "candidates": [
+        {
+          "variable": "prestress_layout_id",
+          "current": "PT-46",
+          "proposed": "PT-42",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: prestress_layout_id PT-46 → PT-42 (relative_cost 2144.68 → 2097.04)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2097.04
+        },
+        {
+          "variable": "girder_catalog_id",
+          "current": "ST-1750",
+          "proposed": "ST-1650",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2144.68 → 2121.21)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2121.21
+        },
+        {
+          "variable": "deck_slab_thickness_mm",
+          "current": 195,
+          "proposed": 190,
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: deck_slab_thickness_mm 195 → 190 (relative_cost 2144.68 → 2138.25)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2138.25
+        },
+        {
+          "variable": "girder_spacing_mm",
+          "current": 2700,
+          "proposed": 2650,
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_spacing_mm 2700 → 2650 (relative_cost 2144.68 → 2144.00)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2144.0
+        }
+      ],
+      "probes": [
+        {
+          "case_id": "BT-a1490d629f2b43ac",
+          "input_hash": "a1490d629f2b43aca49622f15f2cbbb0762561ebd7cd603511df824c85adcc41",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2700,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-42"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 9,
+          "feasible": false,
+          "cv": 0.3815,
+          "max_utilization": 1.3815,
+          "objectives": {
+            "relative_cost": 2097.04,
+            "material_mass_t": 564.68,
+            "embodied_carbon_kgCO2e": 92893.4
+          },
+          "violations": [
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.3815
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "prestress_layout_id",
+            "current": "PT-46",
+            "proposed": "PT-42",
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: prestress_layout_id PT-46 → PT-42 (relative_cost 2144.68 → 2097.04)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2097.04
+          },
+          "outcome": "REJECTED_INFEASIBLE"
+        },
+        {
+          "case_id": "BT-8c6fc3d7464f379b",
+          "input_hash": "8c6fc3d7464f379bf48886658c52afd8876d467d758c2aa9946688bf6470b266",
+          "gene": {
+            "girder_catalog_id": "ST-1650",
+            "girder_count": 5,
+            "girder_spacing_mm": 2700,
+            "deck_slab_thickness_mm": 195,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 10,
+          "feasible": false,
+          "cv": 0.0434,
+          "max_utilization": 1.0246,
+          "objectives": {
+            "relative_cost": 2121.21,
+            "material_mass_t": 548.08,
+            "embodied_carbon_kgCO2e": 92377.3
+          },
+          "violations": [
+            {
+              "rule_id": "STR-002",
+              "severity": "HARD",
+              "margin": 0.0188
+            },
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.0246
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "girder_catalog_id",
+            "current": "ST-1750",
+            "proposed": "ST-1650",
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2144.68 → 2121.21)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2121.21
+          },
+          "outcome": "REJECTED_INFEASIBLE"
+        },
+        {
+          "case_id": "BT-ca416c8a213d3c77",
+          "input_hash": "ca416c8a213d3c7798fb89cf700efa4caf21b2c36b03a136c326f7bf18650061",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2700,
+            "deck_slab_thickness_mm": 190,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-46"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 11,
+          "feasible": true,
+          "cv": 0.0,
+          "max_utilization": 0.9729,
+          "objectives": {
+            "relative_cost": 2138.25,
+            "material_mass_t": 559.8,
+            "embodied_carbon_kgCO2e": 94109.6
+          },
+          "violations": [],
+          "stage": 4,
+          "stage_label": "ACCEPTABLE",
+          "move": {
+            "variable": "deck_slab_thickness_mm",
+            "current": 195,
+            "proposed": 190,
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: deck_slab_thickness_mm 195 → 190 (relative_cost 2144.68 → 2138.25)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2138.25
+          },
+          "outcome": "ACCEPTED"
+        }
+      ],
+      "accepted_case_id": "BT-ca416c8a213d3c77",
+      "unprobed_candidates": 1,
+      "unresolved_solver_failures": 0
+    },
+    {
+      "iteration": 6,
+      "phase": "TRIM",
+      "from_case_id": "BT-ca416c8a213d3c77",
+      "from_stage": "ACCEPTABLE",
+      "candidates": [
+        {
+          "variable": "prestress_layout_id",
+          "current": "PT-46",
+          "proposed": "PT-42",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: prestress_layout_id PT-46 → PT-42 (relative_cost 2138.25 → 2090.61)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2090.61
+        },
+        {
+          "variable": "girder_catalog_id",
+          "current": "ST-1750",
+          "proposed": "ST-1650",
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_catalog_id ST-1750 → ST-1650 (relative_cost 2138.25 → 2114.78)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2114.78
+        },
+        {
+          "variable": "girder_spacing_mm",
+          "current": 2700,
+          "proposed": 2650,
+          "rule_id": null,
+          "rationale": "Láng giềng rẻ hơn: girder_spacing_mm 2700 → 2650 (relative_cost 2138.25 → 2137.56)",
+          "card_id": null,
+          "source": "neighbor",
+          "cheap_objective": 2137.56
+        }
+      ],
+      "probes": [
+        {
+          "case_id": "BT-bb31f0699b4a9016",
+          "input_hash": "bb31f0699b4a9016289d2e6e6fef58b54b28a3607ecd8814d40453e8fd851e74",
+          "gene": {
+            "girder_catalog_id": "ST-1750",
+            "girder_count": 5,
+            "girder_spacing_mm": 2700,
+            "deck_slab_thickness_mm": 190,
+            "girder_concrete_id": "C40",
+            "deck_concrete_id": "C30",
+            "diaphragm_layout_id": "DG-5",
+            "prestress_layout_id": "PT-42"
+          },
+          "status": "SUCCESS",
+          "solver_status": "CONVERGED",
+          "solver_call_index": 12,
+          "feasible": false,
+          "cv": 0.3458,
+          "max_utilization": 1.3458,
+          "objectives": {
+            "relative_cost": 2090.61,
+            "material_mass_t": 558.94,
+            "embodied_carbon_kgCO2e": 92204.0
+          },
+          "violations": [
+            {
+              "rule_id": "SERV-001",
+              "severity": "HARD",
+              "margin": 0.3458
+            }
+          ],
+          "stage": 2,
+          "stage_label": "INFEASIBLE",
+          "move": {
+            "variable": "prestress_layout_id",
+            "current": "PT-46",
+            "proposed": "PT-42",
+            "rule_id": null,
+            "rationale": "Láng giềng rẻ hơn: prestress_layout_id PT-46 → PT-42 (relative_cost 2138.25 → 2090.61)",
+            "card_id": null,
+            "source": "neighbor",
+            "cheap_objective": 2090.61
+          },
+          "outcome": "REJECTED_INFEASIBLE"
+        }
+      ],
+      "accepted_case_id": null,
+      "unprobed_candidates": 2,
+      "unresolved_solver_failures": 0
+    }
+  ],
+  "termination": {
+    "reason": "BUDGET_EXHAUSTED",
+    "message": "Hết 12 lần gọi solver giữa pha TRIM; còn 2 ứng viên chưa thử"
+  },
+  "counters": {
+    "loop": {
+      "iterations": 6,
+      "accepted_moves": 5,
+      "probes": 12,
+      "probes_solver": 12,
+      "probes_l0_rejected": 0,
+      "solver_failures": 0,
+      "candidates_generated": 54,
+      "skipped_visited": 4,
+      "skipped_l0": 13,
+      "skipped_not_cheaper": 19,
+      "skipped_failed": 0
+    },
+    "evaluator": {
+      "proposals": 12,
+      "l0_checks": 12,
+      "l0_passed": 12,
+      "l0_rejected": 0,
+      "cache_hits": 0,
+      "solver_calls": 12,
+      "budget_blocked": 0,
+      "unique_results": 12
+    }
+  },
+  "verification_records": {
+    "BT-7b8e109e20a6c66c": {
+      "record_index": 1,
+      "solver_call_index": 1,
+      "case_id": "BT-7b8e109e20a6c66c",
+      "input_hash": "7b8e109e20a6c66c46a2dc7662ce6a77f7d0dc3ce5333d6faade4645b82f1d8d",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2800,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-38"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2800,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-38"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": null,
+          "generation_action": "DESIGN_LOOP_SEED"
+        },
+        "case_id": "BT-7b8e109e20a6c66c"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 1.3113,
+      "max_utilization": 2.3113,
+      "objectives": {
+        "relative_cost": 2050.78,
+        "material_mass_t": 565.04,
+        "embodied_carbon_kgCO2e": 91134.8
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15883.5,
+        "phiMn_kNm": 16958.6,
+        "Vu_strength1_kN": 1858.4,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -7.309,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.37,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.16,
+        "max_utilization": 2.3113,
+        "distribution_factor_moment": 0.739,
+        "distribution_factor_shear": 0.9093
+      },
+      "violations": [
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 7.31 MPa > giới hạn 3.16 MPa",
+          "margin": 1.3113
+        }
+      ],
+      "provenance": {
+        "input_hash": "7b8e109e20a6c66c46a2dc7662ce6a77f7d0dc3ce5333d6faade4645b82f1d8d",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-38b9d77d2cf4ad4d": {
+      "record_index": 2,
+      "solver_call_index": 2,
+      "case_id": "BT-38b9d77d2cf4ad4d",
+      "input_hash": "38b9d77d2cf4ad4d7c881484a7359dc414232db09ad13088fd786b68e2243b99",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2800,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2800,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-42"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-7b8e109e20a6c66c",
+          "generation_action": "DESIGN_LOOP_REPAIR"
+        },
+        "case_id": "BT-38b9d77d2cf4ad4d"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.5375,
+      "max_utilization": 1.5375,
+      "objectives": {
+        "relative_cost": 2098.42,
+        "material_mass_t": 565.91,
+        "embodied_carbon_kgCO2e": 93040.4
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15883.5,
+        "phiMn_kNm": 18621.3,
+        "Vu_strength1_kN": 1858.4,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -4.862,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.37,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.16,
+        "max_utilization": 1.5375,
+        "distribution_factor_moment": 0.739,
+        "distribution_factor_shear": 0.9093
+      },
+      "violations": [
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 4.86 MPa > giới hạn 3.16 MPa",
+          "margin": 0.5375
+        }
+      ],
+      "provenance": {
+        "input_hash": "38b9d77d2cf4ad4d7c881484a7359dc414232db09ad13088fd786b68e2243b99",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-65c165a753de8b16": {
+      "record_index": 3,
+      "solver_call_index": 3,
+      "case_id": "BT-65c165a753de8b16",
+      "input_hash": "65c165a753de8b161b224f9859e1f4a1d7fbb4f0f991964e508ceb60e1b29dfb",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2800,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2800,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-38b9d77d2cf4ad4d",
+          "generation_action": "DESIGN_LOOP_REPAIR"
+        },
+        "case_id": "BT-65c165a753de8b16"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": true,
+      "cv": 0.0,
+      "max_utilization": 0.9938,
+      "objectives": {
+        "relative_cost": 2146.06,
+        "material_mass_t": 566.77,
+        "embodied_carbon_kgCO2e": 94946.0
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15883.5,
+        "phiMn_kNm": 20261.8,
+        "Vu_strength1_kN": 1858.4,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -2.415,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.37,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.16,
+        "max_utilization": 0.9938,
+        "distribution_factor_moment": 0.739,
+        "distribution_factor_shear": 0.9093
+      },
+      "violations": [],
+      "provenance": {
+        "input_hash": "65c165a753de8b161b224f9859e1f4a1d7fbb4f0f991964e508ceb60e1b29dfb",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-f57c0466607d18d3": {
+      "record_index": 4,
+      "solver_call_index": 4,
+      "case_id": "BT-f57c0466607d18d3",
+      "input_hash": "f57c0466607d18d303864f221ec51a72bca4fb8f915a811734ca1853eee139b7",
+      "gene": {
+        "girder_catalog_id": "ST-1650",
+        "girder_count": 5,
+        "girder_spacing_mm": 2800,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1650",
+          "girder_count": 5,
+          "girder_spacing_mm": 2800,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-65c165a753de8b16",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-f57c0466607d18d3"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.2378,
+      "max_utilization": 1.1986,
+      "objectives": {
+        "relative_cost": 2122.51,
+        "material_mass_t": 549.24,
+        "embodied_carbon_kgCO2e": 92515.9
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15572.0,
+        "phiMn_kNm": 19068.3,
+        "Vu_strength1_kN": 1836.9,
+        "phiVn_kN": 1767.5,
+        "bottom_stress_service3_MPa": -3.79,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 16.76,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.024,
+        "max_utilization": 1.1986,
+        "distribution_factor_moment": 0.7277,
+        "distribution_factor_shear": 0.9093
+      },
+      "violations": [
+        {
+          "rule_id": "STR-002",
+          "severity": "HARD",
+          "message": "Cắt CĐ-I: Vu=1837 kN > φVn=1768 kN",
+          "margin": 0.0392
+        },
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 3.79 MPa > giới hạn 3.16 MPa",
+          "margin": 0.1986
+        }
+      ],
+      "provenance": {
+        "input_hash": "f57c0466607d18d303864f221ec51a72bca4fb8f915a811734ca1853eee139b7",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-2eae035ffa973315": {
+      "record_index": 5,
+      "solver_call_index": 5,
+      "case_id": "BT-2eae035ffa973315",
+      "input_hash": "2eae035ffa973315affc3ea4995c8e0c503deb4c040ce2a50a68941dd59a56b5",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2750,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2750,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-65c165a753de8b16",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-2eae035ffa973315"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": true,
+      "cv": 0.0,
+      "max_utilization": 0.9841,
+      "objectives": {
+        "relative_cost": 2145.37,
+        "material_mass_t": 566.16,
+        "embodied_carbon_kgCO2e": 94872.5
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15732.8,
+        "phiMn_kNm": 20234.1,
+        "Vu_strength1_kN": 1840.3,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -2.169,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.45,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.161,
+        "max_utilization": 0.9841,
+        "distribution_factor_moment": 0.7295,
+        "distribution_factor_shear": 0.8978
+      },
+      "violations": [],
+      "provenance": {
+        "input_hash": "2eae035ffa973315affc3ea4995c8e0c503deb4c040ce2a50a68941dd59a56b5",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-a9f0126568d06a79": {
+      "record_index": 6,
+      "solver_call_index": 6,
+      "case_id": "BT-a9f0126568d06a79",
+      "input_hash": "a9f0126568d06a790816c746b9d60f74c456b160076a428e676fc1af60177b31",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2750,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2750,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-42"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-2eae035ffa973315",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-a9f0126568d06a79"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.4595,
+      "max_utilization": 1.4595,
+      "objectives": {
+        "relative_cost": 2097.73,
+        "material_mass_t": 565.3,
+        "embodied_carbon_kgCO2e": 92966.9
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15732.8,
+        "phiMn_kNm": 18598.0,
+        "Vu_strength1_kN": 1840.3,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -4.615,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.45,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.161,
+        "max_utilization": 1.4595,
+        "distribution_factor_moment": 0.7295,
+        "distribution_factor_shear": 0.8978
+      },
+      "violations": [
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 4.62 MPa > giới hạn 3.16 MPa",
+          "margin": 0.4595
+        }
+      ],
+      "provenance": {
+        "input_hash": "a9f0126568d06a790816c746b9d60f74c456b160076a428e676fc1af60177b31",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-4d7d99e501c53dc7": {
+      "record_index": 7,
+      "solver_call_index": 7,
+      "case_id": "BT-4d7d99e501c53dc7",
+      "input_hash": "4d7d99e501c53dc72daa71f5e9aa9cfa65e037b2f6cc1c942febc8557186a858",
+      "gene": {
+        "girder_catalog_id": "ST-1650",
+        "girder_count": 5,
+        "girder_spacing_mm": 2750,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1650",
+          "girder_count": 5,
+          "girder_spacing_mm": 2750,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-2eae035ffa973315",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-4d7d99e501c53dc7"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.1406,
+      "max_utilization": 1.1116,
+      "objectives": {
+        "relative_cost": 2121.86,
+        "material_mass_t": 548.66,
+        "embodied_carbon_kgCO2e": 92446.6
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15423.2,
+        "phiMn_kNm": 19040.8,
+        "Vu_strength1_kN": 1818.9,
+        "phiVn_kN": 1767.5,
+        "bottom_stress_service3_MPa": -3.515,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 16.86,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.025,
+        "max_utilization": 1.1116,
+        "distribution_factor_moment": 0.7183,
+        "distribution_factor_shear": 0.8978
+      },
+      "violations": [
+        {
+          "rule_id": "STR-002",
+          "severity": "HARD",
+          "message": "Cắt CĐ-I: Vu=1819 kN > φVn=1768 kN",
+          "margin": 0.029
+        },
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 3.52 MPa > giới hạn 3.16 MPa",
+          "margin": 0.1116
+        }
+      ],
+      "provenance": {
+        "input_hash": "4d7d99e501c53dc72daa71f5e9aa9cfa65e037b2f6cc1c942febc8557186a858",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-bcc6c25c208996be": {
+      "record_index": 8,
+      "solver_call_index": 8,
+      "case_id": "BT-bcc6c25c208996be",
+      "input_hash": "bcc6c25c208996be9d9bf354d31a275474d663fbd234eea51ea4a8411c35c76c",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2700,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2700,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-2eae035ffa973315",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-bcc6c25c208996be"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": true,
+      "cv": 0.0,
+      "max_utilization": 0.9744,
+      "objectives": {
+        "relative_cost": 2144.68,
+        "material_mass_t": 565.55,
+        "embodied_carbon_kgCO2e": 94799.0
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15581.7,
+        "phiMn_kNm": 20205.5,
+        "Vu_strength1_kN": 1822.2,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -1.922,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.54,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.162,
+        "max_utilization": 0.9744,
+        "distribution_factor_moment": 0.7199,
+        "distribution_factor_shear": 0.8863
+      },
+      "violations": [],
+      "provenance": {
+        "input_hash": "bcc6c25c208996be9d9bf354d31a275474d663fbd234eea51ea4a8411c35c76c",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-a1490d629f2b43ac": {
+      "record_index": 9,
+      "solver_call_index": 9,
+      "case_id": "BT-a1490d629f2b43ac",
+      "input_hash": "a1490d629f2b43aca49622f15f2cbbb0762561ebd7cd603511df824c85adcc41",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2700,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2700,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-42"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-bcc6c25c208996be",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-a1490d629f2b43ac"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.3815,
+      "max_utilization": 1.3815,
+      "objectives": {
+        "relative_cost": 2097.04,
+        "material_mass_t": 564.68,
+        "embodied_carbon_kgCO2e": 92893.4
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15581.7,
+        "phiMn_kNm": 18574.0,
+        "Vu_strength1_kN": 1822.2,
+        "phiVn_kN": 1870.0,
+        "bottom_stress_service3_MPa": -4.369,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.54,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.162,
+        "max_utilization": 1.3815,
+        "distribution_factor_moment": 0.7199,
+        "distribution_factor_shear": 0.8863
+      },
+      "violations": [
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 4.37 MPa > giới hạn 3.16 MPa",
+          "margin": 0.3815
+        }
+      ],
+      "provenance": {
+        "input_hash": "a1490d629f2b43aca49622f15f2cbbb0762561ebd7cd603511df824c85adcc41",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-8c6fc3d7464f379b": {
+      "record_index": 10,
+      "solver_call_index": 10,
+      "case_id": "BT-8c6fc3d7464f379b",
+      "input_hash": "8c6fc3d7464f379bf48886658c52afd8876d467d758c2aa9946688bf6470b266",
+      "gene": {
+        "girder_catalog_id": "ST-1650",
+        "girder_count": 5,
+        "girder_spacing_mm": 2700,
+        "deck_slab_thickness_mm": 195,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1650",
+          "girder_count": 5,
+          "girder_spacing_mm": 2700,
+          "deck_slab_thickness_mm": 195,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-bcc6c25c208996be",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-8c6fc3d7464f379b"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.0434,
+      "max_utilization": 1.0246,
+      "objectives": {
+        "relative_cost": 2121.21,
+        "material_mass_t": 548.08,
+        "embodied_carbon_kgCO2e": 92377.3
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15274.1,
+        "phiMn_kNm": 19012.4,
+        "Vu_strength1_kN": 1800.8,
+        "phiVn_kN": 1767.5,
+        "bottom_stress_service3_MPa": -3.24,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 16.96,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.026,
+        "max_utilization": 1.0246,
+        "distribution_factor_moment": 0.7089,
+        "distribution_factor_shear": 0.8863
+      },
+      "violations": [
+        {
+          "rule_id": "STR-002",
+          "severity": "HARD",
+          "message": "Cắt CĐ-I: Vu=1801 kN > φVn=1768 kN",
+          "margin": 0.0188
+        },
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 3.24 MPa > giới hạn 3.16 MPa",
+          "margin": 0.0246
+        }
+      ],
+      "provenance": {
+        "input_hash": "8c6fc3d7464f379bf48886658c52afd8876d467d758c2aa9946688bf6470b266",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-ca416c8a213d3c77": {
+      "record_index": 11,
+      "solver_call_index": 11,
+      "case_id": "BT-ca416c8a213d3c77",
+      "input_hash": "ca416c8a213d3c7798fb89cf700efa4caf21b2c36b03a136c326f7bf18650061",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2700,
+        "deck_slab_thickness_mm": 190,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-46"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2700,
+          "deck_slab_thickness_mm": 190,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-46"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-bcc6c25c208996be",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-ca416c8a213d3c77"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": true,
+      "cv": 0.0,
+      "max_utilization": 0.9729,
+      "objectives": {
+        "relative_cost": 2138.25,
+        "material_mass_t": 559.8,
+        "embodied_carbon_kgCO2e": 94109.6
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15550.8,
+        "phiMn_kNm": 20145.8,
+        "Vu_strength1_kN": 1814.3,
+        "phiVn_kN": 1864.9,
+        "bottom_stress_service3_MPa": -1.809,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.71,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.159,
+        "max_utilization": 0.9729,
+        "distribution_factor_moment": 0.7247,
+        "distribution_factor_shear": 0.8863
+      },
+      "violations": [],
+      "provenance": {
+        "input_hash": "ca416c8a213d3c7798fb89cf700efa4caf21b2c36b03a136c326f7bf18650061",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    },
+    "BT-bb31f0699b4a9016": {
+      "record_index": 12,
+      "solver_call_index": 12,
+      "case_id": "BT-bb31f0699b4a9016",
+      "input_hash": "bb31f0699b4a9016289d2e6e6fef58b54b28a3607ecd8814d40453e8fd851e74",
+      "gene": {
+        "girder_catalog_id": "ST-1750",
+        "girder_count": 5,
+        "girder_spacing_mm": 2700,
+        "deck_slab_thickness_mm": 190,
+        "girder_concrete_id": "C40",
+        "deck_concrete_id": "C30",
+        "diaphragm_layout_id": "DG-5",
+        "prestress_layout_id": "PT-42"
+      },
+      "design_state": {
+        "family": "super_t_simple_v1",
+        "status": "CANDIDATE",
+        "project_inputs": {
+          "span_length_m": 38.3,
+          "deck_width_m": 12.0,
+          "alignment_type": "STRAIGHT",
+          "skew_deg": 0
+        },
+        "design_variables": {
+          "girder_catalog_id": "ST-1750",
+          "girder_count": 5,
+          "girder_spacing_mm": 2700,
+          "deck_slab_thickness_mm": 190,
+          "diaphragm_layout_id": "DG-5",
+          "prestress_layout_id": "PT-42"
+        },
+        "materials": {
+          "girder_concrete_id": "C40",
+          "deck_concrete_id": "C30",
+          "prestressing_steel_id": "PS-15.2-1860"
+        },
+        "analysis": {
+          "fidelity": "L1_LINE_GIRDER",
+          "solver": "BUILTIN_L1",
+          "load_profile_id": "LOAD-PROFILE-01"
+        },
+        "constraints": {
+          "rule_profile_id": "BRIDGE-RULESET-V1"
+        },
+        "provenance": {
+          "random_seed": 42,
+          "parent_candidate_id": "BT-ca416c8a213d3c77",
+          "generation_action": "DESIGN_LOOP_TRIM"
+        },
+        "case_id": "BT-bb31f0699b4a9016"
+      },
+      "status": "SUCCESS",
+      "solver_status": "CONVERGED",
+      "solver_name": "BUILTIN_L1",
+      "feasible": false,
+      "cv": 0.3458,
+      "max_utilization": 1.3458,
+      "objectives": {
+        "relative_cost": 2090.61,
+        "material_mass_t": 558.94,
+        "embodied_carbon_kgCO2e": 92204.0
+      },
+      "responses": {
+        "Mu_strength1_kNm": 15550.8,
+        "phiMn_kNm": 18519.4,
+        "Vu_strength1_kN": 1814.3,
+        "phiVn_kN": 1864.9,
+        "bottom_stress_service3_MPa": -4.256,
+        "tension_limit_MPa": 3.162,
+        "max_ll_deflection_mm": 14.71,
+        "deflection_limit_mm": 47.87,
+        "first_frequency_Hz": 2.159,
+        "max_utilization": 1.3458,
+        "distribution_factor_moment": 0.7247,
+        "distribution_factor_shear": 0.8863
+      },
+      "violations": [
+        {
+          "rule_id": "SERV-001",
+          "severity": "HARD",
+          "message": "Kéo thớ dưới SD-III: 4.26 MPa > giới hạn 3.16 MPa",
+          "margin": 0.3458
+        }
+      ],
+      "provenance": {
+        "input_hash": "bb31f0699b4a9016289d2e6e6fef58b54b28a3607ecd8814d40453e8fd851e74",
+        "ruleset_version": "BRIDGE-RULESET-V1/1.1.0",
+        "solver_version": "builtin-l1/0.2.0 (pkg 0.8.0)",
+        "catalogs_version": "1.1.0",
+        "grammar_version": "1.0.0",
+        "random_seed": 42
+      }
+    }
+  },
+  "component_audit": {
+    "registry_version": "component-audit/1.0.0",
+    "candidate_id": "BT-ca416c8a213d3c77",
+    "candidate_input_hash": "ca416c8a213d3c7798fb89cf700efa4caf21b2c36b03a136c326f7bf18650061",
+    "parent_candidate_id": "BT-bcc6c25c208996be",
+    "status": "BLOCKED",
+    "verdict_authority": "INDEPENDENT_VERIFIER",
+    "alters_evaluation_verdict": false,
+    "components": [
+      {
+        "component_id": "D1",
+        "kind": "CROSS_BEAM_DIAPHRAGM",
+        "registry_supported": true,
+        "checks": [
+          {
+            "check_id": "CONNECTION",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho CROSS_BEAM_DIAPHRAGM/CONNECTION.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "DURABILITY",
+            "status": "NOT_EVALUATED",
+            "severity": "SOFT",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho CROSS_BEAM_DIAPHRAGM/DURABILITY.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "FATIGUE",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho CROSS_BEAM_DIAPHRAGM/FATIGUE.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "FLEXURE_SHEAR",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho CROSS_BEAM_DIAPHRAGM/FLEXURE_SHEAR.",
+            "rationale": null,
+            "utilization": null
+          }
+        ]
+      },
+      {
+        "component_id": "G1",
+        "kind": "LONGITUDINAL_GIRDER",
+        "registry_supported": true,
+        "checks": [
+          {
+            "check_id": "DEFLECTION",
+            "status": "PASS",
+            "severity": "HARD",
+            "evidence": {
+              "source_ref": "report:/verification_records/BT-ca416c8a213d3c77",
+              "sha256": "c6422beee29aa40ff868b1025b22f178732121eb8edde7667b230b72eec12b97",
+              "fidelity": "L1",
+              "producer": "design-loop/0.2.0 via builtin-l1/0.2.0"
+            },
+            "message": "SERV-002 theo independent verifier L1; tỷ số D/C dựng lại từ responses.",
+            "rationale": null,
+            "utilization": 0.3073
+          },
+          {
+            "check_id": "DURABILITY",
+            "status": "NOT_EVALUATED",
+            "severity": "SOFT",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho LONGITUDINAL_GIRDER/DURABILITY.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "FATIGUE",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho LONGITUDINAL_GIRDER/FATIGUE.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "FLEXURE_STRENGTH",
+            "status": "PASS",
+            "severity": "HARD",
+            "evidence": {
+              "source_ref": "report:/verification_records/BT-ca416c8a213d3c77",
+              "sha256": "c6422beee29aa40ff868b1025b22f178732121eb8edde7667b230b72eec12b97",
+              "fidelity": "L1",
+              "producer": "design-loop/0.2.0 via builtin-l1/0.2.0"
+            },
+            "message": "STR-001 theo independent verifier L1; tỷ số D/C dựng lại từ responses.",
+            "rationale": null,
+            "utilization": 0.7719
+          },
+          {
+            "check_id": "SERVICE_STRESS",
+            "status": "PASS",
+            "severity": "HARD",
+            "evidence": {
+              "source_ref": "report:/verification_records/BT-ca416c8a213d3c77",
+              "sha256": "c6422beee29aa40ff868b1025b22f178732121eb8edde7667b230b72eec12b97",
+              "fidelity": "L1",
+              "producer": "design-loop/0.2.0 via builtin-l1/0.2.0"
+            },
+            "message": "SERV-001 theo independent verifier L1; tỷ số D/C dựng lại từ responses.",
+            "rationale": null,
+            "utilization": 0.5721
+          },
+          {
+            "check_id": "SHEAR_TORSION",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "L1 chỉ có cắt đơn giản hoá (β=2, cốt đai giả định), không có xoắn; tỷ số cắt L1 = 0.9729. Cần mô hình cắt–xoắn đầy đủ trước khi giữ PASS/FAIL.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "STABILITY",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho LONGITUDINAL_GIRDER/STABILITY.",
+            "rationale": null,
+            "utilization": null
+          }
+        ]
+      },
+      {
+        "component_id": "P1",
+        "kind": "PRESTRESSING_SYSTEM",
+        "registry_supported": true,
+        "checks": [
+          {
+            "check_id": "ANCHORAGE_ZONE",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho PRESTRESSING_SYSTEM/ANCHORAGE_ZONE.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "GROUTING_DURABILITY",
+            "status": "NOT_EVALUATED",
+            "severity": "SOFT",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho PRESTRESSING_SYSTEM/GROUTING_DURABILITY.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "JACKING_STRESS",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho PRESTRESSING_SYSTEM/JACKING_STRESS.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "LOSSES",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho PRESTRESSING_SYSTEM/LOSSES.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "TRANSFER_STRESS",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho PRESTRESSING_SYSTEM/TRANSFER_STRESS.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "ULTIMATE_STRENGTH",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho PRESTRESSING_SYSTEM/ULTIMATE_STRENGTH.",
+            "rationale": null,
+            "utilization": null
+          }
+        ]
+      },
+      {
+        "component_id": "S1",
+        "kind": "DECK_SLAB",
+        "registry_supported": true,
+        "checks": [
+          {
+            "check_id": "DURABILITY",
+            "status": "NOT_EVALUATED",
+            "severity": "SOFT",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho DECK_SLAB/DURABILITY.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "FATIGUE",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho DECK_SLAB/FATIGUE.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "FLEXURE_STRENGTH",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho DECK_SLAB/FLEXURE_STRENGTH.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "SERVICE_CRACKING",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho DECK_SLAB/SERVICE_CRACKING.",
+            "rationale": null,
+            "utilization": null
+          },
+          {
+            "check_id": "SHEAR_PUNCHING",
+            "status": "NOT_EVALUATED",
+            "severity": "HARD",
+            "evidence": null,
+            "message": "Thiếu bằng chứng bắt buộc cho DECK_SLAB/SHEAR_PUNCHING.",
+            "rationale": null,
+            "utilization": null
+          }
+        ]
+      }
+    ],
+    "blocking_reasons": [
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "D1",
+        "check_id": "CONNECTION",
+        "message": "Thiếu hard check CROSS_BEAM_DIAPHRAGM/CONNECTION."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "D1",
+        "check_id": "FATIGUE",
+        "message": "Thiếu hard check CROSS_BEAM_DIAPHRAGM/FATIGUE."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "D1",
+        "check_id": "FLEXURE_SHEAR",
+        "message": "Thiếu hard check CROSS_BEAM_DIAPHRAGM/FLEXURE_SHEAR."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "G1",
+        "check_id": "FATIGUE",
+        "message": "Thiếu hard check LONGITUDINAL_GIRDER/FATIGUE."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "G1",
+        "check_id": "STABILITY",
+        "message": "Thiếu hard check LONGITUDINAL_GIRDER/STABILITY."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "P1",
+        "check_id": "ANCHORAGE_ZONE",
+        "message": "Thiếu hard check PRESTRESSING_SYSTEM/ANCHORAGE_ZONE."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "P1",
+        "check_id": "JACKING_STRESS",
+        "message": "Thiếu hard check PRESTRESSING_SYSTEM/JACKING_STRESS."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "P1",
+        "check_id": "LOSSES",
+        "message": "Thiếu hard check PRESTRESSING_SYSTEM/LOSSES."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "P1",
+        "check_id": "TRANSFER_STRESS",
+        "message": "Thiếu hard check PRESTRESSING_SYSTEM/TRANSFER_STRESS."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "P1",
+        "check_id": "ULTIMATE_STRENGTH",
+        "message": "Thiếu hard check PRESTRESSING_SYSTEM/ULTIMATE_STRENGTH."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "S1",
+        "check_id": "FATIGUE",
+        "message": "Thiếu hard check DECK_SLAB/FATIGUE."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "S1",
+        "check_id": "FLEXURE_STRENGTH",
+        "message": "Thiếu hard check DECK_SLAB/FLEXURE_STRENGTH."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "S1",
+        "check_id": "SERVICE_CRACKING",
+        "message": "Thiếu hard check DECK_SLAB/SERVICE_CRACKING."
+      },
+      {
+        "code": "MISSING_HARD_CHECK_EVIDENCE",
+        "component_id": "S1",
+        "check_id": "SHEAR_PUNCHING",
+        "message": "Thiếu hard check DECK_SLAB/SHEAR_PUNCHING."
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "RP-05b50124ab6f",
+        "component_id": "D1",
+        "check_id": "CONNECTION",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho CONNECTION của D1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho D1/CONNECTION có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-1f0a800df639",
+        "component_id": "S1",
+        "check_id": "SHEAR_PUNCHING",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho SHEAR_PUNCHING của S1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho S1/SHEAR_PUNCHING có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-21319607add2",
+        "component_id": "G1",
+        "check_id": "FATIGUE",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho FATIGUE của G1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho G1/FATIGUE có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-21657b262b4c",
+        "component_id": "P1",
+        "check_id": "TRANSFER_STRESS",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho TRANSFER_STRESS của P1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho P1/TRANSFER_STRESS có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-2b4ac4c6e927",
+        "component_id": "S1",
+        "check_id": "SERVICE_CRACKING",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho SERVICE_CRACKING của S1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho S1/SERVICE_CRACKING có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-2f4c73831dc1",
+        "component_id": "G1",
+        "check_id": "STABILITY",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho STABILITY của G1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho G1/STABILITY có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-2fc5ff63fc92",
+        "component_id": "P1",
+        "check_id": "ULTIMATE_STRENGTH",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho ULTIMATE_STRENGTH của P1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho P1/ULTIMATE_STRENGTH có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-3f15d330d566",
+        "component_id": "G1",
+        "check_id": "DURABILITY",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho DURABILITY của G1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho G1/DURABILITY có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-4a3cb388a90e",
+        "component_id": "G1",
+        "check_id": "SHEAR_TORSION",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho SHEAR_TORSION của G1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho G1/SHEAR_TORSION có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-5a60f50f115c",
+        "component_id": "D1",
+        "check_id": "FATIGUE",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho FATIGUE của D1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho D1/FATIGUE có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-5d02c6f4c994",
+        "component_id": "S1",
+        "check_id": "FATIGUE",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho FATIGUE của S1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho S1/FATIGUE có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-8b5ea308625d",
+        "component_id": "S1",
+        "check_id": "FLEXURE_STRENGTH",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho FLEXURE_STRENGTH của S1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho S1/FLEXURE_STRENGTH có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-9072e0be737b",
+        "component_id": "D1",
+        "check_id": "DURABILITY",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho DURABILITY của D1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho D1/DURABILITY có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-b9a112ecfc63",
+        "component_id": "P1",
+        "check_id": "ANCHORAGE_ZONE",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho ANCHORAGE_ZONE của P1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho P1/ANCHORAGE_ZONE có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-c49ec5f0dc88",
+        "component_id": "D1",
+        "check_id": "FLEXURE_SHEAR",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho FLEXURE_SHEAR của D1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho D1/FLEXURE_SHEAR có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-c7388acb3be7",
+        "component_id": "P1",
+        "check_id": "JACKING_STRESS",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho JACKING_STRESS của P1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho P1/JACKING_STRESS có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-d4d47f262e07",
+        "component_id": "P1",
+        "check_id": "GROUTING_DURABILITY",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho GROUTING_DURABILITY của P1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho P1/GROUTING_DURABILITY có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-e11fcb6539ef",
+        "component_id": "P1",
+        "check_id": "LOSSES",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho LOSSES của P1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho P1/LOSSES có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      },
+      {
+        "proposal_id": "RP-e89ef465b1b4",
+        "component_id": "S1",
+        "check_id": "DURABILITY",
+        "kind": "EVIDENCE_REQUEST",
+        "action": "Bổ sung và kiểm chứng bằng chứng cho DURABILITY của S1; chưa đổi hình học khi chưa biết nguyên nhân.",
+        "expected_direction": "Đóng khoảng trống bằng chứng; chưa dự báo thay đổi sức kháng hoặc nội lực.",
+        "tradeoffs": [
+          "thời gian mô hình hóa",
+          "chi phí kiểm tra",
+          "độ tin cậy dữ liệu"
+        ],
+        "required_evidence": [
+          "Bằng chứng mới cho S1/DURABILITY có SHA-256 và provenance",
+          "Kết quả phân tích lại bằng solver/phương pháp phù hợp với check",
+          "Đánh giá lại bởi independent verifier hoặc kỹ sư có thẩm quyền"
+        ],
+        "requires_reanalysis": true,
+        "claim": "UNVERIFIED_PROPOSAL"
+      }
+    ],
+    "hash_algorithm": "SHA-256",
+    "audit_hash": "9b5eb5e62c117df62fe0362c2bf7628dad8eedaaa6e9cf9b55b0d8f31e450ddc"
+  },
+  "advisories": [
+    "Kết quả L1 chỉ là SCREENED: chưa có mất mát DƯL theo giai đoạn, ứng suất lúc truyền lực, co ngót–từ biến, xoắn, ổn định, mỏi; bắt buộc L2/L3 và kỹ sư duyệt."
+  ],
+  "basis": {
+    "basis_id": "DESIGN-LOOP-0.2.0",
+    "sha256": "3b2d74fc84ea4581064eda5a90d90e755b14e9ff9bcb0ad169d533386ef11d45"
+  },
+  "source_digests": [
+    {
+      "path": "bridge_evolution/design_loop.py",
+      "sha256": "78425587c89f3cd8426bece592348c0789a5ffdf648a809808f85a25f62d0f65"
+    },
+    {
+      "path": "bridge_evolution/evaluate.py",
+      "sha256": "edea1d88511de476fcb60ed9a3d9689277961fd64f03a41272507c5376fc5e14"
+    },
+    {
+      "path": "bridge_evolution/analysis/diagnose.py",
+      "sha256": "0291cb8f78280ec08545ead40cd50a541c870f306450539fb9c11ceb7728ece8"
+    },
+    {
+      "path": "bridge_evolution/optimization/common.py",
+      "sha256": "012895de3172c1455b9cb7d4bc323a8aa25fd396dfc9d21cc53f9feec3a2f9e7"
+    },
+    {
+      "path": "bridge_evolution/verifier/rules.py",
+      "sha256": "5e0e7fd3da54cb64b1667cb6fdf226db0142b35425ec664733fd6d7eb54eb845"
+    },
+    {
+      "path": "bridge_evolution/fe_adapter/solver.py",
+      "sha256": "70469686b6d9bb4fb2e8a42b6906769e25c20784d7d553aff06fd9c694804ed8"
+    },
+    {
+      "path": "bridge_evolution/fe_adapter/line_girder.py",
+      "sha256": "23ed66e2b678f7d5b8522558eb66be7512c0de927a26187b4eaba071c75a8c0e"
+    },
+    {
+      "path": "bridge_evolution/geometry.py",
+      "sha256": "02494260a0248fcd4f87906c64255a8e6cf48fce1ccf7c6c89475cffb8f3050c"
+    },
+    {
+      "path": "bridge_evolution/objectives.py",
+      "sha256": "04d207f3efb47e6b0e2eb4655a17a8bef559e9cfe194e2bb3df71eb5593f1557"
+    },
+    {
+      "path": "bridge_evolution/state.py",
+      "sha256": "ffa789cf88c0354c330f8fd3aaf29a73f8c2afacec3360f0e641fd252f12305f"
+    },
+    {
+      "path": "bridge_evolution/catalogs.py",
+      "sha256": "c1f2a389a02ab7a5b9bc1e11c5525167b6ec7691875053a4d1f2e208ef518556"
+    },
+    {
+      "path": "catalogs/catalogs.json",
+      "sha256": "0d40310ace678ae31bb5a82dc0dd076406c6c4821d02fc86fb4f501d3202d35c"
+    },
+    {
+      "path": "contracts/design_loop_report.schema.json",
+      "sha256": "93c57fd73b540b05489583e45243793160d96cb9fead56560958224e63e9dac2"
+    },
+    {
+      "path": "contracts/bridge_design_state.schema.json",
+      "sha256": "ec924f3126892f1fd2400133f0bada9ceb65b8b294262bade5968049061a9510"
+    },
+    {
+      "path": "contracts/evaluation_result.schema.json",
+      "sha256": "2d360c67ade72e56769e724295323f8332614f44cde707dc1aca4a25b93025c0"
+    },
+    {
+      "path": "bridge_grammar/super_t_simple_v1.json",
+      "sha256": "c8fc322e36399b22ebdcc78cf97f3e06656c48964b8497f13072e1e21ef1b17b"
+    }
+  ],
+  "report_sha256": "ae32036fbc342338f785f934c420d93271385021986e0fb794b389c45870188c"
+}

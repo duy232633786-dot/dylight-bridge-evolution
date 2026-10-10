@@ -1,0 +1,62 @@
+[
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--verify",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\budget_exhausted"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"engineering_approval\":false,\"file_count\":7,\"status\":\"INTEGRITY_VERIFIED\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--verify",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\collateral"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"engineering_approval\":false,\"file_count\":7,\"status\":\"INTEGRITY_VERIFIED\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--verify",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\inconclusive_probe"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"engineering_approval\":false,\"file_count\":7,\"status\":\"INTEGRITY_VERIFIED\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--verify",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\success"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"engineering_approval\":false,\"file_count\":9,\"status\":\"INTEGRITY_VERIFIED\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "C:\\Users\\ADMIN\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-m",
+      "bridge_evolution.evobridge",
+      "--verify",
+      "research\\orchestration\\RND-20260922-74117064\\evidence\\unsupported"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"engineering_approval\":false,\"file_count\":5,\"status\":\"INTEGRITY_VERIFIED\"}\n",
+    "stderr": ""
+  }
+]

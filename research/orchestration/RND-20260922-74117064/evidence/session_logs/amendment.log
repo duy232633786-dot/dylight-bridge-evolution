@@ -1,0 +1,4 @@
+{
+  "status": "ERROR",
+  "error": "Field không được amendment: ['preferred_provider', 'preferred_role', 'required_artifacts', 'review_provider', 'test_commands', 'write_scope']"
+}

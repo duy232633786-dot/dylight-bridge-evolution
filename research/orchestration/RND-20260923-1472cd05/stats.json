@@ -1,0 +1,58 @@
+{
+  "source_records": 104,
+  "distinct_document_keys": 103,
+  "by_batch": {
+    "ai_construction": 22,
+    "bridges_materials": 29,
+    "geometry": 22,
+    "standards": 31
+  },
+  "by_reading_level": {
+    "SELECTED_SECTIONS_READ": 42,
+    "ABSTRACT_READ": 21,
+    "OFFICIAL_PAGE_READ": 36,
+    "METADATA_ONLY": 5
+  },
+  "by_library_relation": {
+    "NO_EXACT_MATCH_IN_PRIOR_INDEX": 89,
+    "MATCHES_EXISTING_LIBRARY": 3,
+    "EXISTING_LOCAL_STANDARD": 12
+  },
+  "downloaded_pdfs": 15,
+  "downloaded_pdf_pages": 2360,
+  "downloaded_bytes": 82322808,
+  "existing_local_pdfs": 12,
+  "countries_and_regions": [
+    "Australia",
+    "Belgium",
+    "Brazil",
+    "Canada",
+    "Chile",
+    "China",
+    "Czech Republic",
+    "Denmark",
+    "European Union",
+    "France",
+    "Germany",
+    "India",
+    "International",
+    "Israel",
+    "Italy",
+    "Japan",
+    "Netherlands",
+    "New Zealand",
+    "Norway",
+    "Portugal",
+    "Russia",
+    "Singapore",
+    "South Africa",
+    "Spain",
+    "Sweden",
+    "Switzerland",
+    "Türkiye",
+    "United Kingdom",
+    "United States",
+    "Vietnam"
+  ],
+  "legacy_records": 234
+}

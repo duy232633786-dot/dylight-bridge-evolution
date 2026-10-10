@@ -1,0 +1,37 @@
+{
+  "read_sources": [
+    "AGENTS.md",
+    "multiagent/PROTOCOL.md",
+    "multiagent/PHYSICS_GATES.md",
+    "README.md",
+    "pyproject.toml",
+    "frame_f1 and related schemas/tests",
+    "evaluate/design_loop/solver/verifier",
+    "user master prompt",
+    "_de_bai.docx (unrelated)"
+  ],
+  "changes": [
+    "bridge_evolution/evobridge.py",
+    "tests/test_evobridge.py",
+    "docs/sage_evobridge/",
+    "research/orchestration/RND-20260922-74117064/"
+  ],
+  "focused_tests": {
+    "passed": 63,
+    "exit_code": 0
+  },
+  "full_baseline": {
+    "exit_code": 1,
+    "failure": "test_unrelated_document_has_no_runtime_link",
+    "cause": "absolute path keyword bridge in temporary directory; neutral-directory rerun passes"
+  },
+  "full_regression": "RUNNING",
+  "independent_review": "same-platform separate agent; four semantic fault cases fixed and rechecked; five packages verified",
+  "remaining": [
+    "production evaluator output guard fix",
+    "A/B scoped component gate",
+    "verified memory and transfer",
+    "missing proposal files",
+    "external Obsidian vault sync not authorized by workspace-only scope"
+  ]
+}

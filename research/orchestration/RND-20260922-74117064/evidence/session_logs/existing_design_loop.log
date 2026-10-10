@@ -1,0 +1,29 @@
+{
+  "seed_case_id": "BT-7b8e109e20a6c66c",
+  "seed_status": "SUCCESS",
+  "final_case_id": "BT-ca416c8a213d3c77",
+  "final_feasible": true,
+  "final_meets_target": true,
+  "final_max_utilization": 0.9729,
+  "final_objectives": {
+    "relative_cost": 2138.25,
+    "material_mass_t": 559.8,
+    "embodied_carbon_kgCO2e": 94109.6
+  },
+  "lineage": [
+    "BT-7b8e109e20a6c66c",
+    "BT-38b9d77d2cf4ad4d",
+    "BT-65c165a753de8b16",
+    "BT-2eae035ffa973315",
+    "BT-bcc6c25c208996be",
+    "BT-ca416c8a213d3c77"
+  ],
+  "termination": {
+    "reason": "BUDGET_EXHAUSTED",
+    "message": "Hết 12 lần gọi solver giữa pha TRIM; còn 2 ứng viên chưa thử"
+  },
+  "solver_calls": 12,
+  "claim_level": "SCREENED",
+  "component_audit_status": "BLOCKED",
+  "report_sha256": "ae32036fbc342338f785f934c420d93271385021986e0fb794b389c45870188c"
+}

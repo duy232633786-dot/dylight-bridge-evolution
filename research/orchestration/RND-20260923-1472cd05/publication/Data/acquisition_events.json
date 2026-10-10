@@ -1,0 +1,185 @@
+[
+  {
+    "accessed_on": "2026-09-23",
+    "policy": "Observed pdf_url only; no paywall bypass; 10s socket timeout; 45s per-download deadline; PDF signature and page-tree parsed without text extraction. No new reading claim.",
+    "downloads": [
+      {
+        "id": "AI-001",
+        "url": "https://arxiv.org/pdf/1504.04909",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 3221283,
+        "sha256": "df7344343b14893a1d79a5459c1f56db50562e246d132cd0269f5201d1455872",
+        "page_count": 15,
+        "resolved_url": "https://arxiv.org/pdf/1504.04909",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\AI-001.pdf",
+        "elapsed_seconds": 12.53
+      },
+      {
+        "id": "AI-005",
+        "url": "https://proceedings.mlr.press/v37/sui15.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 369748,
+        "sha256": "2ce477c022c19edc608b3c6c99c9cabf326fa970393d177e7bb1f1d93a39228f",
+        "page_count": 9,
+        "resolved_url": "https://proceedings.mlr.press/v37/sui15.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\AI-005.pdf",
+        "elapsed_seconds": 3.11
+      },
+      {
+        "id": "AI-006",
+        "url": "https://arxiv.org/pdf/1806.05865",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 7186848,
+        "sha256": "85ecbc13345539cd4b1ef7322499b70108b8f38b603a532509b08b37ea589d19",
+        "page_count": 30,
+        "resolved_url": "https://arxiv.org/pdf/1806.05865",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\AI-006.pdf",
+        "elapsed_seconds": 34.56
+      },
+      {
+        "id": "AI-022",
+        "url": "https://arxiv.org/pdf/1812.06216",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 5596607,
+        "sha256": "535f9252d9dcd6fcf99b41db4e3c015c1b8be1dd741d7fec569074a449f0cda5",
+        "page_count": 15,
+        "resolved_url": "https://arxiv.org/pdf/1812.06216",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\AI-022.pdf",
+        "elapsed_seconds": 28.22
+      },
+      {
+        "id": "BM-013",
+        "url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/hpc/13060/13060.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 2148984,
+        "sha256": "3b0faa46cd1b4c6e3e0f89396f665e369c32ccf7e0ed3829a7de6edfda880c32",
+        "page_count": 176,
+        "resolved_url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/hpc/13060/13060.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\BM-013.pdf",
+        "elapsed_seconds": 5.69
+      },
+      {
+        "id": "BM-017",
+        "url": "https://research.fs.usda.gov/download/treesearch/66405.pdf",
+        "status": "FAILED",
+        "bytes": 0,
+        "sha256": null,
+        "page_count": null,
+        "error": "HTTP Error 403: Forbidden",
+        "elapsed_seconds": 1.95
+      },
+      {
+        "id": "BM-018",
+        "url": "https://highways.dot.gov/media/62156",
+        "status": "FAILED",
+        "bytes": 0,
+        "sha256": null,
+        "page_count": null,
+        "error": "HTTP Error 403: Forbidden",
+        "elapsed_seconds": 0.53
+      },
+      {
+        "id": "BM-020",
+        "url": "https://nsia.no/Road/Published-reports/2023-03?attach=1&pid=SHT-Report-ReportFile",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 3829359,
+        "sha256": "3d3baf8ea000887c9df9ffc2063ac5f3b178921051537465297cc6df76b46377",
+        "page_count": 30,
+        "resolved_url": "https://nsia.no/Road/Published-reports/2023-03?attach=1&pid=SHT-Report-ReportFile",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\BM-020.pdf",
+        "elapsed_seconds": 11.12
+      },
+      {
+        "id": "GE-002",
+        "url": "https://www.block.arch.ethz.ch/brg/files/block_ochs_IASS_2007.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 2293761,
+        "sha256": "b4e48994affa3a297cc3086924beeacf819eec127c496ac5fe1e7ad1d0a1520b",
+        "page_count": 8,
+        "resolved_url": "https://www.block.arch.ethz.ch/brg/files/block_ochs_IASS_2007.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\GE-002.pdf",
+        "elapsed_seconds": 20.33
+      },
+      {
+        "id": "GE-003",
+        "url": "https://www.topopt.mek.dtu.dk/-/media/subsites/topopt/apps/dokumenter-og-filer-til-apps/topopt88.pdf?hash=E80FAB2808804A29FFB181CA05D2EEFECAA86686&la=da",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 253088,
+        "sha256": "21f2f864bd0e53791fdef7c996ba9b8846e6ef59b555c5dbcd8ae087956181d9",
+        "page_count": 15,
+        "resolved_url": "https://www.topopt.mek.dtu.dk/-/media/subsites/topopt/apps/dokumenter-og-filer-til-apps/topopt88.pdf?hash=E80FAB2808804A29FFB181CA05D2EEFECAA86686&la=da",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\GE-003.pdf",
+        "elapsed_seconds": 4.06
+      },
+      {
+        "id": "GE-004",
+        "url": "https://www.cmap.polytechnique.fr/~allaire/ajt-jcp.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 845605,
+        "sha256": "a5f863f677fe80c4535d93d94cd1b419b5d271b5d37162a5ec4850de26441a0c",
+        "page_count": 31,
+        "resolved_url": "https://www.cmap.polytechnique.fr/~allaire/ajt-jcp.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\GE-004.pdf",
+        "elapsed_seconds": 4.92
+      },
+      {
+        "id": "GE-007",
+        "url": "https://graphics.stanford.edu/courses/cs348a-21-winter/Papers/Marching_Cubes.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 1266670,
+        "sha256": "dd085331924836b731bac1569c641f5fc02cd9ba9468bfa36b9816fe73887791",
+        "page_count": 7,
+        "resolved_url": "https://graphics.stanford.edu/courses/cs348a-21-winter/Papers/Marching_Cubes.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\GE-007.pdf",
+        "elapsed_seconds": 13.61
+      },
+      {
+        "id": "BM-015",
+        "url": "https://www.fhwa.dot.gov/bridge/pubs/hif18041.pdf",
+        "status": "FAILED",
+        "bytes": 0,
+        "sha256": null,
+        "page_count": null,
+        "resolved_url": "https://www.fhwa.dot.gov/bridge/pubs/hif18041.pdf",
+        "error": "45 second download deadline",
+        "elapsed_seconds": 45.02
+      },
+      {
+        "id": "BM-019",
+        "url": "https://www.fhwa.dot.gov/bridge/lrfd/fhwanhi04043.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 3930767,
+        "sha256": "8ab43798dd71a94f4f3dbd74f2db15b833f79d632cc78462b60906a224f95fe7",
+        "page_count": 383,
+        "resolved_url": "https://www.fhwa.dot.gov/bridge/lrfd/fhwanhi04043.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\BM-019.pdf",
+        "elapsed_seconds": 8.11
+      },
+      {
+        "id": "GE-008",
+        "url": "https://www.microsoft.com/en-us/research/wp-content/uploads/1982/07/p235-blinn.pdf",
+        "status": "DOWNLOADED_VALID_PDF",
+        "bytes": 1284713,
+        "sha256": "5b7c153d0802bf067ecf41db5a24fabeaace56572fac370eb4c6616f1f0fcd93",
+        "page_count": 22,
+        "resolved_url": "https://www.microsoft.com/en-us/research/wp-content/uploads/1982/07/p235-blinn.pdf",
+        "local_path": "D:\\BIM  CIM\\DỰ ÁN NCKH 2 2026\\artifacts\\sage_research_20260923\\pdf_downloads\\GE-008.pdf",
+        "elapsed_seconds": 7.72
+      }
+    ]
+  },
+  {
+    "batch": "root-standards",
+    "completed_ids": [
+      "ST-002",
+      "ST-004",
+      "ST-006"
+    ],
+    "interrupted_ids": [
+      "ST-005",
+      "ST-011",
+      "ST-013"
+    ],
+    "note": "Stopped the remaining slow downloads; no completed local PDF claimed for interrupted items."
+  }
+]

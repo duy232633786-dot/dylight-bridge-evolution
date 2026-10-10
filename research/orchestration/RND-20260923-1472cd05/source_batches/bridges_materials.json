@@ -1,0 +1,1121 @@
+{
+  "sources": [
+    {
+      "id": "BM-001",
+      "title": "Tatara Bridge",
+      "authors": [
+        "Honshu-Shikoku Bridge Expressway Company Limited"
+      ],
+      "year": null,
+      "publisher": "HSBE",
+      "source_type": "project_case",
+      "topics": [
+        "cable_stayed",
+        "composite_box_girder",
+        "bridge_type_selection"
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "url": "https://www.jb-honshi.co.jp/english/corp_index/technology/introduction/introduction_tatara.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Bridge Type; project chronology; paragraphs on bridge-type reconsideration, HTML lines 80–91",
+      "summary_vi": "Trang của đơn vị vận hành mô tả Tatara là cầu dây văng ba nhịp liên tục với dầm hộp liên hợp, nhịp giữa 890 m. Phương án cầu treo ban đầu được xem xét lại theo điều kiện kinh tế, bảo tồn tự nhiên và tiến bộ kỹ thuật dây văng. Đây là ví dụ về lựa chọn hệ kết cấu gắn với bối cảnh dự án.",
+      "key_points_vi": [
+        "Loại cầu được điều chỉnh trong quá trình phát triển dự án.",
+        "Có mốc khởi công và thông xe do đơn vị vận hành công bố."
+      ],
+      "limitations_vi": [
+        "Không dùng thứ hạng nhịp dài trên trang như thống kê hiện thời.",
+        "Không có mô hình tính hay hồ sơ nghiệm thu trên trang."
+      ],
+      "project_use_vi": "Dùng làm hồ sơ dạng cầu dây văng và lý do lựa chọn hệ.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-002",
+      "title": "Akashi-Kaikyo Bridge",
+      "authors": [
+        "Honshu-Shikoku Bridge Expressway Company Limited"
+      ],
+      "year": null,
+      "publisher": "HSBE",
+      "source_type": "project_case",
+      "topics": [
+        "suspension",
+        "stiffening_truss",
+        "marine_construction"
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "url": "https://www.jb-honshi.co.jp/english/corp_index/technology/introduction/introduction_akashi.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Bridge Type; paragraphs on span and construction environment, HTML lines 80–90",
+      "summary_vi": "HSBE xác định Akashi-Kaikyo là cầu treo ba nhịp, hai khớp, có giàn tăng cứng. Trang nêu tổng chiều dài 3.911 m, nhịp giữa 1.991 m và điều kiện thi công eo biển sâu, dòng triều mạnh. Các dữ kiện giúp phân biệt cáp chịu lực chính với hệ giàn ổn định mặt cầu và bối cảnh thi công biển.",
+      "key_points_vi": [
+        "Nguồn trực tiếp từ đơn vị quản lý cầu.",
+        "Thông xe ngày 5 tháng 4 năm 1998 theo trang."
+      ],
+      "limitations_vi": [
+        "Trang giới thiệu không cung cấp hệ số khí động hoặc kiểm toán động đất."
+      ],
+      "project_use_vi": "Dùng làm trường hợp cầu treo giàn tăng cứng vượt eo biển.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-003",
+      "title": "The history of the Forth Bridge, Fife",
+      "authors": [
+        "Network Rail"
+      ],
+      "year": null,
+      "publisher": "Network Rail",
+      "source_type": "project_case",
+      "topics": [
+        "cantilever",
+        "steel_truss",
+        "railway_bridge",
+        "heritage"
+      ],
+      "countries": [
+        "United Kingdom"
+      ],
+      "url": "https://www.networkrail.co.uk/who-we-are/our-history/iconic-infrastructure/the-history-of-the-forth-bridge-fife/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Historical account; Fowler/Baker design and three double cantilevers, HTML lines 100–110",
+      "summary_vi": "Network Rail trình bày lịch sử phát triển cầu Forth và lựa chọn hệ hẫng đáp ứng yêu cầu vượt luồng tàu. Cầu gồm ba hệ hẫng kép và các nhịp treo giữa chúng; các tháp sử dụng cấu kiện thép dạng ống lớn. Nguồn thích hợp để đọc quan hệ giữa sơ đồ chịu lực, yêu cầu thông thuyền và trình tự phát triển công trình.",
+      "key_points_vi": [
+        "Fowler và Baker phát triển phương án hẫng.",
+        "Phân biệt nhịp treo giữa hẫng với hệ cáp treo."
+      ],
+      "limitations_vi": [
+        "Nguồn lịch sử không phải hồ sơ đánh giá khả năng chịu tải hiện tại."
+      ],
+      "project_use_vi": "Dùng phân loại cầu giàn hẫng đường sắt và yêu cầu tĩnh không.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-004",
+      "title": "Millau Viaduct",
+      "authors": [
+        "Eiffage Génie Civil"
+      ],
+      "year": null,
+      "publisher": "Eiffage Génie Civil",
+      "source_type": "project_case",
+      "topics": [
+        "cable_stayed",
+        "steel_deck",
+        "incremental_launching",
+        "construction"
+      ],
+      "countries": [
+        "France"
+      ],
+      "url": "https://www.eiffagegeniecivil.com/milau-viaduct",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Project narrative and technical description, HTML lines 34–43",
+      "summary_vi": "Nhà thầu Eiffage mô tả Millau là cầu dây văng nhiều nhịp, kết hợp trụ bê tông và mặt cầu thép. Trang liên hệ lựa chọn mặt cầu thép với quá trình lao lắp và tiến độ thi công. Đây là trường hợp đọc cùng lúc hình thức hoàn thiện và phương án dựng cầu, thay vì chỉ thu thập hình ảnh kiến trúc.",
+      "key_points_vi": [
+        "Tổng chiều dài công bố 2.460 m với bảy trụ bê tông.",
+        "Nguồn nhấn mạnh phương pháp lao mặt cầu."
+      ],
+      "limitations_vi": [
+        "Nhận định tối ưu và kinh tế do nhà thầu công bố, chưa đối soát độc lập."
+      ],
+      "project_use_vi": "Dùng làm trường hợp liên kết lựa chọn vật liệu với công nghệ lao cầu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-005",
+      "title": "Project Information",
+      "authors": [
+        "1915Çanakkale Bridge and Motorway Project"
+      ],
+      "year": null,
+      "publisher": "1915Çanakkale",
+      "source_type": "project_case",
+      "topics": [
+        "cross_strait",
+        "project_context",
+        "transport_network"
+      ],
+      "countries": [
+        "Türkiye"
+      ],
+      "url": "https://www.1915canakkale.com/en-us/corporate/project-information",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Project scope and alignment, HTML lines 3–5",
+      "summary_vi": "Trang dự án chính thức đặt cầu 1915Çanakkale trong hệ thống cao tốc và đường kết nối giữa hai bờ châu Âu, châu Á. Nội dung mô tả phạm vi tuyến, cầu cạn, nút giao và các công trình phụ trợ. Nguồn giúp lưu bối cảnh mạng lưới và phạm vi dự án, tránh đồng nhất toàn bộ dự án giao thông với riêng kết cấu cầu chính.",
+      "key_points_vi": [
+        "Mô tả vị trí kết nối Sütlüce và Lapseki.",
+        "Liệt kê các nhóm công trình đi kèm trong dự án."
+      ],
+      "limitations_vi": [
+        "Trang này không đủ dữ liệu để trích kích thước hay kiểm toán kết cấu cầu chính."
+      ],
+      "project_use_vi": "Dùng làm hồ sơ bối cảnh dự án vượt eo biển tại Türkiye.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-006",
+      "title": "Chenab Bridge, India",
+      "authors": [
+        "Leonhardt, Andrä und Partner"
+      ],
+      "year": null,
+      "publisher": "LAP",
+      "source_type": "project_case",
+      "topics": [
+        "steel_arch",
+        "truss_arch",
+        "railway_bridge",
+        "erection_stage_analysis"
+      ],
+      "countries": [
+        "India"
+      ],
+      "url": "https://www.lap-consult.com/en/projects/detail/eisenbahnbruecke-ueber-den-chenab-in-kaschmir-indien",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Railway Bridge across the Chenab River; Services by LAP, HTML lines 13–22",
+      "summary_vi": "Đơn vị thiết kế LAP mô tả Chenab là cầu vòm giàn thép đường sắt, tổng chiều dài 1.315 m và nhịp chính 467 m. Phạm vi công việc nêu rõ phân tích tổng thể, thiết kế chi tiết và phân tích giai đoạn dựng vòm, trụ vòm. Đây là nguồn để gắn sơ đồ hình học với nhu cầu kiểm tra các trạng thái thi công.",
+      "key_points_vi": [
+        "Cầu vòm giàn thép, không phải cầu dây văng.",
+        "Phân tích giai đoạn lắp dựng là phần công việc được nêu rõ."
+      ],
+      "limitations_vi": [
+        "Trang không cung cấp tổ hợp tải, số liệu nền móng hoặc mô hình tính."
+      ],
+      "project_use_vi": "Dùng làm trường hợp vòm giàn thép đường sắt và phân tích dựng lắp.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-007",
+      "title": "Main Bridge",
+      "authors": [
+        "Highways Department, Hong Kong SAR Government"
+      ],
+      "year": null,
+      "publisher": "Hong Kong Highways Department",
+      "source_type": "project_case",
+      "topics": [
+        "sea_crossing",
+        "bridge_tunnel",
+        "project_context"
+      ],
+      "countries": [
+        "China"
+      ],
+      "url": "https://www.hyd.gov.hk/en/our_projects/road_projects/hzmb_projects/6835th/index.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Project Description, HTML lines 52–57",
+      "summary_vi": "Cơ quan đường bộ Hồng Kông mô tả cầu chính HZMB như một hệ vượt biển kết hợp cầu và hầm, nối các khu vực Hồng Kông, Chu Hải và Ma Cao. Nguồn cho biết quy mô làn xe và giới hạn không gian của phần cầu chính. Đây là tài liệu bối cảnh để phân tách hệ cầu, đảo nhân tạo và hầm trong kho dự án.",
+      "key_points_vi": [
+        "Phân biệt phần cầu chính với các dự án kết nối của từng khu vực.",
+        "Có liên kết tới cơ quan quản lý HZMB."
+      ],
+      "limitations_vi": [
+        "Mô tả tổng quan, không cung cấp đặc tính tiết diện hoặc hồ sơ môi trường biển chi tiết."
+      ],
+      "project_use_vi": "Dùng phân loại hệ vượt biển phối hợp nhiều loại công trình.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-008",
+      "title": "Bridge across the Blue River",
+      "authors": [
+        "Stráský, Hustý a partneři",
+        "Jiří Stráský"
+      ],
+      "year": null,
+      "publisher": "SHP",
+      "source_type": "project_case",
+      "topics": [
+        "stress_ribbon",
+        "pedestrian",
+        "precast",
+        "composite_deck"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.shp.eu/en/projects/bridge-across-the-blue-river/60",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Project description; Structure length; Scope of work, HTML lines 14–42",
+      "summary_vi": "SHP giới thiệu cầu qua Blue River tại Colorado là một nhịp dây võng bê tông lắp ghép, kết hợp các đốt đúc sẵn và bản mặt cầu liên hợp. Trang ghi chiều dài nhịp 76,8 m và vai trò thiết kế ý tưởng, phân tích tĩnh và động của Jiří Stráský. Nguồn minh họa một dạng cầu đi bộ khác với dầm hoặc vòm thông thường.",
+      "key_points_vi": [
+        "Hoàn thành năm 2001 theo trang dự án.",
+        "Sơ đồ một nhịp stress ribbon với đốt đúc sẵn."
+      ],
+      "limitations_vi": [
+        "Không công bố giá trị lực neo, độ võng hay tần số dao động."
+      ],
+      "project_use_vi": "Dùng làm hồ sơ cầu đi bộ dây võng và kết cấu đốt lắp ghép.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-009",
+      "title": "Pedestrian Bridge accross the Vltava River in Prague",
+      "authors": [
+        "Stráský, Hustý a partneři",
+        "Jiří Stráský"
+      ],
+      "year": null,
+      "publisher": "SHP",
+      "source_type": "project_case",
+      "topics": [
+        "stress_ribbon",
+        "pedestrian",
+        "prestressing",
+        "durability",
+        "failure_case"
+      ],
+      "countries": [
+        "Czech Republic"
+      ],
+      "url": "https://www.shp.eu/en/projects/pedestrian-bridge-accross-the-vltava-river-in-prague/157",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Project narrative; Structure type; note on 2017 failure",
+      "summary_vi": "Trang SHP mô tả cầu dây võng nhiều nhịp tại Praha-Troja, dùng đốt đúc sẵn, cáp chịu tải và dự ứng lực có bám dính. Nguồn đề cập lực ngang truyền vào hệ tường và cọc nhỏ, đồng thời ghi nhận công trình đã hư hỏng năm 2017. Hồ sơ này hữu ích để lưu cả cấu tạo và lịch sử bất lợi của một dạng cầu.",
+      "key_points_vi": [
+        "Có mô tả đường truyền lực ngang và cấu kiện neo.",
+        "Trang nêu tác động muối chống băng trong nhận định về sự cố."
+      ],
+      "limitations_vi": [
+        "Nhận định nguyên nhân của trang thiết kế không thay thế báo cáo điều tra.",
+        "Trang có hai chỉ số chiều dài khác nhau; cần phân biệt phạm vi đo."
+      ],
+      "project_use_vi": "Dùng gắn dạng stress ribbon với nhu cầu bảo vệ cáp và theo dõi sự cố.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-010",
+      "title": "Trebruer i bærekraftig limtre",
+      "authors": [
+        "Moelven"
+      ],
+      "year": null,
+      "publisher": "Moelven",
+      "source_type": "project_case",
+      "topics": [
+        "timber",
+        "glulam",
+        "beam",
+        "arch",
+        "truss",
+        "prefabrication"
+      ],
+      "countries": [
+        "Norway",
+        "Sweden"
+      ],
+      "url": "https://www.moelven.com/no/produkter-og-tjenester/alt-om-limtre/trebuer-i-barekraftig-limtre/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Brutype: Bjelkebru, Buebru, Fagverksbru, Platebru, Ribbebru; HTML lines 81–132",
+      "summary_vi": "Nhà sản xuất Moelven trình bày các hệ cầu gỗ ghép lớp gồm dầm, vòm, giàn, bản và hệ sườn. Trang giải thích lựa chọn dạng cầu theo nhịp, tải, công năng và điều kiện chế tạo, vận chuyển; cầu đi bộ nhỏ có thể được lắp sẵn tại xưởng. Phần vòm nêu rõ lực ngang cần được giữ bằng nền móng hoặc thanh kéo.",
+      "key_points_vi": [
+        "Nguồn trực tiếp từ đơn vị cung ứng cầu gỗ.",
+        "Có liên hệ giữa hình thức kết cấu và sản xuất."
+      ],
+      "limitations_vi": [
+        "Tuyên bố lợi ích carbon của nhà sản xuất không thay thế LCA theo dự án."
+      ],
+      "project_use_vi": "Dùng lập bảng dạng cầu gỗ và các câu hỏi về chế tạo, vận chuyển.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-011",
+      "title": "Footfall analysis for Singapore’s Helix Bridge",
+      "authors": [
+        "Oasys",
+        "Arup"
+      ],
+      "year": null,
+      "publisher": "Oasys",
+      "source_type": "project_case",
+      "topics": [
+        "pedestrian",
+        "helical_structure",
+        "vibration",
+        "soil_structure_interaction"
+      ],
+      "countries": [
+        "Singapore"
+      ],
+      "url": "https://www.oasys-software.com/case-study/footfall-analysis-for-singapores-helix-bridge/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Structural description; Vibration analysis, HTML lines 53–67",
+      "summary_vi": "Nghiên cứu tình huống của Oasys mô tả hai hệ xoắn liên kết bằng thanh chống và thanh kéo ở cầu Helix. Phần kỹ thuật xem xét dao động do người đi bộ, tải đông người lệch về các sàn ngắm cảnh và tương tác đất–kết cấu. Trang cho biết mô phỏng động được kiểm tra bằng thử nghiệm tại hiện trường, nhưng không kèm dữ liệu thô.",
+      "key_points_vi": [
+        "Hình xoắn được giải thích qua liên kết và độ cứng.",
+        "Trường hợp tải người đi bộ bất đối xứng cần được xét."
+      ],
+      "limitations_vi": [
+        "Không dùng chỉ số chiều dài 3,5 km trên trang làm dữ liệu thiết kế khi chưa đối soát.",
+        "Không có báo cáo thử nghiệm đầy đủ để tái lập."
+      ],
+      "project_use_vi": "Dùng liên kết hình thức cầu đi bộ với kiểm tra tiện nghi dao động.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://a61.com.sg/projects/helix-bridge"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-012",
+      "title": "INTRODUCING STRIATUS - THE FIRST OF ITS KIND 3D CONCRETE PRINTED BRIDGE",
+      "authors": [
+        "Holcim"
+      ],
+      "year": null,
+      "publisher": "Holcim",
+      "source_type": "project_case",
+      "topics": [
+        "masonry_arch",
+        "3d_concrete_printing",
+        "dry_assembly",
+        "pedestrian"
+      ],
+      "countries": [
+        "Italy",
+        "Switzerland"
+      ],
+      "url": "https://www.holcim.com/media/media-releases/striatus-first-3D-concrete-printed-arched-bridge",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Strength through geometry; Circular by design; project partners, HTML lines 204–225",
+      "summary_vi": "Thông cáo của đối tác Holcim giới thiệu Striatus, dự án phối hợp ETH Zurich, ZHACODE và incremental3D tại Venice. Nội dung mô tả vòm các khối bê tông in ba chiều, lắp khô và truyền lực theo cơ chế nén. Nguồn phù hợp cho hồ sơ nguyên lý và chế tạo thử nghiệm; không phải bằng chứng rằng mọi hình in bê tông đều có khả năng chịu lực tương tự.",
+      "key_points_vi": [
+        "Kết hợp nguyên lý xây khối với sản xuất bằng robot.",
+        "Thiết kế lắp khô nhằm hỗ trợ tháo lắp và tái sử dụng."
+      ],
+      "limitations_vi": [
+        "Thông cáo ở giai đoạn chuẩn bị triển lãm, không phải hồ sơ nghiệm thu.",
+        "PDF bài nghiên cứu ETH đã thử mở nhưng công cụ truy cập lỗi; chưa đọc toàn văn."
+      ],
+      "project_use_vi": "Dùng lưu trường hợp vòm in 3D với ranh giới bằng chứng rõ.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://www.research-collection.ethz.ch/entities/publication/142bab19-6dd9-4e1e-9010-0ab8f5f62b8a",
+        "https://striatusbridge.com"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-013",
+      "title": "Ultra-High Performance Concrete: A State-of-the-Art Report for the Bridge Community",
+      "authors": [
+        "Henry G. Russell",
+        "Benjamin A. Graybeal"
+      ],
+      "year": 2013,
+      "publisher": "Federal Highway Administration",
+      "source_type": "research_paper",
+      "topics": [
+        "UHPC",
+        "durability",
+        "chlorides",
+        "freeze_thaw",
+        "fire"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/hpc/13060/",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Chapter 5: Permeability; Freeze-Thaw Resistance; Fire Resistance, HTML chapter 005.cfm lines 90–151",
+      "summary_vi": "Báo cáo FHWA tổng hợp nghiên cứu về UHPC; phần đã đọc so sánh các phép thử thấm chloride, đóng băng–tan băng và chịu lửa. Kết quả thay đổi theo cấp phối, dưỡng hộ, trạng thái nứt và loại sợi. Ví dụ chịu lửa cho thấy không thể chuyển lợi ích độ bền môi trường thành khẳng định chung rằng mọi UHPC đều chống bong nổ tốt.",
+      "key_points_vi": [
+        "Phải lưu phương pháp thử, tuổi mẫu và chế độ dưỡng hộ.",
+        "Có cả kết quả có lợi và trường hợp bong nổ ở nhiệt độ cao."
+      ],
+      "limitations_vi": [
+        "Tổng quan xuất bản 2013; cần lần tới thí nghiệm gốc trước khi lấy tham số thiết kế."
+      ],
+      "project_use_vi": "Dùng lập bản đồ bằng chứng vật liệu và điều kiện áp dụng UHPC.",
+      "pdf_url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/hpc/13060/13060.pdf",
+      "related_urls": [
+        "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/hpc/13060/005.cfm"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-014",
+      "title": "Design and Construction of Field-Cast UHPC Connections",
+      "authors": [
+        "Federal Highway Administration"
+      ],
+      "year": 2014,
+      "publisher": "Federal Highway Administration",
+      "source_type": "manual",
+      "topics": [
+        "UHPC",
+        "connections",
+        "precast",
+        "surface_preparation",
+        "formwork"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/14084/index.cfm",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Construction of Field-Cast UHPC Connections: Surface Preparation for Bond; Formwork, HTML lines 403–425",
+      "summary_vi": "Hướng dẫn mô tả mối nối UHPC đổ tại chỗ giữa các cấu kiện đúc sẵn. Phần đã đọc nhấn mạnh bề mặt tiếp xúc có cốt liệu lộ, trạng thái ẩm thích hợp và ván khuôn kín chịu áp lực hỗn hợp mới trộn. Liên kết tốt phụ thuộc quy trình thi công, không chỉ vào cường độ nén được ghi trên nhãn vật liệu.",
+      "key_points_vi": [
+        "Chuẩn bị mặt tiếp xúc là một điều kiện của khả năng bám dính.",
+        "Ván khuôn cần kiểm soát rò rỉ và áp lực."
+      ],
+      "limitations_vi": [
+        "Đây là bản 2014; có bản cập nhật FHWA-HRT-19-011 cần đối chiếu trước áp dụng."
+      ],
+      "project_use_vi": "Dùng lưu tri thức mối nối và kiểm soát thi công UHPC.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://highways.dot.gov/media/1961"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-015",
+      "title": "Report on Techniques for Bridge Strengthening: Main Report",
+      "authors": [
+        "M. Chajes",
+        "T. Rollins",
+        "H. Dai",
+        "T. Murphy"
+      ],
+      "year": 2019,
+      "publisher": "Federal Highway Administration",
+      "source_type": "research_paper",
+      "topics": [
+        "FRP",
+        "composites",
+        "strengthening",
+        "durability",
+        "repair"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/bridge/pubs/hif18041.pdf",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "§2.1 What is an FRP Composite Material? PDF pages 13–14; §5.4 Texas DOT, PDF pages 41–42; cover/report documentation pages 1,4",
+      "summary_vi": "Báo cáo tập trung vào các phương pháp gia cường cầu, đặc biệt FRP. Phần đã đọc giải thích vai trò chịu lực của sợi, vai trò truyền lực và bảo vệ của nền polymer, cùng ảnh hưởng của cách bố trí sợi. Mục Texas DOT dẫn các nghiên cứu về môi trường ăn mòn và kiểm soát chất lượng, giúp lần về bằng chứng thử nghiệm cụ thể.",
+      "key_points_vi": [
+        "Phân biệt sợi, nền và hướng sợi khi mô tả vật liệu.",
+        "Không đồng nhất sức bền riêng cao với độ cứng lớn hơn thép."
+      ],
+      "limitations_vi": [
+        "Đây là tổng hợp kỹ thuật, không phải chứng nhận cho một hệ FRP thương mại.",
+        "Năm báo cáo là 2019 dù mã tài liệu chứa 18."
+      ],
+      "project_use_vi": "Dùng tạo cây chủ đề FRP và truy vết các chương trình thử nghiệm gia cường.",
+      "pdf_url": "https://www.fhwa.dot.gov/bridge/pubs/hif18041.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-016",
+      "title": "Improved Corrosion-Resistant Steel For Highway Bridge Construction Knowledge-Based Design",
+      "authors": [
+        "Federal Highway Administration"
+      ],
+      "year": 2009,
+      "publisher": "Federal Highway Administration",
+      "source_type": "research_paper",
+      "topics": [
+        "steel",
+        "weathering_steel",
+        "corrosion",
+        "alloy_design"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/publications/research/infrastructure/structures/09053/index.cfm",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Technical note: background and Results, HTML lines 69–98",
+      "summary_vi": "Ghi chú nghiên cứu FHWA giải thích cách chuyển từ điều chỉnh hợp kim theo kinh nghiệm sang hiểu cơ chế ăn mòn và lớp thụ động. Phần kết quả liên hệ môi trường điện hóa với vai trò các nguyên tố hợp kim. Tài liệu cung cấp hướng đọc cơ chế bảo vệ thép, đồng thời cho thấy đặc tính vật liệu phụ thuộc môi trường phơi nhiễm.",
+      "key_points_vi": [
+        "Có sử dụng biểu đồ thế điện cực–pH và nghiên cứu lớp oxide.",
+        "Những đề xuất hợp kim dựa trên thử nghiệm và phân tích được dẫn nguồn."
+      ],
+      "limitations_vi": [
+        "Không lấy tỷ lệ tiết kiệm trên trang làm giả định kinh tế chung.",
+        "Không chuyển đề xuất hợp kim nghiên cứu thành vật liệu được phê duyệt."
+      ],
+      "project_use_vi": "Dùng tổ chức tri thức cơ chế chống ăn mòn và nguồn thử nghiệm thép.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-017",
+      "title": "Timber bridges",
+      "authors": [
+        "Mark E. Mankowski",
+        "Grant T. Kirker",
+        "Rubin Shmulsky"
+      ],
+      "year": 2023,
+      "publisher": "Mississippi State University Forest and Wildlife Research Center; USDA Forest Service repository",
+      "source_type": "manual",
+      "topics": [
+        "timber",
+        "glulam",
+        "durability",
+        "preservative_treatment",
+        "standard_plans"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://research.fs.usda.gov/treesearch/66405",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Chapter 2: Timber Bridge Designs, PDF page 23, paragraphs on revised lumber properties, drainage, treatment and standard plans (text lines 541–573)",
+      "summary_vi": "Ấn phẩm tổng hợp các dạng cầu gỗ và biện pháp bảo vệ độ bền. Đoạn đã đọc lưu ý thay đổi giá trị thiết kế gỗ làm thay đổi khả năng vượt nhịp của các bảng mẫu cũ. Các nguyên tắc tránh đọng nước, thoát nước, xử lý bảo quản và kiểm tra định kỳ được liên hệ với thiết kế và duy trì công trình.",
+      "key_points_vi": [
+        "Bảng mẫu cũ cần đối chiếu thuộc tính gỗ và tải áp dụng.",
+        "Độ bền gắn với chi tiết thoát nước và bảo trì."
+      ],
+      "limitations_vi": [
+        "Ấn phẩm được kho USDA ghi là informally refereed.",
+        "Chỉ đọc các đoạn chọn lọc, chưa kiểm tra toàn bộ tiêu chuẩn được dẫn."
+      ],
+      "project_use_vi": "Dùng tạo mục cầu gỗ, độ bền và giới hạn dùng lại bản vẽ mẫu.",
+      "pdf_url": "https://research.fs.usda.gov/download/treesearch/66405.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-018",
+      "title": "Section Shapes for Short-Span UHPC Bridges",
+      "authors": [
+        "David Garber",
+        "Rafic Helou",
+        "Benjamin Graybeal"
+      ],
+      "year": 2024,
+      "publisher": "Federal Highway Administration",
+      "source_type": "manual",
+      "topics": [
+        "UHPC",
+        "beam",
+        "box_girder",
+        "section_geometry",
+        "stability",
+        "fabrication"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://highways.dot.gov/media/62156",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Chapter 2: Sample of Previously Used UHPC Section Shapes, printed pp.4–6/PDF pp.18–20; General Section Limitations and Stability Considerations, printed pp.7–9/PDF pp.21–23",
+      "summary_vi": "Báo cáo FHWA xem xét tiết diện UHPC cho cầu nhịp ngắn, từ các công trình đã dùng đến các dạng đề xuất. Phần đọc sâu nêu kiểm tra cánh trên, chọc thủng, ổn định cấu kiện mảnh và giới hạn thể tích một mẻ đúc. Các hình thức tiết kiệm vật liệu vì vậy phải đi cùng yêu cầu phân tích và khả năng chế tạo thực tế.",
+      "key_points_vi": [
+        "Có trường hợp Mars Hill, Jakway Park và các dạng tiết diện khác.",
+        "Báo cáo nhận diện khoảng trống hướng dẫn ổn định cấu kiện UHPC mảnh."
+      ],
+      "limitations_vi": [
+        "Tài liệu tự ghi không phải tiêu chuẩn hoặc quy định.",
+        "Một số bài toán minh họa là giả định, không phải cầu đã thi công."
+      ],
+      "project_use_vi": "Dùng lập thư viện tiết diện có liên kết tới giới hạn chế tạo và kiểm tra.",
+      "pdf_url": "https://highways.dot.gov/media/62156",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-019",
+      "title": "Comprehensive Design Example for Prestressed Concrete (PSC) Girder Superstructure Bridge with Commentary (in US Customary Units)",
+      "authors": [
+        "Wagdy G. Wassef",
+        "Christopher Smith",
+        "Chad M. Clancy",
+        "Martin J. Smith"
+      ],
+      "year": 2003,
+      "publisher": "Federal Highway Administration",
+      "source_type": "manual",
+      "topics": [
+        "prestressed_concrete",
+        "beam",
+        "composite_section",
+        "design_example",
+        "units"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/bridge/lrfd/fhwanhi04043.pdf",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Design Step 2: Materials and §2.2 Girder geometry and section properties, printed pp.2-3–2-5/PDF pp.11–13; §2.3 Effective flange width, printed p.2-10/PDF p.18",
+      "summary_vi": "Ví dụ thiết kế FHWA trình bày hình học, vật liệu và đặc trưng tiết diện của cầu dầm bê tông dự ứng lực. Các đoạn đã đọc phân biệt trạng thái truyền dự ứng lực, tiết diện riêng của dầm và tiết diện liên hợp với bản mặt cầu. Tài liệu cũng tách phần hình học dùng tính đặc trưng khỏi phần vẫn phải kể vào tĩnh tải.",
+      "key_points_vi": [
+        "Nguồn ghi rõ hệ đơn vị US customary.",
+        "Ví dụ có điều kiện vật liệu và thời điểm truyền lực cụ thể."
+      ],
+      "limitations_vi": [
+        "Tài liệu lưu trữ từ 2003, không đại diện bộ điều khoản hiện hành.",
+        "Chưa tái tính các ví dụ số trong lần đọc này."
+      ],
+      "project_use_vi": "Dùng học cấu trúc một hồ sơ tính dầm và cách lưu giả định.",
+      "pdf_url": "https://www.fhwa.dot.gov/bridge/lrfd/fhwanhi04043.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-020",
+      "title": "Sub-report 1 on the bridge collapse at Tretten on 15 August 2022",
+      "authors": [
+        "Norwegian Safety Investigation Authority"
+      ],
+      "year": 2023,
+      "publisher": "NSIA",
+      "source_type": "research_paper",
+      "topics": [
+        "timber",
+        "connection_failure",
+        "block_shear",
+        "fatigue",
+        "failure_investigation"
+      ],
+      "countries": [
+        "Norway"
+      ],
+      "url": "https://nsia.no/Road/Published-reports/2023-03",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Official summary and recommendation 2023/10T; attached Norwegian report §1.3.3 HOVEDKONKLUSJON, PDF pp.20–21, text lines 427–451",
+      "summary_vi": "Báo cáo điều tra xem xét vụ sập cầu gỗ Tretten, xác định cơ chế có khả năng nhất là phá hoại khối tại liên kết một thanh chéo và suy giảm dưới tải lặp. Nguồn nêu việc kiểm toán lại đã phát hiện vấn đề nhưng gia cường đề xuất chưa được thực hiện. Bài học bao gồm kiểm tra liên kết và theo dõi hành động sau đánh giá.",
+      "key_points_vi": [
+        "Giữ cách diễn đạt xác suất của cơ quan điều tra.",
+        "Có khuyến nghị kiểm tra liên kết chịu kéo dọc thớ về phá hoại khối."
+      ],
+      "limitations_vi": [
+        "Bản ghi chỉ bao phủ phần 1 (2023); phần 2 đã xuất bản năm 2024 và cần đọc riêng.",
+        "Không suy rộng một sự cố thành kết luận mọi cầu gỗ không an toàn."
+      ],
+      "project_use_vi": "Dùng lưu cơ chế hư hỏng và bài học quản lý có nguồn điều tra.",
+      "pdf_url": "https://nsia.no/Road/Published-reports/2023-03?attach=1&pid=SHT-Report-ReportFile",
+      "related_urls": [
+        "https://nsia.no/Road/Published-reports/2024-03"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-021",
+      "title": "ABC - Accelerated - Technologies and Innovations - Construction - Federal Highway Administration",
+      "authors": [
+        "Federal Highway Administration"
+      ],
+      "year": null,
+      "publisher": "Federal Highway Administration",
+      "source_type": "manual",
+      "topics": [
+        "ABC",
+        "prefabrication",
+        "construction_planning",
+        "mobility_impact"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.fhwa.dot.gov/bridge/abc/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "What is ABC?; Accelerated Bridge Construction; Time Metrics for ABC, HTML lines 79–123",
+      "summary_vi": "FHWA định nghĩa ABC là cách phối hợp quy hoạch, thiết kế, vật liệu và thi công để giảm thời gian tác động tại hiện trường. Trang phân biệt thời gian thi công tại chỗ với thời gian ảnh hưởng giao thông, đồng thời nối tới cấu kiện đúc sẵn và phương thức đưa kết cấu vào vị trí. Đây là khung phân loại phương pháp, không chỉ một kỹ thuật lắp cầu.",
+      "key_points_vi": [
+        "Hai chỉ tiêu thời gian phục vụ hai mục đích khác nhau.",
+        "ABC bao gồm quyết định tổ chức dự án và mua sắm."
+      ],
+      "limitations_vi": [
+        "Không dùng số lượng cầu cần sửa chữa trên trang như thống kê hiện thời.",
+        "PDF ABC Manual được liên kết nhưng lần mở này lỗi; chưa đọc toàn văn manual."
+      ],
+      "project_use_vi": "Dùng thiết lập từ vựng về ABC, chế tạo trước và tác động giao thông.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://www.fhwa.dot.gov/bridge/abc/docs/abcmanual.pdf"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-022",
+      "title": "Segmental construction",
+      "authors": [
+        "American Segmental Bridge Institute"
+      ],
+      "year": null,
+      "publisher": "ASBI",
+      "source_type": "manual",
+      "topics": [
+        "segmental",
+        "balanced_cantilever",
+        "span_by_span",
+        "precast",
+        "extradosed"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://asbi-assoc.org/about/segmental-construction/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Precast segments; Cast-in-place: balanced cantilever; Cable-stayed bridges; Extradosed bridges, HTML lines 13–33",
+      "summary_vi": "ASBI phân biệt đúc sẵn theo dây chuyền ngắn hoặc dài, lắp toàn nhịp, hẫng cân bằng và lắp tiến dần. Trang giải thích vai trò xe đúc trong hẫng đổ tại chỗ, đồng thời mô tả bố trí cáp và khác biệt của cầu extradosed. Nội dung giúp nối loại kết cấu với phương pháp thi công, thay vì xem chúng là các nhãn độc lập.",
+      "key_points_vi": [
+        "Có mô tả ba phương án lắp các đốt đúc sẵn.",
+        "Hệ cáp và độ cứng xoắn của dầm ảnh hưởng lẫn nhau."
+      ],
+      "limitations_vi": [
+        "Khoảng nhịp kinh tế chỉ là hướng dẫn của nguồn, không phải giới hạn phổ quát.",
+        "Chưa đọc handbook ASBI do PDF truy cập lỗi."
+      ],
+      "project_use_vi": "Dùng xây bảng thuật ngữ kết cấu đốt và các chuỗi thi công.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-023",
+      "title": "Construction Methods",
+      "authors": [
+        "BBR Network"
+      ],
+      "year": null,
+      "publisher": "BBR Network",
+      "source_type": "manual",
+      "topics": [
+        "balanced_cantilever",
+        "incremental_launching",
+        "MSS",
+        "span_by_span",
+        "construction_equipment"
+      ],
+      "countries": [
+        "Switzerland",
+        "Türkiye",
+        "Spain"
+      ],
+      "url": "https://www.bbrnetwork.com/technologies/construction-methods/",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Balanced cantilever (cast-in-situ and precast); Incremental launching, HTML lines 63–80",
+      "summary_vi": "Nhà cung cấp công nghệ BBR mô tả đúc hẫng cân bằng và lao dọc phân đoạn, đồng thời phân biệt đúc tại vị trí với chế tạo trước. Phần lao dọc nêu bãi đúc sau mố, liên kết các đoạn bằng dự ứng lực, gối trượt tạm và mũi dẫn để giảm mômen thi công. Nguồn hữu ích để nhận diện thiết bị và trạng thái kết cấu tạm.",
+      "key_points_vi": [
+        "Phương pháp thi công tạo các trạng thái chịu lực riêng.",
+        "Vị trí bãi đúc và đường vận chuyển là dữ liệu đầu vào."
+      ],
+      "limitations_vi": [
+        "Nguồn nhà cung cấp; lợi ích kinh tế và khoảng nhịp cần kiểm chứng theo dự án."
+      ],
+      "project_use_vi": "Dùng lập danh mục công nghệ, thiết bị tạm và dữ liệu thi công cần thu thập.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-024",
+      "title": "Development of materials",
+      "authors": [
+        "Honshu-Shikoku Bridge Expressway Company Limited"
+      ],
+      "year": null,
+      "publisher": "HSBE",
+      "source_type": "project_case",
+      "topics": [
+        "underwater_concrete",
+        "high_workability_concrete",
+        "low_heat_cement",
+        "high_strength_wire"
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "url": "https://www.jb-honshi.co.jp/english/corp_index/technology/construction/construction_material.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Concrete: Underwater desegregate concrete, Highly workable concrete, Low-heat cement; Steel material: High-strength wire",
+      "summary_vi": "HSBE trình bày quá trình phát triển bê tông thi công dưới nước, bê tông dễ đổ và xi măng ít tỏa nhiệt cho hệ cầu Honshu–Shikoku. Các giải pháp được gắn với móng lớn, cốt thép dày và rủi ro nứt nhiệt. Phần dây cường độ cao cho cầu treo cho thấy vật liệu được phát triển để đáp ứng một yêu cầu kết cấu và thi công cụ thể.",
+      "key_points_vi": [
+        "Phát triển vật liệu gắn với thử nghiệm thi công.",
+        "Nứt nhiệt và khả năng đổ là yêu cầu ngoài cường độ."
+      ],
+      "limitations_vi": [
+        "Trang không cung cấp cấp phối, quy trình thử và tiêu chí nghiệm thu đầy đủ."
+      ],
+      "project_use_vi": "Dùng liên kết yêu cầu công trường với lịch sử phát triển vật liệu.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-025",
+      "title": "Maintenance technology for long-span bridges (related to superstructures)",
+      "authors": [
+        "Honshu-Shikoku Bridge Expressway Company Limited"
+      ],
+      "year": null,
+      "publisher": "HSBE",
+      "source_type": "manual",
+      "topics": [
+        "cable_corrosion",
+        "dehumidification",
+        "nondestructive_inspection",
+        "hanger_vibration",
+        "maintenance"
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "url": "https://www.jb-honshi.co.jp/english/corp_index/technology/maintenance/maintenance_super.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Dry air injection system; Suspension bridge hanger rope non-destructive inspection technology; vibration countermeasures, HTML lines 76–100",
+      "summary_vi": "Nguồn vận hành HSBE mô tả kiểm soát ẩm trong cáp chính, kiểm tra dây treo bằng phương pháp từ thông và xử lý dao động dây do gió. Các giải pháp xuất phát từ quan sát ăn mòn hoặc dao động trên cầu thực. Đây là nguồn nối kiến thức hình thức cầu nhịp lớn với khả năng tiếp cận, đo kiểm và duy trì trong suốt vòng đời.",
+      "key_points_vi": [
+        "Có mục tiêu quản lý độ ẩm riêng cho hệ cáp của HSBE.",
+        "Kiểm tra từ thông hỗ trợ đánh giá mất tiết diện dây treo."
+      ],
+      "limitations_vi": [
+        "Ngưỡng và phương pháp mô tả thuộc hệ cầu này; không tự động áp dụng cho mọi cáp."
+      ],
+      "project_use_vi": "Dùng xây nhánh tri thức bảo trì cáp và yêu cầu kiểm tra tiếp cận.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-026",
+      "title": "Post-Tensioned Box Girder Design Manual",
+      "authors": [
+        "John Corven"
+      ],
+      "year": 2016,
+      "publisher": "Federal Highway Administration; U.S. Government Publishing Office repository",
+      "source_type": "manual",
+      "topics": [
+        "box_girder",
+        "post_tensioning",
+        "grouting",
+        "construction"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.govinfo.gov/app/details/GOVPUB-TD2-PURL-gpo160261",
+      "doi": null,
+      "access_status": "CATALOG_ONLY",
+      "reading_level": "METADATA_ONLY",
+      "read_locator": "GovInfo Content Details: Personal Author, Date Issued, Subject; full PDF open attempted and failed",
+      "summary_vi": "Bản ghi chính thức GovInfo xác nhận tài liệu của FHWA về thiết kế dầm hộp dự ứng lực căng sau, tác giả John Corven và năm xuất bản 2016. Chủ đề thư mục bao gồm thiết kế, thi công, vữa và bó cáp. Bản PDF chính thức đã được thử mở nhưng công cụ không tải được, nên hồ sơ này chỉ ghi nhận tài liệu cần đọc tiếp.",
+      "key_points_vi": [
+        "Tác giả và năm được xác minh từ kho chính phủ.",
+        "Có liên kết tới bản PDF chính thức."
+      ],
+      "limitations_vi": [
+        "Chưa đọc chương kỹ thuật; không rút ra yêu cầu hay công thức từ bản ghi.",
+        "PDF của cả FHWA và bản lưu GovInfo đều lỗi truy cập trong phiên này."
+      ],
+      "project_use_vi": "Dùng làm mục chờ đọc sâu về dầm hộp căng sau.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://www.fhwa.dot.gov/bridge/concrete/hif15016.pdf"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-027",
+      "title": "Msikaba Bridge",
+      "year": null,
+      "authors": [],
+      "publisher": "SMEC",
+      "countries": [
+        "South Africa"
+      ],
+      "url": "https://www.smec.com/project/msikaba-bridge/",
+      "doi": null,
+      "source_type": "project_case",
+      "topics": [
+        "bridge-forms",
+        "construction"
+      ],
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Solution; Grouting trials; Composite deck; Wind testing; Concrete thermal modelling.",
+      "summary_vi": "SMEC mô tả cầu dây văng với tháp chữ Y, khối neo, kết cấu nhịp liên hợp và phân tích nhiều giai đoạn lắp dựng. Trang kỹ thuật đề cập thử bơm vữa tỷ lệ thật, thí nghiệm hầm gió, mô hình nhiệt và quan trắc bê tông. Ví dụ cho thấy phát triển hình dạng phải gắn kiểm chứng chế tạo và thi công.",
+      "key_points_vi": [
+        "Cần dữ liệu trạng thái lắp dựng và điều chỉnh cáp.",
+        "Có kiểm soát nhiệt thủy hóa và thử vữa cho bó cáp khó."
+      ],
+      "limitations_vi": [
+        "Trang có mô tả kích thước nhịp không thống nhất giữa các mục; chưa dùng số đo làm dữ liệu thiết kế.",
+        "Không suy ra tiến độ hiện tại từ mục thời gian 2017–2025."
+      ],
+      "project_use_vi": "Bổ sung trường dữ liệu quá trình và kiểm chứng cho cầu nhịp lớn.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-028",
+      "title": "Puente Chacao — proyecto y biblioteca oficial",
+      "year": null,
+      "authors": [],
+      "publisher": "Ministerio de Obras Públicas de Chile",
+      "countries": [
+        "Chile"
+      ],
+      "url": "https://www.mop.gob.cl/puentechacao/",
+      "doi": null,
+      "source_type": "project_case",
+      "topics": [
+        "bridge-forms",
+        "construction"
+      ],
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Trang tổng quan: Historia del Proyecto, Biblioteca del Puente Chacao.",
+      "summary_vi": "Cổng chủ đầu tư trình bày mục tiêu nối đảo Chiloé với đất liền, lịch sử lựa chọn hình thức đầu tư và các giai đoạn thiết kế–thi công. Cổng có thư viện tài liệu để mở rộng nghiên cứu công trình Nam Mỹ. Đợt này chưa đọc hồ sơ kỹ thuật từ thư viện nên chưa trích các thông số kết cấu.",
+      "key_points_vi": [
+        "Nguồn là cơ quan chủ quản dự án."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc trang tổng quan; trang kỹ thuật chi tiết bị timeout."
+      ],
+      "project_use_vi": "Đầu mối thu thập hồ sơ gốc cầu tại Chile.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://www.mop.gob.cl/puentechacao/proyecto/"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "BM-029",
+      "title": "Proposal of representative portfolios for federal roadway bridges in Northeastern Brazil",
+      "year": 2021,
+      "authors": [
+        "G. H. F. Cavalcante",
+        "E. M. V. Pereira",
+        "I. D. Rodrigues",
+        "L. C. M. Vieira Junior",
+        "J. E. Padgett",
+        "G. H. Siqueira"
+      ],
+      "publisher": "arXiv — preprint",
+      "countries": [
+        "Brazil"
+      ],
+      "url": "https://arxiv.org/abs/2108.00934",
+      "doi": "10.48550/arXiv.2108.00934",
+      "source_type": "research_paper",
+      "topics": [
+        "datasets",
+        "bridge-taxonomy",
+        "uncertainty"
+      ],
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract và submission history.",
+      "summary_vi": "Nghiên cứu xây danh mục đại diện từ cầu đường bộ vùng Đông Bắc Brazil, phân loại bốn nhóm cầu và mô tả các biến ngẫu nhiên. Một số tham số được biểu diễn theo biến khác do tương quan mạnh. Điều này gợi ý thư viện hình học nên lưu phân bố và tương quan thay vì tạo mọi kích thước độc lập.",
+      "key_points_vi": [
+        "Có nhóm cầu một nhịp và liên tục nhiều nhịp.",
+        "Thông tin đại diện thống kê khác với bộ sưu tập cầu nổi tiếng."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc abstract; chưa tái lập thống kê hoặc kiểm tra dữ liệu gốc.",
+        "Danh mục vùng không đại diện cho toàn thế giới."
+      ],
+      "project_use_vi": "Tham khảo cách xây tập mẫu hình học có tính đại diện.",
+      "pdf_url": "https://arxiv.org/pdf/2108.00934",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    }
+  ],
+  "synthesis_vi": [
+    "BM-001–BM-012 cung cấp hồ sơ dạng cầu và bối cảnh tại Nhật Bản, châu Âu, Hoa Kỳ, Trung Quốc, Ấn Độ và Singapore; trang chủ đầu tư/đơn vị thiết kế được giữ riêng với bằng chứng tính toán.",
+    "BM-013–BM-020 có phần toàn văn được đọc chọn lọc: UHPC về chloride, đóng băng và lửa; mối nối UHPC; FRP; cơ chế ăn mòn thép; cầu gỗ; giới hạn tiết diện UHPC; ví dụ dầm dự ứng lực; cơ chế sự cố Tretten.",
+    "BM-018 cho thấy thu mảnh tiết diện UHPC phải đi cùng kiểm tra cánh, chọc thủng, ổn định và khả năng trộn/đúc; chính báo cáo nhận diện những điểm còn thiếu hướng dẫn.",
+    "BM-021–BM-023 phân biệt mục tiêu ABC, sản xuất đốt, lắp toàn nhịp, hẫng cân bằng và lao dọc; thông tin về khoảng nhịp kinh tế chỉ có giá trị trong bối cảnh của nguồn.",
+    "BM-020 và BM-025 bổ sung tri thức bất lợi và vận hành: cơ chế liên kết, suy giảm do tải lặp, theo dõi hành động sau kiểm toán, kiểm soát ẩm và kiểm tra cáp.",
+    "Các nguồn nhà sản xuất/đơn vị dự án phục vụ hiểu cấu tạo và quy trình; tuyên bố tiết kiệm, carbon hoặc tối ưu chưa được nâng thành quy luật phổ quát.",
+    "Không phát triển thuật toán, không chạy mô hình và không nhập Revit trong nhánh này; nội dung là nguồn tri thức để tra cứu và đọc tiếp."
+  ],
+  "gaps_vi": [
+    "Chưa có đại diện đủ mạnh từ châu Phi, Nam Mỹ và nhiều nước Đông Nam Á; nhóm này không phải tổng quan toàn cầu đầy đủ.",
+    "ASBI handbook, ABC Manual và bài báo Striatus của ETH gặp lỗi công cụ khi mở PDF; chỉ lưu nguồn liên quan và không gán đã đọc toàn văn.",
+    "BM-026 mới xác minh tác giả/năm/chủ đề từ GovInfo; PDF dầm hộp căng sau cần được truy cập và đọc ở phiên tiếp theo.",
+    "BM-014 là bản 2014; bản cập nhật FHWA-HRT-19-011 đã thấy trong nguồn chính thức nhưng chưa đọc, cần đối chiếu phiên bản trước dùng.",
+    "BM-011 có chỉ số chiều dài 3,5 km đáng nghi trên trang nhà cung cấp; không đưa số đó vào dữ liệu hình học và cần đối soát nguồn chủ sở hữu.",
+    "Chưa có các hồ sơ tính nguyên gốc, mô hình FEM, dữ liệu đo thô, bản vẽ shop hoặc file family đi kèm các trang dự án.",
+    "Các thông số nghiên cứu, bảng thiết kế cũ và điều khoản trích dẫn không được tự động xem là yêu cầu hiện hành của dự án."
+  ]
+}

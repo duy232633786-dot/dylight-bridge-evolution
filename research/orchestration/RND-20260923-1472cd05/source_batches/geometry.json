@@ -1,0 +1,866 @@
+{
+  "sources": [
+    {
+      "id": "GE-001",
+      "title": "The force density method for form finding and computation of general networks",
+      "authors": [
+        "H.-J. Schek"
+      ],
+      "year": 1974,
+      "publisher": "Elsevier — Computer Methods in Applied Mechanics and Engineering",
+      "source_type": "research_paper",
+      "topics": [
+        "force density",
+        "form finding",
+        "network equilibrium"
+      ],
+      "countries": [],
+      "url": "https://www.sciencedirect.com/science/article/pii/0045782574900450",
+      "doi": "10.1016/0045-7825(74)90045-0",
+      "access_status": "BLOCKED",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Publisher abstract retrieved in indexed search; direct publisher open returned HTTP 403.",
+      "summary_vi": "Bài gốc mô tả tìm hình mạng bằng mật độ lực, tức tỷ số lực và chiều dài của từng thanh. Khi các tỷ số được cho trước, tọa độ nút được tìm bằng hệ phương trình tuyến tính. Nếu bổ sung ràng buộc, bài toán có thể trở thành phi tuyến. Đây là cách sinh hình gắn với cân bằng lực thay vì ghép điểm tùy ý.",
+      "key_points_vi": [
+        "Biến điều khiển là tỷ số lực/chiều dài.",
+        "Ràng buộc bổ sung có thể đòi hỏi giải phi tuyến."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc được tóm tắt được lập chỉ mục; chưa truy cập toàn văn.",
+        "Cân bằng mạng chưa chứng minh độ bền hoặc ổn định."
+      ],
+      "project_use_vi": "Làm nguồn nền tảng cho họ phép sinh mạng nút–thanh có cân bằng.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-002",
+      "title": "Thrust Network Analysis: A new methodology for three-dimensional equilibrium",
+      "authors": [
+        "Philippe Block",
+        "John Ochsendorf"
+      ],
+      "year": 2007,
+      "publisher": "Journal of the International Association for Shell and Spatial Structures",
+      "source_type": "research_paper",
+      "topics": [
+        "thrust network analysis",
+        "graphic statics",
+        "compression-only",
+        "masonry"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://brg.ethz.ch/publications/4",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "PDF pp. 2–4, Section 2 Methodology, particularly 2.2 Assumptions and 2.3 Thrust Network Analysis; pp. 6–7, Sections 4–5.",
+      "summary_vi": "Nghiên cứu sinh mạng lực ba chiều chỉ chịu nén trong miền hình học cho phép. Sơ đồ hình và sơ đồ lực đối ngẫu liên hệ hình dạng với lực ngang; tối ưu tuyến tính xác định cao độ nút và hệ số lực. Các giả thiết quan trọng gồm tải cùng phương, điển hình trọng lực, và cơ chế truyền lực nén. Bài phân biệt tìm trạng thái cân bằng với mô phỏng đàn hồi.",
+      "key_points_vi": [
+        "Miền intrados/extrados giới hạn nghiệm hình học.",
+        "Sơ đồ đối ngẫu cho phép điều chỉnh phân bố lực."
+      ],
+      "limitations_vi": [
+        "Phạm vi gốc là mạng chỉ chịu nén dưới tải cùng phương.",
+        "Không thay thế kiểm tra vật liệu, gối và ổn định ngoài phạm vi giả thiết."
+      ],
+      "project_use_vi": "Tạo thẻ nguyên lý cho vòm và mạng chịu nén, kèm điều kiện áp dụng rõ ràng.",
+      "pdf_url": "https://www.block.arch.ethz.ch/brg/files/block_ochs_IASS_2007.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-003",
+      "title": "Efficient topology optimization in MATLAB using 88 lines of code",
+      "authors": [
+        "Erik Andreassen",
+        "Anders Clausen",
+        "Mattias Schevenels",
+        "Boyan S. Lazarov",
+        "Ole Sigmund"
+      ],
+      "year": 2011,
+      "publisher": "Springer — Structural and Multidisciplinary Optimization",
+      "source_type": "research_paper",
+      "topics": [
+        "SIMP",
+        "density filtering",
+        "topology optimization",
+        "MBB beam"
+      ],
+      "countries": [
+        "Denmark",
+        "Belgium"
+      ],
+      "url": "https://orbit.dtu.dk/en/publications/efficient-topology-optimization-in-matlab-using-88-lines-of-code/",
+      "doi": "10.1007/s00158-010-0594-7",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Author PDF pp. 2–4: Section 2 Problem formulation, 2.1 Modified SIMP, 2.2 Optimality criteria, 2.3 Filtering; appendix code inspected.",
+      "summary_vi": "Bài trình bày tối ưu phân bố vật liệu để giảm compliance dưới giới hạn thể tích. Mật độ phần tử điều khiển độ cứng theo SIMP; bộ lọc hạn chế hình bàn cờ và phụ thuộc rời rạc hóa. Tác giả nhấn mạnh phải đánh giá và hiển thị mật độ vật lý sau lọc. Mã ngắn phục vụ học tập, phù hợp làm bài chuẩn kiểm tra thuật toán trước khi xét cấu kiện thực.",
+      "key_points_vi": [
+        "Tách mật độ thiết kế và mật độ vật lý sau lọc.",
+        "Bài MBB có tải, gối và ngân sách vật liệu xác định."
+      ],
+      "limitations_vi": [
+        "Ví dụ giáo dục đàn hồi tuyến tính, chưa kiểm toán cầu.",
+        "Tối ưu compliance không đồng nghĩa đạt mọi giới hạn ứng suất hay chế tạo."
+      ],
+      "project_use_vi": "Làm benchmark nền cho bộ tìm phân bố vật liệu và kiểm chứng bộ lọc.",
+      "pdf_url": "https://www.topopt.mek.dtu.dk/-/media/subsites/topopt/apps/dokumenter-og-filer-til-apps/topopt88.pdf?hash=E80FAB2808804A29FFB181CA05D2EEFECAA86686&la=da",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-004",
+      "title": "Structural optimization using sensitivity analysis and a level-set method",
+      "authors": [
+        "Grégoire Allaire",
+        "François Jouve",
+        "Anca-Maria Toader"
+      ],
+      "year": 2004,
+      "publisher": "Elsevier — Journal of Computational Physics",
+      "source_type": "research_paper",
+      "topics": [
+        "level set",
+        "shape derivatives",
+        "adjoint sensitivity",
+        "structural optimization"
+      ],
+      "countries": [
+        "France",
+        "Portugal"
+      ],
+      "url": "https://www.cmap.polytechnique.fr/~allaire/ajt-jcp.pdf",
+      "doi": "10.1016/j.jcp.2003.09.032",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Journal pp. 363–368: Sections 1 Introduction, 2 Setting of the problem, 3 Shape derivative.",
+      "summary_vi": "Phương pháp biểu diễn biên cấu kiện bằng level-set trên lưới cố định và dùng độ nhạy hình dạng để điều khiển chuyển động biên. Bài xét mô hình đàn hồi cùng mục tiêu và ràng buộc thể tích, chu vi; bài toán liên hợp hỗ trợ tính gradient. Cách biểu diễn thuận lợi cho thay đổi hình thái, nhưng tác giả lưu ý nghiệm tối ưu phụ thuộc mạnh vào hình ban đầu.",
+      "key_points_vi": [
+        "Biên hình học được cập nhật bằng thông tin độ nhạy.",
+        "Ràng buộc hình học giúp bài toán tối ưu có nghĩa."
+      ],
+      "limitations_vi": [
+        "Kết quả phụ thuộc khởi tạo; không bảo đảm tối ưu toàn cục.",
+        "Chưa đọc toàn bộ các ví dụ phi tuyến trong bài."
+      ],
+      "project_use_vi": "Bổ sung phương pháp biến đổi biên cho cấu kiện mới sau khi có mô hình vật lý đủ tin cậy.",
+      "pdf_url": "https://www.cmap.polytechnique.fr/~allaire/ajt-jcp.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-005",
+      "title": "Advantages of Bi-Directional Evolutionary Structural Optimization (BESO) over Evolutionary Structural Optimization (ESO)",
+      "authors": [
+        "X. Huang",
+        "Y. M. Xie",
+        "M. C. Burry"
+      ],
+      "year": 2007,
+      "publisher": "SAGE — Advances in Structural Engineering",
+      "source_type": "research_paper",
+      "topics": [
+        "BESO",
+        "ESO",
+        "material addition and removal"
+      ],
+      "countries": [
+        "Australia"
+      ],
+      "url": "https://journals.sagepub.com/doi/10.1260/136943307783571436",
+      "doi": "10.1260/136943307783571436",
+      "access_status": "BLOCKED",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Publisher abstract returned by indexed search; direct publisher open timed out.",
+      "summary_vi": "Bài so sánh ESO, vốn loại dần vật liệu, với BESO cho phép vừa thêm vừa bỏ vật liệu. Tóm tắt mô tả các ví dụ tối ưu độ cứng trong hai và ba chiều, cùng các ưu điểm do tác giả báo cáo về tính hiệu quả và độ ổn định của phương pháp. Điểm hữu ích cho dự án là khả năng phục hồi vật liệu đã bị loại trong quá trình tìm kiếm.",
+      "key_points_vi": [
+        "BESO có cả thao tác thêm và bỏ vật liệu.",
+        "Cần so sánh trên cùng bài toán và ngân sách."
+      ],
+      "limitations_vi": [
+        "Toàn văn chưa đọc; không suy diễn chi tiết bộ lọc từ tóm tắt.",
+        "Nhận định hiệu quả là kết quả của tác giả, chưa tái lập."
+      ],
+      "project_use_vi": "Tạo họ phép biến dị vật liệu hai chiều và danh sách benchmark cần tái lập.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-006",
+      "title": "A Python script for adaptive layout optimization of trusses",
+      "authors": [
+        "L. He",
+        "Matthew Gilbert",
+        "X. Song"
+      ],
+      "year": 2019,
+      "publisher": "Springer — Structural and Multidisciplinary Optimization; White Rose Research Online",
+      "source_type": "research_paper",
+      "topics": [
+        "ground structure",
+        "truss layout",
+        "adaptive member adding",
+        "Python"
+      ],
+      "countries": [
+        "United Kingdom"
+      ],
+      "url": "https://eprints.whiterose.ac.uk/id/eprint/142746/",
+      "doi": "10.1007/s00158-019-02226-6",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Repository Abstract and Metadata; accepted PDF opened, but only abstract-based synthesis.",
+      "summary_vi": "Nghiên cứu cung cấp mã Python ngắn cho tối ưu bố trí giàn bằng cơ chế thêm thanh thích nghi. Phương pháp xét một hoặc nhiều trường hợp tải, giới hạn kéo và nén khác nhau, chi phí nút và miền đa giác có lỗ. Đây là nguồn sát với mục tiêu dầm/giàn: tập mảnh ghép là các thanh nối nút, còn việc thêm thanh được dẫn hướng bằng tối ưu thay vì thử tất cả tổ hợp.",
+      "key_points_vi": [
+        "Hỗ trợ nhiều tải và sức kháng kéo/nén khác nhau.",
+        "Có thể biểu diễn miền không lồi và lỗ."
+      ],
+      "limitations_vi": [
+        "Chưa kiểm tra khả năng chạy mã gốc trong môi trường dự án.",
+        "Tóm tắt không chứng minh kiểm tra mất ổn định thanh."
+      ],
+      "project_use_vi": "Làm nguồn cho biểu diễn cấu kiện bằng đồ thị và phép sinh thanh thích nghi.",
+      "pdf_url": "https://eprints.whiterose.ac.uk/id/eprint/142746/1/trussPython.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-007",
+      "title": "Marching cubes: A high resolution 3D surface construction algorithm",
+      "authors": [
+        "William E. Lorensen",
+        "Harvey E. Cline"
+      ],
+      "year": 1987,
+      "publisher": "ACM — Computer Graphics / SIGGRAPH",
+      "source_type": "research_paper",
+      "topics": [
+        "marching cubes",
+        "isosurface",
+        "voxel to mesh"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://graphics.stanford.edu/courses/cs348a-21-winter/Papers/Marching_Cubes.pdf",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Journal p. 164, Section 4 Marching Cubes Algorithm; introduction and surface-construction discussion pp. 163–164.",
+      "summary_vi": "Bài gốc chuyển trường dữ liệu ba chiều thành mặt tam giác tại một ngưỡng cho trước. Thuật toán xét từng ô có tám đỉnh, xác định phía trong và ngoài bề mặt, rồi tạo các tam giác tương ứng. Nội suy và thông tin gradient hỗ trợ vị trí, pháp tuyến bề mặt. Đây là bước hiện thực hóa trường vật liệu thành hình hiển thị, không phải bản thân thuật toán tối ưu kết cấu.",
+      "key_points_vi": [
+        "Đầu vào là trường vô hướng và ngưỡng bề mặt.",
+        "Đầu ra là tập tam giác có thể đưa sang công cụ hình học."
+      ],
+      "limitations_vi": [
+        "Bài gốc phục vụ hình ảnh y học; ứng dụng cầu là suy luận chuyển miền.",
+        "Mesh hiển thị chưa bảo đảm kín, chất lượng phần tử hay chịu lực."
+      ],
+      "project_use_vi": "Cung cấp bộ chuyển voxel/trường mật độ sang mesh cho nhánh Dynamo/Revit.",
+      "pdf_url": "https://graphics.stanford.edu/courses/cs348a-21-winter/Papers/Marching_Cubes.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-008",
+      "title": "A Generalization of Algebraic Surface Drawing",
+      "authors": [
+        "James F. Blinn"
+      ],
+      "year": 1982,
+      "publisher": "ACM — Transactions on Graphics; author archive at Microsoft Research",
+      "source_type": "research_paper",
+      "topics": [
+        "implicit surfaces",
+        "metaballs",
+        "Gaussian density",
+        "organic geometry"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.microsoft.com/en-us/research/?p=154282",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Journal pp. 236–238, Section 2 The Model: summed density, threshold surface and shape parameters.",
+      "summary_vi": "Nghiên cứu xây bề mặt ẩn từ tổng ảnh hưởng của các điểm, sử dụng các hàm mật độ Gaussian và một ngưỡng. Tham số từng điểm điều khiển bán kính và mức hòa trộn, giúp các vùng vật liệu nối hoặc tách khi cấu hình thay đổi. Đây là nền tảng hữu ích để hiểu hình hữu cơ trong ảnh tham khảo. Trường hình học này không tự mang ý nghĩa ứng suất hoặc mật độ vật liệu cơ học.",
+      "key_points_vi": [
+        "Có thể điều khiển ảnh hưởng của từng điểm.",
+        "Ngưỡng trường xác định bề mặt và sự hòa trộn."
+      ],
+      "limitations_vi": [
+        "Mục tiêu gốc là mô hình hóa/hiển thị phân tử.",
+        "Không được coi giá trị Gaussian là kết quả tính kết cấu."
+      ],
+      "project_use_vi": "Tạo thẻ nguyên lý điểm–trường–bề mặt cho bộ sinh hình hữu cơ.",
+      "pdf_url": "https://www.microsoft.com/en-us/research/wp-content/uploads/1982/07/p235-blinn.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-009",
+      "title": "Sphere tracing: A geometric method for the antialiased ray tracing of implicit surfaces",
+      "authors": [
+        "John C. Hart"
+      ],
+      "year": 1996,
+      "publisher": "Springer — The Visual Computer",
+      "source_type": "research_paper",
+      "topics": [
+        "signed distance function",
+        "implicit geometry",
+        "Lipschitz bound",
+        "CSG"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://experts.illinois.edu/en/publications/sphere-tracing-a-geometric-method-for-the-antialiased-ray-tracing/",
+      "doi": "10.1007/s003710050084",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Open manuscript Section 2.1 Distance Surfaces, PDF pp. 8–10; manuscript dated July 1994, journal metadata confirms 1996 publication.",
+      "summary_vi": "Bài phân biệt hàm khoảng cách có dấu với cận khoảng cách tới bề mặt ẩn. Điều kiện Lipschitz giúp chọn bước truy tia tránh xuyên bề mặt; các phép ghép hình và biến đổi được liên hệ với biểu diễn khoảng cách. Đối với dự án, giá trị chính là nền tảng toán học cho biểu diễn hình ẩn, đồng thời nhắc rằng một trường hòa trộn bất kỳ chưa chắc là khoảng cách thật.",
+      "key_points_vi": [
+        "Phân biệt signed distance function và signed distance bound.",
+        "Điều kiện toán học chi phối tính tin cậy của phép truy bề mặt."
+      ],
+      "limitations_vi": [
+        "Sphere tracing là phương pháp hiển thị, không phải bộ giải kết cấu.",
+        "Bản đọc là manuscript sớm; không khẳng định trùng từng trang bản tạp chí."
+      ],
+      "project_use_vi": "Làm cơ sở mô tả phép hợp/cắt và dung sai của biểu diễn SDF.",
+      "pdf_url": "https://graphics.stanford.edu/courses/cs348b-20-spring-content/uploads/hart.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-010",
+      "title": "Shape Grammars and the Generative Specification of Painting and Sculpture",
+      "authors": [
+        "George Stiny",
+        "James Gips"
+      ],
+      "year": 1972,
+      "publisher": "North-Holland — Information Processing 71; Auerbach reprint",
+      "source_type": "research_paper",
+      "topics": [
+        "shape grammar",
+        "generative rules",
+        "shape composition"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://www.researchgate.net/publication/221329330_'Shape_Grammars_and_the_Generative_Specification_of_Painting_and_Sculpture'",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Author-uploaded reprint, pp. 127–131, Shape Grammars and Selection Rules; upload credited to James Gips; presented 1971, published 1972.",
+      "summary_vi": "Bài định nghĩa sinh hình bằng bộ từ vựng hình dạng, dấu chỉ dẫn, luật thay thế và hình khởi tạo. Một luật khớp với một phần hình rồi thay bằng hình khác qua các phép biến đổi tương ứng. Chuỗi luật tạo ra họ thiết kế rất lớn; cơ chế chọn lọc giới hạn các kết quả cần xét. Đây là cơ sở trực tiếp cho ý tưởng thay pixel bằng mảnh ghép và nguyên tắc.",
+      "key_points_vi": [
+        "Luật sinh và luật chọn lọc có vai trò riêng.",
+        "Hình học có thể biến đổi theo vị trí, tỷ lệ và hướng."
+      ],
+      "limitations_vi": [
+        "Tài liệu gốc về nghệ thuật; chưa có ràng buộc cơ học.",
+        "Nguồn đọc là bản do tác giả tải lên, không phải trang nhà xuất bản."
+      ],
+      "project_use_vi": "Định nghĩa cấu trúc tri thức cho mảnh ghép, luật ghép và điều kiện áp dụng.",
+      "pdf_url": null,
+      "related_urls": [
+        "http://www.shapegrammar.org/ifip/SGBestPapers72.pdf"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-011",
+      "title": "Procedural modeling of buildings",
+      "authors": [
+        "Pascal Müller",
+        "Peter Wonka",
+        "Simon Haegler",
+        "Andreas Ulmer",
+        "Luc Van Gool"
+      ],
+      "year": 2006,
+      "publisher": "ACM — SIGGRAPH 2006 Papers",
+      "source_type": "research_paper",
+      "topics": [
+        "CGA shape",
+        "procedural modeling",
+        "context-sensitive grammar"
+      ],
+      "countries": [
+        "Switzerland",
+        "United States",
+        "Belgium"
+      ],
+      "url": "https://doi.org/10.1145/1179352.1141931",
+      "doi": "10.1145/1179352.1141931",
+      "access_status": "BLOCKED",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Publisher abstract and author affiliations obtained through indexed result; direct DOI/ACM fetch failed.",
+      "summary_vi": "CGA shape tổ chức hình kiến trúc theo mô tả phân cấp và luật nhạy ngữ cảnh. Các quy tắc điều khiển tương tác giữa phần hình, từ khối tổng thể tới chi tiết bề mặt. Nghiên cứu cho thấy một ngữ pháp có thể tạo nhiều mô hình phức tạp từ cấu trúc luật gọn. Với cầu, nguyên tắc có thể chuyển sang thứ bậc cầu–cấu kiện–liên kết nhưng cần thêm kiểm tra kỹ thuật độc lập.",
+      "key_points_vi": [
+        "Luật có thể phụ thuộc ngữ cảnh và quan hệ giữa phần hình.",
+        "Biểu diễn phân cấp giúp quản lý biến thể."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc tóm tắt nhà xuất bản; chưa đọc toàn văn.",
+        "Mục tiêu hình ảnh/kiến trúc không chứng minh khả năng chịu lực."
+      ],
+      "project_use_vi": "Tham khảo tổ chức bộ sinh hình phân cấp cho Family và cụm cấu kiện.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-012",
+      "title": "An additive manufacturing filter for topology optimization of print-ready designs",
+      "authors": [
+        "Matthijs Langelaar"
+      ],
+      "year": 2017,
+      "publisher": "Springer — Structural and Multidisciplinary Optimization",
+      "source_type": "research_paper",
+      "topics": [
+        "manufacturing constraints",
+        "overhang",
+        "density filter",
+        "additive manufacturing"
+      ],
+      "countries": [
+        "Netherlands"
+      ],
+      "url": "https://repository.tudelft.nl/record/uuid%3A30658a6c-96a9-412c-8386-d94f5418c568",
+      "doi": "10.1007/s00158-016-1522-2",
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Journal pp. 872–875, Sections 2.1 Fabrication model, 2.2 Sensitivity analysis, 2.3 Integration; indexed full article Sections 4–5 Discussion/Conclusion.",
+      "summary_vi": "Bài đưa mô hình chế tạo từng lớp vào quá trình tối ưu thông qua bộ lọc từ bản thiết kế sang hình có thể in. Vật liệu ở lớp trên phụ thuộc vùng đỡ phía dưới; công thức trơn cho phép tính độ nhạy. Cách tiếp cận quan trọng ở chỗ đánh giá trên hình sau bộ lọc chế tạo. Các giả thiết góc và lưới cần hiệu chỉnh theo công nghệ thực tế.",
+      "key_points_vi": [
+        "Đánh giá hiệu năng trên hình sau mô hình chế tạo.",
+        "Bộ lọc có thể ghép với lọc mật độ và phép chiếu."
+      ],
+      "limitations_vi": [
+        "Mô hình gốc giản lược công nghệ bột kim loại, không mặc nhiên áp dụng cho bê tông.",
+        "Chưa bao gồm mọi vấn đề ứng suất dư, biến dạng hoặc khoang kín."
+      ],
+      "project_use_vi": "Xây lớp tri thức về ràng buộc chế tạo ngay trong vòng tìm kiếm.",
+      "pdf_url": "https://repository.tudelft.nl/file/File_91cac4b3-2910-4628-af3b-64f3fef3935d",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-013",
+      "title": "Rationalization of trusses generated via layout optimization",
+      "authors": [
+        "L. He",
+        "Matthew Gilbert"
+      ],
+      "year": 2015,
+      "publisher": "Springer — Structural and Multidisciplinary Optimization; White Rose Research Online",
+      "source_type": "research_paper",
+      "topics": [
+        "truss rationalization",
+        "joint complexity",
+        "geometry optimization",
+        "fabrication"
+      ],
+      "countries": [
+        "United Kingdom"
+      ],
+      "url": "https://eprints.whiterose.ac.uk/id/eprint/91607/",
+      "doi": "10.1007/s00158-015-1260-x",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Repository Abstract and Metadata, journal pp. 677–694; full-text link observed but not read.",
+      "summary_vi": "Tối ưu bố trí giàn có thể tạo quá nhiều thanh và nút khó chế tạo. Bài nghiên cứu hai hướng đơn giản hóa: đưa chiều dài tương đương của nút vào bài toán và tối ưu lại vị trí nút sau khi có bố trí. Ví dụ gồm tải tập trung, tải phân bố, tự trọng và nhiều tải. Kết quả cho thấy giảm độ phức tạp có đánh đổi với thể tích hoặc chi phí tính.",
+      "key_points_vi": [
+        "Số lượng và độ phức tạp nút cần tham gia đánh giá.",
+        "Tối ưu hình học sau bố trí có thể giảm cả độ phức tạp lẫn thể tích."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc tóm tắt; chưa kiểm tra thiết lập các ví dụ.",
+        "Hình đơn giản hơn vẫn cần thiết kế liên kết thực."
+      ],
+      "project_use_vi": "Bổ sung tiêu chí số thanh, số nút và khả năng chế tạo cho cấu kiện giàn.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-014",
+      "title": "3D printing of a post-tensioned concrete girder designed by topology optimization",
+      "authors": [
+        "Gieljan Vantyghem",
+        "Wouter De Corte",
+        "Emad Shakour",
+        "Oded Amir"
+      ],
+      "year": 2020,
+      "publisher": "Elsevier — Automation in Construction; Ghent University bibliography",
+      "source_type": "research_paper",
+      "topics": [
+        "concrete girder",
+        "post-tensioning",
+        "3D concrete printing",
+        "physical validation"
+      ],
+      "countries": [
+        "Belgium",
+        "Israel"
+      ],
+      "url": "https://biblio.ugent.be/publication/8643594",
+      "doi": "10.1016/j.autcon.2020.103084",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "Repository Abstract and bibliography; published PDF explicitly restricted to UGent users.",
+      "summary_vi": "Bài trình bày thiết kế, in và lắp dầm bê tông dự ứng lực kéo sau từ kết quả tối ưu topology. Vì thuật toán tối ưu dùng mô hình hai chiều, nhóm tác giả phải hậu xử lý thiết kế và phân tích phần tử hữu hạn ba chiều. Sau chế tạo, độ võng được đo bằng tương quan ảnh số và so với dự báo. Đây là ví dụ nối thuật toán với mẫu vật thật.",
+      "key_points_vi": [
+        "Tối ưu 2D cần kiểm tra lại sau chuyển thành cấu kiện 3D.",
+        "Bài có thí nghiệm và bàn luận in, lắp ráp, bố trí cốt thép."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc tóm tắt; toàn văn hiện hạn chế quyền truy cập.",
+        "Chưa trích thông số vật liệu hoặc tỷ lệ cải thiện từ toàn văn."
+      ],
+      "project_use_vi": "Ưu tiên xin/đọc bản mở hợp pháp làm mẫu quy trình kiểm chứng dầm mới.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-015",
+      "title": "FEM modelling techniques for simulation of 3D concrete printing",
+      "authors": [
+        "Gieljan Vantyghem",
+        "Ticho Ooms",
+        "Wouter De Corte"
+      ],
+      "year": 2020,
+      "publisher": "arXiv; fib Symposium 2020",
+      "source_type": "research_paper",
+      "topics": [
+        "fresh concrete",
+        "printing sequence",
+        "voxelization",
+        "toolpath FEM"
+      ],
+      "countries": [
+        "Belgium"
+      ],
+      "url": "https://arxiv.org/abs/2009.06907",
+      "doi": "10.48550/arXiv.2009.06907",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract; comments identify fib Symposium 2020; numerical-vs-experimental limitation stated at end of abstract.",
+      "summary_vi": "Nghiên cứu mô phỏng bê tông trong lúc in, khi vật liệu còn tươi, bằng cách thêm dần phần tử qua các bước tính. Hai cách rời rạc hóa được so sánh: voxel hóa hình và quét phần tử theo đường in. Mục tiêu là dự đoán ứng xử trong chế tạo, hỗ trợ chọn tốc độ và góc nhô. Tóm tắt nêu việc đối chiếu thí nghiệm còn thuộc công việc tiếp theo.",
+      "key_points_vi": [
+        "Cần kiểm tra trạng thái đang chế tạo riêng với trạng thái sử dụng.",
+        "Đường in và chiều cao lớp ảnh hưởng mô hình phân tích."
+      ],
+      "limitations_vi": [
+        "Bản đọc là tóm tắt; không coi so sánh hai mô hình là xác nhận thực nghiệm.",
+        "Mô hình vật liệu cần hiệu chuẩn cho cấp phối cụ thể."
+      ],
+      "project_use_vi": "Bổ sung lớp dữ liệu về trạng thái thi công và nguy cơ thất bại khi in.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-016",
+      "title": "The Armadillo Vault: Balancing Computation and Traditional Craft",
+      "authors": [
+        "Philippe Block",
+        "Matthias Rippmann",
+        "Tom Van Mele",
+        "David Escobedo"
+      ],
+      "year": 2017,
+      "publisher": "FABRICATE: Rethinking Design and Construction; ETH Zurich author copy",
+      "source_type": "research_paper",
+      "topics": [
+        "computational masonry",
+        "digital fabrication",
+        "assembly",
+        "thrust network analysis"
+      ],
+      "countries": [
+        "Switzerland",
+        "United States",
+        "Italy"
+      ],
+      "url": "https://www.block.arch.ethz.ch/brg/files/BLOCK_2017_Fabricate_armadillo-vault_1491688805.pdf",
+      "doi": null,
+      "access_status": "OPEN_FULL_TEXT",
+      "reading_level": "SELECTED_SECTIONS_READ",
+      "read_locator": "Chapter pp. 286–287 and following structural-design/fabrication passages; PDF pp. 3–6, including Structural design and analysis and concluding discussion.",
+      "summary_vi": "Trường hợp Armadillo Vault nối tìm hình chịu nén, phân chia khối đá và chế tạo thực tế. Bài mô tả hàng trăm viên đá riêng biệt ghép thành vỏ tự do; cấu trúc được điều khiển bằng hình học và hệ cân bằng lực. Quá trình hiện thực còn cần quản lý dung sai, thông tin từng viên và tay nghề thi công. Nó cho thấy dữ liệu chế tạo và lắp ráp phải đi cùng hình dạng.",
+      "key_points_vi": [
+        "Chia khối được liên hệ với hướng truyền lực.",
+        "Thi công thực cần dung sai, thứ tự lắp và kiểm soát thủ công."
+      ],
+      "limitations_vi": [
+        "Đây là vòm đá trình diễn, không phải dầm cầu chịu uốn.",
+        "Không chuyển thông số công trình sang cấu kiện khác mà thiếu phân tích."
+      ],
+      "project_use_vi": "Tạo case study cho chuỗi hình học–cân bằng–phân mảnh–chế tạo–lắp dựng.",
+      "pdf_url": "https://www.block.arch.ethz.ch/brg/files/BLOCK_2017_Fabricate_armadillo-vault_1491688805.pdf",
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-017",
+      "title": "Algebraic 3D Graphic Statics: Constrained Areas",
+      "authors": [
+        "Masoud Akbarzadeh",
+        "Marton Hablicsek"
+      ],
+      "year": 2020,
+      "publisher": "arXiv",
+      "source_type": "research_paper",
+      "topics": [
+        "3D graphic statics",
+        "polyhedral reciprocal diagrams",
+        "force constraints"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/2007.15133",
+      "doi": "10.48550/arXiv.2007.15133",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract and submission metadata, v1 29 July 2020.",
+      "summary_vi": "Bài nghiên cứu cách khống chế độ lớn lực thông qua diện tích các mặt trong sơ đồ lực đa diện. Sơ đồ hình và lực liên hệ về hình học, topology; thay đổi một mặt dẫn tới cập nhật đa diện tương ứng. Phương pháp mở rộng khả năng khám phá các mạng kết hợp kéo và nén. Đây là cách mã hóa nguyên lý cân bằng thành quan hệ hình học có thể tính toán.",
+      "key_points_vi": [
+        "Diện tích mặt trong sơ đồ lực biểu diễn độ lớn lực.",
+        "Có thể xét hình thái kết hợp thanh kéo và thanh nén."
+      ],
+      "limitations_vi": [
+        "Đã đọc tóm tắt bản arXiv, chưa xác minh bản tạp chí.",
+        "Cân bằng lực chưa bao quát ổn định và thiết kế liên kết."
+      ],
+      "project_use_vi": "Bổ sung nguyên lý ghép hình theo sơ đồ lực cho thư viện cấu kiện mạng.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-018",
+      "title": "Introduction — COMPAS",
+      "authors": [
+        "COMPAS Association"
+      ],
+      "year": null,
+      "publisher": "COMPAS official documentation, version 2.0.4",
+      "source_type": "tool_documentation",
+      "topics": [
+        "Python geometry",
+        "graphs",
+        "meshes",
+        "computational fabrication",
+        "interoperability"
+      ],
+      "countries": [
+        "International"
+      ],
+      "url": "https://compas.dev/compas/2.0.4/userguide/introduction.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Introduction; The Framework; table of contents for geometry, data structures and CAD integrations.",
+      "summary_vi": "COMPAS là khung Python cho tính toán trong kiến trúc, kỹ thuật và chế tạo. Tài liệu mô tả thư viện lõi cùng các mở rộng hình học, phần tử hữu hạn, tìm hình và IFC; có các cấu trúc đồ thị, mesh, cell mesh và assembly. Giá trị cho dự án là tổ chức dữ liệu hình học và quan hệ thành cấu trúc có thể trao đổi, thay vì chỉ lưu ảnh hoặc hình hiển thị.",
+      "key_points_vi": [
+        "Có mô hình dữ liệu cho đồ thị, lưới và lắp ghép.",
+        "Tài liệu phân biệt thư viện lõi với các gói chuyên biệt."
+      ],
+      "limitations_vi": [
+        "Trang được đọc là phiên bản 2.0.4, không khẳng định mới nhất.",
+        "Không có bằng chứng đã chạy trong Dynamo/Revit của người dùng."
+      ],
+      "project_use_vi": "Tham khảo schema hình học trung gian và kết nối giữa các bộ công cụ.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-019",
+      "title": "8.8.3.47 IfcTriangulatedFaceSet",
+      "authors": [
+        "buildingSMART International"
+      ],
+      "year": null,
+      "publisher": "buildingSMART IFC 4.3.2.0 official documentation",
+      "source_type": "standard",
+      "topics": [
+        "IFC 4.3",
+        "mesh exchange",
+        "topological validity",
+        "BIM interoperability"
+      ],
+      "countries": [
+        "International"
+      ],
+      "url": "https://standards.buildingsmart.org/IFC/RELEASE/IFC4_3/HTML/lexical/IfcTriangulatedFaceSet.htm",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Sections 8.8.3.47.1 Semantic definition, Informal Propositions, 8.8.3.47.3 Attributes, 8.8.3.47.5 Formal representation.",
+      "summary_vi": "Đặc tả định nghĩa tập mặt tam giác bằng danh sách điểm và chỉ số đỉnh. Thuộc tính Closed phân biệt bề mặt kín với hở; khi khai báo kín, phải thỏa các điều kiện topology như mỗi cạnh thuộc đúng hai biên mặt và pháp tuyến hướng ra khỏi vật liệu. Đây là nguồn để xây kiểm tra trao đổi mesh, nhưng riêng lớp hình học chưa mô tả đầy đủ chức năng cấu kiện.",
+      "key_points_vi": [
+        "Chỉ số điểm IFC bắt đầu từ 1.",
+        "Closed không chỉ là nhãn; phải thỏa điều kiện topology."
+      ],
+      "limitations_vi": [
+        "Đây là đặc tả dữ liệu, không phải tiêu chuẩn sức kháng cầu.",
+        "Đọc một entity không tương đương kiểm tra toàn bộ hồ sơ IFC."
+      ],
+      "project_use_vi": "Xây quy tắc kiểm tra mesh và provenance khi trao đổi cấu kiện qua IFC.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-020",
+      "title": "TessellatedShapeBuilder Class",
+      "authors": [
+        "Autodesk"
+      ],
+      "year": 2026,
+      "publisher": "Autodesk Revit API Main Reference, 26.4.0.0",
+      "source_type": "tool_documentation",
+      "topics": [
+        "Revit API",
+        "tessellation",
+        "DirectShape",
+        "mesh conversion"
+      ],
+      "countries": [
+        "United States"
+      ],
+      "url": "https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/a144b0e3-c997-eac1-5c00-51c56d9e66f2.htm",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Class description, Properties Target/Fallback and methods; related official DirectShape developer-guide explanation.",
+      "summary_vi": "Tài liệu Revit mô tả lớp dựng hình từ các mặt liên thông, với mục tiêu hình học và chế độ dự phòng được khai báo. Kết quả có thể phục vụ đưa hình tính toán vào mô hình Revit qua DirectShape. Đây là tuyến kỹ thuật phù hợp cho mesh hữu cơ, nhưng cần kiểm tra kiểu kết quả thật sự và lỗi dựng hình. Việc có đối tượng Revit không tự biến nó thành Family tham số.",
+      "key_points_vi": [
+        "Phải khai báo và kiểm tra Target/Fallback của bộ dựng.",
+        "Kết quả mesh cần phân biệt với solid mong muốn."
+      ],
+      "limitations_vi": [
+        "Chưa thực thi API trong phiên Revit thực.",
+        "Tài liệu API không chứng minh hình học đáp ứng tiêu chuẩn thiết kế.",
+        "Không tự kiểm giao nhau giữa các face sets; đảo hướng mặt không tạo void theo Remarks của lớp."
+      ],
+      "project_use_vi": "Định nghĩa yêu cầu dữ liệu và kiểm tra đầu ra cho adapter Dynamo–Revit.",
+      "pdf_url": null,
+      "related_urls": [
+        "https://help.autodesk.com/cloudhelp/2018/ENU/Revit-API/Revit_API_Developers_Guide/Revit_Geometric_Elements/DirectShape.html",
+        "https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/bfbd137b-c2c2-71bb-6f4a-992d0dcf6ea8.htm"
+      ],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-021",
+      "title": "Python and Revit",
+      "authors": [
+        "Dynamo Project"
+      ],
+      "year": null,
+      "publisher": "The Dynamo Primer",
+      "source_type": "tool_documentation",
+      "topics": [
+        "Dynamo",
+        "Python",
+        "Revit",
+        "native structural framing"
+      ],
+      "countries": [
+        "International"
+      ],
+      "url": "https://primer.dynamobim.org/10_Custom-Nodes/10-5_Python-Revit.html",
+      "doi": null,
+      "access_status": "OFFICIAL_WEBPAGE",
+      "reading_level": "OFFICIAL_PAGE_READ",
+      "read_locator": "Platform Specific APIs; Exercises 01–03, particularly reference curves to points, lines and StructuralFraming beams.",
+      "summary_vi": "Primer hướng dẫn Python trong Dynamo truy cập tài liệu Revit và chuyển qua lại giữa hình Dynamo với phần tử Revit. Ví dụ lấy hai đường tham chiếu, chia điểm, nối thành các trục rồi tạo dầm bằng type được chọn. Tài liệu cũng lưu ý việc đặt phần tử bằng Python có thể không giữ liên kết cập nhật như node sẵn có. Đây là cơ sở xác định luồng dữ liệu từ Family tới hình dựng.",
+      "key_points_vi": [
+        "Có chuỗi đường–điểm–trục–dầm native minh họa.",
+        "Cần thiết kế cơ chế cập nhật để tránh phát sinh phần tử trùng."
+      ],
+      "limitations_vi": [
+        "Primer có ví dụ IronPython cũ; phải kiểm tra engine và phiên bản.",
+        "Ví dụ minh họa được tác giả nói rõ không phải thiết kế kết cấu thực."
+      ],
+      "project_use_vi": "Làm tài liệu nền cho hợp đồng input/output của graph Dynamo.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    },
+    {
+      "id": "GE-022",
+      "title": "Topology Optimization for Multi-Axis Additive Manufacturing Considering Overhang and Anisotropy",
+      "authors": [
+        "Seungheon Shin",
+        "Byeonghyeon Goh",
+        "Youngtaek Oh",
+        "Hayoung Chung"
+      ],
+      "year": 2025,
+      "publisher": "arXiv",
+      "source_type": "research_paper",
+      "topics": [
+        "multi-axis fabrication",
+        "anisotropy",
+        "space-time topology optimization",
+        "collision"
+      ],
+      "countries": [],
+      "url": "https://arxiv.org/abs/2502.20343",
+      "doi": "10.48550/arXiv.2502.20343",
+      "access_status": "OPEN_ABSTRACT",
+      "reading_level": "ABSTRACT_READ",
+      "read_locator": "arXiv abstract and v1 submission metadata, 27 February 2025; 27 pages and 21 figures reported, not fully read.",
+      "summary_vi": "Bản nghiên cứu đề xuất tối ưu đồng thời phân bố vật liệu và hướng chế tạo cho in nhiều trục. Trường giả thời gian biểu diễn trình tự tạo hình, cùng ràng buộc góc nhô và nguy cơ va chạm. Mô hình còn đưa tính dị hướng do hướng in vào đánh giá cơ học. Nguồn mới này gợi ý rằng hình tối ưu không thể tách khỏi đường chế tạo và đặc tính vật liệu phát sinh.",
+      "key_points_vi": [
+        "Trình tự chế tạo có thể trở thành biến thiết kế.",
+        "Hướng in ảnh hưởng ứng xử cơ học qua dị hướng."
+      ],
+      "limitations_vi": [
+        "Chỉ đọc abstract của preprint, chưa xác minh phản biện.",
+        "Ví dụ số không mặc nhiên áp dụng cho in bê tông cầu."
+      ],
+      "project_use_vi": "Mở nhóm dữ liệu nghiên cứu mới về liên kết topology–đường in–dị hướng.",
+      "pdf_url": null,
+      "related_urls": [],
+      "accessed_on": "2026-09-23"
+    }
+  ],
+  "synthesis_vi": [
+    "Đối với dầm/giàn chịu uốn, corpus cần ba dạng biểu diễn bổ sung nhau: đồ thị nút–thanh (GE-006, GE-013, GE-017), miền vật liệu liên tục (GE-003, GE-004, GE-005), và hình ẩn/mesh (GE-007 đến GE-009). Đây là tổng hợp đề xuất cho dự án, không phải kết luận chung của một bài.",
+    "Ý tưởng mảnh ghép nên được mã hóa bằng từ vựng, luật biến đổi và điều kiện áp dụng; shape grammar cung cấp cơ sở hình thức (GE-010, GE-011). Nguyên lý chịu lực phải gắn riêng với phạm vi giả thiết, chẳng hạn nén thuần của TNA (GE-002).",
+    "Mesh hữu cơ đẹp chưa chứng minh tính tối ưu hoặc khả năng sử dụng. Chuỗi dữ liệu phải giữ tải/gối/vật liệu, kết quả phân tích, các trạng thái chế tạo, dung sai và thí nghiệm; GE-014 và GE-016 là hai case study nối thiết kế với hiện thực.",
+    "Lớp lọc cần phân biệt hợp lệ hình học, cân bằng và hiệu năng kết cấu, khả năng chế tạo, chất lượng trao đổi BIM. GE-012, GE-013, GE-015, GE-019 đến GE-022 cung cấp các điều kiện ở các lớp khác nhau.",
+    "Không đề xuất thử ngẫu nhiên hàng tỷ hình qua Revit. Những nguồn như SIMP và thêm thanh thích nghi cho thấy có thể dẫn hướng bằng độ nhạy hoặc bài toán tối ưu; Revit/Dynamo là môi trường nhập/xuất, kiểm tra và hiện thực hóa phương án đã chọn.",
+    "Phạm vi phiên đọc: 22 nguồn; 9 nguồn có các phần toàn văn được đọc (GE-002, GE-003, GE-004, GE-007, GE-008, GE-009, GE-010, GE-012, GE-016). Những nguồn còn lại ghi đúng mức tóm tắt hoặc trang tài liệu; GE-001, GE-005, GE-011 bị chặn ở lần mở trực tiếp nhưng có tóm tắt chính chủ được lập chỉ mục."
+  ],
+  "gaps_vi": [
+    "Cần truy cập hợp pháp toàn văn GE-001, GE-005, GE-011 và GE-014 trước khi trích công thức, thông số hoặc quy trình chi tiết.",
+    "Chưa có bộ dữ liệu Family Revit đã chuẩn hóa chức năng chịu lực, tham số, liên kết, vật liệu và quyền sử dụng; thu thập ảnh/hình chưa thay thế được dữ liệu này.",
+    "Cần bổ sung đối chứng vật lý dầm/giàn: mất ổn định thanh và tổng thể, mỏi, xoắn, động lực, nứt, ứng xử liên kết và tải thi công.",
+    "Chưa có dữ liệu benchmark thống nhất để so sánh các biểu diễn trên cùng tải, vật liệu, ngân sách tính và tiêu chí chế tạo.",
+    "Phải tách ngữ pháp hình học mới với tri thức thiết kế có căn cứ; việc ghép mới không đồng nghĩa tính mới sáng chế hoặc lợi ích đã chứng minh.",
+    "Đọc tài liệu Dynamo/API chưa xác nhận tương thích engine hoặc vận hành trong Revit của người dùng; cần kiểm tra riêng khi đến giai đoạn triển khai."
+  ]
+}

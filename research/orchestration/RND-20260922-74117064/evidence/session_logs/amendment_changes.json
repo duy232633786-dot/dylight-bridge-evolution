@@ -1,0 +1,35 @@
+{
+  "title": "SAGE-EvoBridge P0 audit and bounded P1/P3 beam intervention slice",
+  "research_question": "Can the existing frame F1 evaluator support a reproducible immutable-contract failure and intervention trajectory without false benchmark PASS?",
+  "write_scope": [
+    "bridge_evolution/evobridge.py",
+    "tests/test_evobridge.py",
+    "docs/sage_evobridge/",
+    "research/orchestration/RND-20260922-74117064/"
+  ],
+  "required_artifacts": [
+    "docs/sage_evobridge/CURRENT_CAPABILITY_AUDIT.md",
+    "docs/sage_evobridge/REQUIREMENT_TRACEABILITY.md",
+    "docs/sage_evobridge/DESIGN_RECONCILIATION.md",
+    "bridge_evolution/evobridge.py",
+    "tests/test_evobridge.py",
+    "research/orchestration/RND-20260922-74117064/01_design_basis_and_evidence.md"
+  ],
+  "acceptance_criteria": [
+    "Audit is based on current source and raw test evidence; unavailable proposals explicitly recorded",
+    "Existing frame_f1 reused; fixed contract, updated self weight, closed form check, bounded interventions, immutable raw output",
+    "No standards compliance, approved component, transfer improvement or full-system completion claim"
+  ],
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q"
+    ]
+  ],
+  "preferred_provider": "codex",
+  "preferred_role": "structural_analyst",
+  "review_provider": "claude"
+}

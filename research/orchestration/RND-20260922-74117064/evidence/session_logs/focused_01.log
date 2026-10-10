@@ -1,0 +1,30 @@
+.......................F.......                                          [100%]
+================================== FAILURES ===================================
+_______________ test_timeout_recorded_as_tool_numerical_failure _______________
+
+contract = BeamContract(schema_version='1.0', project_id='B1-RESEARCH', task_id='B1-BEAM', units='m-kN-GPa', span_m=10.0, width_m...E'), fidelity='F1_LINEAR_ELASTIC_2D', support_scheme='PIN_ROLLER', mesh_elements=8, reference_relative_tolerance=1e-07)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001ADF551C440>
+
+    def test_timeout_recorded_as_tool_numerical_failure(contract, monkeypatch):
+        def timeout(_):
+            raise TimeoutError("test-only injected timeout")
+        monkeypatch.setattr(evo, "analyze_frame_model", timeout)
+>       result = evo.evaluate_beam(contract, .8)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_evobridge.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+bridge_evolution\evobridge.py:212: in evaluate_beam
+    raw = analyze_frame_model(model)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+_ = {'schema_version': '1.0', 'model_id': 'F1M-e5d7c2fceec5b1307eef0fe8', 'analysis_type': 'LINEAR_ELASTIC_2D_SMALL_DISPLACEMENT', 'units': {'length': 'm', 'force': 'kN', 'moment': 'kN_m', 'elastic_modulus': 'GPa', ...}, ...}
+
+    def timeout(_):
+>       raise TimeoutError("test-only injected timeout")
+E       TimeoutError: test-only injected timeout
+
+tests\test_evobridge.py:140: TimeoutError
+=========================== short test summary info ===========================
+FAILED tests/test_evobridge.py::test_timeout_recorded_as_tool_numerical_failure

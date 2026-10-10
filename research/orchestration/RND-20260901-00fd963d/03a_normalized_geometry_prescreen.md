@@ -1,0 +1,430 @@
+# F0 — Đặc tả topo và hình học chuẩn hóa HGB-B / HGB-D
+
+## 0. Trạng thái phát hành
+
+| Mục | Trạng thái |
+|---|---|
+| Task | `RND-00fd963d-06`, revision `r002` — unblocker độc lập cho Task 3 đang bị khóa bởi G0 |
+| Fidelity | `F0 / IDEA` |
+| `G0` | **`FAIL / STOP_FOR_ENGINEERING_CLAIMS` kế thừa `01` §10**; vòng này `NOT_CLAIMED` và không lật kết quả |
+| `G1` | `NOT_CLAIMED` — chưa có hình học tuyệt đối, fabrication rules và access model |
+| `G2` | `NOT_CLAIMED` — không chạy solver; runtime vòm không khả dụng |
+| Tọa độ tuyệt đối | `NOT_GENERATED` |
+| Solver / seed / raw output | `NOT_RUN / N/A / NONE` |
+| Phương án | HGB-B và HGB-D là **giả thuyết topo**, không phải thiết kế |
+
+Tài liệu này không thay thế `RND-00fd963d-03`. Nó chỉ tạo một ngôn ngữ hình học
+không thứ nguyên, graph lực và bộ kiểm fail-closed để hai phương án có thể được dựng
+lại sau khi dữ liệu G0 được khóa. Không con số sức kháng, độ võng, tần số, nội lực,
+khối lượng, chi phí hoặc carbon nào được phát hành.
+
+## 1. Provenance bất biến của vòng này
+
+| Artifact đầu vào | SHA-256 | Vai trò |
+|---|---|---|
+| `multiagent/tasks/RND-00fd963d-06.json` | `c4483f1695f5512fd3a981fc77ead1c4d3f6526a0929257c7f6ffe73240b71fe` | Hợp đồng task tại initial claim; lifecycle bytes về sau thay đổi có audit riêng |
+| `01_design_basis_and_evidence.md` | `9aa77cda74dad84e9bd1418bf78deabb62f6af3b6d495094628883e90ba54ad6` | Ranh giới bằng chứng và quyết định G0 |
+| `02_concept_portfolio.md` | `ec185333051d1d2cd24274e605a40d5a4e8da4eca638b45ac889f14e55adeaf4` | Định nghĩa HGB-B/HGB-D và finalist decision |
+| `00 - Hybrid Grand Bridge Research Program.md` | `a7924a117f7a92675f75d5b4a5b29b4bceb26d335fa3f294382f2ba9d6e3d011` | Sổ ý định người dùng đã ghi |
+| `Hybrid Grand Bridge Final Concept v1.7.png` | `cafc2249ad282acbcfcf8a914a3ab887a8727bb88080f4a06da974ee75cf3439` | Render ý tưởng; giá trị bằng chứng kỹ thuật bằng 0 |
+| `De_bai_do_an_tot_nghiep_thiet_ke_cau_vuot_song.docx` | `dfd2e6648c82fff806d1a5970bacec0c1fc7d5f5f6f7eef9b902e70174f62383` | Đề bài PSC học thuật tách lineage; không dùng làm basis hybrid |
+| `multiagent/handoffs/RND-00fd963d-06.codex.r001.json` | `1c8f85afaa0e1a57d7aafce4e0548eff3d5f08e63686cff2d11887ea655f5cbd` | Handoff r001 bị Claude yêu cầu sửa |
+| `multiagent/reviews/RND-00fd963d-06.claude.r001.json` | `975f239e037037d303bcf45bca1af89c2fd74c693fc34be1ff8b286de0e2f7ca` | Review độc lập `REVISE`, nguồn finding r002 |
+
+### 1.1 Năm lớp dữ liệu bắt buộc phân biệt
+
+| Lớp | Nội dung được phép dùng ở đây | Không được suy diễn |
+|---|---|---|
+| `VERIFIED_SOURCE` | Bytes/hash và nội dung đọc được của đề bài PSC; trạng thái capability của repo | Không chuyển các giả định PSC `45+75+45 m` sang hybrid 650 m |
+| `USER_INTENT` | Không có dây văng phía trong; giữ dây chủ + hanger ở nhịp giữa; quạt dây văng chỉ phía bờ; một vòm giữa hạ thấp nhập chân tháp; hai nửa vòm biên; dầm hộp thép khí động | Không coi ý định là bằng chứng cân bằng hay an toàn |
+| `CONCEPT_IMAGE` | Seed 650 m, khoảng 1490 m, 32 m, 210 m, 60 m và hình thái v1.7 | Không coi kích thước render là khảo sát hoặc phê duyệt |
+| `RESEARCH_PLACEHOLDER` | Biến không thứ nguyên, thứ tự node, phương trình hình học biểu tượng và graph cơ chế | Không gán miền số thiết kế hoặc kích thước mặc định |
+| `MISSING_INPUT` | Chuỗi khẩu độ canonical, cao độ, khổ luồng được duyệt, địa chất, tải, vật liệu, gió, động đất, tuổi thọ, dung sai | Không tự điền bằng dữ liệu PSC hoặc bằng ảnh |
+
+## 2. Mâu thuẫn hình học đang khóa tọa độ tuyệt đối
+
+Ba cách đọc đang cùng tồn tại và không được phép lấy trung bình:
+
+| ID | Chuỗi đọc từ hồ sơ concept | Tổng số học | Trạng thái |
+|---|---|---:|---|
+| `K1` | `145 + 250 + 650 + 250 + 145` | `1440 m` | Khớp đường kích thước phía trên ảnh |
+| `K2` | Bảng khai `TOTAL LENGTH` | `1490 m` | Thiếu phân bổ `50 m` vào các đoạn |
+| `K3` | Dẫn + chuyển tiếp + biên là ba đoạn riêng mỗi phía | `145 + 250 + 250 + 650 + 250 + 250 + 145` | `1940 m` |
+
+`F0-CHECK SPAN-UNIQUE = VIOLATED`: có ba chuỗi cạnh tranh. Vì vậy mọi trường
+`x_m`, `z_m`, station và node table theo mét phải trả `STOP_SPAN_CHAIN_AMBIGUOUS`.
+Chỉ hình học chuẩn hóa theo `L_MS` được phép tồn tại trong tài liệu này.
+
+## 3. Hệ tọa độ và biến chuẩn hóa
+
+### 3.1 Hệ tọa độ
+
+- `x`: dọc cầu, dương từ bờ trái sang bờ phải.
+- `y`: ngang cầu, dương sang phía phải khi nhìn theo chiều tăng `x`.
+- `z`: thẳng đứng, dương lên trên.
+- Gốc dọc tại giữa nhịp cáp chủ; gốc cao độ chỉ được đặt sau khi có datum G0.
+- `ξ = x/L_MS`, `η = y/B_D`, `ζ = (z-z_ref)/L_MS`.
+- Hai yên cáp giới hạn nhịp giữa có `ξ_SAD,L=-1/2`, `ξ_SAD,R=+1/2` theo **định nghĩa
+  chuẩn hóa**, không phải khẳng định `L_MS=650 m` đã được phê duyệt.
+- Phép đối xứng hình học dọc: `M_x(ξ,η,ζ)=(-ξ,η,ζ)` và đổi hậu tố `L↔R`.
+
+### 3.2 Bộ biến biểu tượng chung
+
+| Biến | Định nghĩa | Miền toán học tối thiểu | Provenance / trạng thái |
+|---|---|---|---|
+| `σ_AP=L_AP/L_MS` | tỷ số nhịp dẫn | `>0` | `MISSING_INPUT`; khóa bởi K1/K2/K3 |
+| `σ_TR=L_TR/L_MS` | tỷ số chuyển tiếp | `≥0` | `MISSING_INPUT`; có thể không là đoạn riêng trong K1 |
+| `σ_SS=L_SS/L_MS` | tỷ số nhịp biên | `>0` | `MISSING_INPUT` |
+| `λ_tot=L_tot/L_MS` | tổng chiều dài chuẩn hóa | derived | `MISSING_INPUT`; chỉ tính sau `SPAN-UNIQUE` |
+| `χ_c=f_c/L_MS` | tỷ số võng cáp chủ | `0<χ_c<ζ_SAD-ζ_DK` | `MISSING_INPUT` |
+| `τ_TN=|x_TN|/L_MS` | vị trí nút chân tháp/vòm | `>0` | `MISSING_INPUT`; không ép `τ_TN=1/2` |
+| `φ_AC=f_AC/L_MS` | độ vồng vòm giữa | `>0` | `MISSING_INPUT` |
+| `λ_AC=L_AC/L_MS` | khẩu độ/dây cung chuẩn hóa của vòm giữa | `>0` | derived từ hai `TN`, chưa mặc định bằng 1 |
+| `γ_gap=g/L_MS` | khe đứng nhỏ nhất vòm–đáy dầm | `>0` | `MISSING_INPUT` |
+| `ζ_SAD` | cao độ yên cáp chuẩn hóa | scalar | `MISSING_INPUT`, phụ thuộc datum G0 |
+| `ζ_DK(ξ)` | trắc dọc mặt cầu chuẩn hóa | function | `MISSING_INPUT`, phụ thuộc datum G0 |
+| `ζ_TN,L/R` | cao độ hai nút chân tháp chuẩn hóa | scalar | `MISSING_INPUT`, phụ thuộc datum G0 |
+| `ζ_soffit(ξ)` | cao độ đáy dầm chuẩn hóa | derived từ `ζ_DK` và chiều cao dầm còn thiếu | `MISSING_INPUT` cho tới khi mặt cắt được khóa |
+| `ξ_CATB,L/R` | vị trí khối neo–chịu xô HGB-B | ngoài hai tháp | `MISSING_INPUT` |
+| `ξ_AN,L/R` | vị trí mố neo HGB-D | ngoài hai tháp | `MISSING_INPUT` |
+| `η_c=s_cable/(2B_D)` | nửa khoảng cách hai mặt phẳng cáp | `0<η_c≤1/2` | `MISSING_INPUT` |
+| `ν_HG` | số khoang hanger mỗi mặt phẳng | số nguyên `≥1` | `MISSING_INPUT` |
+| `ν_ST` | số dây mỗi quạt ngoài | số nguyên `≥1` cho B; `0` cho D | `MISSING_INPUT` |
+| `ψ_a` | phần tải đứng mặt cầu đi vào vòm giữa | B0: `0`; B1: `0<ψ_a≤1` | **quyết định cơ chế chưa khóa** |
+| `κ_CATB` | `H_AH/H_MS,anchor` | không gán miền thiết kế | `NOT_EVALUATED` |
+| `α_T` | mất cân bằng dọc đỉnh tháp chuẩn hóa | không gán tolerance | `NOT_EVALUATED` |
+
+Các điều kiện `>0`, thứ tự và tính nguyên là bất biến toán học, không phải miền thiết
+kế. Không có giá trị min/max kỹ thuật nào được đặt trước khi có design basis.
+
+### 3.3 Hàm hình học chỉ dùng để sinh topo sau này
+
+**Cáp chủ nhịp giữa — template parabol hình học, không phải catenary đã cân bằng:**
+
+```text
+ζ_MS(ξ) = ζ_SAD - χ_c·(1 - 4ξ²),  -1/2 ≤ ξ ≤ +1/2
+```
+
+**Vòm giữa — template parabol qua hai nút chân tháp:** đặt
+`u=(ξ-ξ_TN,L)/(ξ_TN,R-ξ_TN,L)`, `0≤u≤1`:
+
+```text
+ζ_AC(u) = (1-u)·ζ_TN,L + u·ζ_TN,R + 4φ_AC·u(1-u)
+```
+
+**Nửa vòm biên:** dùng cubic Hermite qua `TN` và `CATB`, với hai vector tiếp tuyến
+`t_TN`, `t_CATB` là input. Không dùng một cung tròn mặc định, vì cung tròn sẽ áp đặt
+lực xô và tiếp tuyến mà chưa có cơ sở. Nếu các vector không có, generator trả
+`STOP_HALF_ARCH_TANGENT_MISSING`.
+
+## 4. Graph topo HGB-B — cable-primary, force-closed
+
+### 4.1 Node families
+
+| Family | Node ID biểu tượng | Chức năng |
+|---|---|---|
+| Ground/anchor | `B.CATB.L/R`, `B.GND.CATB.L/R` | khối tổ hợp neo cáp và nhận lực xô nửa vòm |
+| Tower foot | `B.TN.L/R`, `B.GND.TN.L/R` | nút chân tháp tích hợp, springing vòm giữa |
+| Land supports | `B.AB.L/R`, `B.PIER.L/R.q`, `B.BRG.L/R.q`, `B.GND.AB.L/R`, `B.GND.PIER.L/R.q` | mố, trụ và gối đỡ dầm dẫn/chuyển tiếp; `q` và vị trí còn thiếu |
+| Tower/cable saddle | `B.PY.BASE.L/R`, `B.PY.TOP.L/R`, `B.SAD.L/R` | đường truyền lực tháp và đổi hướng cáp |
+| Main cable | `B.MS.i.p` | node cáp chủ; `p∈{-,+}` là hai mặt phẳng cáp |
+| Backstay | `B.BS.i.p` | nhánh sau tháp liên tục tới CATB |
+| Hanger | `B.HG.TOP.i.p`, `B.HG.DECK.i.p` | nối đứng MS–dầm trong nhịp giữa |
+| Landward stays | `B.ST.TOWER.j.p`, `B.ST.DECK.j.p` | chỉ neo ở phía ngoài hai tháp |
+| Deck | `B.DK.k.c` | tim/sườn dầm; `c` là center/edge/box-corner |
+| Central arch | `B.AC.k` | một spine/vòm giữa trên tim cầu từ TN-L đến TN-R |
+| Lateral interface | `B.LAT.k` | liên kết ngang/torsion AC–DK; DOF đứng phụ thuộc B0/B1 |
+| Side half-arch | `B.AH.L/R.k` | nửa vòm giữa CATB và TN |
+| Side spandrel | `B.SP.AH.L/R.k` | đưa tải nhịp biên từ DK xuống AH nếu AH là cấu kiện chịu lực |
+| Common deck section | `B.OR.k`, `B.DP.k` | sườn xiên thép vĩnh cửu; damper chỉ động, không thay OR |
+
+### 4.2 Edge list bắt buộc
+
+```text
+CABLE_PATH:
+  CATB-L -- BS-L(*) -- SAD-L -- MS(*) -- SAD-R -- BS-R(*) -- CATB-R
+
+VERTICAL_MAINSPAN:
+  DK-MAIN(*) -- HG(*) -- MS(*)
+
+TOWER_TO_GROUND:
+  SAD-L -- PY-L -- TN-L -- GND-TN-L
+  SAD-R -- PY-R -- TN-R -- GND-TN-R
+
+LANDWARD_STAYS_ONLY:
+  PY/ST-TOWER-L(*) -- ST-L(*) -- DK-LAND-L(*)
+  PY/ST-TOWER-R(*) -- ST-R(*) -- DK-LAND-R(*)
+
+CENTRAL_ARCH:
+  TN-L -- AC(*) -- TN-R
+  AC(*) -- LAT(*) -- DK-MAIN(*)       [B0: release đứng + dọc; giữ ngang/torsion]
+
+SIDE_HALF_ARCHES:
+  CATB-L -- AH-L(*) -- TN-L
+  TN-R -- AH-R(*) -- CATB-R
+  DK-SIDE(*) -- SP-AH(*) -- AH(*)     [bắt buộc nếu AH nhận tải đứng nhịp biên]
+
+ANCHOR_TO_GROUND:
+  CATB-L -- GND-CATB-L
+  CATB-R -- GND-CATB-R
+
+LAND_DECK_SUPPORT:
+  DK-LAND-L(*) -- BRG-L(*) -- {AB-L or PIER-L(*)} -- GND-{AB/PIER}-L(*)
+  DK-LAND-R(*) -- BRG-R(*) -- {AB-R or PIER-R(*)} -- GND-{AB/PIER}-R(*)
+```
+
+`MS` và `BS` là **một đường cáp liên tục** qua yên; quạt `ST` là hệ cáp riêng và chỉ ở
+phía đất liền. Không node `ST.DECK` nào được nằm trong khoảng giữa hai yên cáp.
+
+### 4.3 Hai biến thể cơ chế không được trộn
+
+| Biến thể | Interface AC–DK | Vai trò vòm giữa | Trạng thái |
+|---|---|---|---|
+| `B0` | truyền ngang/torsion; giải phóng đứng và dọc | spine ngang/xoắn + giá lắp dựng; tự trọng về TN | Finalist HGB-B hiện hành; `ψ_a=0` theo giả thuyết |
+| `B1` | có truyền đứng | chia tải đứng với hệ treo | **Concept mới**, không còn là HGB-B thuần; cần staged nonlinear model để xác định `ψ_a` |
+
+Một thanh chéo thép/CFST thông thường giữa `AC` và `DK` truyền lực dọc trục và không tự
+động tạo ra release đứng. Nếu chọn B0, chi tiết interface phải chứng minh được chuyển
+vị đứng tương đối, chuyển vị nhiệt và truyền ngang đồng thời. Nếu không, `B0` bị bác
+bỏ bởi cơ chế rò độ cứng. Nếu chọn B1, không được ấn định phần trăm chia tải bằng tay.
+
+### 4.4 Invariants HGB-B
+
+1. `degree(CATB in cable path)=1`; mọi node cáp bên trong có degree `2`; yên không
+   được là đầu mút cáp.
+2. `ξ_ST.DECK,L < ξ_SAD,L` và `ξ_ST.DECK,R > ξ_SAD,R`.
+3. `AC` có đúng hai đầu mút và cả hai trùng node `TN`.
+4. Mỗi `AH` có một đầu tại `TN`, một đầu tại **chính** `CATB`; không kết thúc lơ lửng
+   dưới dầm.
+5. Nếu `SP-AH` vắng mặt thì `AH` không được khai là bộ phận đỡ tải đứng nhịp biên.
+6. B0 không có cạnh truyền đứng AC–DK; B1 bắt buộc khai `ψ_a=UNKNOWN_UNTIL_SOLVER`.
+7. Mọi node tải có ít nhất một đường graph tới node `GND-*`; kiểm này chỉ chứng minh
+   connectivity, không chứng minh cân bằng vector hay sức kháng.
+8. Số lượng/vị trí `PIER` và loại `BRG` là `MISSING_INPUT`; tuy vậy family và cạnh
+   `DK→BRG→AB/PIER→GND` bắt buộc có trong graph, nên nhịp phía đất liền không orphan.
+
+## 5. Graph topo HGB-D — đối chứng cầu treo neo đất
+
+### 5.1 Node/edge tối thiểu
+
+```text
+AN-L -- BS/MS-L(*) -- SAD-L -- MS-MAIN(*) -- SAD-R -- BS/MS-R(*) -- AN-R
+                         | HG(*)                    | HG(*)
+                         v                          v
+AB-L -- BRG -- DK-SIDE -- TN-L ===== DK-MAIN ===== TN-R -- DK-SIDE -- BRG -- AB-R
+ |              |          |                          |          |              |
+GND-AB-L     BRG/PIER(*)  PY-L                       PY-R    BRG/PIER(*)      GND-AB-R
+                |          |                          |          |
+           GND-PIER-L(*) GND-TN-L                 GND-TN-R GND-PIER-R(*)
+
+AN-L -- GND-AN-L
+AN-R -- GND-AN-R
+```
+
+HGB-D dùng cùng bề rộng dầm, mặt cắt khí động, điều kiện luồng, tải và design-basis
+hash với HGB-B để làm đối chứng. Nó không có `ST`, `AC`, `AH`, `LAT`, `SP-AH` hoặc
+`CATB`; `AN` chỉ là mố neo cáp. Mọi chênh lệch đầu vào ngoài topology phải bị cấm khi
+so sánh.
+
+### 5.2 Invariants HGB-D
+
+1. Một đường cáp liên tục từ `AN-L` tới `AN-R` qua hai yên.
+2. Không có cạnh mang family `ST`, `AC`, `AH` hoặc `CATB`.
+3. Tải đứng nhịp giữa đi `DK→HG→MS`; độ cứng hình dạng/xoắn do `DK` và giằng chung.
+4. Mố neo và chân tháp là terminal ground khác nhau; không gộp nếu khảo sát không
+   chứng minh đồng vị trí.
+5. B và D phải dùng **cùng một** chuỗi khẩu độ canonical, vị trí mố/trụ/gối, điều kiện
+   biên dầm, navigation prism và mặt cắt dầm ở vòng control đầu tiên; chỉ topology lai
+   được phép khác.
+
+## 6. Mặt cắt ngang chung để so sánh công bằng
+
+Phần này chỉ là topo mặt cắt, chưa có kích thước:
+
+```text
+edge deck -- OR steel strut -- lower box corner == closed aerodynamic steel box
+     |                 replaceable UHPC/steel deck cassette                 |
+edge deck -- OR steel strut -- lower box corner == inspection corridor
+```
+
+- `DK`: hộp thép khí động kín, số khoang là biến; không khóa ba khoang từ render.
+- `OR`: sườn xiên thép vĩnh cửu đỡ cánh hẫng, đối xứng; là đường lực tĩnh.
+- `DP`: giảm chấn nhớt tại một số nút, chỉ là đường lực động và phải tháo thay được.
+- CFRP/carbon chỉ được phép ở mức `RESEARCH_PLACEHOLDER` cho gia cường mỏi, panel nhẹ
+  hoặc thanh kéo có bảo vệ cháy; không thay cấu kiện nén chính và không được coi là
+  “chống cháy” khi chưa có hệ nhựa, lớp bảo vệ, nhiệt độ thiết kế và thử nghiệm G6.
+- Mặt cắt của B và D phải giống nhau ở vòng đối chứng đầu tiên; nếu thay đồng thời cả
+  topology và mặt cắt thì không thể quy nguyên nhân chênh lệch.
+
+## 7. Bộ kiểm fail-closed đăng ký trước
+
+### 7.1 Schema trạng thái
+
+Mỗi phép kiểm chỉ trả một trong bốn trạng thái:
+
+```text
+SATISFIED_F0_TOPOLOGY   # đúng về graph/ký hiệu, không phải gate PASS
+VIOLATED_F0_TOPOLOGY    # mâu thuẫn logic có thể thấy không cần solver
+BLOCKED_MISSING_INPUT   # thiếu input G0/G1
+NOT_RUN_SOLVER_REQUIRED # chỉ solver phù hợp mới trả lời
+```
+
+### 7.2 Danh sách kiểm
+
+| ID | Phép kiểm | Điều kiện | Trạng thái hiện tại |
+|---|---|---|---|
+| `T-SPAN-01` | unique span chain | đúng một trong K1/K2/K3 hoặc chuỗi khảo sát mới được chọn | `VIOLATED_F0_TOPOLOGY` |
+| `T-SPAN-02` | span closure | `ΣL_i=L_tot` theo cùng chain và cùng datum | `BLOCKED_MISSING_INPUT` |
+| `T-CABLE-01` | cable continuity | path anchor-L→saddle-L→main→saddle-R→anchor-R liên tục | B, D: `SATISFIED_F0_TOPOLOGY` |
+| `T-STAY-01` | no inward stays | mọi neo deck của ST nằm landward so với **yên cáp tương ứng `ξ_SAD`** | B: `SATISFIED_F0_TOPOLOGY` theo invariant; D: N/A |
+| `T-GRAPH-01` | connectivity | mọi endpoint tồn tại; không orphan; mọi load-entry có path tới ground | B, D: `SATISFIED_F0_TOPOLOGY` cho graph biểu tượng |
+| `T-SUPPORT-01` | land-deck support closure | mỗi vùng DK phía đất liền có path `DK→BRG→AB/PIER→GND`; B và D dùng cùng support graph | `SATISFIED_F0_TOPOLOGY`; số lượng/vị trí `BLOCKED_MISSING_INPUT` |
+| `T-FORCE-01` | vector equilibrium | tổng phản lực và moment trong tolerance đăng ký trước | `NOT_RUN_SOLVER_REQUIRED` |
+| `T-TOWER-01` | longitudinal tower balance | `α_T` cho DL, tải lệch, nhiệt, gió và thi công | `NOT_RUN_SOLVER_REQUIRED` |
+| `T-CATB-01` | residual thrust | dấu và trị số `1-κ_CATB` cho mọi tổ hợp | `NOT_RUN_SOLVER_REQUIRED` |
+| `T-ARCH-01` | arch endpoint closure | AC→TN hai đầu; AH→TN/CATB | B: `SATISFIED_F0_TOPOLOGY` |
+| `T-ARCH-02` | TN tangent/resultant | xuất tiếp tuyến AC/AH; nếu không đồng tuyến phải có node foundation nhận resultant | `BLOCKED_MISSING_INPUT` |
+| `T-ARCH-03` | AC–DK gap | `min(ζ_soffit-ζ_AC)≥γ_gap` trên miền giao nhau | `BLOCKED_MISSING_INPUT` |
+| `T-NAV-01` | navigation exclusion | cấu kiện thấp nhất sau võng/nhiệt/dung sai nằm ngoài navigation prism | `BLOCKED_MISSING_INPUT` |
+| `T-SYM-01` | symbolic symmetry | graph phải đẳng cấu dưới `M_x`, trừ nhãn L/R | B, D: `SATISFIED_F0_TOPOLOGY` |
+| `T-ROLE-01` | member removal | bỏ AC/AH/ST lần lượt và so cơ chế còn khép | B: `NOT_RUN_SOLVER_REQUIRED`; D là control |
+| `T-REP-01` | deterministic replay | canonical input giống nhau tạo node/member JSON và SHA-256 giống nhau | đăng ký trước; chưa có input để chạy |
+
+### 7.3 Navigation prism
+
+Khi có dữ liệu, hộp cấm kết cấu được định nghĩa bằng:
+
+```text
+P_nav = [x_nav,L, x_nav,R] × [y_nav,L, y_nav,R]
+        × [z_MNTK, z_MNTK + C_nav]
+
+z_lowest,design(x,y)
+  = z_geometry(x,y) - Δ_deflection - Δ_temperature - Δ_tolerance
+
+PASS only if Geometry(permanent structure) ∩ P_nav = ∅
+```
+
+Ở HGB-B, `z_geometry` phải xét đỉnh vòm `AC`, liên kết `LAT`, damper, sàn kiểm tra và
+mọi thiết bị dưới dầm; không chỉ xét đáy hộp thép. Seed `60 m` không đủ để chạy phép
+kiểm vì thiếu `z_MNTK`, bề rộng luồng, trắc dọc, độ võng, nhiệt và dung sai.
+
+## 8. Pseudo-code generator — không có default ẩn
+
+```text
+function build_normalized_topology(spec):
+    require spec.provenance_class for every input
+    require exactly_one(spec.span_chain_candidates.selected)
+    require spec.cable_closure in {GROUND_ANCHORED_CONTINUOUS}
+    require spec.central_arch_role in {B0_LATERAL_RELEASED, B1_VERTICAL_SHARE}
+    require spec.land_support_graph with AB, BRG, optional PIER, and GND terminals
+    require same_span_chain_and_support_graph(HGB_B, HGB_D)
+    require all landmark ordering constraints
+
+    if any requirement missing:
+        return STOP(code, missing_fields, generated_nodes=[])
+
+    chain = canonicalize_span_chain(spec)
+    assert symbolic_sum(chain) == spec.L_tot
+
+    left = build_left_landmarks(chain)
+    right = mirror(left, x=0)
+    deck = build_continuous_deck(left, mainspan, right)
+    cable = build_continuous_ground_anchored_cable(spec.χ_c)
+    hangers = connect_vertical(cable, deck, spec.ν_HG)
+
+    if spec.concept == HGB_B:
+        stays = build_landward_only_stays(spec.ν_ST)
+        central_arch = hermite_or_parabolic_arch(TN_L, TN_R, spec)
+        half_arch_L = hermite(CATB_L, TN_L, t_CATB_L, t_TN_L)
+        half_arch_R = mirror(half_arch_L)
+        interfaces = build_interface(spec.central_arch_role)
+    else if spec.concept == HGB_D:
+        forbid_families(ST, AC, AH, CATB, LAT, SP_AH)
+
+    run_F0_checks()
+    if any VIOLATED or BLOCKED:
+        return STOP(check_results, generated_absolute_coordinates=[])
+
+    output canonical_sort(nodes, members, constraints, provenance)
+    output sha256(canonical_json(output))
+```
+
+Generator tương lai phải tách `normalized_topology.json` khỏi
+`absolute_geometry.json`. File thứ hai không được tạo nếu bất kỳ input G0 nào còn
+`MISSING_INPUT`.
+
+## 9. Kết quả tiền-sàng-lọc và falsifiers
+
+### 9.1 HGB-B
+
+- **Đứng vững ở mức graph:** đường cáp chủ đã có terminal neo; dây văng chỉ phía bờ;
+  AC và AH có endpoint vật lý; topology có thể mirror và tái lập.
+- **Chưa đứng vững về vật lý:** cân bằng vector đỉnh tháp, lực xô CATB, ổn định vòm,
+  khí động, giai đoạn thi công và khổ thông thuyền đều chưa chạy.
+- **Falsifier mới `B-F0-09`:** nếu interface thực tế không thể truyền ngang/xoắn mà
+  đồng thời giải phóng đứng/dọc bền vững, biến thể B0 bị bác bỏ.
+- **Falsifier mới `B-F0-10`:** nếu AH không có spandrel/connection nhận tải nhịp biên,
+  AH không được coi là cấu kiện đỡ tải; nếu không có vai trò ngang riêng, phải loại AH.
+- **Falsifier mới `B-F0-11`:** nếu CATB không thể đồng thời bố trí buồng neo cáp,
+  springing AH, kiểm tra, thay dây và đường lực nền ngắn, cơ chế tổ hợp bị bác bỏ.
+
+### 9.2 HGB-D
+
+- **Đứng vững ở mức graph:** một cơ chế chính, cáp liên tục neo đất, không có member
+  family roleless ở mức topo.
+- **Chưa đứng vững về vật lý:** vẫn cần nền neo, cáp phi tuyến, dầm khí động, gió và
+  mọi dữ liệu G0 giống HGB-B.
+- D phải được giữ làm control. Nếu B không cho lợi ích định lượng sau G1/G2 so với D,
+  phần vòm/hybrid của B bị loại dù hình thức kiến trúc hấp dẫn.
+
+## 10. Quyết định tối thiểu cần người dùng khóa
+
+| ID | Quyết định | Lựa chọn | Khuyến nghị nghiên cứu |
+|---|---|---|---|
+| `UD-01` | Chuỗi khẩu độ canonical | K1=`1440 m`; K2=`1490 m` nhưng phải phân bổ 50 m; K3=`1940 m`; hoặc cung cấp chain mới | Chọn K1 nếu đường kích thước trên ảnh là authority; nếu không, cung cấp chuỗi mới |
+| `UD-02` | Khép lực cáp chủ | cáp liên tục qua tháp thành backstay tới CATB/AN; hoặc tự neo vào dầm | HGB-B/D dùng cáp liên tục neo đất; không dùng quạt ST thay cho backstay |
+| `UD-03` | Vai trò đứng của vòm giữa | B0=`ψ_a=0` theo interface release; B1=chia tải đứng | Chọn B0 để giữ cơ chế phân vai rõ; B1 phải tạo concept lineage mới và chờ solver staged nonlinear |
+| `UD-04` | Hình học navigation | datum, MNTK, rộng×cao luồng được AHJ duyệt, allowance võng/nhiệt/dung sai | Bắt buộc trước mọi cao độ tuyệt đối |
+| `UD-05` | Vai trò nửa vòm biên | đỡ tải đứng qua spandrel; hoặc chỉ kiến trúc | Nếu không đỡ tải và không có vai trò riêng, loại khỏi phương án kỹ thuật |
+| `UD-06` | Sơ đồ gối/mố/trụ phía đất liền | số nhịp, vị trí trụ, loại gối và điều kiện biên | B và D phải dùng cùng một graph support trong vòng control |
+
+`UD-01` và `UD-02` chỉ mở khóa các landmark cáp/tháp. `UD-06` còn cần để mở khóa
+chuỗi node dầm–gối–mố/trụ đầy đủ. `UD-03`…`UD-06` cùng dữ liệu G0 mới đủ để tạo
+hình học 3D có ý nghĩa kỹ thuật.
+
+## 11. Claims được phép và bị cấm
+
+**Được phép:** “HGB-B và HGB-D đã có graph topo ký hiệu; HGB-B khép đường cáp bằng
+backstay–CATB; các kiểm còn lại được preregister và fail-closed.”
+
+**Bị cấm:** “đã cân bằng”, “đã đủ tĩnh không”, “vòm chịu được”, “dầm ổn định gió”,
+“an toàn”, “tối ưu”, “khả thi thi công”, “world-first”, mọi utilization/nội lực/tần
+số/chi phí/carbon, và mọi nhãn `SCREENED` trở lên.
+
+## 12. Đối chiếu acceptance criteria
+
+| Criterion | Bằng chứng trong artifact |
+|---|---|
+| Hai graph topo định danh, không tọa độ tuyệt đối | §4–§5; trạng thái §0 |
+| Biến không thứ nguyên, tọa độ, đối xứng, domain/provenance | §1, §3 |
+| Preregister closure/navigation/symmetry/connectivity | §7 |
+| Pseudo-code fail-closed | §8 |
+| Năm lớp provenance tách biệt | §1.1 |
+| G0/G1/G2 không claim + quyết định mở khóa | §0, §10–§11 |
+
+## 13. Reconciliation review Claude r001
+
+Nguồn: `multiagent/reviews/RND-00fd963d-06.claude.r001.json`, quyết định `REVISE`,
+hash `975f239e037037d303bcf45bca1af89c2fd74c693fc34be1ff8b286de0e2f7ca`.
+
+| Finding | Cách xử lý r002 |
+|---|---|
+| `CL-R06-01` — thiếu AB/PIER/BEARING và cạnh dầm phía bờ xuống ground | Bổ sung node family §4.1, cạnh `LAND_DECK_SUPPORT` §4.2, graph D §5.1 và `T-SUPPORT-01` §7.2 |
+| `CL-R06-02` — control B/D chưa khóa cùng support/span | Bổ sung invariant D §5.2(5), pseudo-code và `T-SUPPORT-01` |
+| `CL-R06-03` — mốc landward dùng tháp/yên không nhất quán | Khóa thống nhất tại `ξ_SAD` trong `T-STAY-01`, khớp invariant B §4.4(2) |
+| `CL-R06-04` — nhãn `λ_AC` và biến cao độ thiếu đăng ký | Sửa `λ_AC` thành khẩu độ/dây cung; thêm `ζ_SAD`, `ζ_DK`, `ζ_TN`, `ζ_soffit` ở §3.2 |
+| `CL-R06-05` — `NOT_CLAIMED` làm mờ G0 đã FAIL | §0 ghi rõ `G0=FAIL` kế thừa, vòng này không claim và không lật |
+
+Kết quả âm được giữ: r001 không được coi là đã đạt connectivity. Mọi trạng thái F0
+trong r002 chỉ áp cho graph biểu tượng đã bổ sung family support; số lượng, vị trí,
+loại gối và điều kiện biên thực vẫn `MISSING_INPUT`.

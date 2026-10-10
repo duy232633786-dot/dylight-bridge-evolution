@@ -1,0 +1,107 @@
+# BRD-054 — Audit và lát cắt SAGE-EvoBridge B1
+
+Ngày phiên: 23/09/2026, Asia/Bangkok. Git HEAD:
+`5e3b214ae6b6bca46a499f62bb25eaf83d90ace5`; checkout đã có thay đổi chưa commit.
+Trạng thái lát cắt: đã triển khai và kiểm chứng bằng benchmark thật; regression
+toàn repo đạt 1.943 tests, 6 skipped, exit 0. Handoff/review được ghi riêng trong
+Lab task BRD-054. Đây không phải hoàn thành hệ thống SAGE-EvoBridge.
+
+## Đã đọc và hiện trạng được chứng minh
+
+Đã đọc yêu cầu đính kèm đầy đủ, AGENTS, PROTOCOL, PHYSICS_GATES, README,
+pyproject, CLI/lab/orchestrator, schema, frame_f1 và tests liên quan; một agent
+khác lần theo UI → design_loop → evaluator → solver → verifier → báo cáo.
+Hai proposal DOCX đúng tên chưa có trong workspace. `_de_bai.docx` đã được đọc
+nhưng là đề bài đồ án cầu khác, không được dùng thay proposal.
+
+CLI Lab chạy được, validate hiện trả `valid=true`. Đường design_loop cũ thực
+chạy 12 solver calls trên GC-06; báo L1 feasible, nhưng component audit vẫn
+BLOCKED và kết thúc vì hết budget trong pha TRIM. Điều này không chứng minh
+kiểm chuẩn toàn cầu đã đạt. Dispatch production MIDAS/OpenSees chưa có solver
+thật; UI/Revit/live MIDAS không được kiểm chứng trong phiên này.
+
+## Thay đổi thực hiện
+
+- `bridge_evolution/evobridge.py`: adapter B1 dùng lại `frame_f1`; typed frozen
+  contract; compiler dầm; kiểm riêng mapping vật liệu/tiết diện/tải/gối; kiểm
+  output/source/model hashes; đối chiếu nghiệm đóng; phân loại lỗi; height
+  intervention; giữ kết quả phản tác dụng, collateral failures và hết budget;
+  ghi gói evidence mới độc quyền và kiểm integrity qua process mới.
+- `tests/test_evobridge.py`: numerical/invariant/negative/subprocess tests.
+- `docs/sage_evobridge/`: capability audit, truy vết, reconciliation, test
+  matrix, basis, role instructions, literature register, cấu hình và cách chạy.
+- Thư mục phiên này: nguyên văn master prompt, metadata, raw trajectories,
+  kết quả review độc lập, lệnh/exit code/logs và handoff.
+
+Không thay framework, model nền, solver cũ, UI, BIM hay artifact đã handoff.
+Đối chiếu `git diff --binary` trước/sau cho thấy các thay đổi tracked có sẵn
+được giữ nguyên. Module mới là đường benchmark riêng trong package hiện hữu;
+production `evaluate_candidate` chưa được hưởng các guard mới.
+
+Lỗi cần ưu tiên ở evaluator production đã được tái hiện bằng fault injection:
+NaN ở võng hoặc solver status NOT_CONVERGED vẫn có thể trả SUCCESS/feasible=true.
+Đã lưu `evidence/legacy_output_guard_probe.json`. Đây là lỗi guard được cài thử
+có kiểm soát, không khẳng định solver thật đã sinh NaN trong lượt chạy bình thường.
+
+## Đầu vào và giới hạn kỹ thuật
+
+Dầm chữ nhật nghiên cứu: L=10 m, b=0,30 m, E=30 GPa, γ=25 kN/m³, tải điểm
+ngoài 100 kN giữa nhịp, gối khớp–con lăn. Đây là số liệu benchmark tự đặt.
+Giới hạn võng 10 mm, ứng suất đàn hồi 30 MPa, thể tích 4 m³ cũng là
+BENCHMARK_CONSTRAINT, không gắn giả điều khoản TCVN/JRA/AASHTO.
+
+Chỉ chiều cao được thay trong miền [0,30;1,20] m. Tải ngoài, gối, E, giới hạn
+và checks được khóa. Mọi thay đổi h tính lại A, I và tự trọng. Tự trọng dùng
+tải nút tributary trên 8 phần tử; không gọi là tải đều phần tử chính xác.
+Nghiệm đối chứng Green của tải điểm được tính trực tiếp từ contract, không
+đọc FE model. Test refinement so thêm với nghiệm tải đều liên tục.
+
+## Kết quả runtime đã lưu
+
+| Lượt | Solver calls | Quan sát | Kết luận |
+|---|---:|---|---|
+| success | 3 | h=0,50 m: võng 27,365 mm; h=0,40 m: 51,439 mm; h=0,80 m: 7,434 mm | CONTRADICTED rồi SUPPORTED_IN_MODEL; phương án cuối đạt ba checks benchmark |
+| budget_exhausted | 2 | Reference + probe 0,40 m, chưa đạt | NO_FEASIBLE_DESIGN_FOUND_WITHIN_BUDGET |
+| collateral | 2 | h=0,80 m giảm võng nhưng VOLUME vượt cap 2 m³ | Không vào danh sách candidate đạt |
+| unsupported | 0 | Yêu cầu FATIGUE chưa hỗ trợ | INCONCLUSIVE; không mở solver |
+| inconclusive_probe | 1 | Probe h=1,50 m ngoài bounds | Từ chối, hypothesis INCONCLUSIVE |
+
+Đây là các lượt exploratory có cấu hình lưu trước khi gọi CLI, không phải
+thí nghiệm confirmatory/transfer. Ba FE calls trong lượt success không bao
+gồm các lượt benchmark khác, chạy thử phát triển hoặc unit tests; từng lượt
+có budget và log riêng. Closed-form check không được đếm thành FE solver call.
+Không có call tới model API trong sản phẩm hoặc job solver tính phí.
+
+Mọi báo cáo giữ claim IDEA, compliance INCONCLUSIVE và approval NOT_REVIEWED.
+Supported hypothesis chỉ nói thay đổi có tác dụng trong mô hình này; không
+kết luận nguyên nhân duy nhất, độ an toàn thực tế hoặc learning.
+
+## Kiểm chứng
+
+- Focused tests sau sửa: 63 passed, exit 0; gồm tests mới và frame_f1 hiện có.
+- Reviewer độc lập cùng nền tảng đã phát hiện và tái kiểm bốn lỗi semantic;
+  bản sửa chặn đủ bốn lỗi, script review exit 0. Không giả nhận cross-vendor.
+- Baseline full suite: exit 1 ở test phân loại tài liệu phụ thuộc tên đường
+  dẫn tạm có chữ `bridge`. Test đó chạy lại với tên tạm trung tính: 1 passed.
+  Giữ nguyên log âm; chưa sửa module phân loại ngoài scope.
+- Regression toàn repo sau patch: **1.943 passed, 6 skipped**, exit 0,
+  732,78 giây. Lệnh thực: `python -m pytest tests -o addopts='' -q
+  --basetemp ../tmp/b054_regression_20260923` với interpreter/PYTHONPATH trong
+  session_metadata.json và REPRODUCE.md. Tests bị skip không được gọi là PASS.
+- Lab validate trước handoff: valid=true, errors=[], exit 0.
+
+## Chưa làm và bàn giao tiếp
+
+P2 approval gate A↔B; verified memory, policy learning và P4 transfer; RuleIR
+tiêu chuẩn đã duyệt; generalized fault-injection dataset; pilot Super-T/vòm;
+UI của đường B1 và Revit/MIDAS live đều chưa hoàn thành. Episode persistence
+và test restart không được gọi là đã học kinh nghiệm.
+
+Ưu tiên tiếp: sửa guard đầu ra tại evaluator production trong một task có
+provenance correction phù hợp, rồi đưa typed failure/intervention records vào
+design_loop cũ. Sau đó xây memory/frozen transfer với baseline cùng budget.
+
+Không cần quyết định thêm để nghiệm thu lát cắt B1. Cần hai proposal gốc để
+truy vết đến chương/trang và trích bibliography; cần mở phạm vi ngoài workspace
+nếu muốn đồng bộ vào vault Obsidian gốc. Hiện có mirror Obsidian trong workspace
+và lịch checkpoint 30 phút; không báo vault ngoài đã sync.
