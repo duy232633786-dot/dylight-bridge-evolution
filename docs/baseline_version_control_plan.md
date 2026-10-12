@@ -224,3 +224,172 @@ hiện nay, nhưng nó **không** thay được Git:
 - snapshot nằm cùng một cây thư mục với artifact gốc; mất máy là mất cả hai.
 
 Git là nguồn tái dựng hạng nhất. Snapshot là hạng hai và phải kèm incident.
+
+## 7. Trạng thái provenance hiện tại (ghi nhận, chưa sửa)
+
+Ngày ghi: 2026-10-12, sau commit `672ba93`. Số liệu lấy từ `python docs/check_handoff_provenance.py`.
+
+- Artifact đã hash trong handoff: 305 — dựng lại từ HEAD: 207; từ snapshot: 30; **không dựng lại được: 68** (baseline 12).
+- File CRLF trong working tree (`.gitattributes` eol=lf): **86** (baseline 4).
+
+Quyết định: **không** hạ hay nâng baseline, không sửa hash, không chuẩn hoá CRLF của file đã ký. Checker provenance chưa nối vào CI cho đến khi có bytes gốc hoặc correction được review độc lập. Chỉ drift (`tests/test_runtime_drift.py`) nằm trong pytest/CI.
+
+### Danh sách 68 artifact không dựng lại được
+
+- bridge_evolution/optimization/nsga2.py — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- docs/sage_evobridge/beam_contract.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- docs/sage_evobridge/budget_contract.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- docs/sage_evobridge/collateral_contract.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- docs/sage_evobridge/unsupported_contract.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- experiments/results/grammar_ab_20260821T061537.020446Z/oracle_comparison.md — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- experiments/results/grammar_ab_20260821T061537.020446Z/summary.md — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- experiments/results/nsga2_operator_ab/pytest_full_suite_long_basetemp.log — `[BI GITIGNORE, CHUA COMMIT, KHONG CO SNAPSHOT]`
+- experiments/results/nsga2_operator_ab/pytest_rerun_short_basetemp.log — `[BI GITIGNORE, CHUA COMMIT, KHONG CO SNAPSHOT]`
+- experiments/results/nsga2_operator_ab/runs.jsonl — `[BI GITIGNORE, CHUA COMMIT, KHONG CO SNAPSHOT]`
+- experiments/results/nsga2_operator_ab/summary.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- experiments/validation/opensees_brd044_benchmarks.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260901-00fd963d/b1_1440_checks.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260901-00fd963d/b1_1440_cross_section.svg — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260901-00fd963d/b1_1440_elevation.svg — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260901-00fd963d/b1_1440_geometry.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260901-00fd963d/b1_1440_nodes.csv — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/MASTER_PROMPT.md — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/checkpoint_20260923_0028.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/checkpoint_20260923_003004.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/checkpoint_20260923_003004.md — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/bootstrap_failures.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/budget_exhausted.stdout.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/collateral.stdout.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/collateral/manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/commands.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe.stdout.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/legacy_output_guard_probe.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/restart_verification.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/amendment.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/amendment_changes.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/baseline_exit.txt — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/baseline_tests.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/claim.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop_exit.txt — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_solver_failure.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_solver_failure_exit.txt — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_01.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_02.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_03.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/git_status_before.txt — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/intake.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/lab_validate_pre_handoff.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/path_diagnostic.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/regression_exit.txt — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/regression_tests.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/session_logs/tracked_before.patch — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/source_snapshots/index.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/success.stdout.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/success/manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/unsupported.stdout.log — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/evidence/unsupported/manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/session_manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260922-74117064/session_metadata.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260923-1472cd05/README.md — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260923-1472cd05/corpus.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260923-1472cd05/independent_review.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260923-1472cd05/publication_manifest.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260923-1472cd05/publication_receipt.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- research/orchestration/RND-20260923-1472cd05/qa_report.json — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- tests/test_material_evidence.py — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- tests/test_nsga2_repaired_operators.py — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- tests/test_rl_env.py — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+- tests/test_state.py — `[HEAD KHAC BYTES DA KY, KHONG CO SNAPSHOT]`
+
+### Danh sách 86 file CRLF
+
+- `bridge_evolution/collaboration/lab.py`
+- `bridge_evolution/evaluate.py`
+- `bridge_evolution/knowledge/local_library.py`
+- `bridge_evolution/optimization/nsga2.py`
+- `bridge_grammar/experimental/arch_deck_v1.json`
+- `contracts/bridge_design_state.schema.json`
+- `contracts/design_loop_report.schema.json`
+- `contracts/site_hazard_profile.schema.json`
+- `docs/design_basis/DB-SUPERT-38M.json`
+- `docs/sage_evobridge/beam_contract.json`
+- `docs/sage_evobridge/budget_contract.json`
+- `docs/sage_evobridge/collateral_contract.json`
+- `docs/sage_evobridge/unsupported_contract.json`
+- `experiments/results/grammar_ab_20260821T061537.020446Z/oracle_comparison.md`
+- `experiments/results/grammar_ab_20260821T061537.020446Z/summary.md`
+- `experiments/results/nsga2_operator_ab/pytest_full_suite_long_basetemp.log`
+- `experiments/results/nsga2_operator_ab/pytest_rerun_short_basetemp.log`
+- `experiments/results/nsga2_operator_ab/summary.json`
+- `experiments/shape_discovery/arch_render_study.md`
+- `experiments/shape_discovery/pre_registration.json`
+- `experiments/validation/opensees_brd044_benchmarks.json`
+- `experiments/validation/opensees_brd045_benchmarks.json`
+- `experiments/validation/opensees_brd045_negative_result.json`
+- `research/library/README.md`
+- `research/literature/README.md`
+- `research/literature/index.json`
+- `research/orchestration/RND-20260901-00fd963d/b1_1440_checks.json`
+- `research/orchestration/RND-20260901-00fd963d/b1_1440_cross_section.svg`
+- `research/orchestration/RND-20260901-00fd963d/b1_1440_elevation.svg`
+- `research/orchestration/RND-20260901-00fd963d/b1_1440_geometry.json`
+- `research/orchestration/RND-20260901-00fd963d/b1_1440_nodes.csv`
+- `research/orchestration/RND-20260922-74117064/MASTER_PROMPT.md`
+- `research/orchestration/RND-20260922-74117064/checkpoint_20260923_0028.json`
+- `research/orchestration/RND-20260922-74117064/checkpoint_20260923_003004.json`
+- `research/orchestration/RND-20260922-74117064/checkpoint_20260923_003004.md`
+- `research/orchestration/RND-20260922-74117064/evidence/bootstrap_failures.json`
+- `research/orchestration/RND-20260922-74117064/evidence/budget_exhausted.stdout.log`
+- `research/orchestration/RND-20260922-74117064/evidence/budget_exhausted/manifest.json`
+- `research/orchestration/RND-20260922-74117064/evidence/collateral.stdout.log`
+- `research/orchestration/RND-20260922-74117064/evidence/collateral/manifest.json`
+- `research/orchestration/RND-20260922-74117064/evidence/commands.json`
+- `research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe.stdout.log`
+- `research/orchestration/RND-20260922-74117064/evidence/inconclusive_probe/manifest.json`
+- `research/orchestration/RND-20260922-74117064/evidence/legacy_output_guard_probe.json`
+- `research/orchestration/RND-20260922-74117064/evidence/restart_verification.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/amendment.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/amendment_changes.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/baseline_exit.txt`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/baseline_tests.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/claim.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_design_loop_exit.txt`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_solver_failure.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/existing_solver_failure_exit.txt`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_01.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_02.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/focused_03.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/git_status_before.txt`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/intake.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/lab_validate_pre_handoff.json`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/path_diagnostic.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/regression_exit.txt`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/regression_tests.log`
+- `research/orchestration/RND-20260922-74117064/evidence/session_logs/tracked_before.patch`
+- `research/orchestration/RND-20260922-74117064/evidence/source_snapshots/index.json`
+- `research/orchestration/RND-20260922-74117064/evidence/success.stdout.log`
+- `research/orchestration/RND-20260922-74117064/evidence/success/manifest.json`
+- `research/orchestration/RND-20260922-74117064/evidence/unsupported.stdout.log`
+- `research/orchestration/RND-20260922-74117064/evidence/unsupported/manifest.json`
+- `research/orchestration/RND-20260922-74117064/session_manifest.json`
+- `research/orchestration/RND-20260922-74117064/session_metadata.json`
+- `research/orchestration/RND-20260923-1472cd05/README.md`
+- `research/orchestration/RND-20260923-1472cd05/corpus.json`
+- `research/orchestration/RND-20260923-1472cd05/independent_review.json`
+- `research/orchestration/RND-20260923-1472cd05/publication_manifest.json`
+- `research/orchestration/RND-20260923-1472cd05/publication_receipt.json`
+- `research/orchestration/RND-20260923-1472cd05/qa_report.json`
+- `tests/test_catalogs.py`
+- `tests/test_local_library.py`
+- `tests/test_material_evidence.py`
+- `tests/test_nsga2_repaired_operators.py`
+- `tests/test_rl_env.py`
+- `tests/test_shape_grammar_experimental.py`
+- `tests/test_site_spec.py`
+- `tests/test_state.py`
