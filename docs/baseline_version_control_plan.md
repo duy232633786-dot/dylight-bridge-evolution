@@ -165,7 +165,7 @@ Làm theo thứ tự, mỗi bước hạ `BASELINE_UNRECOVERABLE` (và `BASELINE
 `docs/check_handoff_provenance.py` xuống đúng con số mới (bánh cóc: script báo
 đỏ cả khi cải thiện mà quên hạ baseline).
 
-0. **Sửa hai test đang khoá cứng con số 9 cũ.** *(Ngoài `write_scope` của
+0. **[ĐÃ XONG 2026-10-12]** Sửa hai test đang khoá cứng con số 9 cũ. *(Ngoài `write_scope` của
    BRD-001 — cần task riêng, và là hệ quả TRỰC TIẾP của việc đóng lệch audit.)*
    - `tests/test_obsidian.py:187` — `assert set(audit["cards"]) == {…range(1, 10)}`
      đóng băng đúng cái lệch mà BRD-001 phải đóng. Tên test là
@@ -205,7 +205,7 @@ Làm theo thứ tự, mỗi bước hạ `BASELINE_UNRECOVERABLE` (và `BASELINE
    cần task riêng.)*
 5. **Nối vào `pytest`.** Tạo `tests/test_runtime_drift.py` ba dòng theo docstring
    đầu `docs/check_runtime_drift.py`. *(Ngoài `write_scope` — cần task riêng.)*
-6. **Sửa `pyproject.toml`** để khai báo `pymoo`, `shapely`, `sectionproperties`,
+6. **[ĐÃ CÓ SẴN — kiểm 2026-10-12]** `pyproject.toml` đã khai báo `pymoo`, `shapely`, `sectionproperties`, `ifcopenshell` trong `dev`/extras và `requirements-dev.lock` có cùng phiên bản. Gốc: **Sửa `pyproject.toml`** để khai báo `pymoo`, `shapely`, `sectionproperties`,
    `ifcopenshell`; đồng bộ `requirements-dev.lock`. Không có bước này thì
    "môi trường audit chính xác" trong README là sai và CI không tái lập được.
    *(Ngoài `write_scope` — cần task riêng.)*

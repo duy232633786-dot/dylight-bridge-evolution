@@ -201,12 +201,10 @@ Quy tắc version-control cho artifact có hash nằm ở
 handoff một artifact chưa được version-control** — hôm nay 0/15 artifact đã ký
 tái dựng được từ `HEAD`, và kế hoạch đóng khoảng trống đó nằm ở §5 của tài liệu.
 
-> **2 test đang đỏ có chủ đích.** `tests/test_obsidian.py` khoá cứng con số 9
-> thẻ của bản audit cũ (`range(1, 10)` và câu cảnh báo "card ngoài snapshot chưa
-> được audit"). Audit nay phủ đủ 20 thẻ nên hai khẳng định đó sai. Cách sửa
-> chính xác nằm ở `docs/baseline_version_control_plan.md` §5 mục 0; `tests/`
-> nằm ngoài `write_scope` của BRD-001 nên không được sửa trong đợt này. **Không**
-> chỉnh dữ liệu audit cho khớp test — đó đúng là kiểu gian lận mà task cấm.
+> **Đã xử lý (2026-10-12).** Hai test `tests/test_obsidian.py` từng khoá cứng con số 9 thẻ
+> nay đếm lại từ runtime (20 thẻ) và đã pass. Toàn bộ pytest: 1974 pass, 4 skip, 0 fail.
+> Trạng thái provenance (68 artifact không dựng lại được, 86 file CRLF) được ghi tại
+> `docs/baseline_version_control_plan.md` §7; checker provenance chưa nằm trong CI.
 
 ## Ghi chú hiệu chỉnh (quan trọng)
 
