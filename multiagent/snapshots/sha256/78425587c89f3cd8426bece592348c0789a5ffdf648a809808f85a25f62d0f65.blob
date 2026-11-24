@@ -1,0 +1,1228 @@
+"""Vòng lặp thiết kế cấu kiện — REPAIR (sửa cho đạt) rồi TRIM (tinh chỉnh kinh tế).
+
+Vị trí trong kiến trúc
+----------------------
+Các thuật toán hiện có (Random Search, NSGA-II, surrogate, RL) là TÌM KIẾM TOÀN
+CỤC trên grammar: chúng đề xuất nhiều gene rời rạc và cần hàng trăm lần gọi
+solver. Kỹ sư thiết kế MỘT cấu kiện làm việc khác: xuất phát từ phương án sơ bộ,
+phân tích, kiểm tra, sửa đúng biến đang khống chế, kiểm lại; khi đã đạt thì bỏ
+bớt vật liệu tới khi vừa chạm ngưỡng. Module này đóng vòng đó thành thuật toán
+xác định, dựng trên đúng các khối đã có của repo và không thay quyền của khối nào:
+
+    seed ─► evaluate_candidate   (schema → L0 → L1 → independent verifier)
+         ─► suggest_repairs      (vi phạm → nước sửa trong miền grammar, không mở solver)
+         ─► BudgetedEvaluator    (ngân sách = số lần solver THẬT SỰ mở; L0/cache miễn phí)
+         ─► build_component_audit (bằng chứng L1 của phương án cuối, fail-closed)
+
+Hai pha
+-------
+* REPAIR — chừng nào phương án chưa "đạt" (chưa qua schema/L0, chưa khả thi
+  theo verifier, hoặc khả thi nhưng ``max_utilization > utilization_target``):
+  lấy nước sửa từ tầng chẩn đoán (kèm thẻ tri thức não 2) và bảng bổ sung
+  ``_EXTRA_STEP_MOVES``; thử LẦN LƯỢT từng nước, chấp nhận nước ĐẦU TIÊN đưa
+  phương án tiến lên trên thang tiến bộ (``progress_key``: stage tăng, hoặc cùng
+  stage mà mức vi phạm/mức vượt mục tiêu giảm). Không nước nào tiến lên ⇒ dừng
+  ``NO_IMPROVING_REPAIR`` — không có đường vòng; đó là lúc chuyển sang tìm kiếm
+  toàn cục hoặc kỹ sư.
+* TRIM — khi đã đạt: liệt kê láng giềng ±1 bậc lưới RẺ HƠN theo objective giải
+  tích (L0 miễn phí), thử theo thứ tự rẻ nhất trước; chấp nhận nước ĐẦU TIÊN vẫn
+  khả thi và vẫn ≤ ``utilization_target``. Không nước nào giữ được ⇒
+  ``CONVERGED``: tối ưu cục bộ một bước trên objective dưới ràng buộc verifier.
+
+Bất biến (khớp AGENTS.md / PROTOCOL.md / PHYSICS_GATES.md)
+----------------------------------------------------------
+1. Vòng lặp KHÔNG có quyền verdict. Khả thi hay không luôn là ``record.feasible``
+   của independent verifier qua ``evaluate_candidate``; vòng lặp chỉ chọn nước
+   đi kế tiếp (``design_verdict_authority = INDEPENDENT_VERIFIER``, quyền của
+   chính vòng lặp = ``NONE``).
+2. Ràng buộc HARD là hàng rào: TRIM không bao giờ chấp nhận phương án
+   infeasible dù rẻ hơn bao nhiêu; ``utilization_target`` chỉ được SIẾT thêm
+   (≤ 1.0), không bao giờ nới verifier.
+3. Ngân sách chỉ tăng khi solver thật sự chạy (``BudgetedEvaluator``). L0
+   reject và cache hit miễn phí; mọi trạng thái đã đánh giá nằm trong tập
+   ``visited`` nên không bao giờ bị mở solver hai lần và vòng lặp không thể
+   dao động.
+4. Solver NOT_CONVERGED là STOP cho phương án đó (bị loại và ghi nhận, không
+   bao giờ được chấp nhận); tại seed thì dừng cả vòng lặp (KC-007: lỗi dữ liệu,
+   không phải phương án xấu).
+5. Tái lập: không dùng ngẫu nhiên, không timestamp; mọi thứ tự là thứ tự khai
+   báo grammar; report mang SHA-256 của chính nó, của basis và của mã nguồn.
+6. Trần claim ``SCREENED``: phương án "đạt" ở L1 là ứng viên sàng lọc, không
+   phải hồ sơ tính toán. Phần bằng chứng L1 KHÔNG phủ (xoắn, mỏi, ổn định, bản
+   mặt cầu, hệ DƯL theo giai đoạn) được bàn giao cho ``build_component_audit``
+   dưới dạng NOT_EVALUATED — audit luôn BLOCKED ở L1, và đó là danh sách việc
+   còn lại cho kỹ sư.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import sys
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+import jsonschema
+
+from . import CONTRACTS_DIR, REPO_ROOT, __version__
+from .analysis import suggest_repairs
+from .catalogs import load_catalogs, load_grammar
+from .evaluate import build_component_audit
+from .fe_adapter import SOLVER_VERSION
+from .geometry import check_geometry
+from .objectives import OBJECTIVE_KEYS, compute_objectives
+from .optimization.common import BudgetedEvaluator, gene_domains, gene_order
+from .state import input_hash, make_case_id, state_from_gene, validate_design_state
+from .verifier import ruleset_version_for
+
+ALGORITHM_ID = "COMPONENT_DESIGN_LOOP"
+ALGORITHM_VERSION = "design-loop/0.2.0"
+REPORT_SCHEMA_VERSION = "1.0"
+BASIS_ID = "DESIGN-LOOP-0.2.0"
+CLAIM_CEILING = "SCREENED"
+DESIGN_VERDICT_AUTHORITY = "INDEPENDENT_VERIFIER"
+LOOP_AUTHORITY = "NONE"
+ALLOWED_GRAMMARS = ("super_t_simple_v1", "super_t_parametric_v2")
+REQUIRED_ANALYSIS = {"fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1"}
+
+PHASE_REPAIR = "REPAIR"
+PHASE_TRIM = "TRIM"
+MOVE_POLICIES = ("knowledge_priority", "cheapest_first")
+TRIM_ORDERS = ("cheapest_first", "recent_reject_last")
+TERMINATION_REASONS = (
+    "CONVERGED",
+    "BUDGET_EXHAUSTED",
+    "MAX_ITERATIONS",
+    "NO_IMPROVING_REPAIR",
+    "TRIM_PROBE_LIMIT",
+    "TRIM_DISABLED",
+    "INCONCLUSIVE_SOLVER_FAILURES",
+    "SEED_REJECTED",
+    "SOLVER_FAILED",
+)
+
+#: Thang tiến bộ — đúng thứ tự pipeline evaluate_candidate rồi tới mục tiêu.
+STAGE_NOT_ANALYSABLE = 0   # SCHEMA_INVALID hoặc SOLVER_FAILED
+STAGE_L0_INVALID = 1       # GEOMETRY_INVALID (chưa mở solver)
+STAGE_INFEASIBLE = 2       # solver chạy, verifier FAIL
+STAGE_OVER_TARGET = 3      # verifier PASS nhưng max_utilization > target
+STAGE_ACCEPTABLE = 4       # PASS và ≤ target
+STAGE_LABELS = {
+    STAGE_NOT_ANALYSABLE: "NOT_ANALYSABLE",
+    STAGE_L0_INVALID: "L0_INVALID",
+    STAGE_INFEASIBLE: "INFEASIBLE",
+    STAGE_OVER_TARGET: "FEASIBLE_OVER_TARGET",
+    STAGE_ACCEPTABLE: "ACCEPTABLE",
+}
+
+_SCHEMA_PATH = CONTRACTS_DIR / "design_loop_report.schema.json"
+_BASIS_PATH = REPO_ROOT / "docs" / "design_basis" / "design_loop_basis.json"
+_PINNED_SOURCE_LABELS = (
+    "bridge_evolution/design_loop.py",
+    "bridge_evolution/evaluate.py",
+    "bridge_evolution/analysis/diagnose.py",
+    "bridge_evolution/optimization/common.py",
+    "bridge_evolution/verifier/rules.py",
+    "bridge_evolution/fe_adapter/solver.py",
+    "bridge_evolution/fe_adapter/line_girder.py",
+    "bridge_evolution/geometry.py",
+    "bridge_evolution/objectives.py",
+    "bridge_evolution/state.py",
+    "bridge_evolution/catalogs.py",
+    "catalogs/catalogs.json",
+    "contracts/design_loop_report.schema.json",
+    "contracts/bridge_design_state.schema.json",
+    "contracts/evaluation_result.schema.json",
+)
+_SOURCE_PATHS = tuple(
+    (label, REPO_ROOT.joinpath(*label.split("/"))) for label in _PINNED_SOURCE_LABELS
+)
+_MATERIAL_VARS = frozenset({"girder_concrete_id", "deck_concrete_id"})
+#: responses của verifier đã làm tròn (kNm 0.1; MPa 1e-3; mm 0.01) nên tỷ số
+#: D/C dựng lại lệch tối đa cỡ 1e-3 so với utils nội bộ của verifier.
+UTIL_ROUNDING_TOL = 2e-3
+_EPS = 1e-9
+
+#: Nước sửa bậc thang cho rule mà tầng chẩn đoán ``analysis.diagnose`` CHƯA phủ.
+#: Cùng dạng ``_STEP_MOVES``: (tên biến, bước ±1 trên miền, lý do). Mọi nước ở
+#: đây vẫn phải qua kiểm L0 "không sinh vi phạm HARD mới" trước khi được đề xuất.
+_EXTRA_STEP_MOVES = {
+    "MODEL-001": [
+        ("deck_slab_thickness_mm", +1,
+         "tăng chiều dày bản để khối ứng suất nén nằm trọn trong bản (miền áp dụng"
+         " công thức Mn của L1)"),
+        ("deck_concrete_id", +1,
+         "nâng cấp bê tông bản để hạ chiều cao khối ứng suất nén"),
+        ("prestress_layout_id", -1,
+         "giảm một bậc cáp để hạ khối nén — đánh đổi trực tiếp với SERV-001,"
+         " verifier sẽ phân xử"),
+    ],
+}
+
+#: Rule L1 → (loại cấu kiện, check_id trong COMPONENT_AUDIT_REGISTRY) mà L1 có
+#: bằng chứng THẬT. STR-002 cố ý KHÔNG có mặt: L1 chỉ có cắt đơn giản hoá
+#: (β = 2, cốt đai giả định), không có xoắn, nên SHEAR_TORSION giữ NOT_EVALUATED.
+RULE_TO_COMPONENT_CHECK = {
+    "STR-001": ("LONGITUDINAL_GIRDER", "FLEXURE_STRENGTH"),
+    "SERV-001": ("LONGITUDINAL_GIRDER", "SERVICE_STRESS"),
+    "SERV-002": ("LONGITUDINAL_GIRDER", "DEFLECTION"),
+}
+#: Các cấu kiện bị vòng lặp CHẠM tới (biến của chúng nằm trong gene) nhưng L1
+#: không có check nào cho chúng — được khai vào manifest để audit nêu rõ khoảng
+#: trống thay vì im lặng.
+TOUCHED_COMPONENTS_WITHOUT_L1_EVIDENCE = (
+    ("S1", "DECK_SLAB"),
+    ("P1", "PRESTRESSING_SYSTEM"),
+    ("D1", "CROSS_BEAM_DIAPHRAGM"),
+)
+
+
+class DesignLoopError(ValueError):
+    """Policy, seed, basis hoặc report vi phạm contract fail-closed."""
+
+
+# ----------------------------------------------------------------- tiện ích
+def _canonical(value: object) -> str:
+    try:
+        return json.dumps(value, sort_keys=True, separators=(",", ":"),
+                          ensure_ascii=False, allow_nan=False)
+    except (TypeError, ValueError) as exc:
+        raise DesignLoopError(f"Dữ liệu report không canonical JSON được: {exc}") from exc
+
+
+def _sha256_json(value: object) -> str:
+    return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
+
+
+def _read_json(path: Path, label: str) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise DesignLoopError(f"Không đọc được {label}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise DesignLoopError(f"{label} phải là JSON object")
+    return value
+
+
+def _source_digests(grammar_id: str) -> list[dict]:
+    """Băm mọi authority ảnh hưởng đến run, cộng grammar động nếu được hỗ trợ."""
+    paths = list(_SOURCE_PATHS)
+    if grammar_id in ALLOWED_GRAMMARS:
+        label = f"bridge_grammar/{grammar_id}.json"
+        paths.append((label, REPO_ROOT / "bridge_grammar" / f"{grammar_id}.json"))
+    digests = []
+    for label, path in paths:
+        if not path.is_file():
+            raise DesignLoopError(f"Không tìm thấy mã nguồn: {label}")
+        digests.append({"path": label,
+                        "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return digests
+
+
+def _schema_errors(report: dict) -> list[str]:
+    schema = _read_json(_SCHEMA_PATH, "design loop report schema")
+    errors = sorted(jsonschema.Draft202012Validator(schema).iter_errors(report),
+                    key=lambda error: list(error.absolute_path))
+    return [f"{'/'.join(str(p) for p in error.absolute_path) or '<root>'}: {error.message}"
+            for error in errors]
+
+
+# ----------------------------------------------------------------- policy
+@dataclass(frozen=True)
+class LoopPolicy:
+    """Tham số điều khiển vòng lặp — mọi giá trị đều xác định, không có RNG.
+
+    * ``objective_key``: mục tiêu đơn dùng để xếp thứ tự và chấp nhận trong
+      TRIM (ba objective vẫn được ghi đủ trong report).
+    * ``utilization_target`` ∈ (0, 1]: mức khai thác tối đa mà kỹ sư cho phép
+      ở L1 (chừa dự trữ cho hiệu ứng L2/L3). 1.0 = đúng giới hạn verifier.
+      Không bao giờ được > 1.0 — vòng lặp chỉ siết, không nới verifier.
+    * ``move_policy``: ``knowledge_priority`` giữ thứ tự của tầng chẩn đoán
+      (ưu tiên theo thẻ tri thức); ``cheapest_first`` sắp lại theo objective
+      giải tích tăng dần (ổn định, cùng khoá thì giữ thứ tự chẩn đoán).
+    * ``trim_order``: ``cheapest_first`` thử láng giềng rẻ nhất trước;
+      ``recent_reject_last`` đẩy những nước (biến → giá trị) đã bị verifier bác
+      ở các vòng TRIM trước xuống CUỐI danh sách — chúng vẫn được thử lại trước
+      khi kết luận CONVERGED, nên nghĩa "tối ưu cục bộ 1 bước" không đổi, chỉ
+      bớt số lần mở solver cho nước gần như chắc chắn vẫn hỏng.
+    * ``max_iterations``: trần số nước đi ĐƯỢC CHẤP NHẬN.
+    * ``max_trim_probes``: trần số ứng viên TRIM được mở solver trong một vòng;
+      None = thử hết (chỉ khi thử hết mới được kết luận CONVERGED).
+    """
+
+    objective_key: str = "relative_cost"
+    utilization_target: float = 1.0
+    move_policy: str = "knowledge_priority"
+    trim_order: str = "cheapest_first"
+    max_iterations: int = 50
+    trim_enabled: bool = True
+    max_trim_probes: int | None = None
+    diagnose_top_k: int = 64
+
+
+def _validate_policy(policy: LoopPolicy) -> None:
+    if not isinstance(policy, LoopPolicy):
+        raise DesignLoopError("policy phải là LoopPolicy")
+    if policy.objective_key not in OBJECTIVE_KEYS:
+        raise DesignLoopError(
+            f"objective_key {policy.objective_key!r} không thuộc {OBJECTIVE_KEYS}")
+    target = policy.utilization_target
+    if (isinstance(target, bool) or not isinstance(target, (int, float))
+            or not math.isfinite(target) or not 0.0 < target <= 1.0):
+        raise DesignLoopError(
+            "utilization_target phải hữu hạn trong (0, 1]; vòng lặp chỉ được siết,"
+            " không được nới giới hạn của verifier")
+    if policy.move_policy not in MOVE_POLICIES:
+        raise DesignLoopError(f"move_policy phải thuộc {MOVE_POLICIES}")
+    if policy.trim_order not in TRIM_ORDERS:
+        raise DesignLoopError(f"trim_order phải thuộc {TRIM_ORDERS}")
+    if (isinstance(policy.max_iterations, bool) or not isinstance(policy.max_iterations, int)
+            or policy.max_iterations < 1):
+        raise DesignLoopError("max_iterations phải là số nguyên >= 1")
+    if policy.max_trim_probes is not None and (
+            isinstance(policy.max_trim_probes, bool)
+            or not isinstance(policy.max_trim_probes, int)
+            or policy.max_trim_probes < 1):
+        raise DesignLoopError("max_trim_probes phải là None hoặc số nguyên >= 1")
+    if (isinstance(policy.diagnose_top_k, bool) or not isinstance(policy.diagnose_top_k, int)
+            or policy.diagnose_top_k < 1):
+        raise DesignLoopError("diagnose_top_k phải là số nguyên >= 1")
+    if not isinstance(policy.trim_enabled, bool):
+        raise DesignLoopError("trim_enabled phải là bool")
+
+
+# ----------------------------------------------------------------- basis
+def load_loop_basis() -> dict:
+    """Nạp basis và khoá các hằng của module vào nó (drift ⇒ dừng)."""
+    basis = _read_json(_BASIS_PATH, "design loop basis")
+    expected = {
+        "schema_version": "1.0",
+        "basis_id": BASIS_ID,
+        "algorithm_id": ALGORITHM_ID,
+        "algorithm_version": ALGORITHM_VERSION,
+        "claim_ceiling": CLAIM_CEILING,
+        "design_verdict_authority": DESIGN_VERDICT_AUTHORITY,
+        "loop_authority": LOOP_AUTHORITY,
+        "allowed_grammars": list(ALLOWED_GRAMMARS),
+        "required_analysis": REQUIRED_ANALYSIS,
+        "default_policy": asdict(LoopPolicy()),
+        "utilization_rounding_tolerance": UTIL_ROUNDING_TOL,
+        "termination_reasons": list(TERMINATION_REASONS),
+        "rule_to_component_check": {
+            rule: list(pair) for rule, pair in RULE_TO_COMPONENT_CHECK.items()},
+        "touched_components_without_l1_evidence": [
+            list(item) for item in TOUCHED_COMPONENTS_WITHOUT_L1_EVIDENCE],
+        "pinned_sources": list(_PINNED_SOURCE_LABELS),
+        "extra_repair_moves": {
+            rule: [[name, delta] for name, delta, _why in moves]
+            for rule, moves in _EXTRA_STEP_MOVES.items()},
+    }
+    drift = [key for key, value in expected.items() if basis.get(key) != value]
+    if drift:
+        raise DesignLoopError(
+            "design loop basis drift so với module tại: " + ", ".join(drift))
+    return basis
+
+
+def _basis_digest() -> str:
+    if not _BASIS_PATH.is_file():
+        raise DesignLoopError("Không tìm thấy design loop basis")
+    return hashlib.sha256(_BASIS_PATH.read_bytes()).hexdigest()
+
+
+# ----------------------------------------------------------------- gene/state
+def gene_from_state(state: dict, grammar_id: str) -> dict:
+    """Gene của EA/RL từ một BridgeDesignState: mọi biến theo ``gene_order``.
+
+    Thiếu biến nào là lỗi seed (fail-closed), không bịa giá trị mặc định.
+    """
+    gene = {}
+    missing = []
+    for name in gene_order(grammar_id):
+        section = state.get("materials") if name in _MATERIAL_VARS \
+            else state.get("design_variables")
+        if not isinstance(section, dict) or name not in section:
+            missing.append(name)
+            continue
+        gene[name] = section[name]
+    if missing:
+        raise DesignLoopError(f"Seed thiếu biến grammar {grammar_id}: {missing}")
+    return gene
+
+
+def _state_core(state: dict) -> dict:
+    """Lõi vật lý của state, đúng cùng biên loại trừ với ``state.input_hash``."""
+    return {key: value for key, value in state.items()
+            if key not in ("provenance", "case_id", "status")}
+
+
+def _difference_paths(left, right, prefix: str = "") -> list[str]:
+    """Liệt kê đường JSON khác nhau để seed rejection có thể chẩn đoán được."""
+    if isinstance(left, dict) and isinstance(right, dict):
+        differences = []
+        for key in sorted(set(left) | set(right)):
+            path = f"{prefix}.{key}" if prefix else key
+            if key not in left or key not in right:
+                differences.append(path)
+            else:
+                differences.extend(_difference_paths(left[key], right[key], path))
+        return differences
+    if isinstance(left, list) and isinstance(right, list):
+        differences = []
+        for index in range(max(len(left), len(right))):
+            path = f"{prefix}[{index}]"
+            if index >= len(left) or index >= len(right):
+                differences.append(path)
+            else:
+                differences.extend(_difference_paths(left[index], right[index], path))
+        return differences
+    return [] if left == right else [prefix or "<root>"]
+
+
+def _apply_move(gene: dict, move: dict) -> dict:
+    mutated = dict(gene)
+    mutated[move["variable"]] = move["proposed"]
+    return mutated
+
+
+def _l0_hard_rules(state: dict) -> set[str] | None:
+    """Tập rule HARD của L0; None nếu state không dựng được hình học."""
+    try:
+        violations, _ = check_geometry(state)
+    except (KeyError, TypeError, ValueError):
+        return None
+    return {v["rule_id"] for v in violations if v.get("severity") == "HARD"}
+
+
+def _cheap_objective(state: dict, objective_key: str) -> float | None:
+    """Objective giải tích (miễn phí) — None nếu L0 chặn hoặc không dựng được."""
+    try:
+        violations, geom = check_geometry(state)
+        if any(v.get("severity") == "HARD" for v in violations):
+            return None
+        return float(compute_objectives(state, geom)[objective_key])
+    except (KeyError, TypeError, ValueError, ZeroDivisionError):
+        return None
+
+
+# ----------------------------------------------------------------- tiến bộ
+def rule_utilizations(responses: dict | None) -> dict[str, float]:
+    """Dựng lại tỷ số D/C từng rule từ ``responses`` của verifier.
+
+    MODEL-001 (a/ts) không được verifier xuất riêng; nó được gán khi
+    ``max_utilization`` vượt mọi tỷ số dựng lại quá ``UTIL_ROUNDING_TOL``.
+    """
+    if not isinstance(responses, dict):
+        return {}
+
+    def ratio(demand: float, capacity: float) -> float:
+        return demand / capacity if capacity > 0 else math.inf
+
+    try:
+        utils = {
+            "STR-001": ratio(responses["Mu_strength1_kNm"], responses["phiMn_kNm"]),
+            "STR-002": ratio(responses["Vu_strength1_kN"], responses["phiVn_kN"]),
+            "SERV-001": ratio(max(0.0, -responses["bottom_stress_service3_MPa"]),
+                              responses["tension_limit_MPa"]),
+            "SERV-002": ratio(responses["max_ll_deflection_mm"],
+                              responses["deflection_limit_mm"]),
+        }
+        max_util = float(responses["max_utilization"])
+    except (KeyError, TypeError, ValueError):
+        return {}
+    finite = [u for u in utils.values() if math.isfinite(u)]
+    if math.isfinite(max_util) and (not finite or max_util > max(finite) + UTIL_ROUNDING_TOL):
+        utils["MODEL-001"] = max_util
+    return {rule: round(u, 6) if math.isfinite(u) else u for rule, u in utils.items()}
+
+
+def progress_stage(record: dict, target: float) -> int:
+    status = record.get("status")
+    if status in ("SCHEMA_INVALID", "SOLVER_FAILED"):
+        return STAGE_NOT_ANALYSABLE
+    if status == "GEOMETRY_INVALID":
+        return STAGE_L0_INVALID
+    if not record.get("feasible"):
+        return STAGE_INFEASIBLE
+    utilization = record.get("max_utilization")
+    if utilization is None or utilization > target + _EPS:
+        return STAGE_OVER_TARGET
+    return STAGE_ACCEPTABLE
+
+
+def progress_key(record: dict, target: float) -> tuple[int, float]:
+    """Khoá so sánh: lớn hơn = tiến bộ. Stage trước, rồi mức vi phạm/vượt."""
+    stage = progress_stage(record, target)
+    if stage == STAGE_ACCEPTABLE:
+        return (stage, 0.0)
+    if stage == STAGE_OVER_TARGET:
+        return (stage, -(float(record["max_utilization"]) - target))
+    cv = record.get("cv")
+    return (stage, -float(cv if cv is not None else math.inf))
+
+
+# ----------------------------------------------------------------- views
+def _objectives_view(record: dict) -> dict | None:
+    objectives = record.get("objectives")
+    if objectives is None:
+        return None
+    return {key: float(value) for key, value in zip(OBJECTIVE_KEYS, objectives)}
+
+
+def _violations_view(record: dict) -> list[dict]:
+    return [{"rule_id": v["rule_id"], "severity": v["severity"],
+             "margin": float(v.get("margin", 0.0))}
+            for v in record.get("violations", [])]
+
+
+def _record_view(record: dict, target: float) -> dict:
+    stage = progress_stage(record, target)
+    return {
+        "case_id": record["case_id"],
+        "input_hash": record["input_hash"],
+        "gene": dict(record["gene"]),
+        "status": record["status"],
+        "solver_status": record.get("solver_status", "NOT_RUN"),
+        "solver_call_index": record.get("solver_call_index"),
+        "feasible": bool(record.get("feasible")),
+        "cv": None if record.get("cv") is None else float(record["cv"]),
+        "max_utilization": record.get("max_utilization"),
+        "objectives": _objectives_view(record),
+        "violations": _violations_view(record),
+        "stage": stage,
+        "stage_label": STAGE_LABELS[stage],
+    }
+
+
+def _unevaluated_view(state: dict, gene: dict | None, status: str,
+                      violations: list[dict]) -> dict:
+    stage = STAGE_NOT_ANALYSABLE
+    return {
+        "case_id": make_case_id(state),
+        "input_hash": input_hash(state),
+        "gene": gene,
+        "status": status,
+        "solver_status": "NOT_RUN",
+        "solver_call_index": None,
+        "feasible": False,
+        "cv": None,
+        "max_utilization": None,
+        "objectives": None,
+        "violations": violations,
+        "stage": stage,
+        "stage_label": STAGE_LABELS[stage],
+    }
+
+
+# ----------------------------------------------------------------- ứng viên
+def _move(variable: str, current, proposed, *, rule_id: str | None, rationale: str,
+          card_id: str | None, source: str) -> dict:
+    return {
+        "variable": variable,
+        "current": current,
+        "proposed": proposed,
+        "rule_id": rule_id,
+        "rationale": rationale,
+        "card_id": card_id,
+        "source": source,
+        "cheap_objective": None,
+    }
+
+
+def _step_value(domain: list, current, delta: int):
+    try:
+        index = domain.index(current)
+    except ValueError:
+        return None
+    target_index = index + delta
+    if 0 <= target_index < len(domain):
+        return domain[target_index]
+    return None
+
+
+def _repair_candidates(record: dict, gene: dict, grammar_id: str, domains: dict,
+                       policy: LoopPolicy, visited: set[str], counters: dict,
+                       failed_hashes: set[str], unresolved_failed: set[str]) -> list[dict]:
+    """Nước sửa cho trạng thái chưa đạt — không mở solver.
+
+    Stage ≤ 2: vi phạm HARD thật của record. Stage 3: vi phạm TỔNG HỢP cho mọi
+    rule có tỷ số D/C > target (margin = mức vượt), để tầng chẩn đoán dùng
+    đúng bậc thang nước sửa của rule đó.
+    """
+    state = record["design_state"]
+    target = policy.utilization_target
+    stage = progress_stage(record, target)
+    if stage <= STAGE_INFEASIBLE:
+        violations = [v for v in record.get("violations", []) if v.get("severity") == "HARD"]
+    else:
+        utils = rule_utilizations(record.get("responses"))
+        violations = [
+            {"rule_id": rule, "severity": "HARD", "margin": round(util - target, 6),
+             "message": f"{rule}: mức khai thác {util:.4f} > mục tiêu {target:.4f}"}
+            for rule, util in sorted(utils.items(), key=lambda item: (-item[1], item[0]))
+            if util > target + _EPS
+        ]
+    raw: list[dict] = []
+    if stage != STAGE_NOT_ANALYSABLE:
+        diagnosis = {"status": record["status"], "violations": violations}
+        for suggestion in suggest_repairs(state, diagnosis, top_k=policy.diagnose_top_k):
+            if suggestion.get("variable") is None:
+                continue  # SOLVER-001: lời khuyên cho người duyệt, không phải nước đi
+            raw.append(_move(
+                suggestion["variable"], suggestion["current"], suggestion["proposed"],
+                rule_id=suggestion["rule_id"], rationale=suggestion["rationale"],
+                card_id=suggestion.get("card_id"), source="diagnose"))
+
+    base_rules = _l0_hard_rules(state)
+    for violation in violations:
+        for name, delta, why in _EXTRA_STEP_MOVES.get(violation["rule_id"], []):
+            if name not in domains:
+                continue
+            proposed = _step_value(domains[name], gene[name], delta)
+            if proposed is None:
+                continue
+            trial_rules = _l0_hard_rules(state_from_gene(
+                _apply_move(gene, {"variable": name, "proposed": proposed}),
+                grammar_id=grammar_id))
+            if base_rules is None or trial_rules is None or not trial_rules <= base_rules:
+                continue  # sinh vi phạm L0 mới → loại như diagnose
+            raw.append(_move(
+                name, gene[name], proposed, rule_id=violation["rule_id"],
+                rationale=f"Vi phạm {violation['rule_id']}: {why} ({gene[name]} → {proposed}).",
+                card_id=None, source="loop_extra"))
+
+    candidates: list[dict] = []
+    seen: set[tuple] = set()
+    for move in raw:
+        if move["variable"] not in domains or move["proposed"] not in domains[move["variable"]]:
+            continue  # ngoài miền grammar: không bao giờ được đề xuất
+        key = (move["variable"], move["proposed"])
+        if key in seen:
+            continue
+        seen.add(key)
+        counters["candidates_generated"] += 1
+        trial_state = state_from_gene(_apply_move(gene, move), grammar_id=grammar_id)
+        trial_hash = input_hash(trial_state)
+        if trial_hash in visited:
+            counters["skipped_visited"] += 1
+            if trial_hash in failed_hashes:
+                counters["skipped_failed"] += 1
+                unresolved_failed.add(trial_hash)
+            continue
+        move["cheap_objective"] = _cheap_objective(trial_state, policy.objective_key)
+        candidates.append(move)
+
+    if policy.move_policy == "cheapest_first":
+        candidates.sort(key=lambda m: (
+            m["cheap_objective"] is None,
+            m["cheap_objective"] if m["cheap_objective"] is not None else 0.0))
+    return candidates
+
+
+def _trim_candidates(record: dict, gene: dict, grammar_id: str, order: list[str],
+                     domains: dict, policy: LoopPolicy, visited: set[str],
+                     counters: dict, failed_hashes: set[str],
+                     unresolved_failed: set[str],
+                     rejected_moves: set[tuple] = frozenset()) -> list[dict]:
+    """Láng giềng ±1 bậc lưới rẻ hơn (objective giải tích), L0 sạch, chưa thăm.
+
+    ``rejected_moves`` = tập (biến, giá trị) đã bị bác ở các vòng TRIM trước;
+    chỉ ảnh hưởng THỨ TỰ khi ``trim_order == "recent_reject_last"``, không bao
+    giờ loại ứng viên.
+    """
+    base = _objectives_view(record)
+    if base is None:
+        return []
+    base_value = base[policy.objective_key]
+    candidates: list[tuple[tuple, dict]] = []
+    for position, name in enumerate(order):
+        domain = domains[name]
+        for delta in (-1, +1):
+            proposed = _step_value(domain, gene[name], delta)
+            if proposed is None:
+                continue
+            counters["candidates_generated"] += 1
+            trial_gene = dict(gene)
+            trial_gene[name] = proposed
+            trial_state = state_from_gene(trial_gene, grammar_id=grammar_id)
+            trial_hash = input_hash(trial_state)
+            if trial_hash in visited:
+                counters["skipped_visited"] += 1
+                if trial_hash in failed_hashes:
+                    counters["skipped_failed"] += 1
+                    unresolved_failed.add(trial_hash)
+                continue
+            cheap = _cheap_objective(trial_state, policy.objective_key)
+            if cheap is None:
+                counters["skipped_l0"] += 1
+                continue
+            if cheap >= base_value - _EPS:
+                counters["skipped_not_cheaper"] += 1
+                continue
+            move = _move(
+                name, gene[name], proposed, rule_id=None,
+                rationale=(f"Láng giềng rẻ hơn: {name} {gene[name]} → {proposed}"
+                           f" ({policy.objective_key} {base_value:.2f} → {cheap:.2f})"),
+                card_id=None, source="neighbor")
+            move["cheap_objective"] = cheap
+            deferred = (policy.trim_order == "recent_reject_last"
+                        and (name, proposed) in rejected_moves)
+            candidates.append(((deferred, cheap, position, delta), move))
+    candidates.sort(key=lambda item: item[0])
+    return [move for _key, move in candidates]
+
+
+# ----------------------------------------------------------------- đánh giá
+def _evaluate(evaluator: BudgetedEvaluator, gene: dict, parent_id: str | None,
+              action: str) -> dict | None:
+    # generation_action là thuộc tính công khai của BudgetedEvaluator; ghi nhãn
+    # theo pha để provenance của từng state nói rõ nó sinh ra từ nước đi nào.
+    evaluator.generation_action = action
+    return evaluator.evaluate_gene(gene, parent_id=parent_id)
+
+
+def _classify(phase: str, record: dict, current: dict, policy: LoopPolicy) -> str:
+    if record.get("status") == "SOLVER_FAILED":
+        return "SOLVER_FAILED"
+    target = policy.utilization_target
+    if phase == PHASE_REPAIR:
+        if progress_key(record, target) > progress_key(current, target):
+            return "ACCEPTED"
+        return "REJECTED_NO_PROGRESS"
+    if record.get("status") != "SUCCESS":
+        return "REJECTED_INVALID"
+    if not record.get("feasible"):
+        return "REJECTED_INFEASIBLE"
+    if progress_stage(record, target) != STAGE_ACCEPTABLE:
+        return "REJECTED_OVER_TARGET"
+    return "ACCEPTED"
+
+
+# ----------------------------------------------------------------- audit
+def _verification_record(record: dict) -> dict:
+    """Payload tự đủ để audit đối soát một lần solver mà không chạy lại."""
+    return {
+        "record_index": int(record["record_index"]),
+        "solver_call_index": int(record["solver_call_index"]),
+        "case_id": record["case_id"],
+        "input_hash": record["input_hash"],
+        "gene": dict(record["gene"]),
+        "design_state": record["design_state"],
+        "status": record["status"],
+        "solver_status": record.get("solver_status", "NOT_RUN"),
+        "solver_name": record.get("solver_name"),
+        "feasible": bool(record.get("feasible")),
+        "cv": None if record.get("cv") is None else float(record["cv"]),
+        "max_utilization": record.get("max_utilization"),
+        "objectives": _objectives_view(record),
+        "responses": record.get("responses"),
+        "violations": [
+            {
+                "rule_id": violation["rule_id"],
+                "severity": violation["severity"],
+                "message": str(violation.get("message", "")),
+                "margin": float(violation.get("margin", 0.0)),
+            }
+            for violation in record.get("violations", [])
+        ],
+        "provenance": dict(record.get("provenance", {})),
+    }
+
+
+def _verification_records(evaluator: BudgetedEvaluator | None) -> dict[str, dict]:
+    if evaluator is None:
+        return {}
+    records: dict[str, dict] = {}
+    for record in evaluator.history:
+        if record.get("solver_call_index") is None:
+            continue
+        payload = _verification_record(record)
+        case_id = payload["case_id"]
+        if case_id in records:
+            raise DesignLoopError(f"Trùng case_id trong verification_records: {case_id}")
+        records[case_id] = payload
+    return records
+
+
+def _component_manifest(final: dict, verification_records: dict[str, dict]) -> dict:
+    """Manifest bằng chứng L1 của phương án cuối cho ``build_component_audit``.
+
+    Chỉ ba rule trong ``RULE_TO_COMPONENT_CHECK`` được khai PASS/FAIL với
+    evidence L1; STR-002 được khai tường minh NOT_EVALUATED (có ghi tỷ số cắt
+    L1 trong message) vì check của registry là SHEAR_TORSION mà L1 không có
+    xoắn. Mọi hard check khác để registry tự sinh NOT_EVALUATED.
+    """
+    responses = final.get("responses") or {}
+    utils = rule_utilizations(responses)
+    hard_failed = {v["rule_id"] for v in final.get("violations", [])
+                   if v.get("severity") == "HARD"}
+    verification_record = verification_records.get(final["case_id"])
+    if verification_record is None:
+        raise DesignLoopError(
+            f"Thiếu verification record đã vật chất hóa cho {final['case_id']}")
+    evidence_digest = _sha256_json(verification_record)
+    evidence = {
+        "source_ref": f"report:/verification_records/{final['case_id']}",
+        "sha256": evidence_digest,
+        "fidelity": "L1",
+        "producer": f"{ALGORITHM_VERSION} via {SOLVER_VERSION}",
+    }
+    girder_checks = []
+    for rule, (_kind, check_id) in RULE_TO_COMPONENT_CHECK.items():
+        utilization = utils.get(rule)
+        if utilization is None or not math.isfinite(utilization):
+            continue  # không có số thì không khai — registry sẽ trả NOT_EVALUATED
+        status = "FAIL" if rule in hard_failed else "PASS"
+        if status == "PASS" and 1.0 < utilization <= 1.0 + UTIL_ROUNDING_TOL:
+            utilization = 1.0  # verifier PASS là authority; lệch chỉ do làm tròn responses
+        girder_checks.append({
+            "check_id": check_id,
+            "status": status,
+            "severity": "HARD",
+            "evidence": evidence,
+            "message": f"{rule} theo independent verifier L1; tỷ số D/C dựng lại từ responses.",
+            "utilization": round(utilization, 4),
+        })
+    shear = utils.get("STR-002")
+    shear_note = (f"; tỷ số cắt L1 = {shear:.4f}"
+                  if isinstance(shear, float) and math.isfinite(shear) else "")
+    girder_checks.append({
+        "check_id": "SHEAR_TORSION",
+        "status": "NOT_EVALUATED",
+        "severity": "HARD",
+        "message": ("L1 chỉ có cắt đơn giản hoá (β=2, cốt đai giả định), không có xoắn"
+                    + shear_note + ". Cần mô hình cắt–xoắn đầy đủ trước khi giữ PASS/FAIL."),
+    })
+    components = [{"component_id": "G1", "kind": "LONGITUDINAL_GIRDER", "checks": girder_checks}]
+    for component_id, kind in TOUCHED_COMPONENTS_WITHOUT_L1_EVIDENCE:
+        components.append({"component_id": component_id, "kind": kind, "checks": []})
+    parent = (final.get("design_state") or {}).get("provenance", {}).get("parent_candidate_id")
+    return {"candidate_id": final["case_id"], "parent_candidate_id": parent,
+            "components": components}
+
+
+def _component_audit(final: dict, verification_records: dict[str, dict]) -> dict | None:
+    if final.get("status") != "SUCCESS":
+        return None
+    result_like = {"case_id": final["case_id"], "provenance": final.get("provenance", {})}
+    return build_component_audit(
+        final["design_state"], result_like,
+        _component_manifest(final, verification_records))
+
+
+# ----------------------------------------------------------------- report
+_EMPTY_EVALUATOR_COUNTERS = {
+    "proposals": 0, "l0_checks": 0, "l0_passed": 0, "l0_rejected": 0,
+    "cache_hits": 0, "solver_calls": 0, "budget_blocked": 0, "unique_results": 0,
+}
+
+
+def _report(*, seed_state: dict, grammar_id: str, budget: int, policy: LoopPolicy,
+            seed_view: dict, final_view: dict | None, final_record: dict | None,
+            lineage: list[str], iterations: list[dict], termination: dict,
+            loop_counters: dict, evaluator: BudgetedEvaluator | None,
+            advisories: list[str]) -> dict:
+    catalogs = load_catalogs()
+    try:
+        grammar_version = str(load_grammar(grammar_id).get("grammar_version", "n/a"))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        # Seed khai grammar không tồn tại vẫn phải nhận được report SEED_REJECTED
+        # thay vì một exception từ tầng nạp grammar.
+        grammar_version = "n/a"
+    feasible_final = bool(final_record and final_record.get("status") == "SUCCESS"
+                          and final_record.get("feasible"))
+    verification_records = _verification_records(evaluator)
+    audit = _component_audit(final_record, verification_records) if final_record else None
+    evaluator_counters = evaluator.counters if evaluator is not None \
+        else dict(_EMPTY_EVALUATOR_COUNTERS)
+    report = {
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "algorithm_id": ALGORITHM_ID,
+        "algorithm_version": ALGORITHM_VERSION,
+        "software_version": __version__,
+        "grammar_id": grammar_id,
+        "grammar_version": grammar_version,
+        "catalogs_version": catalogs["catalogs_version"],
+        "ruleset_version": ruleset_version_for(seed_state),
+        "solver_version": SOLVER_VERSION,
+        "claim_ceiling": CLAIM_CEILING,
+        "claim_level": CLAIM_CEILING if feasible_final else "IDEA",
+        "design_verdict_authority": DESIGN_VERDICT_AUTHORITY,
+        "loop_authority": LOOP_AUTHORITY,
+        "policy": asdict(policy),
+        "budget_solver_calls": budget,
+        "budget_definition": "solver.status != NOT_RUN",
+        "seed": seed_view,
+        "final": final_view,
+        "lineage": lineage,
+        "iterations": iterations,
+        "termination": termination,
+        "counters": {"loop": loop_counters, "evaluator": evaluator_counters},
+        "verification_records": verification_records,
+        "component_audit": audit,
+        "advisories": advisories,
+        "basis": {"basis_id": BASIS_ID, "sha256": _basis_digest()},
+        "source_digests": _source_digests(grammar_id),
+    }
+    report["report_sha256"] = _sha256_json(report)
+    errors = _schema_errors(report)
+    if errors:
+        raise DesignLoopError("Report vi phạm contract: " + "; ".join(errors[:8]))
+    return report
+
+
+def report_digest(report: dict) -> str:
+    """SHA-256 canonical của report bỏ trường tự băm — để kiểm tái lập."""
+    payload = {key: value for key, value in report.items() if key != "report_sha256"}
+    return _sha256_json(payload)
+
+
+# ----------------------------------------------------------------- vòng lặp
+def run_design_loop(seed_state: dict, *, budget: int, policy: LoopPolicy | None = None,
+                    grammar_id: str | None = None) -> dict:
+    """Chạy vòng lặp từ một BridgeDesignState seed; trả về report đúng contract.
+
+    ``budget`` là số lần solver được phép mở (kể cả đánh giá seed). Seed sai
+    contract, khác grammar hoặc dùng fixture test-only bị từ chối TRƯỚC khi mở
+    solver; vòng lặp không bao giờ "sửa" seed để nó hợp lệ.
+    """
+    policy = policy or LoopPolicy()
+    _validate_policy(policy)
+    load_loop_basis()
+    if isinstance(budget, bool) or not isinstance(budget, int) or budget < 0:
+        raise DesignLoopError("budget phải là số nguyên không âm")
+    if not isinstance(seed_state, dict):
+        raise DesignLoopError("seed_state phải là BridgeDesignState (dict)")
+
+    family = seed_state.get("family")
+    grammar_id = grammar_id or family
+    if not isinstance(grammar_id, str) or not grammar_id:
+        raise DesignLoopError("Không xác định được grammar_id của seed")
+    advisories: list[str] = []
+    loop_counters = {
+        "iterations": 0, "accepted_moves": 0, "probes": 0, "probes_solver": 0,
+        "probes_l0_rejected": 0, "solver_failures": 0, "candidates_generated": 0,
+        "skipped_visited": 0, "skipped_l0": 0, "skipped_not_cheaper": 0,
+        "skipped_failed": 0,
+    }
+    schema_violation = {"rule_id": "SCHEMA-001", "severity": "HARD", "margin": 1.0}
+
+    def rejected(message: str, gene: dict | None, violations: list[dict]) -> dict:
+        return _report(
+            seed_state=seed_state, grammar_id=grammar_id, budget=budget, policy=policy,
+            seed_view=_unevaluated_view(seed_state, gene, "SCHEMA_INVALID", violations),
+            final_view=None, final_record=None, lineage=[], iterations=[],
+            termination={"reason": "SEED_REJECTED", "message": message},
+            loop_counters=loop_counters, evaluator=None,
+            advisories=advisories + [
+                "Seed bị từ chối trước khi mở solver; không có nước đi nào được thử."])
+
+    if family != grammar_id:
+        return rejected(f"Seed family {family!r} khác grammar_id {grammar_id!r}", None,
+                        [dict(schema_violation)])
+    if grammar_id not in ALLOWED_GRAMMARS:
+        return rejected(
+            f"Grammar {grammar_id!r} ngoài runtime_scope Super-T của BRD-050; "
+            f"chỉ hỗ trợ {list(ALLOWED_GRAMMARS)}",
+            None, [dict(schema_violation)])
+    schema_errors = validate_design_state(seed_state)
+    if schema_errors:
+        return rejected("Seed sai contract: " + "; ".join(schema_errors[:6]), None,
+                        [dict(schema_violation) for _ in schema_errors])
+    analysis = seed_state.get("analysis") or {}
+    analysis_drift = [
+        f"analysis.{key}" for key, expected in REQUIRED_ANALYSIS.items()
+        if analysis.get(key) != expected
+    ]
+    if analysis_drift:
+        return rejected(
+            "Seed dùng tầng phân tích ngoài runtime BRD-050: "
+            + ", ".join(analysis_drift)
+            + f"; yêu cầu {REQUIRED_ANALYSIS}",
+            None, [dict(schema_violation)])
+    try:
+        gene = gene_from_state(seed_state, grammar_id)
+    except DesignLoopError as exc:
+        return rejected(str(exc), None, [dict(schema_violation)])
+
+    seed_provenance = seed_state.get("provenance") or {}
+    rebuilt_seed = state_from_gene(
+        gene, grammar_id=grammar_id,
+        parent_id=seed_provenance.get("parent_candidate_id"),
+        generation_action="DESIGN_LOOP_SEED",
+        seed=seed_provenance.get("random_seed"))
+    if input_hash(rebuilt_seed) != input_hash(seed_state):
+        differences = _difference_paths(_state_core(seed_state), _state_core(rebuilt_seed))
+        details = ", ".join(differences[:12]) or "input_hash"
+        return rejected(
+            "Seed không thể dựng lại nguyên trạng từ gene; các trường lệch: " + details,
+            gene, [dict(schema_violation)])
+
+    order = gene_order(grammar_id)
+    domains = gene_domains(grammar_id)
+    evaluator = BudgetedEvaluator(
+        budget, generation_action="DESIGN_LOOP_SEED",
+        seed=seed_provenance.get("random_seed"), grammar_id=grammar_id)
+    visited: set[str] = set()
+
+    seed_record = _evaluate(evaluator, gene, seed_provenance.get("parent_candidate_id"),
+                            "DESIGN_LOOP_SEED")
+    if seed_record is None:
+        return _report(
+            seed_state=seed_state, grammar_id=grammar_id, budget=budget, policy=policy,
+            seed_view=_unevaluated_view(seed_state, gene, "NOT_EVALUATED", []),
+            final_view=None, final_record=None, lineage=[], iterations=[],
+            termination={"reason": "BUDGET_EXHAUSTED",
+                         "message": "budget = 0: seed chưa được đánh giá"},
+            loop_counters=loop_counters, evaluator=evaluator, advisories=advisories)
+    visited.add(seed_record["input_hash"])
+    loop_counters["probes"] += 1
+    if seed_record.get("solver_call_index") is not None:
+        loop_counters["probes_solver"] += 1
+    elif seed_record.get("status") in ("GEOMETRY_INVALID", "SCHEMA_INVALID"):
+        loop_counters["probes_l0_rejected"] += 1
+    seed_view = _record_view(seed_record, policy.utilization_target)
+
+    if seed_record["status"] == "SCHEMA_INVALID":
+        return _report(
+            seed_state=seed_state, grammar_id=grammar_id, budget=budget, policy=policy,
+            seed_view=seed_view, final_view=None, final_record=None, lineage=[],
+            iterations=[],
+            termination={"reason": "SEED_REJECTED",
+                         "message": "Seed dựng lại từ gene bị contract từ chối: "
+                                    + "; ".join(v["message"]
+                                                for v in seed_record["violations"][:4])},
+            loop_counters=loop_counters, evaluator=evaluator,
+            advisories=advisories + [
+                "Seed tham chiếu entry chỉ dành cho gold case/test hoặc id ngoài grammar;"
+                " vòng lặp không được phép đi tiếp từ đó."])
+    if seed_record["status"] == "SOLVER_FAILED":
+        loop_counters["solver_failures"] += 1
+        return _report(
+            seed_state=seed_state, grammar_id=grammar_id, budget=budget, policy=policy,
+            seed_view=seed_view, final_view=None, final_record=None,
+            lineage=[seed_record["case_id"]], iterations=[],
+            termination={"reason": "SOLVER_FAILED",
+                         "message": "Solver không hội tụ tại seed — STOP theo PHYSICS_GATES;"
+                                    " kiểm tra dữ liệu catalog (KC-007) trước khi thử lại"},
+            loop_counters=loop_counters, evaluator=evaluator, advisories=advisories)
+
+    current = seed_record
+    lineage = [seed_record["case_id"]]
+    iterations: list[dict] = []
+    termination: dict | None = None
+    target = policy.utilization_target
+    rejected_trim_moves: set[tuple] = set()
+    failed_hashes: set[str] = set()
+
+    while termination is None:
+        if loop_counters["accepted_moves"] >= policy.max_iterations:
+            termination = {"reason": "MAX_ITERATIONS",
+                           "message": f"Đã chấp nhận {policy.max_iterations} nước đi"
+                                      " (trần policy)"}
+            break
+        acceptable = progress_stage(current, target) == STAGE_ACCEPTABLE
+        phase = PHASE_TRIM if acceptable else PHASE_REPAIR
+        if phase == PHASE_TRIM and not policy.trim_enabled:
+            termination = {"reason": "TRIM_DISABLED",
+                           "message": "Phương án đạt mục tiêu; TRIM bị tắt theo policy"}
+            break
+        if evaluator.exhausted:
+            termination = {"reason": "BUDGET_EXHAUSTED",
+                           "message": f"Hết {budget} lần gọi solver trước pha {phase}"}
+            break
+
+        current_gene = dict(current["gene"])
+        unresolved_failed: set[str] = set()
+        if phase == PHASE_REPAIR:
+            candidates = _repair_candidates(current, current_gene, grammar_id, domains,
+                                            policy, visited, loop_counters,
+                                            failed_hashes, unresolved_failed)
+        else:
+            candidates = _trim_candidates(current, current_gene, grammar_id, order, domains,
+                                          policy, visited, loop_counters,
+                                          failed_hashes, unresolved_failed,
+                                          rejected_trim_moves)
+
+        probes: list[dict] = []
+        accepted: dict | None = None
+        stopped_by = None
+        for index, move in enumerate(candidates):
+            if evaluator.exhausted:
+                stopped_by = "BUDGET"
+                break
+            if (phase == PHASE_TRIM and policy.max_trim_probes is not None
+                    and index >= policy.max_trim_probes):
+                stopped_by = "PROBE_LIMIT"
+                break
+            record = _evaluate(evaluator, _apply_move(current_gene, move),
+                               current["case_id"], f"DESIGN_LOOP_{phase}")
+            if record is None:
+                stopped_by = "BUDGET"
+                break
+            visited.add(record["input_hash"])
+            loop_counters["probes"] += 1
+            if record.get("solver_call_index") is not None:
+                loop_counters["probes_solver"] += 1
+            elif record.get("status") in ("GEOMETRY_INVALID", "SCHEMA_INVALID"):
+                loop_counters["probes_l0_rejected"] += 1
+            outcome = _classify(phase, record, current, policy)
+            if outcome == "SOLVER_FAILED":
+                loop_counters["solver_failures"] += 1
+                failed_hashes.add(record["input_hash"])
+                unresolved_failed.add(record["input_hash"])
+            probe = _record_view(record, target)
+            probe["move"] = move
+            probe["outcome"] = outcome
+            probes.append(probe)
+            if outcome == "ACCEPTED":
+                accepted = record
+                break
+            if phase == PHASE_TRIM:
+                rejected_trim_moves.add((move["variable"], move["proposed"]))
+
+        iteration = {
+            "iteration": len(iterations) + 1,
+            "phase": phase,
+            "from_case_id": current["case_id"],
+            "from_stage": STAGE_LABELS[progress_stage(current, target)],
+            "candidates": [dict(move) for move in candidates],
+            "probes": probes,
+            "accepted_case_id": accepted["case_id"] if accepted else None,
+            "unprobed_candidates": max(0, len(candidates) - len(probes)),
+            "unresolved_solver_failures": len(unresolved_failed),
+        }
+        iterations.append(iteration)
+        loop_counters["iterations"] = len(iterations)
+
+        if accepted is not None:
+            loop_counters["accepted_moves"] += 1
+            current = accepted
+            lineage.append(accepted["case_id"])
+            continue
+
+        if stopped_by == "BUDGET" or (evaluator.exhausted and iteration["unprobed_candidates"]):
+            termination = {"reason": "BUDGET_EXHAUSTED",
+                           "message": f"Hết {budget} lần gọi solver giữa pha {phase};"
+                                      f" còn {iteration['unprobed_candidates']} ứng viên"
+                                      " chưa thử"}
+        elif stopped_by == "PROBE_LIMIT":
+            termination = {"reason": "TRIM_PROBE_LIMIT",
+                           "message": f"Đã thử {policy.max_trim_probes} ứng viên TRIM theo"
+                                      f" trần policy; còn {iteration['unprobed_candidates']}"
+                                      " chưa thử nên KHÔNG kết luận tối ưu cục bộ"}
+        elif unresolved_failed:
+            termination = {
+                "reason": "INCONCLUSIVE_SOLVER_FAILURES",
+                "message": (
+                    f"Còn {len(unresolved_failed)} ứng viên trong lân cận {phase} "
+                    "bị solver NOT_CONVERGED; chưa đủ bằng chứng để kết luận hội tụ "
+                    "hoặc không còn nước sửa")}
+        elif phase == PHASE_REPAIR:
+            termination = {"reason": "NO_IMPROVING_REPAIR",
+                           "message": (f"Không ứng viên sửa nào ({len(candidates)} được thử)"
+                                       " làm phương án tiến lên; vòng lặp cục bộ không có"
+                                       " đường vòng — chuyển sang tìm kiếm toàn cục hoặc"
+                                       " kỹ sư")}
+        else:
+            termination = {"reason": "CONVERGED",
+                           "message": (f"Đạt mục tiêu; {len(candidates)} láng giềng rẻ hơn"
+                                       " đều không giữ được khả thi/mục tiêu — tối ưu cục"
+                                       f" bộ 1 bước trên {policy.objective_key}")}
+
+    final_view = _record_view(current, target)
+    final_view["meets_target"] = progress_stage(current, target) == STAGE_ACCEPTABLE
+    final_view["rule_utilizations"] = rule_utilizations(current.get("responses")) or None
+    final_view["design_state"] = current["design_state"]
+
+    if loop_counters["solver_failures"]:
+        advisories.append(
+            f"{loop_counters['solver_failures']} phương án bị solver từ chối (NOT_CONVERGED)"
+            " — kiểm tra dữ liệu catalog (KC-007); chúng không được chấp nhận.")
+    if not final_view["feasible"]:
+        advisories.append(
+            "Phương án cuối chưa khả thi theo independent verifier: kết quả ở mức IDEA."
+            " Cần tìm kiếm toàn cục (NSGA-II) hoặc mở rộng grammar/design basis.")
+    elif not final_view["meets_target"]:
+        advisories.append(
+            f"Khả thi theo verifier nhưng max_utilization > mục tiêu {target}; chưa đạt"
+            " dự trữ mà policy yêu cầu.")
+    advisories.append(
+        "Kết quả L1 chỉ là SCREENED: chưa có mất mát DƯL theo giai đoạn, ứng suất lúc"
+        " truyền lực, co ngót–từ biến, xoắn, ổn định, mỏi; bắt buộc L2/L3 và kỹ sư duyệt.")
+
+    return _report(
+        seed_state=seed_state, grammar_id=grammar_id, budget=budget, policy=policy,
+        seed_view=seed_view, final_view=final_view, final_record=current,
+        lineage=lineage, iterations=iterations, termination=termination,
+        loop_counters=loop_counters, evaluator=evaluator, advisories=advisories)
+
+
+# ----------------------------------------------------------------- CLI
+def summarize(report: dict) -> dict:
+    """Bản tóm tắt ngắn để in ra console (report đầy đủ ghi bằng --out)."""
+    final = report.get("final") or {}
+    return {
+        "seed_case_id": report["seed"]["case_id"],
+        "seed_status": report["seed"]["status"],
+        "final_case_id": final.get("case_id"),
+        "final_feasible": final.get("feasible"),
+        "final_meets_target": final.get("meets_target"),
+        "final_max_utilization": final.get("max_utilization"),
+        "final_objectives": final.get("objectives"),
+        "lineage": report["lineage"],
+        "termination": report["termination"],
+        "solver_calls": report["counters"]["evaluator"]["solver_calls"],
+        "claim_level": report["claim_level"],
+        "component_audit_status": (report.get("component_audit") or {}).get("status"),
+        "report_sha256": report["report_sha256"],
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+    parser = argparse.ArgumentParser(
+        prog="python -m bridge_evolution.design_loop",
+        description="Vòng lặp thiết kế cấu kiện: REPAIR rồi TRIM trên grammar,"
+                    " ngân sách solver trung thực.")
+    parser.add_argument("seed", help="BridgeDesignState JSON"
+                                     " (ví dụ gold_cases/cases/GC-06_cheap_but_fails.json)")
+    parser.add_argument("--budget", type=int, default=40,
+                        help="số lần solver được mở (mặc định 40)")
+    parser.add_argument("--target", type=float, default=1.0,
+                        help="utilization_target trong (0, 1]; 1.0 = đúng giới hạn verifier")
+    parser.add_argument("--objective", default="relative_cost", choices=OBJECTIVE_KEYS)
+    parser.add_argument("--policy", default="knowledge_priority", choices=MOVE_POLICIES)
+    parser.add_argument("--trim-order", default="cheapest_first", choices=TRIM_ORDERS)
+    parser.add_argument("--max-iterations", type=int, default=50)
+    parser.add_argument("--max-trim-probes", type=int, default=None)
+    parser.add_argument("--no-trim", action="store_true",
+                        help="dừng ngay khi đạt, không tinh chỉnh")
+    parser.add_argument("--out", default=None, help="đường dẫn ghi report đầy đủ (JSON)")
+    args = parser.parse_args(argv)
+
+    try:
+        seed_state = json.loads(Path(args.seed).read_text(encoding="utf-8"))
+        policy = LoopPolicy(
+            objective_key=args.objective, utilization_target=args.target,
+            move_policy=args.policy, trim_order=args.trim_order,
+            max_iterations=args.max_iterations,
+            trim_enabled=not args.no_trim, max_trim_probes=args.max_trim_probes)
+        report = run_design_loop(seed_state, budget=args.budget, policy=policy)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(json.dumps({"error": str(exc)}, ensure_ascii=False))
+        return 2
+    if args.out:
+        Path(args.out).write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+                                  encoding="utf-8")
+    print(json.dumps(summarize(report), indent=2, ensure_ascii=False))
+    final = report.get("final") or {}
+    return 0 if final.get("feasible") else 1
+
+
+if __name__ == "__main__":  # pragma: no cover
+    sys.exit(main())

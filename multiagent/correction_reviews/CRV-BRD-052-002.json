@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-052-002",
+  "task_id": "BRD-052",
+  "incident_id": "INC-BRD-052-002",
+  "correction_sha256": "1e1eb32d7f9511d8180a3c4035e36ec00807211c2b96efe829cae8ffbbc377d0",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot hash khớp handoff; live hash khớp current_sha256.",
+    "Nội dung giao diện giữ cảnh báo L1 sơ bộ và yêu cầu kiểm chứng MIDAS L2 trước phát hành; không thấy tuyên bố vượt claim.",
+    "Diff phù hợp incident cập nhật UI Lab; không thấy credential mới."
+  ],
+  "notes": "tests NOT_RUN: lệnh Python bị Access is denied; kết luận dựa trên đối chiếu PowerShell và nội dung file. Phán quyết do codex (codex-cli 0.172.0, model gpt-6-luna) đưa ra; runner ghi nguyên văn qua CLI. Đầu ra thô: .tmp/lab-review/codex_cor_20261124.jsonl sha256=9f0ba7df0b8366e0. Test do tác giả correction chạy: 100 + 53 test xanh."
+}

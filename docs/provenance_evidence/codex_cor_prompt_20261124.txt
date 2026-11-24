@@ -1,0 +1,20 @@
+EXECUTE MODE. You are the INDEPENDENT REVIEWER (agent id: codex) for 10 provenance corrections in this repository (DYLIGHT bridge research lab). Read multiagent/PROTOCOL.md section "Sửa provenance sau handoff" first. The corrections were written by agent "claude"; you must judge them yourself.
+
+Rules for running commands on this Windows machine:
+- Never use single quotes anywhere. Use only double quotes, or no quotes.
+- Run Python ONLY via this exact path: C:\Users\ADMIN\pybin\py3.cmd
+- Do NOT modify any file in the repository. Do NOT run "lab review-provenance" yourself; only report.
+
+Steps:
+1. Run: C:\Users\ADMIN\pybin\py3.cmd .tmp/lab-review/check_corrections_20261124.py --diff
+   It checks, for each correction COR-BRD-025-001, COR-BRD-035-001, COR-BRD-050-001..003, COR-BRD-052-001..005:
+   snapshot bytes == hash recorded in the original handoff, live bytes == correction current_sha256, and prints a diff.
+2. Read each correction JSON in multiagent/corrections/ and the changed files as needed. Judge:
+   (a) hashes consistent; (b) the change does not raise any claim level beyond what the lab allows
+   (box_girder_parametric_v1 must stay claim IDEA in the design loop; registry docs/design_basis/model_applicability.json is hash-pinned L0 only);
+   (c) no physics/safety gate is bypassed, no credentials added; (d) the stated reason matches the diff.
+3. Try to run the verification tests: C:\Users\ADMIN\pybin\py3.cmd -m pytest tests/test_design_loop.py tests/test_lab_api.py tests/test_midas_section.py tests/test_serve_public.py -q -p no:cacheprovider
+   If Python cannot run in your sandbox, say "tests NOT_RUN" and judge from code and hashes only; do not invent results.
+
+FINAL ANSWER: output ONLY a JSON array, no prose, one object per correction:
+[{"correction_id": "COR-BRD-025-001", "decision": "APPROVE" or "REVISE" or "REJECT", "findings": ["short factual finding", "..."], "notes": "one sentence, include whether tests ran and their result"}]

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-035-001",
+  "task_id": "BRD-035",
+  "incident_id": "INC-BRD-035-001",
+  "correction_sha256": "ada5aff95ac46ce4b28902aeda8e69c85ca23d3d12f2e9777672c5e924d356df",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot hash khớp handoff; live hash khớp current_sha256.",
+    "Catalog giữ các prestress layout được grammar tham chiếu và marker BOX-PARAM; không có dấu hiệu nâng claim hay bypass gate.",
+    "Thay đổi catalog phù hợp incident mở rộng hỗ trợ dầm hộp; không thấy credential mới."
+  ],
+  "notes": "tests NOT_RUN: lệnh Python bị Access is denied; kết luận dựa trên đối chiếu PowerShell và nội dung file. Phán quyết do codex (codex-cli 0.172.0, model gpt-6-luna) đưa ra; runner ghi nguyên văn qua CLI. Đầu ra thô: .tmp/lab-review/codex_cor_20261124.jsonl sha256=9f0ba7df0b8366e0. Test do tác giả correction chạy: 100 + 53 test xanh."
+}

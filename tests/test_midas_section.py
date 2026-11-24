@@ -89,7 +89,11 @@ def test_midas_api_example_1cell_reproduces_manual_arrays():
     rebuilt = ms.normalize_params({"cell_type": "1CELL", "joints": p["joints"], "dims": bundle["exported_dims"]})
     assert not ms.hi3_adjusted(rebuilt)
     polys2 = ms.build_polygons(rebuilt)
-    assert polys2["outer"] == pytest.approx(bundle["geometry"]["outer"]) and polys2["inners"][0] == pytest.approx(bundle["geometry"]["inners"][0])
+    # pytest >= 9 không nhận approx lồng nhau: so đa giác sau khi làm phẳng toạ độ
+    flat = lambda poly: [c for pt in poly for c in pt]  # noqa: E731
+    assert len(polys2["outer"]) == len(bundle["geometry"]["outer"])
+    assert flat(polys2["outer"]) == pytest.approx(flat(bundle["geometry"]["outer"]))
+    assert flat(polys2["inners"][0]) == pytest.approx(flat(bundle["geometry"]["inners"][0]))
     assert ms.section_properties(polys2)["Iyy_m4"] == pytest.approx(bundle["properties"]["Iyy_m4"])
     assert any(r["group"] == "Lưu ý" and r["field"] == "HI3" for r in bundle["dialog_table"])
 

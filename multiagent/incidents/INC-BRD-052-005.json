@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-052-005",
+  "task_id": "BRD-052",
+  "detected_at_utc": "2026-11-24T03:32:39.322071Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-052.claude.r006.json",
+  "original_handoff_sha256": "a78d69c02298a3da3d1c39a99f011934248662dac4405f6caa69e2088e8244bc",
+  "artifact_path": "tests/test_midas_section.py",
+  "recorded_sha256": "7bd6c55ac71c4f5c6dbb0fa5c8fbb8f0b219284d53ad4da6500b3d4b3bcc9276",
+  "observed_sha256": "2d6d332495b9a4c8d9cd677f47d0d3291bb50c2d4a6d020adf45c2a84058a66f",
+  "reason": "pytest 9 không còn nhận pytest.approx() lồng nhau (TypeError trên CI); so đa giác sau khi làm phẳng toạ độ, thêm kiểm số đỉnh. Không đổi ý nghĩa kiểm tra.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

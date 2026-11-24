@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-025-001",
+  "task_id": "BRD-025",
+  "incident_id": "INC-BRD-025-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Bảo toàn bytes đã duyệt của bridge_grammar/box_girder_parametric_v1.json (snapshot) và nối sang bytes hiện tại; các lệnh kiểm chứng đã chạy xanh trên máy tác giả.",
+  "original_handoff_path": "multiagent/handoffs/BRD-025.opencode.r003.json",
+  "original_handoff_sha256": "4ea4e745253be5e8acda9934b5c6c9085b5d88c59ea90791dfa39deb947603ed",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/a6bf5449cc2b6bc00bf5a3c6879540d78bd1a6cc552a3cd4c43f142f46ea7808.blob",
+    "sha256": "a6bf5449cc2b6bc00bf5a3c6879540d78bd1a6cc552a3cd4c43f142f46ea7808"
+  },
+  "corrected_artifact": {
+    "path": "bridge_grammar/box_girder_parametric_v1.json",
+    "previous_sha256": "a6bf5449cc2b6bc00bf5a3c6879540d78bd1a6cc552a3cd4c43f142f46ea7808",
+    "current_sha256": "08bdb598c2e31682d58ff6bd5ba45645a0233b45a3549277c2355860d864529c"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_loop.py",
+      "tests/test_physics_sim.py",
+      "tests/test_lab_api.py",
+      "tests/test_catalogs.py",
+      "tests/test_design_study.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Bytes mốc dựng lại từ lịch sử git hoặc snapshot có sẵn và đã đối chiếu đúng SHA-256 ghi trong handoff."
+  ],
+  "unresolved_risks": [
+    "Correction không tự xác nhận nội dung kỹ thuật của thay đổi; cần reviewer độc lập kiểm diff và chạy lại test."
+  ],
+  "supersedes_correction_sha256": null
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-052-002",
+  "task_id": "BRD-052",
+  "incident_id": "INC-BRD-052-002",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Bảo toàn bytes đã duyệt của dashboard/lab.html (snapshot) và nối sang bytes hiện tại; các lệnh kiểm chứng đã chạy xanh trên máy tác giả.",
+  "original_handoff_path": "multiagent/handoffs/BRD-052.claude.r006.json",
+  "original_handoff_sha256": "a78d69c02298a3da3d1c39a99f011934248662dac4405f6caa69e2088e8244bc",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/6f225e4cdaeb14a9ef30cb7b97d90f9d3260a7c471b4dc70ec428f412410e63d.blob",
+    "sha256": "6f225e4cdaeb14a9ef30cb7b97d90f9d3260a7c471b4dc70ec428f412410e63d"
+  },
+  "corrected_artifact": {
+    "path": "dashboard/lab.html",
+    "previous_sha256": "6f225e4cdaeb14a9ef30cb7b97d90f9d3260a7c471b4dc70ec428f412410e63d",
+    "current_sha256": "67d76b7a42e2498956e990b5c5b2d1d41d63139f327c3aa6d9f4bc443a074eca"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_lab_api.py",
+      "tests/test_midas_section.py",
+      "tests/test_serve_public.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Bytes mốc dựng lại từ lịch sử git hoặc snapshot có sẵn và đã đối chiếu đúng SHA-256 ghi trong handoff."
+  ],
+  "unresolved_risks": [
+    "Correction không tự xác nhận nội dung kỹ thuật của thay đổi; cần reviewer độc lập kiểm diff và chạy lại test."
+  ],
+  "supersedes_correction_sha256": null
+}

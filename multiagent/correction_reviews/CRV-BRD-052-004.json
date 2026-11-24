@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-052-004",
+  "task_id": "BRD-052",
+  "incident_id": "INC-BRD-052-004",
+  "correction_sha256": "042d4620719f2e2efd9983b288b86aa30dd8441c0a5abfbad690e254b58f7ef0",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot hash khớp handoff; live hash khớp current_sha256.",
+    "Diff thay đổi kiểu hiển thị CSS; không ảnh hưởng claim, physics gate hoặc dữ liệu kỹ thuật.",
+    "Thay đổi phù hợp incident cập nhật UI; không thấy credential mới."
+  ],
+  "notes": "tests NOT_RUN: lệnh Python bị Access is denied; kết luận dựa trên đối chiếu PowerShell và nội dung file. Phán quyết do codex (codex-cli 0.172.0, model gpt-6-luna) đưa ra; runner ghi nguyên văn qua CLI. Đầu ra thô: .tmp/lab-review/codex_cor_20261124.jsonl sha256=9f0ba7df0b8366e0. Test do tác giả correction chạy: 100 + 53 test xanh."
+}

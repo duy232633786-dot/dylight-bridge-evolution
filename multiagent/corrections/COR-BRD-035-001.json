@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "correction_id": "COR-BRD-035-001",
+  "task_id": "BRD-035",
+  "incident_id": "INC-BRD-035-001",
+  "agent_id": "claude",
+  "role": "evidence_safety_auditor",
+  "summary": "Bảo toàn bytes đã duyệt của catalogs/catalogs.json (snapshot) và nối sang bytes hiện tại; các lệnh kiểm chứng đã chạy xanh trên máy tác giả.",
+  "original_handoff_path": "multiagent/handoffs/BRD-035.opencode.r001.json",
+  "original_handoff_sha256": "f40af697def67133673c846cc8ea2037920fec827b0032b128748e6c3438e068",
+  "snapshot": {
+    "path": "multiagent/snapshots/sha256/0d40310ace678ae31bb5a82dc0dd076406c6c4821d02fc86fb4f501d3202d35c.blob",
+    "sha256": "0d40310ace678ae31bb5a82dc0dd076406c6c4821d02fc86fb4f501d3202d35c"
+  },
+  "corrected_artifact": {
+    "path": "catalogs/catalogs.json",
+    "previous_sha256": "0d40310ace678ae31bb5a82dc0dd076406c6c4821d02fc86fb4f501d3202d35c",
+    "current_sha256": "40251d34bb3371bf721f935fd6956339727dac99ede066e267ffc690a5e678fb"
+  },
+  "verification_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_design_loop.py",
+      "tests/test_physics_sim.py",
+      "tests/test_lab_api.py",
+      "tests/test_catalogs.py",
+      "tests/test_design_study.py",
+      "-q"
+    ]
+  ],
+  "assumptions": [
+    "Bytes mốc dựng lại từ lịch sử git hoặc snapshot có sẵn và đã đối chiếu đúng SHA-256 ghi trong handoff."
+  ],
+  "unresolved_risks": [
+    "Correction không tự xác nhận nội dung kỹ thuật của thay đổi; cần reviewer độc lập kiểm diff và chạy lại test."
+  ],
+  "supersedes_correction_sha256": null
+}

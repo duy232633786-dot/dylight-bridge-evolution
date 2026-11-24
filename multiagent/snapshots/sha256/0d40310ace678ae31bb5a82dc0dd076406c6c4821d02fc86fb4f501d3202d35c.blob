@@ -1,0 +1,139 @@
+{
+  "catalogs_version": "1.1.0",
+  "note": "PLACEHOLDER bậc độ lớn đúng cho phát triển pipeline. PHẢI hiệu chỉnh theo hồ sơ tiết diện Super-T thực trước khi công bố kết quả (Research Contract §7). 1.1.0 chỉ THÊM (không sửa/không xóa entry cũ): marker girder_sections.ST-PARAM, bê tông C55/C60 placeholder nội suy, rule profile BRIDGE-RULESET-V2 — mọi state grammar v1 cho kết quả y hệt 1.0.0.",
+
+  "girder_sections": {
+    "ST-1650": { "depth_m": 1.65, "area_m2": 0.615, "I_m4": 0.190, "y_bottom_m": 0.755, "top_flange_width_m": 2.06, "web_width_total_m": 0.20 },
+    "ST-1750": { "depth_m": 1.75, "area_m2": 0.649, "I_m4": 0.226, "y_bottom_m": 0.795, "top_flange_width_m": 2.06, "web_width_total_m": 0.20 },
+    "ST-1850": { "depth_m": 1.85, "area_m2": 0.683, "I_m4": 0.266, "y_bottom_m": 0.835, "top_flange_width_m": 2.06, "web_width_total_m": 0.20 },
+    "ST-TEST-SINGULAR": { "depth_m": 1.75, "area_m2": 0.649, "I_m4": 0.0, "y_bottom_m": 0.795, "top_flange_width_m": 2.06, "web_width_total_m": 0.20, "test_only": true },
+    "ST-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KH\u1ed0NG ph\u1ea3i s\u1ed1 li\u1ec7u ti\u1ebft di\u1ec7n. Khi design_variables.girder_catalog_id = ST-PARAM, \u0111\u1eb7c tr\u01b0ng ti\u1ebft di\u1ec7n \u0111\u01b0\u1ee3c T\u00cdNH t\u1eeb 6 tham s\u1ed1 h\u00ecnh d\u1ea1ng qua bridge_evolution.section.section_from_params, kh\u00f4ng tra catalog. Entry t\u1ed3n t\u1ea1i \u0111\u1ec3 tham chi\u1ebfu catalog trong state contract v\u1eabn ph\u00e2n gi\u1ea3i \u0111\u01b0\u1ee3c."
+    },
+    "I-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KHONG phai so lieu tiet dien. Dac trung tiet dan I duoc TINH tu 6 tham so hinh dang (girder_depth, top_flange_width, top_flange_thickness, web_thickness, bottom_flange_width, bottom_flange_thickness) qua bridge_evolution.section_types.i_girder_section_from_params, khong tra catalog."
+    },
+    "BOX-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KHONG phai so lieu tiet dien. Dac trung tiet dan hop duoc TINH tu 4 tham so hinh dang (box_web_height, box_web_thickness, box_bottom_width, box_bottom_slab) qua bridge_evolution.section_types.box_girder_section_from_params, khong tra catalog."
+    },
+    "CI-PARAM": {
+      "parametric": true,
+      "note": "MARKER, KHONG phai so lieu tiet dien. Dac trung tiet dan I thep lien hop duoc TINH tu 6 tham so hinh dang (steel_depth, steel_top_flange_width, steel_top_flange_thickness, steel_web_thickness, steel_bottom_flange_width, steel_bottom_flange_thickness) qua bridge_evolution.section_types.composite_i_girder_section_from_params, khong tra catalog."
+    }
+  },
+
+  "concretes": {
+    "C30": { "fc_MPa": 30, "E_GPa": 25.7, "density_kg_m3": 2500, "unit_cost_per_m3": 2.8, "carbon_kgCO2e_per_m3": 300 },
+    "C35": { "fc_MPa": 35, "E_GPa": 27.8, "density_kg_m3": 2500, "unit_cost_per_m3": 3.0, "carbon_kgCO2e_per_m3": 320 },
+    "C40": { "fc_MPa": 40, "E_GPa": 29.7, "density_kg_m3": 2500, "unit_cost_per_m3": 3.4, "carbon_kgCO2e_per_m3": 350 },
+    "C45": { "fc_MPa": 45, "E_GPa": 31.5, "density_kg_m3": 2500, "unit_cost_per_m3": 3.7, "carbon_kgCO2e_per_m3": 375 },
+    "C50": { "fc_MPa": 50, "E_GPa": 33.2, "density_kg_m3": 2500, "unit_cost_per_m3": 4.0, "carbon_kgCO2e_per_m3": 400 },
+    "C55": { "fc_MPa": 55, "E_GPa": 34.9, "density_kg_m3": 2500, "unit_cost_per_m3": 4.4, "carbon_kgCO2e_per_m3": 430,
+      "note": "PLACEHOLDER nội suy từ C50: E = 4700·√f'c (MPa) như các cấp có sẵn; giá và carbon tăng dần theo hàm lượng xi măng. CHƯA có báo giá/EPD thực — chỉ dùng xếp hạng tương đối trong cùng một run." },
+    "C60": { "fc_MPa": 60, "E_GPa": 36.4, "density_kg_m3": 2500, "unit_cost_per_m3": 4.9, "carbon_kgCO2e_per_m3": 465,
+      "note": "PLACEHOLDER nội suy từ C50, cùng cơ sở với C55. Vẫn nằm trong dải bê tông thường của TCVN 11823-5 (khối ứng suất chữ nhật còn hiệu lực). KHÔNG mở rộng lên UHPC: công thức SERV-001/STR-001/STR-002 hiện hành nằm ngoài miền áp dụng (docs/03_shape_evolution.md §4)." }
+  },
+
+  "prestressing_steels": {
+    "PS-15.2-1860": {
+      "strand_area_mm2": 140, "fpu_MPa": 1860, "jacking_ratio": 0.75,
+      "assumed_total_loss_ratio": 0.20, "k_bond_factor": 0.28,
+      "unit_mass_kg_per_m": 1.102, "unit_cost_per_tonne": 55, "carbon_kgCO2e_per_tonne": 2200
+    }
+  },
+
+  "prestress_layouts": {
+    "PT-34": { "strand_count": 34, "centroid_from_bottom_m": 0.12 },
+    "PT-38": { "strand_count": 38, "centroid_from_bottom_m": 0.12 },
+    "PT-42": { "strand_count": 42, "centroid_from_bottom_m": 0.12 },
+    "PT-46": { "strand_count": 46, "centroid_from_bottom_m": 0.12 },
+    "PT-50": { "strand_count": 50, "centroid_from_bottom_m": 0.13 },
+    "PT-54": { "strand_count": 54, "centroid_from_bottom_m": 0.13 }
+  },
+
+  "diaphragm_layouts": {
+    "DG-END-ONLY": { "rows": 2, "positions_ratio": [0.0, 1.0] },
+    "DG-3": { "rows": 3, "positions_ratio": [0.0, 0.5, 1.0] },
+    "DG-5": { "rows": 5, "positions_ratio": [0.0, 0.25, 0.5, 0.75, 1.0] },
+    "_geometry": { "depth_ratio_of_girder": 0.7, "thickness_m": 0.20, "concrete_id": "C30" }
+  },
+
+  "load_profiles": {
+    "LOAD-PROFILE-01": {
+      "description": "HL-93 theo TCVN 11823-3 (design truck + lane load, IM trên truck)",
+      "truck_axles": [[0.0, 35.0], [4.3, 145.0], [8.6, 145.0]],
+      "tandem_axles": [[0.0, 110.0], [1.2, 110.0]],
+      "lane_load_kN_per_m": 9.3,
+      "impact_factor": 0.33,
+      "design_lane_width_m": 3.5,
+      "multiple_presence": { "1": 1.2, "2": 1.0, "3": 0.85, "4": 0.65 },
+      "wearing_surface_thickness_m": 0.075,
+      "wearing_surface_unit_weight_kN_m3": 22.5,
+      "barrier_line_load_kN_per_m": 5.0,
+      "barrier_count": 2,
+      "misc_smeared_dead_load_kN_per_m_per_girder": 1.5
+    }
+  },
+
+  "cost_model": {
+    "note": "Đơn vị tương đối (đồng bộ với unit_cost trong concretes/steels). Placeholder — hiệu chỉnh theo dự toán thực.",
+    "fixed_cost_per_girder": 180,
+    "strand_extra_length_m": 1.0,
+    "diaphragm_bay_clear_width_offset_m": 1.0
+  },
+
+  "rule_profiles": {
+    "BRIDGE-RULESET-V1": {
+      "ruleset_version": "1.1.0",
+      "overhang_min_m": 0.4,
+      "overhang_max_m": 1.5,
+      "overhang_max_spacing_ratio": 0.6,
+      "flange_gap_min_m": 0.04,
+      "slab_thickness_min_m": 0.175,
+      "slab_thickness_span_formula": "max(min, (S_mm+3000)/30 mm)",
+      "phi_flexure": 1.0,
+      "phi_shear": 0.9,
+      "service_tension_limit_coef_sqrt_fc": 0.5,
+      "deflection_limit_span_ratio": 800,
+      "min_first_frequency_Hz": 2.0,
+      "diaphragm_min_rows_span_over_30m": 3,
+      "diaphragm_max_spacing_m": 10.0,
+      "strength1": { "DC": 1.25, "DW": 1.5, "LL": 1.75 },
+      "service3": { "DC": 1.0, "DW": 1.0, "LL": 0.8 }
+    },
+    "BRIDGE-RULESET-V2": {
+      "note": "Bản sao NGUYÊN VĂN BRIDGE-RULESET-V1/1.1.0 + khối fab_limits cho tiết diện tham số hóa (FAB-001…FAB-007). Không nới lỏng bất kỳ ngưỡng an toàn nào của V1: V2 chỉ THÊM ràng buộc chế tạo/vận chuyển/cẩu lắp.",
+      "ruleset_version": "2.0.0",
+      "overhang_min_m": 0.4,
+      "overhang_max_m": 1.5,
+      "overhang_max_spacing_ratio": 0.6,
+      "flange_gap_min_m": 0.04,
+      "slab_thickness_min_m": 0.175,
+      "slab_thickness_span_formula": "max(min, (S_mm+3000)/30 mm)",
+      "phi_flexure": 1.0,
+      "phi_shear": 0.9,
+      "service_tension_limit_coef_sqrt_fc": 0.5,
+      "deflection_limit_span_ratio": 800,
+      "min_first_frequency_Hz": 2.0,
+      "diaphragm_min_rows_span_over_30m": 3,
+      "diaphragm_max_spacing_m": 10.0,
+      "strength1": { "DC": 1.25, "DW": 1.5, "LL": 1.75 },
+      "service3": { "DC": 1.0, "DW": 1.0, "LL": 0.8 },
+      "fab_limits": {
+        "note": "Ngưỡng chế tạo PLACEHOLDER mức xưởng đúc Super-T phổ thông VN; phải đối chiếu năng lực xưởng/cẩu/tuyến vận chuyển thực trước khi dùng. Tên khóa ở đây là tên CATALOG; geometry.py ánh xạ sang tên tham số của bridge_evolution.section.FAB_DEFAULTS.",
+        "web_thickness_min_mm": 100,
+        "top_flange_thickness_min_mm": 90,
+        "strand_cell_mm": 50,
+        "cover_mm": 50,
+        "lift_capacity_t": 80,
+        "transport_height_mm": 2200,
+        "min_draft_ratio": 0.04,
+        "span_depth_ratio_min": 17,
+        "span_depth_ratio_max": 26
+      }
+    }
+  }
+}

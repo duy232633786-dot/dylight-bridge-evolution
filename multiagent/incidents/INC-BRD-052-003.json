@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-BRD-052-003",
+  "task_id": "BRD-052",
+  "detected_at_utc": "2026-11-24T03:32:38.782638Z",
+  "detected_by": "claude",
+  "original_handoff_path": "multiagent/handoffs/BRD-052.claude.r006.json",
+  "original_handoff_sha256": "a78d69c02298a3da3d1c39a99f011934248662dac4405f6caa69e2088e8244bc",
+  "artifact_path": "dashboard/lab.js",
+  "recorded_sha256": "647feabb4d508a7e3d15f2baf2c9d977f5b6f4d98e963117918a2963d106a4c0",
+  "observed_sha256": "0be219eb374f6d1248416eb5ed310d3ee15a649020b21bfc5e149cd24c5a5975",
+  "reason": "Drift do commit 074208d (2026-11-24, đẩy theo yêu cầu người dùng): thêm physics_sim/midas_loads, mở rộng design loop + grammar/catalog cho dầm hộp, cập nhật UI Lab; và ffef5cd: mở design loop cho box_girder như phản hồi L1, claim_level bị chặn ở IDEA vì registry hash-pinned vẫn chỉ cấp L0.",
+  "disposition": "CONTROLLED_CORRECTION"
+}

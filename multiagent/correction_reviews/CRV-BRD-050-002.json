@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "review_id": "CRV-BRD-050-002",
+  "task_id": "BRD-050",
+  "incident_id": "INC-BRD-050-002",
+  "correction_sha256": "4d9dc0b37dc24de85f80480ff1098243f17f9f7e6fe506801e0f552e2f26fbad",
+  "reviewer_id": "codex",
+  "decision": "APPROVE",
+  "independence_confirmed": true,
+  "findings": [
+    "Snapshot hash khớp handoff; live hash khớp current_sha256.",
+    "Basis thêm cấu hình design loop cho box girder; model_applicability.json vẫn ghi box_girder_parametric_v1 chỉ ở L0_GEOMETRY.",
+    "Diff phù hợp incident mở rộng loop; không thấy thay đổi claim authority, bypass gate hoặc credential mới."
+  ],
+  "notes": "tests NOT_RUN: lệnh Python bị Access is denied; kết luận dựa trên đối chiếu PowerShell và nội dung file. Phán quyết do codex (codex-cli 0.172.0, model gpt-6-luna) đưa ra; runner ghi nguyên văn qua CLI. Đầu ra thô: .tmp/lab-review/codex_cor_20261124.jsonl sha256=9f0ba7df0b8366e0. Test do tác giả correction chạy: 100 + 53 test xanh."
+}
