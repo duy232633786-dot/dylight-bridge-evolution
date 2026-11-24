@@ -84,6 +84,10 @@ CLAIM_CEILING = "SCREENED"
 DESIGN_VERDICT_AUTHORITY = "INDEPENDENT_VERIFIER"
 LOOP_AUTHORITY = "NONE"
 ALLOWED_GRAMMARS = ("super_t_simple_v1", "super_t_parametric_v2", "box_girder_parametric_v1")
+#: Chạy vòng lặp L1 chỉ như phản hồi vật lý; registry áp dụng (model_applicability.json,
+#: hash đã duyệt) vẫn chỉ cho L0 nên claim không bao giờ vượt IDEA. Mở thêm cấp claim
+#: phải đi qua task + review của lab, không sửa ở đây.
+L1_FEEDBACK_ONLY_GRAMMARS = ("box_girder_parametric_v1",)
 REQUIRED_ANALYSIS = {"fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1"}
 
 PHASE_REPAIR = "REPAIR"
@@ -872,6 +876,8 @@ def _report(*, seed_state: dict, grammar_id: str, budget: int, policy: LoopPolic
         grammar_version = "n/a"
     feasible_final = bool(final_record and final_record.get("status") == "SUCCESS"
                           and final_record.get("feasible"))
+    # Họ chỉ được L1 làm PHẢN HỒI (registry áp dụng chỉ cấp L0): claim không vượt IDEA.
+    family_claim_cap = "IDEA" if grammar_id in L1_FEEDBACK_ONLY_GRAMMARS else CLAIM_CEILING
     verification_records = _verification_records(evaluator)
     audit = _component_audit(final_record, verification_records) if final_record else None
     evaluator_counters = evaluator.counters if evaluator is not None \
@@ -887,7 +893,7 @@ def _report(*, seed_state: dict, grammar_id: str, budget: int, policy: LoopPolic
         "ruleset_version": ruleset_version_for(seed_state),
         "solver_version": SOLVER_VERSION,
         "claim_ceiling": CLAIM_CEILING,
-        "claim_level": CLAIM_CEILING if feasible_final else "IDEA",
+        "claim_level": family_claim_cap if feasible_final else "IDEA",
         "design_verdict_authority": DESIGN_VERDICT_AUTHORITY,
         "loop_authority": LOOP_AUTHORITY,
         "policy": asdict(policy),

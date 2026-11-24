@@ -281,14 +281,28 @@ def test_l2_or_l3_seed_is_rejected_instead_of_silently_downgraded_to_l1():
     assert report["counters"]["evaluator"]["solver_calls"] == 0
 
 
-def test_non_super_t_family_is_rejected_before_solver():
+def test_box_girder_runs_as_l1_feedback_but_claim_stays_idea():
+    """Hộp được chạy vòng lặp L1 làm phản hồi; registry vẫn chỉ cấp L0 nên claim ≤ IDEA."""
     registry = load_applicability_registry()
-    gene = registry["families"]["box_girder_parametric_v1"]["anchor_gene"]
-    seed = state_from_gene(dict(gene), grammar_id="box_girder_parametric_v1")
+    family = registry["families"]["box_girder_parametric_v1"]
+    assert family["allowed_study_levels"] == ["L0_GEOMETRY"]
+    seed = state_from_gene(dict(family["anchor_gene"]), grammar_id="box_girder_parametric_v1")
+    report = run_design_loop(seed, budget=10)
+    _validate(report)
+    assert report["termination"]["reason"] != "SEED_REJECTED"
+    assert report["counters"]["evaluator"]["solver_calls"] > 0
+    assert report["claim_level"] == "IDEA"
+    assert any("MIDAS Civil L2" in a for a in report["advisories"])
+
+
+def test_family_outside_runtime_scope_is_rejected_before_solver():
+    registry = load_applicability_registry()
+    gene = registry["families"]["i_girder_parametric_v1"]["anchor_gene"]
+    seed = state_from_gene(dict(gene), grammar_id="i_girder_parametric_v1")
     report = run_design_loop(seed, budget=10)
     _validate(report)
     assert report["termination"]["reason"] == "SEED_REJECTED"
-    assert "runtime_scope Super-T" in report["termination"]["message"]
+    assert "runtime_scope" in report["termination"]["message"]
     assert report["counters"]["evaluator"]["solver_calls"] == 0
 
 
