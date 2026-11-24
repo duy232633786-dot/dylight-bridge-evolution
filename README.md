@@ -66,6 +66,25 @@ python scripts/serve_lab.py        # mở http://127.0.0.1:8790/lab.html
 tài khoản hay dịch vụ ngoài. Kết quả chỉ ở mức sàng lọc `SCREENED`, không thay
 thế kiểm chứng MIDAS và phê duyệt của kỹ sư. Giấy phép: MIT.
 
+### Phát hành bản web công khai
+
+`scripts/serve_public.py` là bản dành cho Internet (cùng giao diện Lab), có
+thêm lớp phòng thủ: không lưu run của người dùng lên máy chủ, giới hạn body
+64 KB, giới hạn số phép tính đồng thời và số yêu cầu mỗi IP, hạ trần
+ngân sách xuống 150, ẩn lỗi nội bộ và đường dẫn, tắt liệt kê thư mục, CSP chặt
+(chỉ chạy script của chính repo). `Dockerfile` chạy bản này bằng người dùng
+không phải root, cổng 7860:
+
+```bash
+docker build -t dylight-lab .
+docker run --rm -p 7860:7860 dylight-lab   # http://localhost:7860/lab.html
+```
+
+Dùng được trên Hugging Face Spaces (SDK Docker) hoặc Render/Railway/Fly.io
+(đọc biến `PORT`). Image bật sẵn `DYLIGHT_TRUST_PROXY=1` (lấy IP do proxy của
+nền tảng ghi vào cuối `X-Forwarded-For`); nếu cho máy chủ nhận kết nối trực
+tiếp không qua proxy thì đặt `DYLIGHT_TRUST_PROXY=0`.
+
 ## Chạy nhanh
 
 ```bash
