@@ -94,7 +94,28 @@ def _kg_term(sec: dict, Eg: float, Ed: float, ts: float) -> float:
 
 def distribution_factors(sec: dict, Eg: float, Ed: float, spacing: float, ts: float,
                          span: float, deck_width: float, lp: dict) -> dict:
-    """DF dầm trong theo TCVN 11823-4 (type k). Đơn vị công thức: mm."""
+    """DF dầm trong theo TCVN 11823-4 (type k), hoặc n_lanes × mp cho hộp đơn ô (n=1). Đơn vị công thức: mm."""
+    n_lanes = max(1, int((deck_width - 1.0) / lp["design_lane_width_m"]))  # trừ 2 gờ lan can
+    mp = lp["multiple_presence"][str(min(n_lanes, 4))]
+    girder_count = max(1, int(lp.get("_girder_count", 1)))
+    if girder_count == 1:
+        # Cầu hộp đơn ô: không dùng công thức phân bố ngang đa dầm type-k (chỉ hợp lệ S ≤ 4.9 m).
+        # Toàn bộ mặt cắt hộp đơn ô gánh toàn bộ số làn thiết kế nhân hệ số làn mp.
+        df_box = n_lanes * mp
+        return {
+            "g_moment": df_box,
+            "g_shear": df_box,
+            "g_deflection": df_box,
+            "n_lanes": n_lanes,
+            "multiple_presence": mp,
+            "method": "SINGLE_CELL_BOX_WHOLE_SECTION",
+            "limitation_note": (
+                "Cầu hộp đơn ô (girder_count=1): DF uốn/cắt/võng lấy bằng n_lanes × mp "
+                "cho toàn mặt cắt. Mô hình 1D L1 CHỈ sàng lọc uốn và cắt; "
+                "xoắn (3D torsion), vênh (warping) và trễ cắt bản cánh (shear lag) "
+                "BẮT BUỘC kiểm chứng bằng MIDAS Civil L2."
+            ),
+        }
     S, L, t = spacing * 1000, span * 1000, ts * 1000
     Kg = _kg_term(sec, Eg, Ed, ts)
     stiff = (Kg / (L * t**3)) ** 0.1
@@ -102,12 +123,10 @@ def distribution_factors(sec: dict, Eg: float, Ed: float, spacing: float, ts: fl
     g_m2 = 0.075 + (S / 2900) ** 0.6 * (S / L) ** 0.2 * stiff
     g_v1 = 0.36 + S / 7600
     g_v2 = 0.2 + S / 3600 - (S / 10700) ** 2
-    n_lanes = max(1, int((deck_width - 1.0) / lp["design_lane_width_m"]))  # trừ 2 gờ lan can
-    mp = lp["multiple_presence"][str(min(n_lanes, 4))]
     return {
         "g_moment": max(g_m1, g_m2),
         "g_shear": max(g_v1, g_v2),
-        "g_deflection": mp * n_lanes / max(1, lp["_girder_count"]),
+        "g_deflection": mp * n_lanes / girder_count,
         "n_lanes": n_lanes,
     }
 
@@ -196,7 +215,7 @@ def analyze(state: dict, geom: dict) -> dict:
     mass_per_m = (w_stage1 + w_dw) / GRAVITY                          # t/m
     f1 = (math.pi / (2.0 * L**2)) * math.sqrt(EI_c / mass_per_m)
 
-    return {
+    result = {
         "solver": {"name": "BUILTIN_L1", "status": "CONVERGED"},
         "composite": comp,
         "distribution": df,
@@ -219,3 +238,6 @@ def analyze(state: dict, geom: dict) -> dict:
         "deflection_m": {"ll": d_ll},
         "first_frequency_Hz": f1,
     }
+    if n == 1 and "limitation_note" in df:
+        result["advisories"] = [df["limitation_note"]]
+    return result

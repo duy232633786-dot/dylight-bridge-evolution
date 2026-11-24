@@ -1,35 +1,523 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DYLIGHT Lab</title>
+<title>DYLIGHT Bridge · Thiết kế &amp; Tối ưu Cầu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="lab.css">
 </head>
 <body>
 <div id="lab">
   <header class="top">
-    <div class="brand"><span class="name">DYLIGHT Lab</span><span class="sub">Hướng 1 · sáng tạo hình học và chất lượng cấu kiện cầu</span></div>
-    <div class="claim" id="claim-banner"><span class="pill warn">SCREENED</span><span>trần claim của mọi số trong lab · L0/L1, chưa L2/L3, chưa thí nghiệm, chưa kỹ sư duyệt</span></div>
+    <div class="brand">
+      <span class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 28 28" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 20h24"/>
+          <path d="M4 20C7 10 21 10 24 20"/>
+          <path d="M9 14v6M14 12.5V20M19 14v6"/>
+          <path d="M4 20v3M24 20v3"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="name" id="brand-name">DYLIGHT Bridge</span>
+        <span class="sub" id="brand-sub">Thiết kế mặt cắt &amp; Tối ưu dầm cầu</span>
+      </div>
+    </div>
+    <div class="claim" id="claim-banner">
+      <span class="pill warn">Sơ bộ L1 · TCVN 11823</span>
+      <span>Cần kiểm chứng MIDAS L2 trước khi phát hành</span>
+    </div>
     <div class="spacer"></div>
+    <button class="theme-btn" id="btn-theme" title="Chuyển giao diện Sáng / Tối" aria-label="Chuyển giao diện Sáng / Tối">☾</button>
+    <div class="mode-switch" role="group" aria-label="Chế độ hiển thị">
+      <button class="mode-btn on" id="mode-eng" data-mode="engineer" title="Chỉ hiện công cụ kỹ sư cầu">Kỹ sư</button>
+      <button class="mode-btn" id="mode-lab" data-mode="lab" title="Mở thêm bảng điều khiển phòng lab, đa tác tử, cổng G0–G7, Não 2">Lab / Dev</button>
+    </div>
     <span class="chip" id="server-chip">đang kết nối…</span>
   </header>
 
   <nav class="side">
-    <button class="nav on" data-view="overview">Tổng quan</button>
-    <button class="nav" data-view="bench">Bàn cấu kiện</button>
-    <button class="nav" data-view="creative">Sáng tạo mặt cắt</button>
-    <button class="nav" data-view="evidence">Bằng chứng &amp; cổng</button>
-    <button class="nav" data-view="process">Quy trình lab</button>
-    <button class="nav" data-view="knowledge">Não 2</button>
-    <div class="side-note">Lab đọc dữ liệu sống từ repo: task, handoff, review, thẻ tri thức, capability matrix. Mọi phép tính đi qua evaluate_candidate và design_loop, lab không tự tính.</div>
+    <div class="nav-group">Quy trình Kỹ sư (4 bước)</div>
+    <button class="nav step-nav" data-view="brief">
+      <span class="step-num">1</span>
+      <span class="step-copy">
+        <span class="step-title">Hồ sơ &amp; Tự nhiên</span>
+        <span class="step-desc">Nhập nhịp cầu &amp; chọn vùng khí hậu</span>
+      </span>
+    </button>
+    <button class="nav step-nav" data-view="creative">
+      <span class="step-num">2</span>
+      <span class="step-copy">
+        <span class="step-title">Thiết kế Mặt cắt</span>
+        <span class="step-desc">Dầm Hộp PSC &amp; Super-T</span>
+      </span>
+    </button>
+    <button class="nav step-nav on" data-view="bench">
+      <span class="step-num">3</span>
+      <span class="step-copy">
+        <span class="step-title">AI &amp; Thử tải vật lý</span>
+        <span class="step-desc">Tối ưu 3D &amp; Đấu trường λ</span>
+      </span>
+    </button>
+    <button class="nav step-nav" data-view="report">
+      <span class="step-num">4</span>
+      <span class="step-copy">
+        <span class="step-title">Xuất BIM/MIDAS</span>
+        <span class="step-desc">Đối chứng L2 &amp; tải bài báo</span>
+      </span>
+    </button>
+
+    <div class="nav-group lab-only">Phòng Lab &amp; Nghiên cứu</div>
+    <button class="nav lab-only" data-view="overview">Tổng quan Lab</button>
+    <button class="nav lab-only" data-view="evidence">Bằng chứng &amp; Cổng</button>
+    <button class="nav lab-only" data-view="process">Quy trình đa tác tử</button>
+    <button class="nav lab-only" data-view="knowledge">Kho tri thức (Não 2)</button>
+
+    <div class="side-note" id="side-note-eng">
+      <strong>Phạm vi công cụ:</strong> Dựng &amp; xuất mặt cắt MIDAS/Revit, tối ưu &amp; thử tải vật lý sơ bộ theo TCVN 11823 (L1). Bật <strong>Lab / Dev</strong> ở góc trên nếu cần xem dữ liệu nghiên cứu nội bộ.
+    </div>
+    <div class="side-note lab-only">
+      Lab đọc dữ liệu sống từ repo: task, handoff, review, thẻ tri thức, capability matrix. Mọi phép tính đi qua <code>evaluate_candidate</code> và <code>design_loop</code>.
+    </div>
   </nav>
 
   <main class="main">
-    <!-- Tổng quan -->
-    <section class="view on" id="view-overview">
+    <!-- 1. Hồ sơ gốc & Điều kiện tự nhiên Việt Nam -->
+    <section class="view" id="view-brief">
+      <div class="brief-hero">
+        <div class="brief-hero-copy">
+          <div class="hero-eyebrow">Bước 1 / 4 · Khởi tạo đề bài cầu</div>
+          <h2 class="page-title">Hồ sơ gốc &amp; Điều kiện tự nhiên Việt Nam</h2>
+          <p class="hero-sub">Chọn nhanh 1 trong 5 vùng khí hậu &amp; tải trọng đặc trưng Việt Nam, nhập đơn giá tham chiếu và chạy trọn vòng AI tối ưu + thử tải đối kháng chỉ với một cú bấm.</p>
+        </div>
+        <div class="brief-hero-actions">
+          <button class="btn primary btn-lg" id="btn-demo-5min" title="Chạy trọn vòng: áp dụng kịch bản → tối ưu AI → thử tải đối kháng Human vs. AI">▶ Chạy Demo 5 phút</button>
+          <button class="btn btn-lg" id="btn-apply-brief">Áp dụng kịch bản → Sang Bước 3</button>
+        </div>
+      </div>
+
+      <div class="grid2 brief-grid">
+        <div class="card wide" id="brief-presets-card">
+          <div class="card-head-row">
+            <h3>Bộ Kịch bản Vùng khí hậu &amp; Nhiễu Việt Nam (1-click Presets V0–V4)</h3>
+            <span class="chip" id="brief-preset-chip">Kịch bản: V0_INLAND</span>
+          </div>
+          <div id="brief-presets-grid" class="presets-grid">
+            <div class="note">Đang tải bộ kịch bản Việt Nam từ máy chủ…</div>
+          </div>
+        </div>
+
+        <div class="card" id="brief-design-card">
+          <h3>Hồ sơ thiết kế gốc (Design Brief)</h3>
+          <div class="form-grid">
+            <label>Chiều dài nhịp tính toán L (m)
+              <input type="number" id="br-span" value="38.2" min="15" max="120" step="0.1">
+            </label>
+            <label>Bề rộng mặt cầu B (m)
+              <input type="number" id="br-width" value="12.0" min="6" max="32" step="0.25">
+            </label>
+            <label>Cấp bê tông dầm f'c
+              <select id="br-fc">
+                <option value="C50" selected>C50 (f'c = 50 MPa · Super-T / Hộp)</option>
+                <option value="C45">C45 (f'c = 45 MPa)</option>
+                <option value="C60">C60 (f'c = 60 MPa · Cường độ cao)</option>
+                <option value="C40">C40 (f'c = 40 MPa)</option>
+              </select>
+            </label>
+            <label>Họ mặt cắt mục tiêu
+              <select id="br-family">
+                <option value="super_t">Dầm Super-T (TCVN / 22TCN)</option>
+                <option value="box_girder">Dầm Hộp PSC 1 ô (L1 sàng lọc)</option>
+              </select>
+            </label>
+          </div>
+
+          <h3 style="margin-top:16px">Đơn giá tham chiếu do kỹ sư nhập <span class="pill na">Tạm tính</span></h3>
+          <div class="form-grid">
+            <label>Bê tông dầm/bản (VNĐ/m³)
+              <input type="number" id="br-price-concrete" value="3200000" min="500000" max="20000000" step="100000">
+            </label>
+            <label>Cáp DƯL hoàn thiện (VNĐ/tấn)
+              <input type="number" id="br-price-tendon" value="65000000" min="10000000" max="250000000" step="1000000">
+            </label>
+          </div>
+          <div class="note">Đơn giá tham chiếu do kỹ sư nhập chỉ dùng để ước tính mức tiết kiệm VNĐ song song với chi phí tương đối; không thay thế dự toán công trình theo định mức Nhà nước.</div>
+          <div id="brief-active-summary" class="brief-summary"></div>
+        </div>
+
+        <div class="card" id="brief-hazard-params">
+          <div class="card-head-row">
+            <h3>Tinh chỉnh Thông số Tự nhiên &amp; Nhiễu (TCVN 11823)</h3>
+            <span class="pill warn">Sơ bộ · L1</span>
+          </div>
+          <div class="sliders brief-sliders">
+            <label>
+              <span>Gió cơ bản V_B (m/s)</span>
+              <input type="range" id="sc-wind-vb" min="20" max="65" step="1" value="32">
+              <span class="val" id="sc-wind-vb-val">32 m/s</span>
+            </label>
+            <label>
+              <span>Gradient nhiệt T1 (°C)</span>
+              <input type="range" id="sc-tg-t1" min="10" max="35" step="1" value="22">
+              <span class="val" id="sc-tg-t1-val">22 °C</span>
+            </label>
+            <label>
+              <span>Động đất PGA (g)</span>
+              <input type="range" id="sc-pga" min="0" max="0.35" step="0.01" value="0.08">
+              <span class="val" id="sc-pga-val">0.08 g</span>
+            </label>
+            <label>
+              <span>Quá tải α × HL-93</span>
+              <input type="range" id="sc-ll-mult" min="0.8" max="2.0" step="0.05" value="1.0">
+              <span class="val" id="sc-ll-mult-val">1.00×</span>
+            </label>
+            <label>
+              <span>Hệ số xung kích IM</span>
+              <input type="range" id="sc-im" min="0.15" max="0.50" step="0.01" value="0.33">
+              <span class="val" id="sc-im-val">0.33</span>
+            </label>
+            <label>
+              <span>Cấp phơi nhiễm</span>
+              <select id="sc-exposure">
+                <option value="INLAND_MODERATE">INLAND_MODERATE · Nội địa (0.50√f'c, phủ 50mm)</option>
+                <option value="COASTAL_HUMID">COASTAL_HUMID · Ven biển (0.25√f'c, phủ 60mm)</option>
+                <option value="MARINE_SEVERE">MARINE_SEVERE · Biển khắc nghiệt (0.0 MPa, phủ 75mm)</option>
+              </select>
+              <span class="val"></span>
+            </label>
+          </div>
+          <div class="note">Động đất ở L1 chỉ sàng lọc chiều dài gối đỡ tối thiểu <code>N_min</code> và lực chốt chống xô ngang bảo thủ; phổ phản ứng <code>SPFC</code> được xuất sang MIDAS Civil L2.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Thiết kế mặt cắt -->
+    <section class="view" id="view-creative">
+      <div class="proc-head">
+        <div class="filters" id="sec-tabs">
+          <button class="btn active" data-sec="psc">Hộp PSC (MIDAS)</button>
+          <button class="btn" data-sec="supert">Dầm Super-T (Tham số)</button>
+          <button class="btn lab-only" data-sec="arch">Hình thái vòm · MAP-Elites</button>
+        </div>
+        <span class="note">Nhập kích thước hoặc kéo thanh trượt — đặc trưng mặt cắt và mã xuất MIDAS cập nhật tức thời.</span>
+      </div>
+
+      <div class="sec-pane on" id="sec-psc">
+        <iframe id="midas-frame" data-src="midas_section.html" title="Mặt cắt hộp PSC kiểu MIDAS" class="full-frame sec-frame"></iframe>
+      </div>
+
+      <div class="sec-pane" id="sec-supert">
+        <div class="creative one">
+          <div class="card studio">
+            <h3>Thiết kế mặt cắt Dầm Super-T tham số · nhập số hoặc kéo</h3>
+            <div class="studio-grid">
+              <div class="sliders" id="studio-sliders"></div>
+              <div class="studio-draw">
+                <svg id="studio-svg" viewBox="0 0 420 340"></svg>
+                <div class="note" id="studio-props"></div>
+              </div>
+            </div>
+            <div class="row-btns">
+              <button class="btn" id="btn-studio-anchor">Khôi phục mặc định</button>
+              <button class="btn primary" id="btn-studio-seed">Đưa sang Bước 3 (AI &amp; Thử tải) →</button>
+              <button class="btn" id="btn-studio-midas">Xuất mặt cắt PSC-Value sang MIDAS →</button>
+            </div>
+            <div id="studio-violations"></div>
+            <div class="note">Kiểm tra nhanh hình học &amp; khả năng chế tạo (L0). Đưa sang Bước 3 để kiểm toán chịu lực TCVN 11823.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-pane" id="sec-arch">
+        <div class="creative one">
+          <div class="card portfolio">
+            <h3>Danh mục hình thái vòm · MAP-Elites có safety shield · <span class="pill na">IDEA</span></h3>
+            <div class="row2">
+              <label>Seed<input type="number" id="cs-seed" value="7" min="0"></label>
+              <label>Số biến dị<input type="number" id="cs-iter" value="60" min="0" max="400"></label>
+            </div>
+            <button class="btn primary" id="btn-creative">▶ Sinh danh mục</button>
+            <div class="note" id="cs-status">Profile kỹ thuật là giới hạn tìm kiếm mặc định của lab (chưa có nguồn), kết quả chỉ là ý tưởng hình thái đã qua sàng F0.</div>
+            <div id="cs-grid" class="cs-grid"></div>
+            <div id="cs-detail"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. AI Phát minh & Thử tải vật lý -->
+    <section class="view on" id="view-bench">
+      <div class="bench" id="bench-wrap">
+        <aside class="bench-side">
+          <div class="bench-side-head">
+            <h3>Thiết lập tối ưu phương án</h3>
+            <button class="btn btn-xs" id="btn-toggle-bench" title="Thu gọn bảng thiết lập để mở rộng khung 3D">◧ Mở rộng 3D</button>
+          </div>
+          <label>Phương án gốc
+            <select id="seed-select"></select>
+          </label>
+          <div class="warn-banner" id="box-l1-banner" style="display:none">
+            <strong>⚠ Cảnh báo Dầm Hộp (L1):</strong> L1 chỉ sàng lọc Uốn/Cắt 1D — Xoắn/Vênh/Shear Lag bắt buộc kiểm chứng MIDAS L2.
+          </div>
+          <div class="row2">
+            <label>Ưu tiên tối ưu
+              <select id="in-objective">
+                <option value="relative_cost">Chi phí thấp nhất</option>
+                <option value="material_mass_t">Khối lượng nhẹ nhất</option>
+                <option value="embodied_carbon_kgCO2e">Phát thải CO₂ thấp nhất</option>
+              </select>
+            </label>
+            <label>Giới hạn D/C ≤
+              <input type="number" id="in-target" value="1.0" min="0.05" max="1" step="0.01">
+            </label>
+          </div>
+
+          <details class="adv-box">
+            <summary>Tùy chọn nâng cao (Solver)</summary>
+            <div class="adv-body">
+              <div class="row2">
+                <label>Số bước thử tối đa<input type="number" id="in-budget" value="40" min="0" max="400"></label>
+                <label>Tinh chỉnh tối ưu<select id="in-trim-on"><option value="1">Bật</option><option value="0">Tắt</option></select></label>
+              </div>
+              <div class="row2">
+                <label>Chiến lược sửa lỗi<select id="in-policy"><option value="knowledge_priority">Ưu tiên kinh nghiệm cầu</option><option value="cheapest_first">Rẻ nhất trước</option></select></label>
+                <label>Thứ tự cắt giảm<select id="in-trim"><option value="cheapest_first">Rẻ nhất trước</option><option value="recent_reject_last">Đẩy bước trượt xuống cuối</option></select></label>
+              </div>
+            </div>
+          </details>
+
+          <button class="btn primary full-w" id="btn-run">▶ Chạy tối ưu phương án</button>
+          <div class="note" id="run-status"></div>
+
+          <div class="eng-hints" id="bench-hints" style="display:none">
+            <div class="eng-hints-title">Gợi ý kỹ thuật cho phương án này</div>
+            <div id="bench-hints-body"></div>
+          </div>
+
+          <div class="bench-quick-actions">
+            <button class="btn full-w" id="btn-go-report">Bước 4: Xuất BIM/MIDAS &amp; Đối chứng →</button>
+          </div>
+
+          <h3>Lịch sử phương án</h3>
+          <div id="runs-list" class="runs"></div>
+        </aside>
+
+        <div class="bench-main">
+          <div class="bench-topbar">
+            <div class="pill-tabs" role="tablist">
+              <button class="pill-tab active" id="tab-bench-3d" data-pane="3d">Xem 3D</button>
+              <button class="pill-tab" id="tab-bench-stress" data-pane="stress">Đấu trường Thử tải λ</button>
+            </div>
+            <span class="chip" id="bench-scenario-chip" title="Kịch bản từ Bước 1">Kịch bản: V0_INLAND</span>
+            <div class="spacer"></div>
+            <button class="btn btn-xs" id="btn-quick-stress" title="Chạy thử tải đối kháng Human vs. AI theo kịch bản hiện tại">⚡ Chạy Thử tải λ</button>
+            <button class="btn btn-xs restore-bench" id="btn-restore-bench" title="Hiện lại bảng thiết lập">◨ Hiện bảng thiết lập</button>
+          </div>
+
+          <div class="bench-pane on" id="pane-3d">
+            <iframe id="inspector" src="inspector.html" title="Mô hình 3D &amp; Kiểm tra cấu kiện"></iframe>
+          </div>
+
+          <div class="bench-pane" id="pane-stress">
+            <div class="stress-wrap">
+              <div class="stress-head">
+                <div class="stress-badge">
+                  <span class="pill warn">Sơ bộ · L1 (Kịch bản giả định — Cần kiểm chứng MIDAS L2)</span>
+                  <span class="note" id="st-honesty-note" style="margin:0">Đấu trường so sánh dự trữ chịu lực Human Baseline vs. AI-Optimized dưới kịch bản tự nhiên Việt Nam.</span>
+                </div>
+                <div class="stress-controls">
+                  <label class="lambda-ctrl">
+                    <span>Hệ số tải λ = <strong id="st-lambda-val">1.0×</strong></span>
+                    <input type="range" id="st-lambda" min="0.5" max="2.5" step="0.1" value="1.0">
+                  </label>
+                  <button class="btn btn-xs primary" id="btn-st-play">▶ Chạy hoạt ảnh thử tải</button>
+                  <button class="btn btn-xs" id="btn-st-run">↻ Tính lại</button>
+                </div>
+              </div>
+
+              <div id="st-env-bar" class="env-strip"></div>
+              <div id="st-kpi-grid" class="kpi-strip stress-kpis"></div>
+
+              <div class="stress-charts">
+                <div class="card">
+                  <div class="card-head-row">
+                    <h3>Đường cong Dự trữ Chịu lực (λ → D/C max · Human vs. AI)</h3>
+                    <span class="note" style="margin:0" id="st-limits-legend"></span>
+                  </div>
+                  <div id="st-reserve-wrap" class="chart-wrap">
+                    <div class="note">Bấm <strong>⚡ Chạy Thử tải λ</strong> để chạy mô phỏng đối kháng Human vs. AI.</div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-head-row">
+                    <h3>Biểu đồ Dọc nhịp x ∈ [0, L]</h3>
+                    <div class="filters" id="st-env-tabs">
+                      <button class="btn btn-xs active" data-metric="M">Mô-men M(x)</button>
+                      <button class="btn btn-xs" data-metric="defl">Độ võng δ(x)</button>
+                      <button class="btn btn-xs" data-metric="sigma">Ứng suất σ(x)</button>
+                    </div>
+                  </div>
+                  <div id="st-env-wrap" class="chart-wrap">
+                    <div class="note">Chưa có dữ liệu biểu đồ dọc nhịp.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Xuất BIM/MIDAS & Đối chứng -->
+    <section class="view" id="view-report">
+      <div class="report-head">
+        <div>
+          <h2 class="page-title">4. Xuất BIM/MIDAS &amp; Đối chứng Khoa học</h2>
+          <div class="note" id="rep-subtitle">Đang xem phương án từ Bước 3 (AI &amp; Thử tải vật lý).</div>
+        </div>
+        <div class="row-btns" style="margin-top:0">
+          <button class="btn primary" id="btn-export-interchange">⇄ Xuất gói đồng bộ Revit/MIDAS</button>
+          <button class="btn" id="btn-export-print">In / Xuất PDF thuyết minh</button>
+          <button class="btn" id="btn-export-csv">Tải bảng so sánh CSV</button>
+          <button class="btn" id="btn-export-json">Tải dữ liệu JSON</button>
+        </div>
+      </div>
+
+      <div class="card wide interchange-box" id="interchange-panel" style="display:none">
+        <div class="card-head-row">
+          <h3>Gói đồng bộ Revit / Dynamo &amp; MIDAS Civil (bridge_interchange_v1)</h3>
+          <span class="chip" id="ic-sha-chip">SHA-256</span>
+        </div>
+        <div class="note" id="ic-summary"></div>
+        <div class="row-btns">
+          <button class="btn primary btn-xs" id="btn-dl-ic-json">⬇ Tải bridge_interchange_v1.json</button>
+          <button class="btn btn-xs" id="btn-dl-ic-mct">⬇ Tải midas_full_loads.mct (Tải trọng &amp; Tổ hợp)</button>
+          <button class="btn btn-xs" id="btn-dl-ic-csv">⬇ Tải revit_dynamo_stations.csv</button>
+        </div>
+      </div>
+
+      <div class="kpi-strip" id="rep-kpis"></div>
+
+      <div class="grid2">
+        <div class="card" id="rep-compare">
+          <h3>So sánh trực tiếp: Phương án gốc vs. Phương án tối ưu</h3>
+          <div class="body"><div class="note">Chạy hoặc chọn một phương án ở Bước 3 để xem so sánh.</div></div>
+        </div>
+
+        <div class="card" id="rep-dc">
+          <h3>Kiểm toán tỷ số D/C (TCVN 11823 · L1) &amp; Gợi ý kỹ thuật</h3>
+          <div class="body"><div class="note">Chưa có dữ liệu kiểm toán.</div></div>
+        </div>
+
+        <div class="card" id="rep-diff">
+          <h3>Các thông số hình học &amp; vật liệu đã thay đổi</h3>
+          <div class="body"><div class="note">Chưa có dữ liệu.</div></div>
+        </div>
+
+        <div class="card" id="rep-scope">
+          <h3>Phạm vi đã kiểm tra &amp; Hạng mục cần kiểm chứng tiếp</h3>
+          <div class="body"></div>
+        </div>
+
+        <div class="card wide" id="rep-insights-card">
+          <h3>Bài học &amp; Quy luật thiết kế rút ra cho Kỹ sư</h3>
+          <div class="body" id="rep-insights-body"><div class="note">Chạy tối ưu để hệ thống tự tổng hợp quy luật thiết kế và ước tính tiết kiệm VNĐ tham chiếu.</div></div>
+        </div>
+
+        <div class="card wide" id="rep-l2-card">
+          <div class="card-head-row">
+            <h3>Đối chứng MIDAS Civil L2 (Human Baseline vs. AI-Invented)</h3>
+            <div class="row-btns" style="margin-top:0">
+              <button class="btn primary btn-xs" id="btn-l2-compare">▶ Tính sai số L1–L2 &amp; Lợi thế thực</button>
+              <button class="btn btn-xs" id="btn-l2-tex" disabled>Tải bảng đối chứng L2 LaTeX (.tex)</button>
+              <button class="btn btn-xs" id="btn-l2-csv" disabled>Tải CSV đối chứng L2</button>
+            </div>
+          </div>
+          <div class="note">Nhập kết quả kiểm chứng độc lập từ <strong>MIDAS Civil (L2)</strong> và thể tích vật liệu từ <strong>Revit BIM</strong> để tính sai số L1–L2 (%) và xuất bảng chuẩn <code>booktabs</code> cho bài báo.</div>
+          <div class="l2-grid">
+            <table class="grid l2-table">
+              <thead>
+                <tr>
+                  <th>Đại lượng kiểm chứng</th>
+                  <th class="num">Human Baseline (MIDAS L2)</th>
+                  <th class="num">AI-Optimized (MIDAS L2)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Mô-men lớn nhất M<sub>max</sub> (kN·m)</td>
+                  <td class="num"><input type="number" step="any" id="l2-base-m" placeholder="vd: 8450"></td>
+                  <td class="num"><input type="number" step="any" id="l2-ai-m" placeholder="vd: 8210"></td>
+                </tr>
+                <tr>
+                  <td>Ứng suất thớ dưới σ<sub>bot</sub> (MPa)</td>
+                  <td class="num"><input type="number" step="any" id="l2-base-sigma" placeholder="vd: 2.15"></td>
+                  <td class="num"><input type="number" step="any" id="l2-ai-sigma" placeholder="vd: 1.42"></td>
+                </tr>
+                <tr>
+                  <td>Độ võng hoạt tải δ<sub>LL</sub> (mm)</td>
+                  <td class="num"><input type="number" step="any" id="l2-base-defl" placeholder="vd: 28.4"></td>
+                  <td class="num"><input type="number" step="any" id="l2-ai-defl" placeholder="vd: 24.1"></td>
+                </tr>
+                <tr>
+                  <td>Thể tích bê tông Revit V<sub>c</sub> (m³)</td>
+                  <td class="num"><input type="number" step="any" id="l2-base-vol" placeholder="vd: 148.5"></td>
+                  <td class="num"><input type="number" step="any" id="l2-ai-vol" placeholder="vd: 132.0"></td>
+                </tr>
+                <tr>
+                  <td>Tỷ số (D/C)<sub>max</sub> (L2)</td>
+                  <td class="num"><input type="number" step="any" id="l2-base-dc" placeholder="vd: 1.06"></td>
+                  <td class="num"><input type="number" step="any" id="l2-ai-dc" placeholder="vd: 0.89"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="l2-result" class="l2-result"></div>
+        </div>
+
+        <div class="card wide" id="rep-chart-card">
+          <div class="card-head-row">
+            <h3>Biểu đồ hội tụ tối ưu hóa (Chi phí &amp; D/C theo bước lặp)</h3>
+            <button class="btn btn-xs" id="btn-export-svg">Tải hình SVG (cho bài báo)</button>
+          </div>
+          <div class="body">
+            <div id="rep-chart" class="chart-wrap"><div class="note">Chưa có dữ liệu chuỗi lặp.</div></div>
+          </div>
+        </div>
+
+        <div class="card wide" id="rep-bench-card">
+          <div class="card-head-row">
+            <h3>Thực nghiệm đối chứng cho bài báo (Ablation Benchmark)</h3>
+            <div class="row-btns" style="margin-top:0">
+              <select id="bm-scope" class="inline-select" title="Phạm vi chạy thực nghiệm">
+                <option value="current">Ca thử đang chọn (3 chiến lược)</option>
+                <option value="all">Toàn bộ bộ chuẩn GC-01..GC-07 (21 lượt)</option>
+              </select>
+              <button class="btn primary btn-xs" id="btn-run-benchmark">▶ Chạy thực nghiệm đối chứng</button>
+              <button class="btn btn-xs" id="btn-export-tex" disabled>Tải bảng LaTeX (.tex)</button>
+              <button class="btn btn-xs" id="btn-export-bm-csv" disabled>Tải CSV thực nghiệm</button>
+            </div>
+          </div>
+          <div class="note" id="bm-status">So sánh định lượng 3 chiến lược: (1) Dẫn hướng tri thức + Tinh chỉnh, (2) Không tri thức (Rẻ nhất trước), (3) Không tinh chỉnh TRIM — đối chiếu trực tiếp với Oracle toàn cục.</div>
+          <div id="bm-table" class="body"></div>
+        </div>
+
+        <div class="card wide" id="rep-cite-card">
+          <div class="card-head-row">
+            <h3>Trích dẫn &amp; Tái lập khoa học (Reproducibility Artifact)</h3>
+            <button class="btn btn-xs" id="btn-copy-bibtex">Sao chép BibTeX</button>
+          </div>
+          <div class="body" id="rep-cite-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAB MODE: Tổng quan Lab -->
+    <section class="view" id="view-overview">
       <div class="grid2">
         <div class="card" id="ov-gates"><h3>Cổng vật lý G0–G7</h3><div class="body"></div></div>
         <div class="card" id="ov-caps"><h3>Năng lực runtime</h3><div class="body"></div></div>
@@ -40,76 +528,10 @@
       </div>
     </section>
 
-    <!-- Bàn cấu kiện -->
-    <section class="view" id="view-bench">
-      <div class="bench">
-        <aside class="bench-side">
-          <h3>Chạy vòng lặp thiết kế</h3>
-          <label>Seed<select id="seed-select"></select></label>
-          <div class="row2">
-            <label>Ngân sách solver<input type="number" id="in-budget" value="40" min="0" max="400"></label>
-            <label>Mục tiêu D/C ≤<input type="number" id="in-target" value="1.0" min="0.05" max="1" step="0.01"></label>
-          </div>
-          <div class="row2">
-            <label>Chọn nước sửa<select id="in-policy"><option value="knowledge_priority">theo thẻ tri thức</option><option value="cheapest_first">rẻ nhất trước</option></select></label>
-            <label>Thứ tự TRIM<select id="in-trim"><option value="cheapest_first">rẻ nhất trước</option><option value="recent_reject_last">nước bị bác xuống cuối</option></select></label>
-          </div>
-          <div class="row2">
-            <label>Mục tiêu<select id="in-objective"><option value="relative_cost">chi phí</option><option value="material_mass_t">khối lượng</option><option value="embodied_carbon_kgCO2e">carbon</option></select></label>
-            <label>Tinh chỉnh<select id="in-trim-on"><option value="1">bật</option><option value="0">tắt</option></select></label>
-          </div>
-          <button class="btn primary" id="btn-run">▶ Chạy vòng lặp</button>
-          <div class="note" id="run-status"></div>
-          <h3>Run đã lưu</h3>
-          <div id="runs-list" class="runs"></div>
-          <div class="note">Report lưu tại artifacts/design_loop, có SHA-256 để nộp handoff.</div>
-        </aside>
-        <iframe id="inspector" src="inspector.html" title="Component Inspector"></iframe>
-      </div>
-    </section>
-
-    <!-- Sáng tạo mặt cắt: một bàn, ba họ (BRD-051 + BRD-052) -->
-    <section class="view" id="view-creative">
-      <div class="proc-head">
-        <div class="filters" id="sec-tabs">
-          <button class="btn active" data-sec="psc">Hộp PSC · kiểu MIDAS</button>
-          <button class="btn" data-sec="supert">Super-T tham số v2</button>
-          <button class="btn" data-sec="arch">Hình thái vòm · MAP-Elites</button>
-        </div>
-        <span class="note">Một bàn sáng tạo mặt cắt: gõ số hoặc kéo thanh trượt, hình bên cạnh đổi theo tức thì. Mọi hình học ở đây là L0/IDEA, chưa nói gì về chịu lực.</span>
-      </div>
-      <div class="sec-pane on" id="sec-psc"><iframe id="midas-frame" data-src="midas_section.html" title="Mặt cắt hộp PSC kiểu MIDAS" class="full-frame sec-frame"></iframe></div>
-      <div class="sec-pane" id="sec-supert"><div class="creative one">
-        <div class="card studio">
-          <h3>Studio tiết diện Super-T tham số (grammar v2) · gõ số hoặc kéo</h3>
-          <div class="studio-grid">
-            <div class="sliders" id="studio-sliders"></div>
-            <div class="studio-draw"><svg id="studio-svg" viewBox="0 0 420 340"></svg><div class="note" id="studio-props"></div></div>
-          </div>
-          <div class="row-btns"><button class="btn" id="btn-studio-anchor">Về anchor</button><button class="btn primary" id="btn-studio-seed">Dùng làm seed vòng lặp →</button><button class="btn" id="btn-studio-midas">Xuất PSC-Value MIDAS →</button></div>
-          <div id="studio-violations"></div>
-          <div class="note">L0 + objective giải tích, không mở solver. FAB-* dùng ngưỡng mặc định repo, chưa gắn nhà máy. Vòng lặp thiết kế mới là bước đánh giá thật.</div>
-        </div>
-      </div></div>
-      <div class="sec-pane" id="sec-arch"><div class="creative one">
-        <div class="card portfolio">
-          <h3>Danh mục hình thái vòm · MAP-Elites có safety shield · <span class="pill na">IDEA</span></h3>
-          <div class="row2">
-            <label>Seed<input type="number" id="cs-seed" value="7" min="0"></label>
-            <label>Số biến dị<input type="number" id="cs-iter" value="60" min="0" max="400"></label>
-          </div>
-          <button class="btn primary" id="btn-creative">▶ Sinh danh mục</button>
-          <div class="note" id="cs-status">Profile kỹ thuật là giới hạn tìm kiếm mặc định của lab (chưa có nguồn), kết quả chỉ là ý tưởng hình thái đã qua sàng F0.</div>
-          <div id="cs-grid" class="cs-grid"></div>
-          <div id="cs-detail"></div>
-        </div>
-      </div></div>
-    </section>
-
-    <!-- Bằng chứng & cổng -->
+    <!-- LAB MODE: Bằng chứng & cổng -->
     <section class="view" id="view-evidence">
       <div class="grid2">
-        <div class="card" id="ev-current"><h3>Phương án đang xem</h3><div class="body"><div class="note">Chạy hoặc nạp một report ở Bàn cấu kiện.</div></div></div>
+        <div class="card" id="ev-current"><h3>Phương án đang xem</h3><div class="body"><div class="note">Chạy hoặc nạp một report ở Bước 3.</div></div></div>
         <div class="card" id="ev-gates"><h3>Cổng cho phương án này</h3><div class="body"></div></div>
         <div class="card" id="ev-audit"><h3>Audit đa cấu kiện</h3><div class="body"></div></div>
         <div class="card" id="ev-cards"><h3>Thẻ tri thức đã dùng</h3><div class="body"></div></div>
@@ -117,7 +539,7 @@
       </div>
     </section>
 
-    <!-- Quy trình lab -->
+    <!-- LAB MODE: Quy trình lab -->
     <section class="view" id="view-process">
       <div class="proc-head">
         <div class="filters" id="task-filters"></div>
@@ -131,7 +553,7 @@
       </div>
     </section>
 
-    <!-- Não 2 -->
+    <!-- LAB MODE: Não 2 -->
     <section class="view" id="view-knowledge">
       <div class="proc-head">
         <input type="search" id="kc-search" placeholder="tìm theo rule (SERV-001), biến hoặc từ khoá…">

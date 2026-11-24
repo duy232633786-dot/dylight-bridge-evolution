@@ -59,7 +59,9 @@ from bridge_evolution.objectives import compute_objectives  # noqa: E402
 from bridge_evolution.section import PARAM_KEYS, build_section_polygon  # noqa: E402
 from bridge_evolution.state import state_from_gene, validate_design_state  # noqa: E402
 from bridge_evolution import creative_shape  # noqa: E402
+from bridge_evolution import midas_loads  # noqa: E402
 from bridge_evolution import midas_section  # noqa: E402
+from bridge_evolution import physics_sim  # noqa: E402
 
 LAB_VERSION = "lab-ui/0.1.0"
 DASHBOARD_DIR = REPO_ROOT / "dashboard"
@@ -268,7 +270,7 @@ def api_overview() -> dict:
 def api_catalog() -> dict:
     cat = load_catalogs()
     grammars = {}
-    for grammar_id in ("super_t_simple_v1", "super_t_parametric_v2"):
+    for grammar_id in ("super_t_simple_v1", "super_t_parametric_v2", "box_girder_parametric_v1"):
         grammar = load_grammar(grammar_id)
         grammars[grammar_id] = {
             "grammar_version": grammar.get("grammar_version"),
@@ -338,8 +340,8 @@ def _seed_state(payload: dict) -> dict:
 def api_section(payload: dict) -> dict:
     """Studio tiết diện: L0 + objective giải tích cho một gene (mặc định grammar v2)."""
     grammar_id = payload.get("grammar_id", "super_t_parametric_v2") if isinstance(payload, dict) else "super_t_parametric_v2"
-    if grammar_id not in ("super_t_simple_v1", "super_t_parametric_v2"):
-        raise LabApiError("grammar_id chỉ nhận super_t_simple_v1 hoặc super_t_parametric_v2")
+    if grammar_id not in ("super_t_simple_v1", "super_t_parametric_v2", "box_girder_parametric_v1"):
+        raise LabApiError("grammar_id chỉ nhận super_t_simple_v1, super_t_parametric_v2 hoặc box_girder_parametric_v1")
     registry = load_applicability_registry()
     anchor = dict(registry["families"][grammar_id]["anchor_gene"])
     gene_raw = payload.get("gene")
@@ -370,6 +372,12 @@ def api_section(payload: dict) -> dict:
         try:
             out["polygon"] = build_section_polygon({k: gene[k] for k in PARAM_KEYS})
         except Exception as exc:  # FAB-000 đã được check_geometry báo
+            out["polygon_error"] = str(exc)
+    elif grammar_id == "box_girder_parametric_v1":
+        try:
+            from bridge_evolution.section_types import BOX_GIRDER_PARAM_KEYS, _box_ring
+            out["polygon"] = _box_ring({k: gene[k] for k in BOX_GIRDER_PARAM_KEYS})
+        except Exception as exc:
             out["polygon_error"] = str(exc)
     if geom.get("section") and not any(v.get("severity") == "HARD" for v in violations):
         out["objectives"] = compute_objectives(state, geom)
@@ -626,6 +634,46 @@ def api_midas_supert_value(payload: dict) -> dict:
     return out
 
 
+# ---------------------------------------------------------------- Physics Sim, Interchange & L2 Compare
+def api_sim_presets(params: dict) -> dict:
+    return physics_sim.list_sim_presets()
+
+
+def api_sim_stress_test(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    for field in ("baseline_state", "ai_state", "scenario"):
+        val = payload.get(field)
+        if val is not None and not isinstance(val, dict):
+            raise LabApiError(f"{field} phải là object")
+    try:
+        return physics_sim.run_stress_test(
+            payload.get("baseline_state") or {},
+            payload.get("ai_state") or {},
+            payload.get("scenario") or {},
+        )
+    except (ValueError, TypeError) as exc:
+        raise LabApiError(str(exc)) from exc
+
+
+def api_export_interchange(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    try:
+        return midas_loads.build_interchange_bundle(payload)
+    except (ValueError, TypeError) as exc:
+        raise LabApiError(str(exc)) from exc
+
+
+def api_validation_l2_compare(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise LabApiError("payload phải là object")
+    try:
+        return physics_sim.compare_l2_validation(payload)
+    except (ValueError, TypeError) as exc:
+        raise LabApiError(str(exc)) from exc
+
+
 # ---------------------------------------------------------------- HTTP
 GET_ROUTES = {
     "/api/health": lambda params: {"status": "ok", "lab_version": LAB_VERSION, "software_version": __version__},
@@ -638,6 +686,7 @@ GET_ROUTES = {
     "/api/knowledge/query": lambda params: api_knowledge_query(params),
     "/api/obsidian": lambda params: api_obsidian(),
     "/api/midas/presets": api_midas_presets,
+    "/api/sim/presets": api_sim_presets,
 }
 POST_ROUTES = {
     "/api/evaluate": api_evaluate,
@@ -648,6 +697,9 @@ POST_ROUTES = {
     "/api/midas/psc-family": api_midas_family,
     "/api/midas/propose": api_midas_propose,
     "/api/midas/supert-value": api_midas_supert_value,
+    "/api/sim/stress-test": api_sim_stress_test,
+    "/api/export/interchange": api_export_interchange,
+    "/api/validation/l2-compare": api_validation_l2_compare,
 }
 
 

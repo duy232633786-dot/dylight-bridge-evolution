@@ -83,7 +83,7 @@ BASIS_ID = "DESIGN-LOOP-0.2.0"
 CLAIM_CEILING = "SCREENED"
 DESIGN_VERDICT_AUTHORITY = "INDEPENDENT_VERIFIER"
 LOOP_AUTHORITY = "NONE"
-ALLOWED_GRAMMARS = ("super_t_simple_v1", "super_t_parametric_v2")
+ALLOWED_GRAMMARS = ("super_t_simple_v1", "super_t_parametric_v2", "box_girder_parametric_v1")
 REQUIRED_ANALYSIS = {"fidelity": "L1_LINE_GIRDER", "solver": "BUILTIN_L1"}
 
 PHASE_REPAIR = "REPAIR"
@@ -157,6 +157,46 @@ _EXTRA_STEP_MOVES = {
         ("prestress_layout_id", -1,
          "giảm một bậc cáp để hạ khối nén — đánh đổi trực tiếp với SERV-001,"
          " verifier sẽ phân xử"),
+    ],
+    "SERV-001": [
+        ("box_web_height_mm", +1,
+         "tăng chiều cao sườn hộp để tăng mô đun chống uốn thớ dưới"),
+        ("box_bottom_width_mm", +1,
+         "mở rộng bản đáy hộp để tăng diện tích vùng chịu kéo và mô đun chống uốn"),
+        ("box_bottom_slab_mm", +1,
+         "tăng chiều dày bản đáy hộp để hạ ứng suất kéo thớ dưới"),
+    ],
+    "STR-001": [
+        ("box_web_height_mm", +1,
+         "tăng chiều cao sườn hộp để tăng cánh tay đòn nội lực dp"),
+        ("box_bottom_width_mm", +1,
+         "mở rộng bản đáy hộp để bố trí thêm cáp và tăng khả năng chịu uốn"),
+    ],
+    "STR-002": [
+        ("box_web_thickness_mm", +1,
+         "tăng chiều dày 2 sườn hộp để tăng tiết diện chịu cắt bv = 2·tw"),
+        ("box_web_height_mm", +1,
+         "tăng chiều cao sườn hộp để tăng chiều cao hữu hiệu chịu cắt dv"),
+    ],
+    "SERV-002": [
+        ("box_web_height_mm", +1,
+         "tăng chiều cao sườn hộp để tăng độ cứng uốn EI, giảm võng hoạt tải"),
+        ("box_bottom_slab_mm", +1,
+         "tăng chiều dày bản đáy hộp để tăng mô men quán tính I"),
+    ],
+    "FAB-001": [
+        ("box_web_thickness_mm", +1,
+         "tăng chiều dày sườn hộp đạt tối thiểu cấu tạo đặt cáp"),
+    ],
+    "FAB-002": [
+        ("box_bottom_slab_mm", +1,
+         "tăng chiều dày bản đáy hộp đạt tối thiểu cấu tạo"),
+    ],
+    "FAB-003": [
+        ("box_bottom_width_mm", +1,
+         "mở rộng bản đáy hộp để tăng số tao cáp bố trí được"),
+        ("box_bottom_slab_mm", +1,
+         "tăng chiều dày bản đáy hộp để tăng số hàng tao cáp"),
     ],
 }
 
@@ -1148,6 +1188,11 @@ def run_design_loop(seed_state: dict, *, budget: int, policy: LoopPolicy | None 
         advisories.append(
             f"Khả thi theo verifier nhưng max_utilization > mục tiêu {target}; chưa đạt"
             " dự trữ mà policy yêu cầu.")
+    if grammar_id == "box_girder_parametric_v1":
+        advisories.append(
+            "Cầu hộp đơn ô (box_girder_parametric_v1): L1 chỉ sàng lọc uốn và cắt 1D "
+            "(DF = n_lanes × mp); xoắn (3D torsion), vênh (warping) và trễ cắt bản cánh "
+            "(shear lag) BẮT BUỘC kiểm chứng bằng MIDAS Civil L2.")
     advisories.append(
         "Kết quả L1 chỉ là SCREENED: chưa có mất mát DƯL theo giai đoạn, ứng suất lúc"
         " truyền lực, co ngót–từ biến, xoắn, ổn định, mỏi; bắt buộc L2/L3 và kỹ sư duyệt.")

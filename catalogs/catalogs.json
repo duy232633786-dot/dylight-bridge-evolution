@@ -51,7 +51,12 @@
     "PT-42": { "strand_count": 42, "centroid_from_bottom_m": 0.12 },
     "PT-46": { "strand_count": 46, "centroid_from_bottom_m": 0.12 },
     "PT-50": { "strand_count": 50, "centroid_from_bottom_m": 0.13 },
-    "PT-54": { "strand_count": 54, "centroid_from_bottom_m": 0.13 }
+    "PT-54": { "strand_count": 54, "centroid_from_bottom_m": 0.13 },
+    "PT-80": { "strand_count": 80, "centroid_from_bottom_m": 0.14 },
+    "PT-100": { "strand_count": 100, "centroid_from_bottom_m": 0.15 },
+    "PT-120": { "strand_count": 120, "centroid_from_bottom_m": 0.16 },
+    "PT-160": { "strand_count": 160, "centroid_from_bottom_m": 0.18 },
+    "PT-200": { "strand_count": 200, "centroid_from_bottom_m": 0.20 }
   },
 
   "diaphragm_layouts": {

@@ -23,7 +23,7 @@
     "girder_concrete_id": { "type": "catalog", "domain": ["C40", "C45", "C50", "C55", "C60"] },
     "deck_concrete_id": { "type": "catalog", "domain": ["C30", "C35"] },
     "diaphragm_layout_id": { "type": "catalog", "domain": ["DG-3", "DG-5"] },
-    "prestress_layout_id": { "type": "catalog", "domain": ["PT-34", "PT-38", "PT-42", "PT-46", "PT-50", "PT-54"] },
+    "prestress_layout_id": { "type": "catalog", "domain": ["PT-34", "PT-38", "PT-42", "PT-46", "PT-50", "PT-54", "PT-80", "PT-100", "PT-120", "PT-160", "PT-200"] },
 
     "box_web_height_mm": { "type": "grid", "min": 1600, "max": 3200, "step": 100 },
     "box_bottom_width_mm": { "type": "grid", "min": 5500, "max": 7500, "step": 100 },

@@ -9,7 +9,8 @@
   "loop_authority": "NONE",
   "allowed_grammars": [
     "super_t_simple_v1",
-    "super_t_parametric_v2"
+    "super_t_parametric_v2",
+    "box_girder_parametric_v1"
   ],
   "required_analysis": {
     "fidelity": "L1_LINE_GIRDER",
@@ -135,6 +136,72 @@
       [
         "prestress_layout_id",
         -1
+      ]
+    ],
+    "SERV-001": [
+      [
+        "box_web_height_mm",
+        1
+      ],
+      [
+        "box_bottom_width_mm",
+        1
+      ],
+      [
+        "box_bottom_slab_mm",
+        1
+      ]
+    ],
+    "STR-001": [
+      [
+        "box_web_height_mm",
+        1
+      ],
+      [
+        "box_bottom_width_mm",
+        1
+      ]
+    ],
+    "STR-002": [
+      [
+        "box_web_thickness_mm",
+        1
+      ],
+      [
+        "box_web_height_mm",
+        1
+      ]
+    ],
+    "SERV-002": [
+      [
+        "box_web_height_mm",
+        1
+      ],
+      [
+        "box_bottom_slab_mm",
+        1
+      ]
+    ],
+    "FAB-001": [
+      [
+        "box_web_thickness_mm",
+        1
+      ]
+    ],
+    "FAB-002": [
+      [
+        "box_bottom_slab_mm",
+        1
+      ]
+    ],
+    "FAB-003": [
+      [
+        "box_bottom_width_mm",
+        1
+      ],
+      [
+        "box_bottom_slab_mm",
+        1
       ]
     ]
   },
