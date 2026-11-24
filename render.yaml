@@ -1,0 +1,14 @@
+# Render Blueprint — bản web công khai của DYLIGHT Lab (Dockerfile → scripts/serve_public.py).
+services:
+  - type: web
+    name: dylight-lab
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DYLIGHT_TRUST_PROXY
+        value: "1"
+      - key: DYLIGHT_MAX_CONCURRENT
+        value: "1"
