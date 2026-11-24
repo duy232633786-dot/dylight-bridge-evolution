@@ -56,7 +56,7 @@ không nâng trần claim `SCREENED` của dự án.
 ## Dùng thử phòng Lab (web app cục bộ)
 
 ```bash
-git clone https://github.com/phamduybill2005-creator/dylight-bridge-evolution.git
+git clone https://github.com/duy232633786-dot/dylight-bridge-evolution.git
 cd dylight-bridge-evolution
 python -m pip install -e ".[dev]"
 python scripts/serve_lab.py        # mở http://127.0.0.1:8790/lab.html
