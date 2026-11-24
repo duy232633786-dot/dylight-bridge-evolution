@@ -47,3 +47,7 @@ CLAUDE.local.md
 
 # Thư mục scratch của các phiên lab (không phải artifact có hash)
 .tmp/
+# BRD-059 hash các file này trong handoff -> phải có trong git
+!experiments/results/nsga2_operator_ab/runs.jsonl
+!experiments/results/nsga2_operator_ab/pytest_full_suite_long_basetemp.log
+!experiments/results/nsga2_operator_ab/pytest_rerun_short_basetemp.log
