@@ -1,13 +1,8 @@
-* text=auto eol=lf
-*.py text eol=lf
-*.md text eol=lf
-*.json text eol=lf
-*.jsonl text eol=lf
-*.toml text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-*.ps1 text eol=lf
-*.csv text eol=lf
+# Repo này neo SHA-256 vào bytes của file (registry, schema, snapshot, handoff).
+# Git phải lưu và checkout ĐÚNG bytes như khi hash được duyệt — KHÔNG chuẩn hoá xuống dòng.
+# (Trước 24/11/2026 dùng eol=lf: 356 file CRLF trên máy tác giả bị lưu thành LF trong git,
+#  nên mọi bản clone lệch hash đã duyệt.)
+* -text
 *.whl binary
 *.png binary
 *.jpg binary
